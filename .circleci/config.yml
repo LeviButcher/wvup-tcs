@@ -56,8 +56,8 @@ workflows:
     jobs:
       - checkout-code
       - build-front:
-        requires:
-          - checkout-code
+          requires:
+            - checkout-code
       - test-front:
           requires:
             - build-front
