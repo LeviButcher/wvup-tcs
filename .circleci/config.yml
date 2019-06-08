@@ -11,12 +11,22 @@ executors:
     working_directory: ~/repo
 
 jobs:
-  build-front:
+  checkout-code:
     executor: front-exec
     steps:
       - checkout
+      - save_cache:
+          key: v1-repo-{{ .Environment.CIRCLE_SHA1 }}
+          paths:
+            - ~/repo
 
+  build-front:
+    executor: front-exec
+    steps:
       # Download and cache dependencies
+      - restore_cache:
+          keys:
+            - v1-repo-{{ .Environment.CIRCLE_SHA1 }}
       - restore_cache:
           keys:
             - v1-dependencies-{{ checksum "frontend/package.json" }}
@@ -33,6 +43,9 @@ jobs:
   test-front:
     executor: front-exec
     steps:
+      - restore_cache:
+          keys:
+            - v1-repo-{{ .Environment.CIRCLE_SHA1 }}
       # run tests!
       - run: cd frontend && npm test
 
@@ -41,7 +54,10 @@ workflows:
 
   build-test-front:
     jobs:
-      - build-front
+      - checkout-code
+      - build-front:
+        requires:
+          - checkout-code
       - test-front:
           requires:
             - build-front
