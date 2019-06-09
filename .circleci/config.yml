@@ -11,7 +11,7 @@ executors:
     working_directory: ~/repo
   back-exec:
     docker:
-      - image: mcr.microsoft.com/dotnet/core/sdk:3.0.100-preview2-alpine3.8
+      - image: mcr.microsoft.com/dotnet/core/sdk:2.2
     working_directory: ~/repo
 
 jobs:
@@ -97,6 +97,7 @@ jobs:
             - v1-back-dependencies-
 
       - run: cd backend/ && dotnet restore tcs-service
+      - run: cd backend/ && dotnet restore tcs-service-test
 
       - save_cache:
           paths:
