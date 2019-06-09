@@ -9,6 +9,10 @@ executors:
     docker:
       - image: circleci/node:10
     working_directory: ~/repo
+  back-exec:
+    docker:
+      - image: mcr.microsoft.com/dotnet/core/sdk:3.0.100-preview2-alpine3.8
+    working_directory: ~/repo
 
 jobs:
   checkout-code:
@@ -16,9 +20,13 @@ jobs:
     steps:
       - checkout
       - save_cache:
-          key: v1-repo-{{ .Environment.CIRCLE_SHA1 }}
+          key: v1-frontend-{{ .Environment.CIRCLE_SHA1 }}
           paths:
-            - ~/repo
+            - ~/repo/frontend
+      - save_cache:
+          key: v1-backend-{{ .Environment.CIRCLE_SHA1 }}
+          paths:
+            - ~/repo/backend
 
   build-front:
     executor: front-exec
@@ -26,31 +34,31 @@ jobs:
       # Download and cache dependencies
       - restore_cache:
           keys:
-            - v1-repo-{{ .Environment.CIRCLE_SHA1 }}
+            - v1-frontend-{{ .Environment.CIRCLE_SHA1 }}
       - restore_cache:
           keys:
-            - v1-dependencies-{{ checksum "frontend/package.json" }}
+            - v1-front-dependencies-{{ checksum "frontend/package.json" }}
             # fallback to using the latest cache if no exact match is found
-            - v1-dependencies-
+            - v1-front-dependencies-
 
       - run: cd frontend && npm install
 
       - save_cache:
           paths:
             - frontend/node_modules
-          key: v1-dependencies-{{ checksum "frontend/package.json" }}
+          key: v1-front-dependencies-{{ checksum "frontend/package.json" }}
 
   test-front:
     executor: front-exec
     steps:
       - restore_cache:
           keys:
-            - v1-repo-{{ .Environment.CIRCLE_SHA1 }}
+            - v1-frontend-{{ .Environment.CIRCLE_SHA1 }}
       - restore_cache:
           keys:
-            - v1-dependencies-{{ checksum "frontend/package.json" }}
+            - v1-front-dependencies-{{ checksum "frontend/package.json" }}
             # fallback to using the latest cache if no exact match is found
-            - v1-dependencies-
+            - v1-front-dependencies-
       # run tests!
       - run: cd frontend && npm test
 
@@ -61,21 +69,69 @@ jobs:
           docker_layer_caching: true
       - restore_cache:
           keys:
-            - v1-repo-{{ .Environment.CIRCLE_SHA1 }}
+            - v1-frontend-{{ .Environment.CIRCLE_SHA1 }}
       - restore_cache:
           keys:
-            - v1-dependencies-{{ checksum "frontend/package.json" }}
+            - v1-front-dependencies-{{ checksum "frontend/package.json" }}
             # fallback to using the latest cache if no exact match is found
-            - v1-dependencies-
+            - v1-front-dependencies-
 
       - run: docker login -u $DOCKER_USER -p $DOCKER_PASS
       - run: docker build -t lcbutch/tcs-front:$CIRCLE_BRANCH frontend/
       - run: docker push lcbutch/tcs-front:$CIRCLE_BRANCH
 
+  build-back:
+    executor: back-exec
+    steps:
+      - restore_cache:
+          keys:
+            - v1-backend-{{ .Environment.CIRCLE_SHA1 }}
+      - restore_cache:
+          keys:
+            - v1-back-dependencies-{{ checksum "backend/tcs-service/tcs-service.csproj" }}
+            - v1-back-dependencies-
+
+      - run: cd backend/ && dotnet restore tcs-service
+
+      - save_cache:
+          paths:
+            - ~.nuget/packages
+          key: v1-back-dependencies-{{ checksum "backend/tcs-service/tcs-service.csproj" }}
+
+  test-back:
+    executor: back-exec
+    steps:
+      - restore_cache:
+          keys:
+            - v1-backend-{{ .Environment.CIRCLE_SHA1 }}
+      - restore_cache:
+          keys:
+            - v1-back-dependencies-{{ checksum "backend/tcs-service/tcs-service.csproj" }}
+            - v1-back-dependencies-
+      - run: cd backend/ && dotnet test tcs-service-test
+
+  deploy-back:
+    executor: back-exec
+    steps:
+      - setup_remote_docker:
+          docker_layer_caching: true
+      - restore_cache:
+          keys:
+            - v1-backend-{{ .Environment.CIRCLE_SHA1 }}
+      - restore_cache:
+          keys:
+            - v1-back-dependencies-{{ checksum "backend/tcs-service/tcs-service.csproj" }}
+            # fallback to using the latest cache if no exact match is found
+            - v1-back-dependencies-
+
+      - run: docker login -u $DOCKER_USER -p $DOCKER_PASS
+      - run: docker build -t lcbutch/tcs-service:$CIRCLE_BRANCH backend/tcs-service/
+      - run: docker push lcbutch/tcs-service:$CIRCLE_BRANCH
+
 workflows:
   version: 2
 
-  build-test-front:
+  build-test-deploy:
     jobs:
       - checkout-code
       - build-front:
@@ -87,3 +143,12 @@ workflows:
       - deploy-front:
           requires:
             - test-front
+      - build-back:
+          requires:
+            - checkout-code
+      - test-back:
+          requires:
+            - build-back
+      - deploy-back:
+          requires:
+            - test-back
