@@ -61,8 +61,7 @@ jobs:
   deploy-front:
     executor: front-exec
     steps:
-      - setup_remote_docker:
-          docker_layer_caching: true
+      - setup_remote_docker
       - restore_cache:
           keys:
             - v1-frontend-{{ .Environment.CIRCLE_SHA1 }}
@@ -119,8 +118,7 @@ jobs:
   deploy-back:
     executor: back-exec
     steps:
-      - setup_remote_docker:
-          docker_layer_caching: true
+      - setup_remote_docker
       - restore_cache:
           keys:
             - v1-backend-{{ .Environment.CIRCLE_SHA1 }}
@@ -130,9 +128,12 @@ jobs:
             # fallback to using the latest cache if no exact match is found
             - v1-back-dependencies-
 
-      - run: docker login -u $DOCKER_USER -p $DOCKER_PASS
-      - run: docker build -t lcbutch/tcs-service:$CIRCLE_BRANCH backend/tcs-service/
-      - run: docker push lcbutch/tcs-service:$CIRCLE_BRANCH
+      - run: |
+          docker login -u $DOCKER_USER -p $DOCKER_PASS
+      - run: |
+          docker build -t lcbutch/tcs-service:$CIRCLE_BRANCH backend/tcs-service/
+      - run: |
+          docker push lcbutch/tcs-service:$CIRCLE_BRANCH
 
 workflows:
   version: 2
