@@ -15,7 +15,7 @@ executors:
     working_directory: ~/repo
 
 jobs:
-  checkout-code:
+  checkout-code-front:
     executor: front-exec
     steps:
       - checkout
@@ -23,10 +23,6 @@ jobs:
           key: v1-frontend-{{ .Environment.CIRCLE_SHA1 }}
           paths:
             - ~/repo/frontend
-      - save_cache:
-          key: v1-backend-{{ .Environment.CIRCLE_SHA1 }}
-          paths:
-            - ~/repo/backend
 
   build-front:
     executor: front-exec
@@ -80,6 +76,15 @@ jobs:
       - run: docker build -t lcbutch/tcs-front:$CIRCLE_BRANCH frontend/
       - run: docker push lcbutch/tcs-front:$CIRCLE_BRANCH
 
+  checkout-code-back:
+    executor: back-exec
+    steps:
+      - checkout
+      - save_cache:
+          key: v1-backend-{{ .Environment.CIRCLE_SHA1 }}
+          paths:
+            - ~/repo/backend
+
   build-back:
     executor: back-exec
     steps:
@@ -95,7 +100,7 @@ jobs:
 
       - save_cache:
           paths:
-            - ~.nuget/packages
+            - ~/.nuget/packages
           key: v1-back-dependencies-{{ checksum "backend/tcs-service/tcs-service.csproj" }}
 
   test-back:
@@ -133,10 +138,11 @@ workflows:
 
   build-test-deploy:
     jobs:
-      - checkout-code
+      - checkout-code-front
+      - checkout-code-back
       - build-front:
           requires:
-            - checkout-code
+            - checkout-code-front
       - test-front:
           requires:
             - build-front
@@ -145,7 +151,7 @@ workflows:
             - test-front
       - build-back:
           requires:
-            - checkout-code
+            - checkout-code-back
       - test-back:
           requires:
             - build-back
