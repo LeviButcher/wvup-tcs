@@ -84,3 +84,6 @@ workflows:
       - test-front:
           requires:
             - build-front
+      - deploy-front:
+          requires:
+            - test-front
