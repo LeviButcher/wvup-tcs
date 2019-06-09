@@ -54,6 +54,24 @@ jobs:
       # run tests!
       - run: cd frontend && npm test
 
+  deploy-front:
+    executor: front-exec
+    steps:
+      - setup_remote_docker:
+          docker_layer_caching: true
+      - restore_cache:
+          keys:
+            - v1-repo-{{ .Environment.CIRCLE_SHA1 }}
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "frontend/package.json" }}
+            # fallback to using the latest cache if no exact match is found
+            - v1-dependencies-
+
+      - run: docker login -u $DOCKER_USER -p $DOCKER_PASS
+      - run: docker build -t lcbutch/tcs-front:$CIRCLE_BRANCH frontend/
+      - run: docker push lcbutch/tcs-front:$CIRCLE_BRANCH
+
 workflows:
   version: 2
 
