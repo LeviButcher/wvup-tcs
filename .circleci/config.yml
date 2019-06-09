@@ -128,12 +128,9 @@ jobs:
             # fallback to using the latest cache if no exact match is found
             - v1-back-dependencies-
 
-      - run: |
-          docker login -u $DOCKER_USER -p $DOCKER_PASS
-      - run: |
-          docker build -t lcbutch/tcs-service:$CIRCLE_BRANCH backend/tcs-service/
-      - run: |
-          docker push lcbutch/tcs-service:$CIRCLE_BRANCH
+      - run: docker login -u $DOCKER_USER -p $DOCKER_PASS
+      - run: docker build -t lcbutch/tcs-service:$CIRCLE_BRANCH backend/tcs-service/
+      - run: docker push lcbutch/tcs-service:$CIRCLE_BRANCH
 
 workflows:
   version: 2
@@ -148,9 +145,9 @@ workflows:
       - test-front:
           requires:
             - build-front
-      - deploy-front:
-          requires:
-            - test-front
+      # - deploy-front:
+      #     requires:
+      #       - test-front
       - build-back:
           requires:
             - checkout-code-back
