@@ -1,0 +1,31 @@
+version: "3.7"
+
+services:
+  tcs-front:
+    image: lcbutch/tcs-front:develop
+    ports:
+      - "80:80"
+
+  # tcs-service:
+  #   image: lcbutch/tcs-service:develop
+  #   environment:
+  #     - "DB:connectionString"
+
+  tcs-db:
+    image: microsoft/mssql-server-linux
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD
+    expose:
+      - "1443"
+    volumes:
+      - db-data:/var/opt/mssql
+
+  watchtower:
+    image: containrrr/watchtower
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: --interval 30
+
+volumes:
+  db-data:
