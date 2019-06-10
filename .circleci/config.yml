@@ -157,7 +157,8 @@ workflows:
           requires:
             - test-front
           filters:
-            only: master
+            branches:
+              only: master
       - build-back:
           requires:
             - checkout-code-back
@@ -168,4 +169,5 @@ workflows:
           requires:
             - test-back
           filters:
-            only: master
+            branches:
+              only: master
