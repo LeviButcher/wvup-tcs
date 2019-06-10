@@ -156,6 +156,8 @@ workflows:
       - deploy-front:
           requires:
             - test-front
+          filters:
+            only: master
       - build-back:
           requires:
             - checkout-code-back
@@ -165,3 +167,5 @@ workflows:
       - deploy-back:
           requires:
             - test-back
+          filters:
+            only: master
