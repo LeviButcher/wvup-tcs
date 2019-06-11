@@ -12,10 +12,12 @@ services:
       - "DB:connectionString"
 
   tcs-db:
+    build:
+      context: .
+      args:
+        - ACCEPT_EULA=Y
+        - SA_PASSWORD
     image: microsoft/mssql-server-linux
-    args:
-      - ACCEPT_EULA=Y
-      - SA_PASSWORD
     expose:
       - "1443"
     volumes:
