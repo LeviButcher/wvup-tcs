@@ -2,18 +2,18 @@ version: "3.7"
 
 services:
   tcs-front:
-    image: lcbutch/tcs-front:develop
+    image: lcbutch/tcs-front:${TAG}
     ports:
       - "80:80"
 
-  # tcs-service:
-  #   image: lcbutch/tcs-service:develop
-  #   environment:
-  #     - "DB:connectionString"
+  tcs-service:
+    image: lcbutch/tcs-service:${TAG}
+    environment:
+      - "DB:connectionString"
 
   tcs-db:
     image: microsoft/mssql-server-linux
-    environment:
+    args:
       - ACCEPT_EULA=Y
       - SA_PASSWORD
     expose:
