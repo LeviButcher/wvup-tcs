@@ -1,10 +1,13 @@
 import React from 'react';
 import styled from 'styled-components';
+import { Link } from '@reach/router';
 import Card from '../../ui/Card';
 
 const Home = () => (
   <FullScreenContainer>
-    <StyledCard styled={{ 'font-size': '75px' }}>SignIn</StyledCard>
+    <StyledCard styled={{ 'font-size': '75px' }}>
+      <Link to="/signin">SignIn</Link>
+    </StyledCard>
     <StyledCard>SignOut</StyledCard>
   </FullScreenContainer>
 );
