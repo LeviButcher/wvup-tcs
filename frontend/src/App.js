@@ -4,6 +4,7 @@ import { ThemeProvider } from 'styled-components';
 import { KioskLayout, Home, SignIn } from './components/kiosk';
 import { DashboardLayout } from './components/dashboard';
 import Theme from './theme.json';
+import NotFound from './components/NotFound';
 
 function App() {
   return (
@@ -13,9 +14,11 @@ function App() {
           <KioskLayout path="/">
             <Home path="/" />
             <SignIn path="/signin" />
+            <NotFound default />
           </KioskLayout>
           <DashboardLayout path="/dashboard">
             <Hello path="/" />
+            <NotFound default />
           </DashboardLayout>
         </Router>
       </ThemeProvider>
