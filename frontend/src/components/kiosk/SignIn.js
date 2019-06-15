@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { Formik, Form, Field } from 'formik';
 import Card from '../../ui/Card';
 import Input from '../../ui/Input';
+import Header from '../../ui/Header';
 
 const SignIn = () => (
   <FullScreenContainer>
@@ -28,7 +29,7 @@ const SignIn = () => (
       >
         {({ isSubmitting }) => (
           <Form>
-            <header style={{ 'font-size': '25px' }}>Sign In</header>
+            <Header>Sign In</Header>
             <Field type="email" name="email" component={Input} label="Email" />
             <button type="submit" disabled={isSubmitting}>
               Submit
@@ -43,7 +44,7 @@ const SignIn = () => (
 const StyledCard = styled(Card)`
   width: fit-content;
   margin: auto;
-  padding: 4rem;
+  padding: 2rem;
   box-shadow: 0 0 5px 1px;
 `;
 

@@ -32,11 +32,15 @@ const LayoutGrid = styled.div`
 const SideNav = () => {
   return (
     <nav>
-      <Header text="TCS" align="center" />
+      <Header align="center">TCS</Header>
       <LinkGroup>
-        <Header text="Visits" type="h2" />
+        <Header type="h2">Visits</Header>
         <Link to="signins">Sign Ins</Link>
         <Link to="tours">Class Tours</Link>
+      </LinkGroup>
+      <LinkGroup>
+        <Header type="h2">Stuff</Header>
+        <Link to="signins">Dummy</Link>
       </LinkGroup>
     </nav>
   );
