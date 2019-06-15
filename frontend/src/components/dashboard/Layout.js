@@ -18,8 +18,13 @@ const LayoutGrid = styled.div`
   display: grid;
   grid-template: 'nav main' 1fr / 350px auto;
 
+  & > * {
+    padding: ${props => props.theme.padding};
+  }
+
   & > nav {
     height: 100%;
+    padding: 0 ${props => props.theme.padding};
     background-color: #afafaf;
   }
 `;
