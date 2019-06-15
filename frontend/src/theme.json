@@ -1,6 +1,8 @@
 {
   "padding": "2rem",
   "color": {
-    "main": "#afa"
-  }
+    "main": "rgb(9, 18, 38)",
+    "accent": "#ffc814"
+  },
+  "kioskHeaderSize": "75px"
 }

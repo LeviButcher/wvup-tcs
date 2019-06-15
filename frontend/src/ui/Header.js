@@ -1,27 +1,27 @@
 import React from 'react';
 import styled from 'styled-components';
 
-const Header = ({ className, text, type = 'h1' }) => {
+const Header = ({ className, children, type = 'h1' }) => {
   let Heading;
   switch (type) {
     case 'h6':
-      Heading = <h6>{text}</h6>;
+      Heading = <h6>{children}</h6>;
       break;
     case 'h5':
-      Heading = <h5>{text}</h5>;
+      Heading = <h5>{children}</h5>;
       break;
     case 'h4':
-      Heading = <h4>{text}</h4>;
+      Heading = <h4>{children}</h4>;
       break;
     case 'h3':
-      Heading = <h3>{text}</h3>;
+      Heading = <h3>{children}</h3>;
       break;
     case 'h2':
-      Heading = <h2>{text}</h2>;
+      Heading = <h2>{children}</h2>;
       break;
     case 'h1':
     default:
-      Heading = <h1>{text}</h1>;
+      Heading = <h1>{children}</h1>;
   }
 
   return <header className={className}>{Heading}</header>;
