@@ -5,17 +5,17 @@ using System.Linq;
 using System.Threading.Tasks;
 using tcs_service.EF;
 using tcs_service.Models;
+using tcs_service.Repos.Base;
 using tcs_service.Repos.Interfaces;
 
 namespace tcs_service.Repos
 {
-    public class ClassTourRepo : IClassTourRepo
+    public class ClassTourRepo : BaseRepo<ClassTour>, IClassTourRepo
     {
-        private TCSContext _db;
 
         public ClassTourRepo(TCSContext context)
         {
-            _db = context;      
+            _db = context;
         }
 
         public async Task<ClassTour> Add(ClassTour tour)
@@ -35,7 +35,7 @@ namespace tcs_service.Repos
             return await _db.ClassTours.SingleOrDefaultAsync(a => a.ID == id);
         }
 
-        public IEnumerable<ClassTour> GetAll()
+        public override IEnumerable<ClassTour> GetAll()
         {
             return _db.ClassTours;
         }

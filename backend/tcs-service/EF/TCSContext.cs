@@ -10,7 +10,10 @@ namespace tcs_service.EF
   {
     public DbSet<ClassTour> ClassTours { get; set; }
 
-    public TCSContext()
+     public DbSet<User> Users { get; set; }
+
+
+        public TCSContext()
     {
 
     }
@@ -27,8 +30,14 @@ namespace tcs_service.EF
         }
     }
 
-    protected override void OnModelCreating(ModelBuilder builder)
-    {
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            base.OnConfiguring(optionsBuilder);
+        }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+        }
     }
-  }
 }
