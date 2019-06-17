@@ -16,7 +16,7 @@ const LayoutGrid = styled.div`
   max-height: 100vh;
   y-overflow: none;
   display: grid;
-  grid-template: 'nav main' 1fr / 350px auto;
+  grid-template: 'nav main' 1fr / 300px auto;
 
   & > * {
     padding: ${props => props.theme.padding};
@@ -34,13 +34,22 @@ const SideNav = () => {
     <nav>
       <Header align="center">TCS</Header>
       <LinkGroup>
-        <Header type="h2">Visits</Header>
+        <Header type="h2">Lookups</Header>
         <Link to="signins">Sign Ins</Link>
         <Link to="tours">Class Tours</Link>
       </LinkGroup>
       <LinkGroup>
-        <Header type="h2">Stuff</Header>
-        <Link to="signins">Dummy</Link>
+        <Header type="h2">Reports</Header>
+        <Link to="signins">Class Tour</Link>
+        <Link to="signins">Volunteer</Link>
+        <Link to="signins">Weekly Visits</Link>
+        <Link to="signins">Peak Hours</Link>
+        <Link to="signins">Success</Link>
+      </LinkGroup>
+      <LinkGroup>
+        <Header type="h2">Admin</Header>
+        <Link to="signins">Users</Link>
+        <Link to="signins">Reason for Visiting</Link>
       </LinkGroup>
     </nav>
   );
