@@ -12,6 +12,8 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.EntityFrameworkCore;
 using tcs_service.EF;
+using tcs_service.Repos.Interfaces;
+using tcs_service.Repos;
 
 namespace tcs_service
 {
@@ -27,13 +29,15 @@ namespace tcs_service
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddScoped<IClassTourRepo, ClassTourRepo>();
+
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
             services.AddDbContext<TCSContext>(options =>
                     options.UseSqlServer(Configuration["DB:connectionString"]));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, TCSContext db)
         {
 
             if (env.IsDevelopment())
@@ -45,6 +49,8 @@ namespace tcs_service
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
+
+            DbInitializer.InitializeData(db);
 
             app.UseHttpsRedirection();
             app.UseMvc();
