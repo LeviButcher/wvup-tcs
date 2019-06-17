@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using tcs_service.Models;
+using tcs_service.Repos.Base;
 
 namespace tcs_service.Repos.Interfaces
 {
-    public interface IClassTourRepo
+    public interface IClassTourRepo : IRepo<ClassTour>
     {
         Task<ClassTour> Add(ClassTour tour);
 
@@ -16,7 +17,6 @@ namespace tcs_service.Repos.Interfaces
 
         Task<ClassTour> Find(int id);
 
-        IEnumerable<ClassTour> GetAll();
 
         Task<ClassTour> Remove(int id);
     }

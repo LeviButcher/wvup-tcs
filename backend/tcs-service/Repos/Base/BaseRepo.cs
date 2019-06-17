@@ -6,9 +6,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using tcs_service.EF;
 
-namespace tcs_service.Repos
+namespace tcs_service.Repos.Base
 {
-    public class BaseRepo : IDisposable
+    public abstract class BaseRepo<T> : IRepo<T>,IDisposable
     {
         protected TCSContext _db;
         private bool _disposed = false;
@@ -68,6 +68,7 @@ namespace tcs_service.Repos
                 throw;
             }
         }
-        
+
+        public abstract IEnumerable<T> GetAll();
     }
 }
