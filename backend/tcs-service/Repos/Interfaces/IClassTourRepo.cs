@@ -13,9 +13,9 @@ namespace tcs_service.Repos.Interfaces
 
         Task<ClassTour> Update(ClassTour tour);
 
-        Task<bool> Exist(int id);
+        
 
-        Task<ClassTour> Find(int id);
+        
 
 
         Task<ClassTour> Remove(int id);
