@@ -20,7 +20,7 @@ const Courses = [
 
 const SignIn = () => (
   <FullScreenContainer>
-    <StyledCard>
+    <Card>
       <Formik
         initialValues={{ email: '' }}
         validate={values => {
@@ -86,26 +86,16 @@ const SignIn = () => (
                 />
               ))}
             </FieldGroup>
-            <Button
-              type="submit"
-              display="block"
-              disabled={isSubmitting}
-              style={{ marginLeft: 'auto' }}
-            >
+            <br />
+            <Button type="submit" align="right" disabled={isSubmitting}>
               Submit
             </Button>
           </Form>
         )}
       </Formik>
-    </StyledCard>
+    </Card>
   </FullScreenContainer>
 );
-
-const StyledCard = styled(Card)`
-  width: 600px;
-  padding: 2rem;
-  box-shadow: 0 0 5px 1px;
-`;
 
 const FullScreenContainer = styled.div`
   padding: ${props => props.theme.padding};

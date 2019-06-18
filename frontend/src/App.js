@@ -1,8 +1,12 @@
 import React from 'react';
 import { Router } from '@reach/router';
 import { ThemeProvider } from 'styled-components';
-import { KioskLayout, Home, SignIn } from './components/kiosk';
-import { DashboardLayout, ClassTourLookup } from './components/dashboard';
+import { KioskLayout, Home, SignIn, SignOut } from './components/kiosk';
+import {
+  DashboardLayout,
+  ClassTourLookup,
+  Login
+} from './components/dashboard';
 import Theme from './theme.json';
 import NotFound from './components/NotFound';
 
@@ -14,6 +18,7 @@ function App() {
           <KioskLayout path="/">
             <Home path="/" />
             <SignIn path="/signin" />
+            <SignOut path="/signout" />
             <NotFound default />
           </KioskLayout>
           <DashboardLayout path="/dashboard">
@@ -21,6 +26,7 @@ function App() {
             <ClassTourLookup path="/tours" />
             <NotFound default />
           </DashboardLayout>
+          <Login path="/login" />
         </Router>
       </ThemeProvider>
     </div>
