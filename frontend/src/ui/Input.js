@@ -27,4 +27,7 @@ export default styled(Input)`
     width: 100%;
     margin-bottom: 10px;
   }
+  & input {
+    margin-bottom: 20px;
+  }
 `;

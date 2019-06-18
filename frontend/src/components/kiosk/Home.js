@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { Link } from '@reach/router';
-import Header from '../../ui/Header';
+import { Header, Card } from '../../ui';
 
 const Home = () => (
   <FullScreenContainer>
@@ -25,13 +25,12 @@ const Footer = styled.footer`
   padding: 0 ${props => props.theme.padding};
 `;
 
-const Box = styled.div`
+const Box = styled(Card)`
   width: 400px;
   height: 400px;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 0 5px 1px;
   font-size: 60px;
   align-self: center;
   justify-self: center;
