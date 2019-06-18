@@ -25,12 +25,12 @@ namespace tcs_service.Repos
             return tour;
         }
 
-        public async Task<bool> Exist(int id)
+        public async override Task<bool> Exist(int id)
         {
             return await _db.ClassTours.AnyAsync(e => e.ID == id);
         }
 
-        public async Task<ClassTour> Find(int id)
+        public async override Task<ClassTour> Find(int id)
         {
             return await _db.ClassTours.SingleOrDefaultAsync(a => a.ID == id);
         }
@@ -40,7 +40,7 @@ namespace tcs_service.Repos
             return _db.ClassTours;
         }
 
-        public async Task<ClassTour> Remove(int id)
+        public async override Task<ClassTour> Remove(int id)
         {
             var tour = await _db.ClassTours.SingleAsync(a => a.ID == id);
             _db.ClassTours.Remove(tour);

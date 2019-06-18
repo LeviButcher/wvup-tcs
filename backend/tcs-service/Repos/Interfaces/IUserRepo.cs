@@ -10,5 +10,9 @@ namespace tcs_service.Repos.Interfaces
     public interface IUserRepo : IRepo<User>
     {
         User Authenticate(string username, string password);
+        Task<User> Create(User user, string password);
+        void Update(User user, string password = null);
+        void Delete(int id);
+
     }
 }
