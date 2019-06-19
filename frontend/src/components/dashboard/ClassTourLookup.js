@@ -1,12 +1,13 @@
 import React from 'react';
+import { Link } from '@reach/router';
 import { Form, Field, Formik } from 'formik';
 import { Input, Button, FieldGroup, Table, Header } from '../../ui';
 
 const Tours = [
-  { name: 'Parkersburg South', count: '24', date: Date.now() },
-  { name: 'Parkersburg North', count: '24', date: Date.now() },
-  { name: 'Ripley', count: '24', date: Date.now() },
-  { name: 'Ravenswood', count: '24', date: Date.now() }
+  { id: 5, name: 'Parkersburg South', count: '24', date: Date.now() },
+  { id: 6, name: 'Parkersburg North', count: '24', date: Date.now() },
+  { id: 7, name: 'Ripley', count: '24', date: Date.now() },
+  { id: 4, name: 'Ravenswood', count: '24', date: Date.now() }
 ];
 
 const ClassTourLookup = () => {
@@ -36,8 +37,12 @@ const ClassTourLookup = () => {
         )}
       </Formik>
       <hr />
-      <br />
-      <br />
+      <Header align="right" type="h4">
+        <Link to="create">
+          <Button display="inline">Add Class Tour</Button>
+        </Link>
+      </Header>
+
       <Table>
         <caption>
           <Header>Class Tour</Header>
@@ -51,16 +56,28 @@ const ClassTourLookup = () => {
         </thead>
         <tbody>
           {Tours.map(tour => (
-            <tr>
-              <td>{tour.name}</td>
-              <td>{tour.count}</td>
-              <td>{tour.date}</td>
-            </tr>
+            <ClassTourRow key={tour.id} tour={tour} />
           ))}
         </tbody>
       </Table>
     </div>
   );
 };
+
+const ClassTourRow = ({ tour: { id, name, count, date } }) => (
+  <tr>
+    <td>{name}</td>
+    <td>{count}</td>
+    <td>{date}</td>
+    <td>
+      <Button display="inline">
+        <Link to={`update/${id}`}>Update</Link>
+      </Button>
+      <Button display="inline">
+        <Link to={`delete/${id}`}>Delete</Link>
+      </Button>
+    </td>
+  </tr>
+);
 
 export default ClassTourLookup;
