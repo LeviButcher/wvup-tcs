@@ -5,7 +5,7 @@ export default styled.button.attrs(props => ({
   margin: marginConvertor(props.align)
 }))`
   margin: ${props => props.margin};
-  display: block;
+  display: ${props => props.display || 'block'};
   border-radius: 5px;
   padding: 0.75rem 1.75rem;
   border: none;

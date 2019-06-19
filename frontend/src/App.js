@@ -9,6 +9,8 @@ import {
 } from './components/dashboard';
 import Theme from './theme.json';
 import NotFound from './components/NotFound';
+import ClassTourForm from './components/dashboard/ClassTourForm';
+import FetchClassTour from './components/dashboard/FetchClassTour';
 
 function App() {
   return (
@@ -24,6 +26,11 @@ function App() {
           <DashboardLayout path="/dashboard">
             <Hello path="/" />
             <ClassTourLookup path="/tours" />
+            <ClassTourForm path="/tours/create" />
+            <FetchClassTour
+              path="/tours/update/:classTourId"
+              Component={ClassTourForm}
+            />
             <NotFound default />
           </DashboardLayout>
           <Login path="/login" />
