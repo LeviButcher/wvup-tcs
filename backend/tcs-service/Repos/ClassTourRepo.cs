@@ -12,7 +12,6 @@ namespace tcs_service.Repos
 {
     public class ClassTourRepo : BaseRepo<ClassTour>, IClassTourRepo
     {
-
         public ClassTourRepo(TCSContext context)
         {
             _db = context;
