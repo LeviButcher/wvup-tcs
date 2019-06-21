@@ -12,7 +12,8 @@ namespace tcs_service.Controllers
 {
     [Produces("application/json")]
     [Route("api/ClassTours")]
-    public class ClassToursController : Controller
+    [ApiController]
+    public class ClassToursController : ControllerBase
     {
         private readonly IClassTourRepo _classTourRepo;
 
@@ -39,7 +40,7 @@ namespace tcs_service.Controllers
 
             return results;
         }
-
+            
         [HttpGet("{id}")]
         [Produces(typeof(ClassTour))]
         public async Task<IActionResult> GetClassTour([FromRoute] int id)
@@ -120,9 +121,9 @@ namespace tcs_service.Controllers
                 return NotFound();
             }
 
-            await _classTourRepo.Remove(id);
+            var tour = await _classTourRepo.Remove(id);
 
-            return Ok();
+            return Ok(tour);
         }
     }
 }
