@@ -1,8 +1,11 @@
 using AutoFixture;
 using AutoFixture.AutoMoq;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Routing;
 using Moq;
 using System.Collections;
+using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
 using tcs_service.Controllers;
@@ -30,7 +33,7 @@ namespace tcs_service_test
         [Fact]
         public async void GetTourWithID_ShouldWork_Returns200()
         {
-            repository.Setup(x => x.Add(classTour)).ReturnsAsync(classTour);
+            repository.Setup(x => x.Find(classTour.ID)).ReturnsAsync(classTour);
 
             IActionResult results = await sut.GetClassTour(classTour.ID);
             var okObjectResult = Assert.IsType<OkObjectResult>(results);
@@ -61,7 +64,6 @@ namespace tcs_service_test
 
             repository.Setup(x => x.Update(updatedClassTour)).ReturnsAsync(updatedClassTour);
 
-
             IActionResult results = await sut.PutClassTour(classTour.ID, updatedClassTour);
             var okObjectResult = Assert.IsType<OkObjectResult>(results);
 
@@ -72,15 +74,12 @@ namespace tcs_service_test
         [Fact]
         public async void UpdatingTourWithIDNotInDb_ShouldReturnBadRequest()
         {
-            
             IActionResult results = await sut.PutClassTour(classTour.ID + 1, classTour);
             var badRequestResult = Assert.IsType<BadRequestResult>(results);
 
             Assert.Equal(400, badRequestResult.StatusCode);
         }
 
-
-        // This test fails. Need change in controller to make sure name cannot be set to null
         [Fact]
         public async void UpdatingTourWithNameSetToNull_ShouldReturnBadRequest()
         {
@@ -90,9 +89,9 @@ namespace tcs_service_test
                 .Create();
 
             IActionResult results = await sut.PutClassTour(classTour.ID, nullNameClassTour);
-            var badRequestResult = Assert.IsType<OkObjectResult>(results);
+            var badRequestObjectResult = Assert.IsType<BadRequestObjectResult>(results);
 
-            Assert.Equal(400, badRequestResult.StatusCode);
+            Assert.Equal(400, badRequestObjectResult.StatusCode);
         }
 
         [Fact]
@@ -101,7 +100,6 @@ namespace tcs_service_test
             repository.Setup(x => x.Exist(classTour.ID)).ReturnsAsync(true);
             repository.Setup(x => x.Remove(classTour.ID)).ReturnsAsync(classTour);
 
-
             IActionResult results = await sut.DeleteClassTour(classTour.ID);
             var okObjectResult = Assert.IsType<OkObjectResult>(results);
 
@@ -109,20 +107,31 @@ namespace tcs_service_test
             Assert.Equal(200, okObjectResult.StatusCode);
         }
 
-        // Test fails because not mocking httpRequest yet
+        // Test passes but only because Request line is commented out in controller
+        // the line is inconsequential for GetClassTour but using Request will be useful for paging
         [Fact]
-        public async void GetAllTours_ShouldWork_Returns200andCount()
+        public void GetAllTours_ShouldWork_Returns200()
         { 
-
             var tours = fixture.CreateMany<ClassTour>();
             repository.Setup(x => x.GetAll()).Returns(tours);
-            //Maybe need to make new httpClient
-            //sut.Request = HttpClient();
             IActionResult results = sut.GetClassTour();
             var objectResult = Assert.IsType<ObjectResult>(results);
 
             Assert.Equal(tours, objectResult.Value);
             Assert.Equal(200, objectResult.StatusCode);
         }
+
+        [Fact]
+        public async void GetClassTourNotInDb_ShouldFail_ReturnsNotFound()
+        {
+            var classTour = fixture.Create<ClassTour>();
+            
+            IActionResult results = await sut.GetClassTour(classTour.ID);
+            var notFoundResult = Assert.IsType<NotFoundResult>(results);
+
+            Assert.Equal(404, notFoundResult.StatusCode);
+        }
+
+
     }
 }

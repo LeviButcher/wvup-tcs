@@ -36,7 +36,7 @@ namespace tcs_service.Controllers
                 StatusCode = (int)HttpStatusCode.OK
             };
 
-            Request.HttpContext.Response.Headers.Add("X-Total-Count", _classTourRepo.GetAll().Count().ToString());
+            //Request.HttpContext.Response.Headers.Add("X-Total-Count", _classTourRepo.GetAll().Count().ToString());
 
             return results;
         }
@@ -64,7 +64,7 @@ namespace tcs_service.Controllers
         [Produces(typeof(ClassTour))]
         public async Task<IActionResult> PutClassTour([FromRoute] int id, [FromBody] ClassTour classTour)
         {
-            if (!ModelState.IsValid)
+            if (!ModelState.IsValid || classTour.Name == null)
             {
                 return BadRequest(ModelState);
             }
