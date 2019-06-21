@@ -6,24 +6,24 @@ using System.Linq;
 using System.Threading.Tasks;
 using tcs_service.EF;
 
-namespace tcs_service.Repos
+namespace tcs_service.Repos.Base
 {
-    public class BaseRepo : IDisposable
+    public abstract class BaseRepo<T> : IRepo<T>,IDisposable where T : new()
     {
         protected TCSContext _db;
         private bool _disposed = false;
 
-        public BaseRepo()
+        protected BaseRepo()
         {
             _db = new TCSContext();
         }
 
-        public BaseRepo(TCSContext context)
+        protected BaseRepo(TCSContext context)
         {
             _db = context;
         }
 
-        public BaseRepo(DbContextOptions options)
+        protected BaseRepo(DbContextOptions options)
         {
             _db = new TCSContext(options);
         }
@@ -68,6 +68,10 @@ namespace tcs_service.Repos
                 throw;
             }
         }
-        
+
+        public abstract Task<bool> Exist(int id);
+        public abstract Task<T> Find(int id);
+        public abstract IEnumerable<T> GetAll();
+        public abstract Task<T> Remove(int id);
     }
 }
