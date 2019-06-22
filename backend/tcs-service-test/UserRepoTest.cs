@@ -1,31 +1,14 @@
 using AutoFixture;
 using AutoFixture.AutoMoq;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Storage;
-using Moq;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using tcs_service.Controllers;
-using tcs_service.EF;
 using tcs_service.Exceptions;
 using tcs_service.Models;
 using tcs_service.Repos;
-using tcs_service.Repos.Interfaces;
 using Xunit;
+using tcs_service_test.Helpers;
 
 namespace tcs_service_test
 {
-  public class DbInMemory {
-    public static DbContextOptions getDbInMemoryOptions(string dbName)
-    {
-        var options = new DbContextOptionsBuilder<TCSContext>()
-              .UseInMemoryDatabase(databaseName: dbName)
-              .Options;
-        return options;
-    }
-  }
-
   public class UserRepoTest : IDisposable
   {
     UserRepo userRepo;
@@ -44,7 +27,6 @@ namespace tcs_service_test
         fixture = null;
     }
 
-    // Expect user to be successfuly created and be in repo
     [Fact]
     public async void CreateUser_HappyPath() {
       var user = fixture.Create<User>();
