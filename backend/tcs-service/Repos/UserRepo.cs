@@ -8,6 +8,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using tcs_service.EF;
 using tcs_service.Exceptions;
 using tcs_service.Helpers;
 using tcs_service.Models;
@@ -21,20 +22,21 @@ namespace tcs_service.Repos
 
         private readonly AppSettings _appSettings;
 
-
-
         public UserRepo(IOptions<AppSettings> appSettings)
         {
             _appSettings = appSettings.Value;
         }
 
+        public UserRepo(DbContextOptions options) : base(options)
+        {   
+        }
 
-        public User Authenticate(string username, string password)
+        public async Task<User> Authenticate(string username, string password)
         {
             if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
                 return null;
 
-            var user = _db.Users.SingleOrDefault(x => x.Username == username);
+            var user = await _db.Users.SingleOrDefaultAsync(x => x.Username == username);
 
             // check if username exists
             if (user == null)
@@ -72,7 +74,7 @@ namespace tcs_service.Repos
 
         public void Update(User userParam, string password = null)
         {
-            var user = _db.Users.Find(userParam.Id);
+            var user = _db.Users.Find(userParam.ID);
 
             if (user == null)
                 throw new AppException("User not found");
@@ -165,12 +167,12 @@ namespace tcs_service.Repos
 
         public override async Task<bool> Exist(int id)
         {
-           return await _db.Users.AnyAsync(e => e.Id == id);
+           return await _db.Users.AnyAsync(e => e.ID == id);
         }
 
         public override async Task<User> Remove(int id)
         {
-            var user = await _db.Users.SingleAsync(a => a.Id == id);
+            var user = await _db.Users.SingleAsync(a => a.ID == id);
             _db.Users.Remove(user);
             await _db.SaveChangesAsync();
             return user;
