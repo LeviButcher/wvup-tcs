@@ -6,7 +6,6 @@ using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
@@ -54,7 +53,7 @@ namespace tcs_service.Controllers
                     new Claim(ClaimTypes.Name, user.ID.ToString())
                 }),
                 Expires = DateTime.UtcNow.AddDays(7),
-                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature),
             };
             var token = tokenHandler.CreateToken(tokenDescriptor);
             var tokenString = tokenHandler.WriteToken(token);
@@ -72,7 +71,7 @@ namespace tcs_service.Controllers
 
         [AllowAnonymous]
         [HttpPost("register")]
-        public IActionResult Register([FromBody]UserDto userDto)
+        public async Task<IActionResult> Register([FromBody]UserDto userDto)
         {
             // map dto to entity
             var user = _mapper.Map<User>(userDto);
@@ -80,8 +79,8 @@ namespace tcs_service.Controllers
             try
             {
                 // save
-                _userRepo.Create(user, userDto.Password);
-                return Ok();
+                var res = await _userRepo.Create(user, userDto.Password);
+                return Created($"api/Users/${res.ID}", res);
             }
             catch (AppException ex)
             {

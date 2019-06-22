@@ -7,7 +7,7 @@ using tcs_service.Repos;
 using Xunit;
 using tcs_service_test.Helpers;
 
-namespace tcs_service_test
+namespace tcs_service_test.Repos
 {
   public class UserRepoTest : IDisposable
   {
