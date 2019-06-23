@@ -27,8 +27,9 @@ namespace tcs_service.Repos
             _appSettings = appSettings.Value;
         }
 
-        public UserRepo(DbContextOptions options) : base(options)
+        public UserRepo(DbContextOptions options, IOptions<AppSettings> appSettings) : base(options)
         {   
+            _appSettings = appSettings.Value;
         }
 
         public async Task<User> Authenticate(string username, string password)

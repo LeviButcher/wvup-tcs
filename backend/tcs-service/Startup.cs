@@ -90,6 +90,8 @@ namespace tcs_service
 
             DbInitializer.InitializeData(db);
 
+            app.UseAuthentication();
+
             app.UseMvc();
         }
     }

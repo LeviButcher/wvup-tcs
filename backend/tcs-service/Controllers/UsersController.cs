@@ -18,7 +18,7 @@ namespace tcs_service.Controllers
 {
     [Authorize]
     [ApiController]
-    [Route("[controller]")]
+    [Route("api/[controller]")]
     public class UsersController : ControllerBase
     {
          private IMapper _mapper;
