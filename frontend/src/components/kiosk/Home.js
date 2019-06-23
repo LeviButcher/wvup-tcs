@@ -1,27 +1,49 @@
 import React from 'react';
 import styled from 'styled-components';
 import { Link } from '@reach/router';
-import Card from '../../ui/Card';
+import { Header, Card } from '../../ui';
 
 const Home = () => (
   <FullScreenContainer>
-    <StyledCard styled={{ 'font-size': '75px' }}>
+    <Box style={{ 'grid-area': 'boxLeft' }}>
       <Link to="/signin">SignIn</Link>
-    </StyledCard>
-    <StyledCard>SignOut</StyledCard>
+    </Box>
+    <Box style={{ 'grid-area': 'boxRight' }}>
+      <Link to="/signout">SignOut</Link>
+    </Box>
+    <Footer>
+      <Header type="h3" align="center">
+        <Link to="/signin/teacher">Sign in for teachers</Link>
+      </Header>
+    </Footer>
   </FullScreenContainer>
 );
 
-const StyledCard = styled(Card)`
-  padding: 4rem;
-  box-shadow: 0 0 5px 1px;
+const Footer = styled.footer`
+  background-color: #afafaf;
+  grid-area: footer;
+  padding: 0 ${props => props.theme.padding};
+`;
+
+const Box = styled(Card)`
+  width: 400px;
+  height: 400px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 60px;
+  align-self: center;
+  justify-self: center;
 `;
 
 const FullScreenContainer = styled.div`
-  height: calc(100vh - 75px);
-  display: flex;
-  align-items: center;
-  justify-content: space-evenly;
+  height: calc(100vh - ${props => props.theme.kioskHeaderSize});
+  width: 100%;
+  display: grid;
+  grid-template:
+    'boxLeft boxRight' 1fr
+    'footer footer' auto / 50% 50%;
+  align-items: flex-end;
 `;
 
 export default Home;

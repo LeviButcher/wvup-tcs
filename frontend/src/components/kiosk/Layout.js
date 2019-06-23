@@ -4,19 +4,18 @@ import Header from '../../ui/Header';
 
 const Layout = ({ children }) => (
   <div>
-    <StyledHeader text="Welcome to the Tutoring Center" />
+    <StyledHeader>Welcome to the Tutoring Center</StyledHeader>
     <div>{children}</div>
   </div>
 );
 
 const StyledHeader = styled(Header)`
-  text-align: center;
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: rgb(9, 18, 38);
-  color: #ffc814;
-  height: 75px;
+  background-color: ${props => props.theme.color.main};
+  color: ${props => props.theme.color.accent};
+  height: ${props => props.theme.kioskHeaderSize};
 `;
 
 export default Layout;
