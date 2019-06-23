@@ -6,6 +6,7 @@ const Input = ({
   form: { touched, errors }, // also values, setXXXX, handleXXXX, dirty, isValid, status, etc.
   className,
   label,
+  type,
   id,
   ...props
 }) => (
@@ -13,7 +14,7 @@ const Input = ({
     <label htmlFor={id} style={{ textTransform: 'capitalize' }}>
       {label || field.name}
     </label>
-    <input id={id} type="text" {...field} {...props} />
+    <input id={id} type={type || 'text'} {...field} {...props} />
     {touched[field.name] && errors[field.name] && (
       <div className="error">{errors[field.name]}</div>
     )}

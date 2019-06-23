@@ -11,6 +11,7 @@ import Theme from './theme.json';
 import NotFound from './components/NotFound';
 import ClassTourForm from './components/dashboard/ClassTourForm';
 import FetchClassTour from './components/dashboard/FetchClassTour';
+import IsAuthenticated from './components/IsAuthenticated';
 
 function App() {
   return (
@@ -23,16 +24,18 @@ function App() {
             <SignOut path="/signout" />
             <NotFound default />
           </KioskLayout>
-          <DashboardLayout path="/dashboard">
-            <Hello path="/" />
-            <ClassTourLookup path="/tours" />
-            <ClassTourForm path="/tours/create" />
-            <FetchClassTour
-              path="/tours/update/:classTourId"
-              Component={ClassTourForm}
-            />
-            <NotFound default />
-          </DashboardLayout>
+          <IsAuthenticated redirectRoute="/login" path="/dashboard">
+            <DashboardLayout path="/">
+              <Hello path="/" />
+              <ClassTourLookup path="/tours" />
+              <ClassTourForm path="/tours/create" />
+              <FetchClassTour
+                path="/tours/update/:classTourId"
+                Component={ClassTourForm}
+              />
+              <NotFound default />
+            </DashboardLayout>
+          </IsAuthenticated>
           <Login path="/login" />
         </Router>
       </ThemeProvider>
