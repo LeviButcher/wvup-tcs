@@ -6,6 +6,9 @@ using tcs_service.Models;
 using tcs_service.Repos;
 using Xunit;
 using tcs_service_test.Helpers;
+using Moq;
+using Microsoft.Extensions.Options;
+using tcs_service.Helpers;
 
 namespace tcs_service_test.Repos
 {
@@ -13,10 +16,18 @@ namespace tcs_service_test.Repos
   {
     UserRepo userRepo;
     string dbName = "UserRepoTest";
+
+    readonly string secret = "supersecretpassphrasethatissuperlongbecauseithastobe";
+
     IFixture fixture;
 
+    Mock<IOptions<AppSettings>> mockAppSettings;
+
     public UserRepoTest() {
-      userRepo = new UserRepo(DbInMemory.getDbInMemoryOptions(dbName));
+      AppSettings appSettings = new AppSettings() { Secret = secret };
+      mockAppSettings = new Mock<IOptions<AppSettings>>();
+      mockAppSettings.Setup(ap => ap.Value).Returns(appSettings);
+      userRepo = new UserRepo(DbInMemory.getDbInMemoryOptions(dbName), mockAppSettings.Object);
       fixture = new Fixture()
         .Customize(new AutoMoqCustomization());
     }
