@@ -132,5 +132,11 @@ namespace tcs_service.Controllers
             return Ok();
         }
 
+
+        [Authorize]
+        [HttpGet("IsAuthenticate")]
+        public IActionResult IsAuthenticated() {
+            return Ok(new {authenticated=true});
+        }
     }
 }

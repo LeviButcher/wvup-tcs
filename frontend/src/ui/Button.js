@@ -12,7 +12,10 @@ export default styled.button.attrs(props => ({
 
   background-color: #4646da;
   color: white;
-  &[disabled='true'] {
+  &[disabled] {
     background-color: #bfbfff;
+  }
+  &:hover {
+    box-shadow: 0 0 10px 1px #4646daff;
   }
 `;
