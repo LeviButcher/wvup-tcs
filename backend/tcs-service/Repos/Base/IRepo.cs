@@ -9,12 +9,6 @@ namespace tcs_service.Repos.Base
     {
 
 
-        Task<bool> Exist(int id);
-
-        Task<T> Find(int id);
-
-        IEnumerable<T> GetAll();
-
-        Task<T> Remove(int id);
+   
     }
 }
