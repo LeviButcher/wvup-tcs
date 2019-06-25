@@ -95,6 +95,20 @@ namespace tcs_service_test
         }
 
         [Fact]
+        public async void CreatingTourWithNameSetToNull_ShouldReturnBadRequest()
+        {
+            var nullNameClassTour = fixture.Build<ClassTour>()
+                .With(x => x.ID, classTour.ID)
+                .Without(x => x.Name)
+                .Create();
+
+            IActionResult results = await sut.PostClassTour(nullNameClassTour);
+            var badRequestObjectResult = Assert.IsType<BadRequestObjectResult>(results);
+
+            Assert.Equal(400, badRequestObjectResult.StatusCode);
+        }
+
+        [Fact]
         public async void DeleteTour_ShouldWork_Returns200()
         {
             repository.Setup(x => x.Exist(classTour.ID)).ReturnsAsync(true);
