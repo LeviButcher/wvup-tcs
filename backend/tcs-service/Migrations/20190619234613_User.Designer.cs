@@ -10,8 +10,8 @@ using tcs_service.EF;
 namespace tcs_service.Migrations
 {
     [DbContext(typeof(TCSContext))]
-    [Migration("20190621133855_UpdateClassTourNameRequired")]
-    partial class UpdateClassTourNameRequired
+    [Migration("20190619234613_User")]
+    partial class User
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -29,8 +29,7 @@ namespace tcs_service.Migrations
 
                     b.Property<DateTime>("DayVisited");
 
-                    b.Property<string>("Name")
-                        .IsRequired();
+                    b.Property<string>("Name");
 
                     b.Property<int>("NumberOfStudents");
 
@@ -39,6 +38,26 @@ namespace tcs_service.Migrations
                     b.ToTable("ClassTours");
                 });
 
+            modelBuilder.Entity("tcs_service.Models.User", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("FirstName");
+
+                    b.Property<string>("LastName");
+
+                    b.Property<byte[]>("PasswordHash");
+
+                    b.Property<byte[]>("PasswordSalt");
+
+                    b.Property<string>("Username");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Users");
+                });
 #pragma warning restore 612, 618
         }
     }
