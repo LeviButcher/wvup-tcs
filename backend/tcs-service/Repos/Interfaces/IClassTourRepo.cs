@@ -7,18 +7,12 @@ using tcs_service.Repos.Base;
 
 namespace tcs_service.Repos.Interfaces
 {
-    public interface IClassTourRepo
+    public interface IClassTourRepo : IRepo<ClassTour>
     {
         Task<ClassTour> Add(ClassTour tour);
 
         Task<ClassTour> Update(ClassTour tour);
 
-        Task<bool> Exist(int id);
-
-        Task<ClassTour> Find(int id);
-
-        IEnumerable<ClassTour> GetAll();
-
-        Task<ClassTour> Remove(int id);
+       // Task<ClassTour> Remove(int id);
     }
 }
