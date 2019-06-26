@@ -1,13 +1,7 @@
 using AutoFixture;
 using AutoFixture.AutoMoq;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Routing;
 using Moq;
-using System.Collections;
-using System.IO;
-using System.Net.Http;
-using System.Threading.Tasks;
 using tcs_service.Controllers;
 using tcs_service.Models;
 using tcs_service.Repos.Interfaces;
@@ -81,34 +75,6 @@ namespace tcs_service_test
         }
 
         [Fact]
-        public async void UpdatingTourWithNameSetToNull_ShouldReturnBadRequest()
-        {
-            var nullNameClassTour = fixture.Build<ClassTour>()
-                .With(x => x.ID, classTour.ID)
-                .Without(x => x.Name)
-                .Create();
-
-            IActionResult results = await sut.PutClassTour(classTour.ID, nullNameClassTour);
-            var badRequestObjectResult = Assert.IsType<BadRequestObjectResult>(results);
-
-            Assert.Equal(400, badRequestObjectResult.StatusCode);
-        }
-
-        [Fact]
-        public async void CreatingTourWithNameSetToNull_ShouldReturnBadRequest()
-        {
-            var nullNameClassTour = fixture.Build<ClassTour>()
-                .With(x => x.ID, classTour.ID)
-                .Without(x => x.Name)
-                .Create();
-
-            IActionResult results = await sut.PostClassTour(nullNameClassTour);
-            var badRequestObjectResult = Assert.IsType<BadRequestObjectResult>(results);
-
-            Assert.Equal(400, badRequestObjectResult.StatusCode);
-        }
-
-        [Fact]
         public async void DeleteTour_ShouldWork_Returns200()
         {
             repository.Setup(x => x.Exist(classTour.ID)).ReturnsAsync(true);
@@ -146,6 +112,6 @@ namespace tcs_service_test
             Assert.Equal(404, notFoundResult.StatusCode);
         }
 
-
+        //TODO:  Test ModelState Validation
     }
 }

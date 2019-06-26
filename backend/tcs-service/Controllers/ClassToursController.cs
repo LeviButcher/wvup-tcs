@@ -64,7 +64,7 @@ namespace tcs_service.Controllers
         [Produces(typeof(ClassTour))]
         public async Task<IActionResult> PutClassTour([FromRoute] int id, [FromBody] ClassTour classTour)
         {
-            if (!ModelState.IsValid || classTour.Name == null)
+            if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
@@ -97,7 +97,7 @@ namespace tcs_service.Controllers
         [Produces(typeof(ClassTour))]
         public async Task<IActionResult> PostClassTour([FromBody] ClassTour classTour)
         {
-            if (!ModelState.IsValid)
+            if (!ModelState.IsValid || classTour.Name == null)
             {
                 return BadRequest(ModelState);
             }
