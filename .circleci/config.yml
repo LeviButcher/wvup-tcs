@@ -72,7 +72,7 @@ jobs:
             - v1-front-dependencies-
 
       - run: docker login -u $DOCKER_USER -p $DOCKER_PASS
-      - run: docker build --build-arg REACT_APP_BACKEND="${REACT_APP_BACKEND}" REACT_APP_TOKEN="${REACT_APP_TOKEN}" -t lcbutch/tcs-front:$CIRCLE_BRANCH frontend/
+      - run: docker build --build-arg REACT_APP_BACKEND="${REACT_APP_BACKEND}" --build-arg REACT_APP_TOKEN="${REACT_APP_TOKEN}" -t lcbutch/tcs-front:$CIRCLE_BRANCH frontend/
       - run: docker push lcbutch/tcs-front:$CIRCLE_BRANCH
 
   checkout-code-back:
