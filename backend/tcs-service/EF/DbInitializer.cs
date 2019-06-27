@@ -38,15 +38,15 @@ namespace tcs_service.EF
 
         private static void SeedData(TCSContext context)
         {
-            string classTours = File.ReadAllText(@"../SampleData/dbo.ClassTours.data.sql");
-            string courses = File.ReadAllText(@"../SampleData/dbo.Courses.data.sql");
-            string departments = File.ReadAllText(@"../SampleData/dbo.Departments.data.sql");
-            string people = File.ReadAllText(@"../SampleData/dbo.People.data.sql");
-            string reasons = File.ReadAllText(@"../SampleData/dbo.Reasons.data.sql");
-            string semesters = File.ReadAllText(@"../SampleData/dbo.Semesters.data.sql");
-            string signIns = File.ReadAllText(@"../SampleData/dbo.SignIns.data.sql");
-            string signInReasons = File.ReadAllText(@"../SampleData/dbo.SignInReasons.data.sql");
-            string signInCourses = File.ReadAllText(@"../SampleData/dbo.SignInCourses.data.sql");
+            string classTours = File.ReadAllText(@"./SampleData/dbo.ClassTours.data.sql");
+            string courses = File.ReadAllText(@"./SampleData/dbo.Courses.data.sql");
+            string departments = File.ReadAllText(@"./SampleData/dbo.Departments.data.sql");
+            string people = File.ReadAllText(@"./SampleData/dbo.People.data.sql");
+            string reasons = File.ReadAllText(@"./SampleData/dbo.Reasons.data.sql");
+            string semesters = File.ReadAllText(@"./SampleData/dbo.Semesters.data.sql");
+            string signIns = File.ReadAllText(@"./SampleData/dbo.SignIns.data.sql");
+            string signInReasons = File.ReadAllText(@"./SampleData/dbo.SignInReasons.data.sql");
+            string signInCourses = File.ReadAllText(@"./SampleData/dbo.SignInCourses.data.sql");
 
 
             context.Database.ExecuteSqlCommand(classTours);
@@ -59,6 +59,6 @@ namespace tcs_service.EF
             context.Database.ExecuteSqlCommand(signInReasons);
             context.Database.ExecuteSqlCommand(signInCourses);
         }
-    
+
     }
 }
