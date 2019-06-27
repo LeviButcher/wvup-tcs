@@ -12,7 +12,5 @@ namespace tcs_service.Repos.Interfaces
         Task<ClassTour> Add(ClassTour tour);
 
         Task<ClassTour> Update(ClassTour tour);
-
-       // Task<ClassTour> Remove(int id);
     }
 }
