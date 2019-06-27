@@ -1,0 +1,40 @@
+version: "3.7"
+
+services:
+  tcs-front:
+    build:
+      context: ./frontend/
+      dockerfile: Dockerfile.development
+      args:
+        - REACT_APP_BACKEND=http://localhost:8080/api/
+        - REACT_APP_TOKEN=Getjiggywithit
+    ports:
+      - "80:3000"
+    environment:
+      NODE_ENV: development
+      CHOKIDAR_USEPOLLING: "true"
+      REACT_APP_BACKEND: "http://localhost:8080/api/"
+      REACT_APP_TOKEN: "Getjiggywithit"
+
+  tcs-service:
+    build:
+      context: ./backend/tcs-service
+    ports:
+      - "8080:80"
+    environment:
+      DB:connectionString: "Server=tcs-db;Database=tcs;User Id=SA;Password=Develop@90"
+      AppSettings:Secret: SuperSecretkeyThatNooneWillEverknow
+      ASPNETCORE_ENVIRONMENT: DEVELOPMENT
+
+  tcs-db:
+    image: microsoft/mssql-server-linux
+    environment:
+      ACCEPT_EULA: Y
+      SA_PASSWORD: Develop@90
+    expose:
+      - "1443"
+    volumes:
+      - db-data:/var/opt/mssql
+
+volumes:
+  db-data:

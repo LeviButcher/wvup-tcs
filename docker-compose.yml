@@ -8,14 +8,18 @@ services:
 
   tcs-service:
     image: lcbutch/tcs-service:${TAG}
+    ports:
+      - "8080:80"
     environment:
-      - "DB:connectionString"
+      DB:connectionString: "Server=tcs-db;Database=tcs;User Id=SA;Password=Develop@90"
+      AppSettings:Secret: SuperSecretkeyThatNooneWillEverknow
+      ASPNETCORE_ENVIRONMENT: DEVELOPMENT
 
   tcs-db:
     image: microsoft/mssql-server-linux
     environment:
       - ACCEPT_EULA=Y
-      - SA_PASSWORD
+      - SA_PASSWORD=Develop@90
     expose:
       - "1443"
     volumes:
