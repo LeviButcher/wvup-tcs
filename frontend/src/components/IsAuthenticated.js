@@ -12,12 +12,16 @@ const checkAuth = callApi(
 const IsAuthenticated = ({ redirectRoute, children }) => {
   const [isAuth, setAuth] = useState(false);
   useEffect(() => {
-    checkAuth(null).then(async res => {
-      if (res.status !== 200 || (await res.json()).authenticated !== true) {
+    checkAuth(null)
+      .then(async res => {
+        if (res.status !== 200 || (await res.json()).authenticated !== true) {
+          navigate(redirectRoute);
+        }
+        setAuth(true);
+      })
+      .catch(() => {
         navigate(redirectRoute);
-      }
-      setAuth(true);
-    });
+      });
   }, [redirectRoute]);
 
   return <div>{isAuth && children}</div>;

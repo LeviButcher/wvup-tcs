@@ -19,21 +19,26 @@ const Login = () => {
           initialValues={{ username: '', password: '' }}
           onSubmit={async (values, { setSubmitting, setStatus }) => {
             const message = {};
-            const res = await postToAuthApi(values);
-            if (res.status === 200) {
-              // put token in localstorage
-              const user = await res.json();
-              localStorage.setItem(
-                `${process.env.REACT_APP_TOKEN}`,
-                user.token
-              );
-              navigate('/dashboard');
-            } else {
-              const error = await res.json();
-              message.msg = error.message;
-            }
-            setSubmitting(false);
-            setStatus(message);
+            postToAuthApi(values)
+              .then(async res => {
+                if (res.status !== 200) {
+                  throw await res.json();
+                }
+                // put token in localstorage
+                const user = await res.json();
+                localStorage.setItem(
+                  `${process.env.REACT_APP_TOKEN}`,
+                  user.token
+                );
+                navigate('/dashboard');
+              })
+              .catch(async error => {
+                message.msg = error.message;
+              })
+              .finally(() => {
+                setStatus(message);
+                setSubmitting(false);
+              });
           }}
         >
           {({ status, values, isSubmitting, handleSubmit }) => (

@@ -2,65 +2,113 @@ import React from 'react';
 import { Form, Field, Formik } from 'formik';
 import { navigate } from '@reach/router';
 import { Input, Button, Header, Card } from '../../ui';
+import callApi from '../../utils/callApi';
 
-// pass in callback for submission, route to create or update
-// add in hidden field for ID for update
-// pass in ClassTour object fills in fields
-//
-// Lookup tour will grab tours data then pass down to component
-//
-// make default callback, creation function
+const postClassTour = callApi(
+  `${process.env.REACT_APP_BACKEND}classtours/`,
+  'POST'
+);
 
-function createClassTour() {
-  setTimeout(() => {
-    alert('Faked creation of tour');
-    navigate('/dashboard/tours');
-  }, 1000);
+function createClassTour(values, { setSubmitting, setStatus }) {
+  const message = {};
+  postClassTour(values)
+    .then(async res => {
+      if (res.status !== 201) {
+        throw await res.json();
+      }
+      alert(`Created tour for ${values.name}`);
+      navigate('/dashboard/tours');
+    })
+    .catch(e => {
+      message.msg = e.message;
+    })
+    .finally(() => {
+      setSubmitting(false);
+      setStatus(message);
+    });
+}
+
+function updateClassTour(values, { setSubmitting, setStatus }) {
+  const message = {};
+  callApi(
+    `${process.env.REACT_APP_BACKEND}classtours/${values.id}`,
+    'PUT',
+    values
+  )
+    .then(async res => {
+      if (res.status !== 200) {
+        throw await res.json();
+      }
+      alert(`Updated tour for ${values.name}`);
+      navigate('/dashboard/tours');
+    })
+    .catch(e => {
+      message.msg = e.message;
+    })
+    .finally(() => {
+      setSubmitting(false);
+      setStatus(message);
+    });
+}
+
+function getSubmitForAction(action) {
+  switch (action) {
+    case 'Create':
+      return createClassTour;
+    case 'Update':
+      return updateClassTour;
+    default:
+      return () =>
+        console.error(
+          'Never hit a case in transalating a action to a submittion function'
+        );
+  }
 }
 
 const classTourDefault = {
   name: '',
-  date: '',
-  count: ''
+  dayVisited: '',
+  numberOfStudents: ''
 };
 
 // do create and updates tours
-const ClassTourForm = ({
-  classTour = classTourDefault,
-  onSubmit,
-  action = 'Create'
-}) => {
+const ClassTourForm = ({ classTour = classTourDefault, action = 'Create' }) => {
   return (
     <Card>
-      <Formik onSubmit={onSubmit || createClassTour}>
-        {({ isSubmitting }) => (
+      <Formik initialValues={classTour} onSubmit={getSubmitForAction(action)}>
+        {({ values, status, isSubmitting }) => (
           <Form>
             <Header>{action} Tour</Header>
+            {status && status.msg && (
+              <div style={{ color: 'red' }}>{status.msg}</div>
+            )}
             <Field
               id="name"
               type="text"
               name="name"
-              value={classTour.name}
               component={Input}
               label="Name"
             />
             <Field
-              id="date"
+              id="dayVisited"
               type="date"
-              name="date"
-              value={classTour.date}
+              name="dayVisited"
+              value={
+                values.dayVisited.length > 0
+                  ? new Date(values.dayVisited).toISOString().substr(0, 10)
+                  : ''
+              }
               component={Input}
               label="Date Toured"
             />
             <Field
-              id="count"
+              id="numberOfStudents"
               type="number"
-              name="count"
-              value={classTour.count}
+              name="numberOfStudents"
               component={Input}
               label="Number of Tourist"
             />
-            <Button align="right" disabled={isSubmitting}>
+            <Button align="right" disabled={isSubmitting} type="Submit">
               {action}
             </Button>
           </Form>

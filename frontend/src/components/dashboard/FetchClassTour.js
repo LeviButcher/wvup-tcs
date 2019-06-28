@@ -1,17 +1,23 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import callApi from '../../utils/callApi';
 
-const fakeTour = {
-  name: 'Faky',
-  date: new Date(),
-  count: '20'
-};
+const FetchClassTour = ({ Component, classTourId, ...props }) => {
+  const [tour, setTour] = useState();
+  useEffect(() => {
+    callApi(
+      `${process.env.REACT_APP_BACKEND}classtours/${classTourId}`,
+      'GET',
+      null
+    )
+      .then(async res => {
+        setTour(await res.json());
+      })
+      .catch(e => {
+        alert(e);
+      });
+  }, []);
 
-const FetchClassTour = ({ Component, classTourId }) => {
-  return (
-    <>
-      <Component classTour={fakeTour} action="Update" />
-    </>
-  );
+  return <>{tour && <Component classTour={tour} classTourId {...props} />}</>;
 };
 
 export default FetchClassTour;

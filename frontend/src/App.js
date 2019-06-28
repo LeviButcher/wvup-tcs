@@ -1,5 +1,5 @@
 import React from 'react';
-import { Router } from '@reach/router';
+import { navigate, Router } from '@reach/router';
 import { ThemeProvider } from 'styled-components';
 import { KioskLayout, Home, SignIn, SignOut } from './components/kiosk';
 import {
@@ -32,6 +32,7 @@ function App() {
               <FetchClassTour
                 path="/tours/update/:classTourId"
                 Component={ClassTourForm}
+                action="Update"
               />
               <NotFound default />
             </DashboardLayout>
