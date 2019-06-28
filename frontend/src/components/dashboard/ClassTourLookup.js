@@ -1,19 +1,27 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from '@reach/router';
 import { Form, Field, Formik } from 'formik';
 import { Input, Button, FieldGroup, Table, Header } from '../../ui';
+import callApi from '../../utils/callApi';
 
-const Tours = [
-  { id: 5, name: 'Parkersburg South', count: '24', date: Date.now() },
-  { id: 6, name: 'Parkersburg North', count: '24', date: Date.now() },
-  { id: 7, name: 'Ripley', count: '24', date: Date.now() },
-  { id: 4, name: 'Ravenswood', count: '24', date: Date.now() }
-];
+const getClassTours = callApi(
+  `${process.env.REACT_APP_BACKEND}classtours/`,
+  'GET'
+);
 
 const ClassTourLookup = () => {
+  const [tours, setTours] = useState();
   return (
     <div>
-      <Formik>
+      <Formik
+        initialValues={{ startDate: '', endDate: '' }}
+        onSubmit={() => {
+          getClassTours(null).then(async res => {
+            const returnedTours = await res.json();
+            setTours(returnedTours);
+          });
+        }}
+      >
         {() => (
           <Form>
             <FieldGroup>
@@ -23,6 +31,7 @@ const ClassTourLookup = () => {
                 name="startDate"
                 component={Input}
                 label="Start Date"
+                required
               />
               <Field
                 id="endDate"
@@ -30,8 +39,9 @@ const ClassTourLookup = () => {
                 name="endDate"
                 component={Input}
                 label="End Date"
+                required
               />
-              <Button>Lookup</Button>
+              <Button type="Submit">Lookup</Button>
             </FieldGroup>
           </Form>
         )}
@@ -42,33 +52,36 @@ const ClassTourLookup = () => {
           <Button display="inline">Add Class Tour</Button>
         </Link>
       </Header>
-
-      <Table>
-        <caption>
-          <Header>Class Tour</Header>
-        </caption>
-        <thead align="left">
-          <tr>
-            <th>Name</th>
-            <th>Total Count</th>
-            <th>Date</th>
-          </tr>
-        </thead>
-        <tbody>
-          {Tours.map(tour => (
-            <ClassTourRow key={tour.id} tour={tour} />
-          ))}
-        </tbody>
-      </Table>
+      {tours && (
+        <>
+          <Table>
+            <caption>
+              <Header>Class Tours</Header>
+            </caption>
+            <thead align="left">
+              <tr>
+                <th>Name</th>
+                <th>Total Tourists</th>
+                <th>Date</th>
+              </tr>
+            </thead>
+            <tbody>
+              {tours.map(tour => (
+                <ClassTourRow key={tour.id} tour={tour} />
+              ))}
+            </tbody>
+          </Table>
+        </>
+      )}
     </div>
   );
 };
 
-const ClassTourRow = ({ tour: { id, name, count, date } }) => (
+const ClassTourRow = ({ tour: { id, name, numberOfStudents, dayVisited } }) => (
   <tr>
     <td>{name}</td>
-    <td>{count}</td>
-    <td>{date}</td>
+    <td>{numberOfStudents}</td>
+    <td>{new Date(dayVisited).toLocaleString()}</td>
     <td>
       <Button display="inline">
         <Link to={`update/${id}`}>Update</Link>

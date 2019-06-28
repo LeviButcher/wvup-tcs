@@ -6,20 +6,20 @@ import Header from '../../ui/Header';
 const Layout = ({ children }) => (
   <LayoutGrid>
     <SideNav />
-    <div>{children}</div>
+    <main>{children}</main>
   </LayoutGrid>
 );
 
 const LayoutGrid = styled.div`
-  width: 100vw;
   height: 100vh;
   max-height: 100vh;
-  y-overflow: none;
+  overflow-y: hidden;
   display: grid;
-  grid-template: 'nav main' 1fr / 300px auto;
+  grid-template: 'nav main' 100vh / 300px auto;
 
-  & > * {
+  & > main {
     padding: ${props => props.theme.padding};
+    overflow-y: scroll;
   }
 
   & > nav {
