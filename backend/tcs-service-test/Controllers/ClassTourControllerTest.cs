@@ -2,6 +2,7 @@ using AutoFixture;
 using AutoFixture.AutoMoq;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
+using System;
 using tcs_service.Controllers;
 using tcs_service.Models;
 using tcs_service.Repos.Interfaces;
@@ -9,7 +10,7 @@ using Xunit;
 
 namespace tcs_service_test
 {
-    public class ClassTourTests
+    public class ClassTourControllerTest : IDisposable
     {
         ClassTour classTour;
         ClassToursController sut;
@@ -17,7 +18,7 @@ namespace tcs_service_test
         IFixture fixture = new Fixture()
            .Customize(new AutoMoqCustomization());
 
-        public ClassTourTests()
+        public ClassTourControllerTest()
         {       
             classTour = fixture.Create<ClassTour>();
             repository = new Mock<IClassTourRepo>();
@@ -110,6 +111,12 @@ namespace tcs_service_test
             var notFoundResult = Assert.IsType<NotFoundResult>(results);
 
             Assert.Equal(404, notFoundResult.StatusCode);
+        }
+
+        public void Dispose()
+        {
+            repository = null;
+            sut = null;
         }
 
         //TODO:  Test ModelState Validation

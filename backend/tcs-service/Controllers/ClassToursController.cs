@@ -71,7 +71,7 @@ namespace tcs_service.Controllers
 
             if (id != classTour.ID)
             {
-                return BadRequest();
+                return BadRequest("ID's do not match");
             }
 
             try

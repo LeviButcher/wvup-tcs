@@ -98,5 +98,5 @@ INSERT INTO [dbo].[SignIns] ([ID], [PersonId], [SemesterId], [InTime], [OutTime]
 INSERT INTO [dbo].[SignIns] ([ID], [PersonId], [SemesterId], [InTime], [OutTime], [Tutoring]) VALUES (97, 24, 201901, N'2019-06-17 15:25:59', N'2019-06-17 18:14:08', 0)
 INSERT INTO [dbo].[SignIns] ([ID], [PersonId], [SemesterId], [InTime], [OutTime], [Tutoring]) VALUES (98, 10, 201901, N'2018-08-22 14:37:48', N'2018-08-22 16:11:39', 1)
 INSERT INTO [dbo].[SignIns] ([ID], [PersonId], [SemesterId], [InTime], [OutTime], [Tutoring]) VALUES (99, 59, 201901, N'2018-09-04 00:02:45', null, 1)
-INSERT INTO [dbo].[SignIns] ([ID], [PersonId], [SemesterId], [InTime], [OutTime], [Tutoring]) VALUES (100, 47, 201903, N'2019-06-28 20:51:33', N'2019-06-28 23:43:35', 0)
+INSERT INTO [dbo].[SignIns] ([ID], [PersonId], [SemesterId], [InTime], [OutTime], [Tutoring]) VALUES (100, 47, 201903, N'2018-09-04 00:02:45', null, 0)
 SET IDENTITY_INSERT [dbo].[SignIns] OFF

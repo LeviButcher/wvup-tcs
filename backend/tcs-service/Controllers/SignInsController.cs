@@ -14,12 +14,10 @@ namespace tcs_service.Controllers
     [ApiController]
     public class SignInsController : ControllerBase
     {
-        private readonly TCSContext _context;
         private ISignInRepo _iRepo;
 
-        public SignInsController(TCSContext context, ISignInRepo iRepo)
+        public SignInsController( ISignInRepo iRepo )
         {
-            _context = context;
             _iRepo = iRepo;
         }
 
@@ -96,7 +94,60 @@ namespace tcs_service.Controllers
 
             await _iRepo.Add(signIn);
             return CreatedAtAction("GetSignIn", new { id = signIn.ID }, signIn);
-           
+        }
+
+        [HttpPut("/signIns/{id}")]
+        public async Task<IActionResult> PutSignIn([FromRoute] int id, [FromBody] SignIn signIn)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            if (id != signIn.ID)
+            {
+                return BadRequest();
+            }
+
+            try
+            {
+                await _iRepo.Update(signIn);
+                return Ok(signIn);
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!await _iRepo.Exist(id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+        }
+
+        //PUT: api/SignIns/5/SignOut
+        [HttpPut("{id}")]
+        public async Task<IActionResult> SignOut([FromRoute] int id, [FromBody] SignIn signIn)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            if (id != signIn.ID)
+            {
+                return BadRequest("IDs do not match");
+            }
+            if(signIn.InTime == null)
+            {
+                return BadRequest("Student is not signed in");
+            }
+
+            signIn.OutTime = DateTime.Now;
+            await _iRepo.Update(signIn);
+            return Ok(signIn);
         }
     }
 }

@@ -25,7 +25,7 @@ namespace tcs_service.Models
         public Semester Semester { get; set; }
 
         [Required]
-        public DateTime InTime { get; set; }
+        public DateTime? InTime { get; set; }
 
         public DateTime? OutTime { get; set; }
 
