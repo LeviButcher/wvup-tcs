@@ -74,7 +74,7 @@ const classTourDefault = {
 // do create and updates tours
 const ClassTourForm = ({ classTour = classTourDefault, action = 'Create' }) => {
   return (
-    <Card>
+    <Card style={{ margin: 'auto' }}>
       <Formik initialValues={classTour} onSubmit={getSubmitForAction(action)}>
         {({ values, status, isSubmitting }) => (
           <Form>

@@ -1,7 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Link } from '@reach/router';
-import Header from '../../ui/Header';
+import { Header, Link } from '../../ui';
 
 const Layout = ({ children }) => (
   <LayoutGrid>
@@ -15,7 +14,7 @@ const LayoutGrid = styled.div`
   max-height: 100vh;
   overflow-y: hidden;
   display: grid;
-  grid-template: 'nav main' 100vh / 300px auto;
+  grid-template: 'nav main' 100vh / 250px auto;
 
   & > main {
     padding: ${props => props.theme.padding};
@@ -25,42 +24,54 @@ const LayoutGrid = styled.div`
   & > nav {
     height: 100%;
     padding: 0 ${props => props.theme.padding};
-    background-color: #afafaf;
+    background-color: ${props => props.theme.color.main};
+    color: #fff;
   }
 `;
 
 const SideNav = () => {
   return (
     <nav>
-      <Header align="center">TCS</Header>
+      <MainHeader align="center">TCS</MainHeader>
       <LinkGroup>
         <Header type="h2">Lookups</Header>
-        <Link to="signins">Sign Ins</Link>
-        <Link to="tours">Class Tours</Link>
+        <NavLink to="signins">Sign Ins</NavLink>
+        <NavLink to="tours">Class Tours</NavLink>
       </LinkGroup>
       <LinkGroup>
         <Header type="h2">Reports</Header>
-        <Link to="signins">Class Tour</Link>
-        <Link to="signins">Volunteer</Link>
-        <Link to="signins">Weekly Visits</Link>
-        <Link to="signins">Peak Hours</Link>
-        <Link to="signins">Success</Link>
+        <NavLink to="signins">Class Tour</NavLink>
+        <NavLink to="signins">Volunteer</NavLink>
+        <NavLink to="signins">Weekly Visits</NavLink>
+        <NavLink to="signins">Peak Hours</NavLink>
+        <NavLink to="signins">Success</NavLink>
       </LinkGroup>
       <LinkGroup>
         <Header type="h2">Admin</Header>
-        <Link to="signins">Users</Link>
-        <Link to="signins">Reason for Visiting</Link>
+        <NavLink to="signins">Users</NavLink>
+        <NavLink to="signins">Reason for Visiting</NavLink>
       </LinkGroup>
     </nav>
   );
 };
 
+const MainHeader = styled(Header)`
+  color: ${props => props.theme.color.accent};
+`;
+
 const LinkGroup = styled.div`
-  border-bottom 1px solid #ddd;
   text-align: right;
   padding: 10px 0;
   & > * {
     display: block;
+  }
+`;
+
+const NavLink = styled(Link)`
+  color: #bbb;
+  margin: 0.5rem auto;
+  &:hover {
+    color: ${props => props.theme.color.accent};
   }
 `;
 
