@@ -13,11 +13,11 @@ const Input = ({
   <div className={className}>
     <label htmlFor={id} style={{ textTransform: 'capitalize' }}>
       {label || field.name}
+      {touched[field.name] && errors[field.name] && (
+        <div style={{ color: 'red' }}>{errors[field.name]}</div>
+      )}
     </label>
     <input id={id} type={type || 'text'} {...field} {...props} />
-    {touched[field.name] && errors[field.name] && (
-      <div className="error">{errors[field.name]}</div>
-    )}
   </div>
 );
 
