@@ -16,6 +16,7 @@ const LayoutGrid = styled.div`
   display: grid;
   grid-template: 'nav main' 100vh / 250px auto;
 
+
   & > main {
     padding: ${props => props.theme.padding};
     overflow-y: scroll;

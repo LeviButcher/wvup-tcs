@@ -38,6 +38,7 @@ const ClassTourLookup = () => {
                 name="startDate"
                 component={Input}
                 label="Start Date"
+                required
               />
               <Field
                 id="endDate"
@@ -45,6 +46,7 @@ const ClassTourLookup = () => {
                 name="endDate"
                 component={Input}
                 label="End Date"
+                required
               />
 
               <Button type="Submit" align="right">
