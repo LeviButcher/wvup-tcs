@@ -1,8 +1,22 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { Link } from '@reach/router';
-import { Formik, Form, Field } from 'formik';
-import { Card, Input, Header, Button, FieldGroup } from '../../ui';
+import { Formik, Form, Field, ErrorMessage } from 'formik';
+import * as Yup from 'yup';
+import { Card, Input, Header, Button, FieldGroup, Checkbox } from '../../ui';
+
+const SignInSchema = Yup.object().shape({
+  email: Yup.string()
+    .email('Invalid email')
+    .required('Email is required'),
+  courses: Yup.array()
+    .required('Please select at least one course')
+    .min(1),
+  reasons: Yup.array()
+    .required('Please select at least one reason for visiting')
+    .min(1),
+  tutoring: Yup.boolean()
+});
 
 const Reasons = [
   { name: 'Computer Use', id: 1 },
@@ -19,84 +33,160 @@ const Courses = [
   { courseName: 'CS129', CRN: '32156' }
 ];
 
-const SignIn = () => (
-  <FullScreenContainer>
-    <Card>
-      <Link to="/">Go Back</Link>
-      <Formik
-        initialValues={{ email: '' }}
-        validate={values => {
-          const errors = {};
-          if (!values.email) {
-            errors.email = 'Required';
-          } else if (
-            !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(values.email)
-          ) {
-            errors.email = 'Invalid email address';
-          }
-          return errors;
-        }}
-        onSubmit={(values, { setSubmitting }) => {
-          setTimeout(() => {
+const getReasons = () => {
+  return new Promise(resolve => {
+    setTimeout(() => {
+      resolve(Reasons);
+    }, 1000);
+  });
+};
+
+const getCourses = () => {
+  return new Promise(resolve => {
+    setTimeout(() => {
+      resolve(Courses);
+    }, 1000);
+  });
+};
+
+const useQuery = queryFunc => {
+  const [data, setData] = useState();
+
+  useEffect(() => {
+    queryFunc().then(res => {
+      setData(res);
+    });
+  }, []);
+
+  return [data];
+};
+
+const isWVUPAddress = email => /^[A-Z0-9._%+-]+@wvup.edu$/i.test(email);
+
+const SignIn = () => {
+  const [reasons] = useQuery(getReasons);
+  const [courses, setCourses] = useState();
+
+  return (
+    <FullScreenContainer>
+      <Card>
+        <Link to="/">Go Back</Link>
+        <Formik
+          initialValues={{
+            email: '',
+            reasons: [],
+            tutoring: false,
+            courses: []
+          }}
+          validationSchema={SignInSchema}
+          validate={async values => {
+            const errors = {};
+            if (!isWVUPAddress(values.email)) {
+              errors.email = 'Must be wvup.edu email address';
+            }
+            if (!errors.email) {
+              const res = await getCourses();
+              setCourses(res);
+            }
+            return errors;
+          }}
+          onSubmit={async (values, { setSubmitting }) => {
+            console.log(values);
             setSubmitting(false);
-          }, 1000);
-        }}
-      >
-        {({ isSubmitting }) => (
-          <Form>
-            <Header>Student Sign In</Header>
-            <Field
-              id="email"
-              type="email"
-              name="email"
-              component={Input}
-              label="Email"
-            />
-            <Header type="h4">Reason for Visiting</Header>
-            <FieldGroup>
+          }}
+        >
+          {({ isSubmitting, status }) => (
+            <Form>
+              <Header>Student Sign In</Header>
+              {status && status.msg && <div>{status.msg}</div>}
               <Field
-                id="tutoring"
-                type="checkbox"
-                name="reason"
+                id="email"
+                type="email"
+                name="email"
                 component={Input}
-                label="Tutoring"
-                value="Tutoring"
+                label="Email"
               />
-              {Reasons.map(reason => (
-                <Field
-                  key={reason.id}
-                  id={reason.id}
-                  type="checkbox"
-                  name="reason"
-                  component={Input}
-                  label={reason.name}
-                  value={reason.id}
-                />
-              ))}
-            </FieldGroup>
-            <Header type="h4">Classes visisiting for</Header>
-            <FieldGroup>
-              {Courses.map(course => (
-                <Field
-                  key={course.CRN}
-                  id={course.CRN}
-                  type="checkbox"
-                  name="course"
-                  component={Input}
-                  label={course.courseName}
-                  value={course.CRN}
-                />
-              ))}
-            </FieldGroup>
-            <br />
-            <Button type="submit" align="right" disabled={isSubmitting}>
-              Submit
-            </Button>
-          </Form>
-        )}
-      </Formik>
-    </Card>
-  </FullScreenContainer>
+
+              {reasons && <ReasonsCheckboxes reasons={reasons} />}
+              {courses && (
+                <>
+                  <CoursesCheckboxes courses={courses} />
+                </>
+              )}
+              <br />
+              <Button
+                type="submit"
+                align="right"
+                disabled={isSubmitting}
+                intent="primary"
+              >
+                Submit
+              </Button>
+            </Form>
+          )}
+        </Formik>
+      </Card>
+    </FullScreenContainer>
+  );
+};
+
+const ReasonsCheckboxes = ({ reasons }) => (
+  <>
+    <Header type="h4">
+      Reason for Visiting
+      <ErrorMessage name="reasons">
+        {message => <div style={{ color: 'red' }}>{message}</div>}
+      </ErrorMessage>
+      <ErrorMessage name="tutoring">
+        {message => <div style={{ color: 'red' }}>{message}</div>}
+      </ErrorMessage>
+    </Header>
+    <FieldGroup>
+      <label>
+        Tutoring
+        <Field
+          id="tutoring"
+          type="checkbox"
+          name="tutoring"
+          component="input"
+          label="Tutoring"
+          value="Tutoring"
+        />
+      </label>
+      {reasons.map(reason => (
+        <Checkbox
+          key={reason.id}
+          id={reason.id}
+          name="reasons"
+          label={reason.name}
+          value={reason.id}
+        />
+      ))}
+    </FieldGroup>
+  </>
+);
+
+const CoursesCheckboxes = ({ courses }) => (
+  <>
+    <Header type="h4">
+      Classes visiting for
+      <ErrorMessage name="courses">
+        {message => <div style={{ color: 'red' }}>{message}</div>}
+      </ErrorMessage>
+    </Header>
+    <FieldGroup>
+      {courses.map(course => (
+        <Checkbox
+          key={course.CRN}
+          id={course.CRN}
+          type="checkbox"
+          name="courses"
+          label={course.courseName}
+          value={course.CRN}
+        />
+      ))}
+    </FieldGroup>
+  </>
 );
 
 const FullScreenContainer = styled.div`
