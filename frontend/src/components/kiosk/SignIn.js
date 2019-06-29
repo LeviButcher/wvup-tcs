@@ -1,5 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
+import { Link } from '@reach/router';
 import { Formik, Form, Field } from 'formik';
 import { Card, Input, Header, Button, FieldGroup } from '../../ui';
 
@@ -21,6 +22,7 @@ const Courses = [
 const SignIn = () => (
   <FullScreenContainer>
     <Card>
+      <Link to="/">Go Back</Link>
       <Formik
         initialValues={{ email: '' }}
         validate={values => {
@@ -101,7 +103,7 @@ const FullScreenContainer = styled.div`
   padding: ${props => props.theme.padding};
   height: calc(100vh - 75px);
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-evenly;
 `;
 

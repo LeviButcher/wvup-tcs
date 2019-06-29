@@ -1,8 +1,10 @@
 import styled from 'styled-components';
 import marginConvertor from '../utils/marginConvertor';
+import intentToColorConvertor from '../utils/intentToColorConvertor';
 
 export default styled.button.attrs(props => ({
-  margin: marginConvertor(props.align)
+  margin: marginConvertor(props.align),
+  background: intentToColorConvertor(props.intent)
 }))`
   margin: ${props => props.margin};
   display: ${props => props.display || 'block'};
@@ -10,12 +12,16 @@ export default styled.button.attrs(props => ({
   padding: 0.75rem 1.75rem;
   border: none;
 
-  background-color: #4646da;
+  background: ${props => props.background};
   color: white;
   &[disabled] {
-    background-color: #bfbfff;
+    background: #bfbfff;
   }
   &:hover {
-    box-shadow: 0 0 10px 1px #4646daff;
+    box-shadow: 0 0 10px 1px ${props => props.background}bb;
+  }
+  & > a {
+    color: white;
+    text-decoration: none;
   }
 `;

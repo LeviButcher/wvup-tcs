@@ -1,11 +1,13 @@
 import React from 'react';
 import styled from 'styled-components';
+import { Link } from '@reach/router';
 import { Formik, Form, Field } from 'formik';
 import { Card, Input, Header, Button } from '../../ui';
 
 const SignOut = () => (
   <FullScreenContainer>
     <Card>
+      <Link to="/">Go Back</Link>
       <Formik
         initialValues={{ email: '' }}
         validate={values => {
@@ -49,8 +51,8 @@ const FullScreenContainer = styled.div`
   padding: ${props => props.theme.padding};
   height: calc(100vh - ${props => props.theme.kioskHeaderSize});
   display: flex;
-  align-items: flex-start;
-  justify-content: space-evenly;
+  align-items: center;
+  justify-content: center;
 `;
 
 export default SignOut;
