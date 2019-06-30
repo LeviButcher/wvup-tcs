@@ -9,6 +9,7 @@ import {
 } from 'react-vis';
 import styled from 'styled-components';
 import { Formik, Form, Field } from 'formik';
+import { CSVLink } from 'react-csv';
 import { Card, Header, Button, Input, Table } from '../../ui';
 import dataPointsConvertor from '../../utils/dataPointsConvertor';
 
@@ -75,7 +76,13 @@ const ClassTourReport = () => {
           </Card>
         )}
       </div>
-      <div>{tours && <ClassTourSumTable classTours={tours} />}</div>
+      <div>
+        {tours && (
+          <>
+            <ClassTourSumTable classTours={tours} />
+          </>
+        )}
+      </div>
     </ReportLayout>
   );
 };
@@ -84,7 +91,12 @@ const ClassTourSumTable = ({ classTours }) => {
   return (
     <Table>
       <caption>
-        <Header>Total visitors per group</Header>
+        <Header>
+          Total visitors per group -{' '}
+          <CSVLink data={classTours} filename="classTourReport">
+            Download
+          </CSVLink>
+        </Header>
       </caption>
       <thead>
         <tr>

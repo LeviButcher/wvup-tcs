@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import { Link } from '@reach/router';
 import { Form, Field, Formik } from 'formik';
+import { CSVLink } from 'react-csv';
 import { Input, Button, Card, Table, Header } from '../../ui';
 import callApi from '../../utils/callApi';
 
@@ -60,7 +61,12 @@ const ClassTourLookup = () => {
         <>
           <Table>
             <caption>
-              <Header>Class Tours</Header>
+              <Header>
+                Class Tours -{' '}
+                <CSVLink data={tours} filename="classTourLookup">
+                  Download
+                </CSVLink>
+              </Header>
             </caption>
             <thead align="left">
               <tr>
