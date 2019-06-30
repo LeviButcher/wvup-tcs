@@ -1,7 +1,13 @@
 import React from 'react';
 import { Router } from '@reach/router';
 import { ThemeProvider } from 'styled-components';
-import { KioskLayout, Home, SignIn, SignOut } from './components/kiosk';
+import {
+  KioskLayout,
+  Home,
+  SignIn,
+  SignOut,
+  SignInTeacher
+} from './components/kiosk';
 import {
   DashboardLayout,
   ClassTourLookup,
@@ -27,6 +33,7 @@ function App() {
             <Home path="/" />
             <SignIn path="/signin" />
             <SignOut path="/signout" />
+            <SignInTeacher path="/signin/teacher" />
             <NotFound default />
           </KioskLayout>
           <IsAuthenticated redirectRoute="/login" path="/dashboard">

@@ -1,49 +1,17 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Link } from '@reach/router';
-import { Formik, Form, Field } from 'formik';
-import { Card, Input, Header, Button } from '../../ui';
+import EmailForm from '../EmailForm';
 
 const SignOut = () => (
   <FullScreenContainer>
-    <Card>
-      <Link to="/">Go Back</Link>
-      <Formik
-        initialValues={{ email: '' }}
-        validate={values => {
-          const errors = {};
-          if (!values.email) {
-            errors.email = 'Required';
-          } else if (
-            !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(values.email)
-          ) {
-            errors.email = 'Invalid email address';
-          }
-          return errors;
-        }}
-        onSubmit={(values, { setSubmitting }) => {
-          setTimeout(() => {
-            setSubmitting(false);
-          }, 1000);
-        }}
-      >
-        {({ isSubmitting }) => (
-          <Form>
-            <Header>Student Sign Out</Header>
-            <Field
-              id="email"
-              type="email"
-              name="email"
-              component={Input}
-              label="Email"
-            />
-            <Button type="submit" align="right" disabled={isSubmitting}>
-              Submit
-            </Button>
-          </Form>
-        )}
-      </Formik>
-    </Card>
+    <EmailForm
+      title="Sign Out"
+      onSubmit={(values, { setSubmitting }) => {
+        setTimeout(() => {
+          setSubmitting(false);
+        }, 1000);
+      }}
+    />
   </FullScreenContainer>
 );
 
