@@ -6,7 +6,11 @@ import {
   DashboardLayout,
   ClassTourLookup,
   Login,
-  ClassTourReport
+  ClassTourReport,
+  VolunteerReport,
+  WeeklyVisitsReport,
+  PeakHoursReport,
+  ReasonForVisitingReport
 } from './components/dashboard';
 import Theme from './theme.json';
 import NotFound from './components/NotFound';
@@ -36,6 +40,10 @@ function App() {
                 action="Update"
               />
               <ClassTourReport path="/report/tours" />
+              <VolunteerReport path="/report/volunteer" />
+              <WeeklyVisitsReport path="/report/weekly-visits" />
+              <PeakHoursReport path="/report/peak-hours" />
+              <ReasonForVisitingReport path="/report/reason-for-visiting" />
               <NotFound default />
             </DashboardLayout>
           </IsAuthenticated>

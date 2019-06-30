@@ -7,11 +7,11 @@ import {
   XAxis,
   YAxis
 } from 'react-vis';
-import styled from 'styled-components';
-import { Formik, Form, Field } from 'formik';
 import { CSVLink } from 'react-csv';
-import { Card, Header, Button, Input, Table } from '../../ui';
+import { Card, Header, Table, ReportLayout } from '../../ui';
 import dataPointsConvertor from '../../utils/dataPointsConvertor';
+import StartToEndDateForm from '../StartToEndDateForm';
+import makeAsync from '../../utils/makeAsync';
 
 const tourToXYPoint = dataPointsConvertor('name', 'totalTourists');
 
@@ -22,48 +22,22 @@ const toursData = [
   { name: 'Ravenswood High', totalTourists: 25 }
 ];
 
-const getClassTourSum = () =>
-  new Promise(res => setTimeout(() => res(toursData), 1000));
+const getClassTourSum = makeAsync(1000, toursData);
 
 const ClassTourReport = () => {
   const [tours, setTours] = useState();
   return (
     <ReportLayout>
       <div>
-        <Card>
-          <Header>Class Tour Report</Header>
-          <p>Enter begin and end date</p>
-          <Formik
-            onSubmit={(values, { setSubmitting }) => {
-              getClassTourSum().then(res => {
-                setTours(res);
-                setSubmitting(false);
-              });
-            }}
-          >
-            {({ isSubmitting }) => (
-              <Form>
-                <Field
-                  id="startDate"
-                  type="date"
-                  name="startDate"
-                  component={Input}
-                  label="start Date"
-                />
-                <Field
-                  id="endDate"
-                  type="date"
-                  name="endDate"
-                  component={Input}
-                  label="end Date"
-                />
-                <Button align="right" intent="primary" disabled={isSubmitting}>
-                  Run Report
-                </Button>
-              </Form>
-            )}
-          </Formik>
-        </Card>
+        <StartToEndDateForm
+          onSubmit={(values, { setSubmitting }) => {
+            getClassTourSum().then(res => {
+              setTours(res);
+              setSubmitting(false);
+            });
+          }}
+          name="Class Tour"
+        />
         {tours && (
           <Card width="600px">
             <XYPlot height={300} width={500} xType="ordinal" color="#1A70E3">
@@ -115,12 +89,5 @@ const ClassTourSumTable = ({ classTours }) => {
     </Table>
   );
 };
-
-const ReportLayout = styled.div`
-  display: grid;
-  grid-template: 'form report' 1fr / auto 1fr;
-  grid-gap: 30px;
-  align-items: flex-start;
-`;
 
 export default ClassTourReport;
