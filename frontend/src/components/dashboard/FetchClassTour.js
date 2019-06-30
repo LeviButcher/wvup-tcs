@@ -15,7 +15,7 @@ const FetchClassTour = ({ Component, classTourId, ...props }) => {
       .catch(e => {
         alert(e);
       });
-  }, []);
+  }, [classTourId]);
 
   return <>{tour && <Component classTour={tour} classTourId {...props} />}</>;
 };

@@ -16,7 +16,6 @@ const LayoutGrid = styled.div`
   display: grid;
   grid-template: 'nav main' 100vh / 250px auto;
 
-
   & > main {
     padding: ${props => props.theme.padding};
     overflow-y: scroll;
@@ -41,16 +40,16 @@ const SideNav = () => {
       </LinkGroup>
       <LinkGroup>
         <Header type="h2">Reports</Header>
-        <NavLink to="signins">Class Tour</NavLink>
-        <NavLink to="signins">Volunteer</NavLink>
-        <NavLink to="signins">Weekly Visits</NavLink>
-        <NavLink to="signins">Peak Hours</NavLink>
-        <NavLink to="signins">Success</NavLink>
+        <NavLink to="report/tours">Class Tour</NavLink>
+        <NavLink to="report/volunteer">Volunteer</NavLink>
+        <NavLink to="report/weekly-visits">Weekly Visits</NavLink>
+        <NavLink to="report/peak-hours">Peak Hours</NavLink>
+        <NavLink to="report/success">Success</NavLink>
       </LinkGroup>
       <LinkGroup>
         <Header type="h2">Admin</Header>
-        <NavLink to="signins">Users</NavLink>
-        <NavLink to="signins">Reason for Visiting</NavLink>
+        <NavLink to="admin/users">Users</NavLink>
+        <NavLink to="admin/">Reason for Visiting</NavLink>
       </LinkGroup>
     </nav>
   );

@@ -1,11 +1,12 @@
 import React from 'react';
-import { navigate, Router } from '@reach/router';
+import { Router } from '@reach/router';
 import { ThemeProvider } from 'styled-components';
 import { KioskLayout, Home, SignIn, SignOut } from './components/kiosk';
 import {
   DashboardLayout,
   ClassTourLookup,
-  Login
+  Login,
+  ClassTourReport
 } from './components/dashboard';
 import Theme from './theme.json';
 import NotFound from './components/NotFound';
@@ -34,6 +35,7 @@ function App() {
                 Component={ClassTourForm}
                 action="Update"
               />
+              <ClassTourReport path="/report/tours" />
               <NotFound default />
             </DashboardLayout>
           </IsAuthenticated>
@@ -44,6 +46,8 @@ function App() {
   );
 }
 
-const Hello = () => <div>Yup</div>;
+const Hello = () => (
+  <div>Hey Levi you need to make this default dashboard view</div>
+);
 
 export default App;
