@@ -44,6 +44,7 @@ const SideNav = () => {
         <NavLink to="report/volunteer">Volunteer</NavLink>
         <NavLink to="report/weekly-visits">Weekly Visits</NavLink>
         <NavLink to="report/peak-hours">Peak Hours</NavLink>
+        <NavLink to="report/reason-for-visiting">Reasons For Visiting</NavLink>
         <NavLink to="report/success">Success</NavLink>
       </LinkGroup>
       <LinkGroup>
