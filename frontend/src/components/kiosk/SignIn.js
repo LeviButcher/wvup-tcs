@@ -91,7 +91,6 @@ const SignIn = () => {
             return errors;
           }}
           onSubmit={async (values, { setSubmitting }) => {
-            console.log(values);
             setSubmitting(false);
           }}
         >
