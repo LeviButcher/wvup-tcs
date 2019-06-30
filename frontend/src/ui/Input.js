@@ -27,8 +27,16 @@ export default styled(Input)`
     display: block;
     width: 100%;
     margin-bottom: 10px;
+    color: #444;
   }
   & input {
     margin-bottom: 20px;
+    border-radius: 5px;
+    border: 2px solid #ccc;
+    padding: 0.5rem;
+  }
+  & input:focus {
+    outline: 0;
+    border: 2px solid ${props => props.theme.color.primary};
   }
 `;
