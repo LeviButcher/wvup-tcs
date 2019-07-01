@@ -60,6 +60,12 @@ namespace tcs_service.Controllers
             return Ok(classTour);
         }
 
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<ClassTour>>> Get([FromQuery] DateTime start, [FromQuery] DateTime end)
+        {
+            return Ok(await _classTourRepo.GetBetweenDates(start, end));
+        }
+
         [HttpPut("{id}")]
         [Produces(typeof(ClassTour))]
         public async Task<IActionResult> PutClassTour([FromRoute] int id, [FromBody] ClassTour classTour)
@@ -124,6 +130,11 @@ namespace tcs_service.Controllers
             var tour = await _classTourRepo.Remove(id);
 
             return Ok(tour);
+        }
+
+        public async Task<ActionResult<IEnumerable<ClassTour>>> GetBetweenDates(DateTime start, DateTime end)
+        {
+            return Ok(await _classTourRepo.GetBetweenDates(start, end));
         }
     }
 }

@@ -12,5 +12,7 @@ namespace tcs_service.Repos.Interfaces
         Task<ClassTour> Add(ClassTour tour);
 
         Task<ClassTour> Update(ClassTour tour);
+
+        Task<IEnumerable<ClassTour>> GetBetweenDates(DateTime start, DateTime end);
     }
 }

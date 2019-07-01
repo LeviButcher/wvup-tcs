@@ -20,6 +20,18 @@ namespace tcs_service.Repos.Interfaces
 
         Task<Course> AddCourse(Course course);
 
+        Task<bool> CourseExist(int id);
+
         Task<Reason> AddReason(Reason reason);
+
+        Task<bool> ReasonExist(int id);
+
+        Task<Person> AddPerson(Person person);
+
+        Task<bool> PersonExist(int id);
+
+        Task<bool> DepartmentExist(int id);
+
+        SignIn GetMostRecentSignInByID(int id);
     }
 }

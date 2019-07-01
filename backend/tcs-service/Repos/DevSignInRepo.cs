@@ -10,8 +10,8 @@ namespace tcs_service.Repos
 {
     public class DevSignInRepo : SignInRepo
     {
-        public DevSignInRepo(TCSContext context) : base(context) { }
-            
+        public DevSignInRepo(DbContextOptions options) : base(options) { }
+
         public DbSet<Person> PersonTable;
         public DbSet<Course> CourseTable;
         StudentInfoViewModel studentInfoViewModel = new StudentInfoViewModel();

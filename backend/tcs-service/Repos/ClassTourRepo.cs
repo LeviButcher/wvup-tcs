@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using tcs_service.EF;
@@ -35,6 +36,11 @@ namespace tcs_service.Repos
         public override IEnumerable<ClassTour> GetAll()
         {
             return _db.ClassTours;
+        }
+
+        public Task<IEnumerable<ClassTour>> GetBetweenDates(DateTime start, DateTime end)
+        {
+            throw new NotImplementedException();
         }
 
         public async override Task<ClassTour> Remove(int id)

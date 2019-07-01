@@ -16,7 +16,7 @@ namespace tcs_service.Controllers
     {
         private ISignInRepo _iRepo;
 
-        public SignInsController( ISignInRepo iRepo )
+        public SignInsController(ISignInRepo iRepo)
         {
             _iRepo = iRepo;
         }
@@ -66,30 +66,70 @@ namespace tcs_service.Controllers
             signIn.Tutoring = signInViewModel.Tutoring;
             signIn.InTime = DateTime.Now;
 
-            foreach(Course course in signInViewModel.Courses)
+            if (!await _iRepo.PersonExist(signInViewModel.PersonId))
             {
-                var signInCourse = new SignInCourse
+                var person = new Person
                 {
-                    SignInID = signIn.ID,
-                    CourseID = course.CRN
+                    ID = signInViewModel.PersonId,
+                    PersonType = signInViewModel.Type,
+                    FirstName = signInViewModel.FirstName,
+                    LastName = signInViewModel.LastName,
+                    Email = signInViewModel.Email
                 };
 
-                await _iRepo.AddCourse(course);
-
-                signIn.Courses.Add(signInCourse);
+                await _iRepo.AddPerson(person);
             }
 
-            foreach (Reason reason in signInViewModel.Reasons)
+            if (signInViewModel.Tutoring && signInViewModel.Courses == null)
             {
-                await _iRepo.AddReason(reason);
+                return BadRequest("Must select one or more courses");
+            }
 
-                var signInReason = new SignInReason
+            if (!signInViewModel.Tutoring && signInViewModel.Reasons == null)
+            {
+                return BadRequest("Must select one or more reason for visit");
+            }
+
+            if (signInViewModel.Courses != null)
+            {
+                foreach (Course course in signInViewModel.Courses)
                 {
-                    SignInID = signIn.ID,
-                    ReasonID = reason.ID
-                };
+                    course.DepartmentID = course.Department.Code;
+                    var signInCourse = new SignInCourse
+                    {
+                        SignInID = signIn.ID,
+                        CourseID = course.CRN
+                    };
 
-                signIn.Reasons.Add(signInReason);
+
+                    if (!await _iRepo.CourseExist(course.CRN))
+                    {
+                        await _iRepo.AddCourse(course);
+                    }
+
+
+
+                    signIn.Courses.Add(signInCourse);
+                }
+            }
+
+            if (signInViewModel.Reasons != null)
+            {
+                foreach (Reason reason in signInViewModel.Reasons)
+                {
+                    if (!await _iRepo.ReasonExist(reason.ID))
+                    {
+                        await _iRepo.AddReason(reason);
+                    }
+
+                    var signInReason = new SignInReason
+                    {
+                        SignInID = signIn.ID,
+                        ReasonID = reason.ID
+                    };
+
+                    signIn.Reasons.Add(signInReason);
+                }
             }
 
             await _iRepo.Add(signIn);
@@ -127,20 +167,22 @@ namespace tcs_service.Controllers
             }
         }
 
-        //PUT: api/SignIns/5/SignOut
-        [HttpPut("{id}")]
-        public async Task<IActionResult> SignOut([FromRoute] int id, [FromBody] SignIn signIn)
+        [HttpPut("{id}/signOut")]
+        public async Task<IActionResult> SignOut([FromRoute] int id)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            if (id != signIn.ID)
+            var signIn = await GetMostRecentById(id);
+
+            if(signIn == null)
             {
-                return BadRequest("IDs do not match");
+                return NotFound();
             }
-            if(signIn.InTime == null)
+
+            if (signIn.OutTime != null)
             {
                 return BadRequest("Student is not signed in");
             }
@@ -148,6 +190,29 @@ namespace tcs_service.Controllers
             signIn.OutTime = DateTime.Now;
             await _iRepo.Update(signIn);
             return Ok(signIn);
+        }
+
+        [HttpGet("{studentID}/id")]
+        public StudentInfoViewModel GetStudentInfoWithID([FromRoute] int studentID)
+        {
+            return _iRepo.GetStudentInfoWithID(studentID);
+        }
+
+        // GET: api/SignIns/student@wvup.edu/email
+        [HttpGet("{studentEmail}/email")]
+        public StudentInfoViewModel GetStudentInfoWithEmail([FromRoute] string studentEmail)
+        {
+            return _iRepo.GetStudentInfoWithEmail(studentEmail);
+        }
+       
+        private async Task<SignIn> GetMostRecentById(int id)
+        {
+            if(! await _iRepo.PersonExist(id))
+            {
+                return null;
+            }
+
+            return  _iRepo.GetMostRecentSignInByID(id);
         }
     }
 }

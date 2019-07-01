@@ -66,7 +66,7 @@ namespace tcs_service_test.Controllers
                 .Create();
 
             var res = await sut.PostSignIn(signIn);
-            var objectResult = Assert.IsType<BadRequestResult>(res);
+            var objectResult = Assert.IsType<BadRequestObjectResult>(res);
             Assert.Equal(400, objectResult.StatusCode);
         }
 
@@ -79,7 +79,7 @@ namespace tcs_service_test.Controllers
                 .Create();
 
             var res = await sut.PostSignIn(signIn);
-            var objectResult = Assert.IsType<BadRequestResult>(res);
+            var objectResult = Assert.IsType<BadRequestObjectResult>(res);
             Assert.Equal(400, objectResult.StatusCode);
         }
 
