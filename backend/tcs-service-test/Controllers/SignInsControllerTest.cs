@@ -84,45 +84,6 @@ namespace tcs_service_test.Controllers
         }
 
         [Fact]
-        public async void StudentSignsOut_WhileNotSignedIn_ShouldFail()
-        {
-            var signIn = fixture.Build<SignIn>()
-                .Without(x => x.InTime)
-                .Without(x => x.OutTime)
-               .Create();
-
-            var res = await sut.SignOut(signIn.ID, signIn);
-            var objectResult = Assert.IsType<BadRequestObjectResult>(res);
-            Assert.Equal(400, objectResult.StatusCode);
-        }
-
-        [Fact]
-        public async void StudentSignsOut_WhileSignedIn_ShouldPass()
-        {
-            var signIn = fixture.Build<SignIn>()
-               .Without(x => x.OutTime)
-               .Create();
-
-            var res = await sut.SignOut(signIn.ID, signIn);
-            var objectResult = Assert.IsType<OkObjectResult>(res);
-            Assert.Equal(200, objectResult.StatusCode);
-        }
-
-        //TODO
-        [Fact]
-        public async void StudentSignsIn_WhileAlreadySignedIn_ShouldPass()
-        {
-            Assert.True(true);
-        }
-
-        //TODO
-        [Fact]
-        public async void SignIn_WithExistingDepartment_ShouldPass()
-        {
-            Assert.True(true);
-        }
-
-        [Fact]
         public async void CreateSignIn_WithPreviouslyUnexistingCourseAndDepartment_ShouldPass()
         {
             var department = fixture.Create<Department>();
