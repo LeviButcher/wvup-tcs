@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -9,7 +10,7 @@ namespace tcs_service.Repos
 {
     public class ProdSignInRepo : SignInRepo
     {
-        public ProdSignInRepo(TCSContext context) : base(context) { }
+        public ProdSignInRepo(DbContextOptions options) : base(options) { }
         public override StudentInfoViewModel GetStudentInfoWithEmail(string studentEmail)
         {
             throw new NotImplementedException();

@@ -13,10 +13,10 @@ namespace tcs_service.Repos
 {
     public abstract class SignInRepo : BaseRepo<SignIn>, ISignInRepo
     {
-       
-        public SignInRepo(TCSContext context)
+
+        public SignInRepo(DbContextOptions options) : base(options)
         {
-            _db = context;
+
         }
 
         public async Task<SignIn> Add(SignIn signIn)
@@ -68,11 +68,48 @@ namespace tcs_service.Repos
             return course;
         }
 
+        public async Task<bool> CourseExist(int id)
+        {
+            return await _db.Courses.AnyAsync(e => e.CRN == id);
+        }
+
+
         public async Task<Reason> AddReason(Reason reason)
         {
             await _db.AddAsync(reason);
             await _db.SaveChangesAsync();
             return reason;
+        }
+
+        public async Task<bool> ReasonExist(int id)
+        {
+            return await _db.Reasons.AnyAsync(e => e.ID == id);
+        }
+
+        public async Task<Department> AddDepartment(Department dept)
+        {
+            await _db.AddAsync(dept);
+            await _db.SaveChangesAsync();
+            return dept;
+        }
+
+        public async Task<bool> DepartmentExist(int id)
+        {
+            return await _db.Departments.AnyAsync(e => e.Code == id);
+        }
+
+
+
+        public async Task<Person> AddPerson(Person person)
+        {
+            await _db.AddAsync(person);
+            await _db.SaveChangesAsync();
+            return person;
+        }
+
+        public async Task<bool> PersonExist(int id)
+        {
+            return await _db.People.AnyAsync(e => e.ID == id);
         }
 
         private async Task<bool> SemesterExists(int id)
@@ -104,6 +141,17 @@ namespace tcs_service.Repos
             });
 
             return semester.Entity;
+        }
+
+        // needs to be async
+        public SignIn GetMostRecentSignInByID(int id)
+        {
+             var signIn = _db.SignIns.Where(p => p.PersonId == id)
+                .GroupBy(x => x.PersonId)
+                .Select(e => e.OrderByDescending(t => t.InTime)).FirstOrDefault();
+               
+
+            return signIn.First();
         }
 
         public abstract StudentInfoViewModel GetStudentInfoWithEmail(string studentEmail);

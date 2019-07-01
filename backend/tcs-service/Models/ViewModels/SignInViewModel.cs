@@ -12,6 +12,7 @@ namespace tcs_service.Models.ViewModels
 
         public int PersonId { get; set; }
 
+        public PersonType Type { get; set; }
         public string FirstName { get; set; }
 
         public string LastName { get; set; }

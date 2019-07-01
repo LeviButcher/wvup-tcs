@@ -70,7 +70,7 @@ namespace tcs_service_test
         public async void UpdatingTourWithIDNotInDb_ShouldReturnBadRequest()
         {
             IActionResult results = await sut.PutClassTour(classTour.ID + 1, classTour);
-            var badRequestResult = Assert.IsType<BadRequestResult>(results);
+            var badRequestResult = Assert.IsType<BadRequestObjectResult>(results);
 
             Assert.Equal(400, badRequestResult.StatusCode);
         }
