@@ -16,7 +16,8 @@ import {
   VolunteerReport,
   WeeklyVisitsReport,
   PeakHoursReport,
-  ReasonForVisitingReport
+  ReasonForVisitingReport,
+  SuccessReport
 } from './components/dashboard';
 import Theme from './theme.json';
 import NotFound from './components/NotFound';
@@ -51,6 +52,7 @@ function App() {
               <WeeklyVisitsReport path="/report/weekly-visits" />
               <PeakHoursReport path="/report/peak-hours" />
               <ReasonForVisitingReport path="/report/reason-for-visiting" />
+              <SuccessReport path="/report/success" />
               <NotFound default />
             </DashboardLayout>
           </IsAuthenticated>

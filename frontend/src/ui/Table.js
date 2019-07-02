@@ -18,6 +18,12 @@ export default styled.table`
     background: #ddd;
   }
   & td {
-    padding: 0.5rem;
+    padding: 0.5rem 1rem;
+  }
+
+  & tfoot {
+    border-bottom: 2px solid ${props => props.theme.color.main};
+    /* background: ${props => props.theme.color.main}; */
+    color: #888;
   }
 `;
