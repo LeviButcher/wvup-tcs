@@ -30,6 +30,7 @@ const Login = () => {
                   `${process.env.REACT_APP_TOKEN}`,
                   user.token
                 );
+                localStorage.setItem('username', user.username);
                 navigate('/dashboard');
               })
               .catch(async error => {
