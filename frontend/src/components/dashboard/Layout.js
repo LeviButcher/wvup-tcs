@@ -1,6 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { Header, Link } from '../../ui';
+import Logout from '../Logout';
 
 const Layout = ({ children }) => (
   <LayoutGrid>
@@ -33,6 +34,7 @@ const SideNav = () => {
   return (
     <nav>
       <MainHeader align="center">TCS</MainHeader>
+      <Logout />
       <LinkGroup>
         <Header type="h2">Lookups</Header>
         <NavLink to="signins">Sign Ins</NavLink>
