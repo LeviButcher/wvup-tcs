@@ -92,9 +92,15 @@ namespace tcs_service.Controllers
 
             if (signInViewModel.Courses != null)
             {
+                
                 foreach (Course course in signInViewModel.Courses)
                 {
                     course.DepartmentID = course.Department.Code;
+                    if(await _iRepo.DepartmentExist(course.Department.Code))
+                    {
+                        course.Department = null;
+                    }
+
                     var signInCourse = new SignInCourse
                     {
                         SignInID = signIn.ID,
@@ -106,9 +112,7 @@ namespace tcs_service.Controllers
                     {
                         await _iRepo.AddCourse(course);
                     }
-
-
-
+                        
                     signIn.Courses.Add(signInCourse);
                 }
             }
