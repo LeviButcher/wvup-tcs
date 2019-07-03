@@ -28,7 +28,7 @@ namespace tcs_service.Repos
         }
 
         public UserRepo(DbContextOptions options, IOptions<AppSettings> appSettings) : base(options)
-        {   
+        {
             _appSettings = appSettings.Value;
         }
 
@@ -68,14 +68,14 @@ namespace tcs_service.Repos
             user.PasswordSalt = passwordSalt;
 
             await _db.Users.AddAsync(user);
-            _db.SaveChanges();
+            await _db.SaveChangesAsync();
 
             return user;
         }
 
-        public void Update(User userParam, string password = null)
+        public async Task<User> Update(User userParam, string password = null)
         {
-            var user = _db.Users.Find(userParam.ID);
+            var user = await _db.Users.FindAsync(userParam.ID);
 
             if (user == null)
                 throw new AppException("User not found");
@@ -83,7 +83,7 @@ namespace tcs_service.Repos
             if (userParam.Username != user.Username)
             {
                 // username has changed so check if the new username is already taken
-                if (_db.Users.Any(x => x.Username == userParam.Username))
+                if (await _db.Users.AnyAsync(x => x.Username == userParam.Username))
                     throw new AppException("Username " + userParam.Username + " is already taken");
             }
 
@@ -103,7 +103,8 @@ namespace tcs_service.Repos
             }
 
             _db.Users.Update(user);
-            _db.SaveChanges();
+            await _db.SaveChangesAsync();
+            return user;
         }
 
         public void Delete(int id)
@@ -168,7 +169,7 @@ namespace tcs_service.Repos
 
         public override async Task<bool> Exist(int id)
         {
-           return await _db.Users.AnyAsync(e => e.ID == id);
+            return await _db.Users.AnyAsync(e => e.ID == id);
         }
 
         public override async Task<User> Remove(int id)
