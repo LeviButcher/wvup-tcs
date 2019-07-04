@@ -110,16 +110,6 @@ namespace tcs_service.Repos
             return user;
         }
 
-        public void Delete(int id)
-        {
-            var user = _db.Users.Find(id);
-            if (user != null)
-            {
-                _db.Users.Remove(user);
-                _db.SaveChanges();
-            }
-        }
-
         public override async Task<User> Find(int id)
         {
             return await _db.Users.FindAsync(id);
