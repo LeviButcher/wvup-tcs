@@ -80,6 +80,9 @@ namespace tcs_service.Repos
             if (user == null)
                 throw new AppException("User not found");
 
+            if (user.Username == null)
+                throw new AppException("Username cannot be null");
+
             if (userParam.Username != user.Username)
             {
                 // username has changed so check if the new username is already taken
@@ -178,11 +181,6 @@ namespace tcs_service.Repos
             _db.Users.Remove(user);
             await _db.SaveChangesAsync();
             return user;
-        }
-
-        public User GetById(int id)
-        {
-            throw new NotImplementedException();
         }
     }
 }

@@ -128,7 +128,7 @@ namespace tcs_service.Controllers
         [HttpDelete("{id}")]
         public IActionResult Delete(int id)
         {
-            _userRepo.Delete(id);
+            _userRepo.Remove(id);
             return Ok();
         }
 

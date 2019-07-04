@@ -9,6 +9,8 @@ using tcs_service_test.Helpers;
 using Moq;
 using Microsoft.Extensions.Options;
 using tcs_service.Helpers;
+using Microsoft.EntityFrameworkCore;
+using tcs_service.EF;
 
 namespace tcs_service_test.Repos
 {
@@ -23,18 +25,26 @@ namespace tcs_service_test.Repos
 
         Mock<IOptions<AppSettings>> mockAppSettings;
 
+        TCSContext db;
+
         public UserRepoTest()
         {
             AppSettings appSettings = new AppSettings() { Secret = secret };
             mockAppSettings = new Mock<IOptions<AppSettings>>();
             mockAppSettings.Setup(ap => ap.Value).Returns(appSettings);
-            userRepo = new UserRepo(DbInMemory.getDbInMemoryOptions(dbName), mockAppSettings.Object);
+            var dbOptions = DbInMemory.getDbInMemoryOptions(dbName);
+            db = new TCSContext(dbOptions);
+            userRepo = new UserRepo(dbOptions, mockAppSettings.Object);
             fixture = new Fixture()
               .Customize(new AutoMoqCustomization());
+
+            // Sets all users created by autofixture to not have properties set
+            fixture.Customize<User>((ob) => ob.Without(x => x.ID).Without(x => x.PasswordHash).Without(x => x.PasswordSalt));
         }
 
         public void Dispose()
         {
+            db.Database.EnsureDeleted();
             userRepo = null;
             fixture = null;
         }
@@ -120,10 +130,84 @@ namespace tcs_service_test.Repos
             var createdUser = await userRepo.Create(user, password);
             var originalName = createdUser.Username;
             var updatedUser = createdUser;
-            updatedUser.Username = "updatedUser";
+            
+            updatedUser.Username = updateUserName;
             var updateRes = await userRepo.Update(updatedUser);
+            
             Assert.NotEqual(originalName, updateRes.Username);
-            Assert.Equal(updateRes.Username, updateUserName);
+            Assert.Equal(updateRes.Username, updateUserName);   
+        }
+
+        [Fact]
+        public async void UpdateUser_EmptyUserName_ShouldThrowException()
+        {
+            const string updateUserName = null;
+            var user = fixture.Create<User>();
+            var password = fixture.Create<String>();
+            var createdUser = await userRepo.Create(user, password);
+            
+            var originalName = createdUser.Username;
+            var updatedUser = createdUser;
+
+            updatedUser.Username = updateUserName;
+            await Assert.ThrowsAsync<AppException>(() => userRepo.Update(updatedUser));
+        }
+
+        [Fact]
+        public async void UpdateUser_ChangePassword_HappyPath() {
+            var user = fixture.Create<User>();
+            var password = fixture.Create<String>();
+            var createdUser = await userRepo.Create(user, password);
+            var oldPassword = createdUser.PasswordHash;
+
+            var newPassword = fixture.Create<String>();
+            var updatedUser = await userRepo.Update(createdUser, newPassword);
+
+            Assert.NotEqual(oldPassword, updatedUser.PasswordHash);
+        }
+
+        [Fact]
+        public async void UpdateUser_ChangePasswordWithNull_DoesNotChangeHash() {
+            var user = fixture.Create<User>();
+            var password = fixture.Create<String>();
+            var createdUser = await userRepo.Create(user, password);
+            var oldPassword = createdUser.PasswordHash;
+
+            var newPassword = "";
+            var updatedUser = await userRepo.Update(createdUser, newPassword);
+
+            Assert.Equal(oldPassword, updatedUser.PasswordHash);
+        }
+
+        // Gave real names to make more readable
+        // Have to create a copy to give a new reference so to not automatically updating 
+        // the tom stored in memory db's Username
+        [Fact]
+        public async void UpdateUser_UsernameAlreadyTaken_ThrowsException() {
+            var password = fixture.Create<String>();
+            
+            var bob = fixture.Build<User>().With(x => x.Username, "bob").Create();
+            bob = await userRepo.Create(bob, password);
+            var tom = fixture.Build<User>().With(x => x.Username, "tom").Create();
+            tom = await userRepo.Create(tom, password);
+            
+            var newTom = tom.Copy();
+            newTom.Username = "bob";
+
+            await Assert.ThrowsAsync<AppException>(() => userRepo.Update(newTom));
+        }
+
+        [Fact]
+        public async void RemoveUser_HappyPath() {
+            var password = fixture.Create<String>();
+
+            var bob = fixture.Build<User>().Create();
+            bob = await userRepo.Create(bob, password);
+            
+            await userRepo.Remove(bob.ID);
+            var found = await userRepo.Find(bob.ID);
+
+            Assert.Null(found);
         }
     }
 }
