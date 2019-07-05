@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import { Link } from '@reach/router';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import { Card, Input, Header, Button, FieldGroup, Checkbox } from '../../ui';
+import useQuery from '../../hooks/useQuery';
 
 const SignInSchema = Yup.object().shape({
   email: Yup.string()
@@ -47,18 +48,6 @@ const getCourses = () => {
       resolve(Courses);
     }, 1000);
   });
-};
-
-const useQuery = queryFunc => {
-  const [data, setData] = useState();
-
-  useEffect(() => {
-    queryFunc().then(res => {
-      setData(res);
-    });
-  }, []);
-
-  return [data];
 };
 
 const isWVUPAddress = email => /^[A-Z0-9._%+-]+@wvup.edu$/i.test(email);

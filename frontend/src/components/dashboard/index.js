@@ -6,6 +6,7 @@ import VolunteerReport from './VolunteerReport';
 import WeeklyVisitsReport from './WeeklyVisitsReport';
 import PeakHoursReport from './PeakHoursReport';
 import ReasonForVisitingReport from './ReasonForVisitingReport';
+import UsersManagement from './UsersManagement';
 
 export {
   DashboardLayout,
@@ -15,5 +16,6 @@ export {
   VolunteerReport,
   WeeklyVisitsReport,
   PeakHoursReport,
-  ReasonForVisitingReport
+  ReasonForVisitingReport,
+  UsersManagement
 };
