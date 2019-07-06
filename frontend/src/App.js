@@ -18,7 +18,8 @@ import {
   PeakHoursReport,
   ReasonForVisitingReport,
   UserManagement,
-  UserForm
+  UserForm,
+  SuccessReport
 } from './components/dashboard';
 import Theme from './theme.json';
 import NotFound from './components/NotFound';
@@ -62,6 +63,7 @@ function App() {
                 Component={UserForm}
                 action="Update"
               />
+              <SuccessReport path="/report/success" />
               <NotFound default />
             </DashboardLayout>
           </IsAuthenticated>
