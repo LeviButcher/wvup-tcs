@@ -27,20 +27,7 @@ namespace tcs_service.Controllers
             return await _classTourRepo.Exist(id);
         }
 
-        [HttpGet]
-        [Produces(typeof(DbSet<ClassTour>))]
-        public IActionResult GetClassTour()
-        {
-            var results = new ObjectResult(_classTourRepo.GetAll())
-            {
-                StatusCode = (int)HttpStatusCode.OK
-            };
-
-            //Request.HttpContext.Response.Headers.Add("X-Total-Count", _classTourRepo.GetAll().Count().ToString());
-
-            return results;
-        }
-            
+             
         [HttpGet("{id}")]
         [Produces(typeof(ClassTour))]
         public async Task<IActionResult> GetClassTour([FromRoute] int id)
@@ -132,9 +119,9 @@ namespace tcs_service.Controllers
             return Ok(tour);
         }
 
-        public async Task<ActionResult<IEnumerable<ClassTour>>> GetBetweenDates(DateTime start, DateTime end)
-        {
-            return Ok(await _classTourRepo.GetBetweenDates(start, end));
-        }
+        //public async Task<ActionResult<IEnumerable<ClassTour>>> GetBetweenDates(DateTime start, DateTime end)
+        //{
+        //    return Ok(await _classTourRepo.GetBetweenDates(start, end));
+        //}
     }
 }
