@@ -30,8 +30,12 @@ namespace tcs_service.Repos.Interfaces
 
         Task<bool> PersonExist(int id);
 
+        Task<bool> PersonExist(string email);
+
         Task<bool> DepartmentExist(int id);
 
         SignIn GetMostRecentSignInByID(int id);
+
+        SignIn GetMostRecentSignInByEmail(string email);
     }
 }

@@ -53,7 +53,7 @@ namespace tcs_service.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> PostSignIn([FromBody] SignInViewModel signInViewModel)
+        public async Task<IActionResult> PostSignIn([FromBody] SignInViewModel signInViewModel, bool teacher)
         {
             if (!ModelState.IsValid)
             {
@@ -80,62 +80,65 @@ namespace tcs_service.Controllers
                 await _iRepo.AddPerson(person);
             }
 
-            if (signInViewModel.Tutoring && signInViewModel.Courses == null)
+            if(!teacher)
             {
-                return BadRequest("Must select one or more courses");
-            }
-
-            if (!signInViewModel.Tutoring && signInViewModel.Reasons == null)
-            {
-                return BadRequest("Must select one or more reason for visit");
-            }
-
-            if (signInViewModel.Courses != null)
-            {
-                
-                foreach (Course course in signInViewModel.Courses)
+                if (signInViewModel.Tutoring && signInViewModel.Courses == null)
                 {
-                    course.DepartmentID = course.Department.Code;
-                    if(await _iRepo.DepartmentExist(course.Department.Code))
+                    return BadRequest("Must select one or more courses");
+                }
+
+                if (!signInViewModel.Tutoring && signInViewModel.Reasons == null)
+                {
+                    return BadRequest("Must select one or more reason for visit");
+                }
+
+                if (signInViewModel.Courses != null)
+                {
+
+                    foreach (Course course in signInViewModel.Courses)
                     {
-                        course.Department = null;
+                        course.DepartmentID = course.Department.Code;
+                        if (await _iRepo.DepartmentExist(course.Department.Code))
+                        {
+                            course.Department = null;
+                        }
+
+                        var signInCourse = new SignInCourse
+                        {
+                            SignInID = signIn.ID,
+                            CourseID = course.CRN
+                        };
+
+
+                        if (!await _iRepo.CourseExist(course.CRN))
+                        {
+                            await _iRepo.AddCourse(course);
+                        }
+
+                        signIn.Courses.Add(signInCourse);
                     }
+                }
 
-                    var signInCourse = new SignInCourse
+                if (signInViewModel.Reasons != null)
+                {
+                    foreach (Reason reason in signInViewModel.Reasons)
                     {
-                        SignInID = signIn.ID,
-                        CourseID = course.CRN
-                    };
+                        if (!await _iRepo.ReasonExist(reason.ID))
+                        {
+                            await _iRepo.AddReason(reason);
+                        }
 
+                        var signInReason = new SignInReason
+                        {
+                            SignInID = signIn.ID,
+                            ReasonID = reason.ID
+                        };
 
-                    if (!await _iRepo.CourseExist(course.CRN))
-                    {
-                        await _iRepo.AddCourse(course);
+                        signIn.Reasons.Add(signInReason);
                     }
-                        
-                    signIn.Courses.Add(signInCourse);
                 }
             }
-
-            if (signInViewModel.Reasons != null)
-            {
-                foreach (Reason reason in signInViewModel.Reasons)
-                {
-                    if (!await _iRepo.ReasonExist(reason.ID))
-                    {
-                        await _iRepo.AddReason(reason);
-                    }
-
-                    var signInReason = new SignInReason
-                    {
-                        SignInID = signIn.ID,
-                        ReasonID = reason.ID
-                    };
-
-                    signIn.Reasons.Add(signInReason);
-                }
-            }
-
+            
             await _iRepo.Add(signIn);
             return CreatedAtAction("GetSignIn", new { id = signIn.ID }, signIn);
         }
@@ -171,7 +174,7 @@ namespace tcs_service.Controllers
             }
         }
 
-        [HttpPut("{id}/signOut")]
+        [HttpPut("{id}/IDsignOut")]
         public async Task<IActionResult> SignOut([FromRoute] int id)
         {
             if (!ModelState.IsValid)
@@ -182,6 +185,31 @@ namespace tcs_service.Controllers
             var signIn = await GetMostRecentById(id);
 
             if(signIn == null)
+            {
+                return NotFound();
+            }
+
+            if (signIn.OutTime != null)
+            {
+                return BadRequest("Student is not signed in");
+            }
+
+            signIn.OutTime = DateTime.Now;
+            await _iRepo.Update(signIn);
+            return Ok(signIn);
+        }
+
+        [HttpPut("{email}/SignOut")]
+        public async Task<IActionResult> SignOut([FromRoute] string email)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var signIn = await GetMostRecentByEmail(email);
+
+            if (signIn == null)
             {
                 return NotFound();
             }
@@ -217,6 +245,16 @@ namespace tcs_service.Controllers
             }
 
             return  _iRepo.GetMostRecentSignInByID(id);
+        }
+
+        private async Task<SignIn> GetMostRecentByEmail(string email)
+        {
+            if (!await _iRepo.PersonExist(email))
+            {
+                return null;
+            }
+
+            return _iRepo.GetMostRecentSignInByEmail(email);
         }
     }
 }
