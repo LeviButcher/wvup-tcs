@@ -22,8 +22,6 @@ export default styled.table`
   }
 
   & tfoot {
-    border-bottom: 2px solid ${props => props.theme.color.main};
-    /* background: ${props => props.theme.color.main}; */
-    color: #888;
+    border-top: 2px solid ${props => props.theme.color.main};
   }
 `;

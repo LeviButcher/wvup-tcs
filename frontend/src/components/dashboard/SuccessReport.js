@@ -179,8 +179,7 @@ const SuccessTable = ({ successRecords }) => {
 };
 
 const SpecialRow = styled.tr`
-  background: ${props => props.theme.color.accent}88 !important;
-  font-weight: bold;
+  font-weight: 800;
 `;
 
 // Group by Department, Display Summation of Department records,  Display total at end
