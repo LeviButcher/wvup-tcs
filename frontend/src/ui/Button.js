@@ -11,6 +11,8 @@ export default styled.button.attrs(props => ({
   border-radius: 5px;
   padding: 0.75rem 1.75rem;
   border: none;
+  cursor: pointer;
+  text-decoration: none !important;
 
   background: ${props => props.background};
   color: white;

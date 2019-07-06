@@ -7,6 +7,9 @@ import useQuery from '../../hooks/useQuery';
 
 const getUsers = callApi(`${process.env.REACT_APP_BACKEND}users/`, 'GET');
 
+const deleteUser = id =>
+  callApi(`${process.env.REACT_APP_BACKEND}users/${id}`, 'DELETE', null);
+
 const unWrapFetch = async fetchFunc => {
   const res = await fetchFunc(null);
   return res.json();
@@ -46,18 +49,29 @@ const UserTable = ({ users }) => (
           <td>{user.username}</td>
           <td>{`${user.firstName} ${user.lastName}`}</td>
           <td>
-            <Button
-              display="inline-block"
-              intent="secondary"
-              style={{ margin: '0 1rem' }}
-            >
-              <Link to={`update/${user.id}`}>Update</Link>
-            </Button>
+            <Link to={`update/${user.id}`}>
+              <Button
+                display="inline-block"
+                intent="secondary"
+                style={{ margin: '0 1rem' }}
+              >
+                Update
+              </Button>
+            </Link>
             <Button
               display="inline-block"
               intent="danger"
               style={{ margin: '0 1rem' }}
-              onClick={() => alert('Yell at levi todo')}
+              onClick={() => {
+                if (user.username === localStorage.getItem('username')) {
+                  alert("You can't delete yourself silly");
+                } else {
+                  const goDelete = window.confirm(
+                    `Are you sure you want to delete ${user.username}`
+                  );
+                  if (goDelete) deleteUser(user.id);
+                }
+              }}
             >
               Delete
             </Button>

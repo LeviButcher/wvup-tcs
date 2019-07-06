@@ -20,7 +20,8 @@ function createClassTour(values, { setSubmitting, setStatus }) {
       navigate('/dashboard/tours');
     })
     .catch(e => {
-      message.msg = e.message;
+      console.log(e);
+      message.msg = e.message || e.title;
     })
     .finally(() => {
       setSubmitting(false);
@@ -43,7 +44,7 @@ function updateClassTour(values, { setSubmitting, setStatus }) {
       navigate('/dashboard/tours');
     })
     .catch(e => {
-      message.msg = e.message;
+      message.msg = e.message || e.title;
     })
     .finally(() => {
       setSubmitting(false);
