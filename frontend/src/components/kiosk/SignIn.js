@@ -130,7 +130,7 @@ const ReasonsCheckboxes = ({ reasons }) => (
       </ErrorMessage>
     </Header>
     <FieldGroup>
-      <label>
+      <SingleCheckBoxLabel>
         Tutoring
         <Field
           id="tutoring"
@@ -140,7 +140,7 @@ const ReasonsCheckboxes = ({ reasons }) => (
           label="Tutoring"
           value="Tutoring"
         />
-      </label>
+      </SingleCheckBoxLabel>
       {reasons.map(reason => (
         <Checkbox
           key={reason.id}
@@ -183,6 +183,12 @@ const FullScreenContainer = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-evenly;
+`;
+
+const SingleCheckBoxLabel = styled.label`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 `;
 
 export default SignIn;

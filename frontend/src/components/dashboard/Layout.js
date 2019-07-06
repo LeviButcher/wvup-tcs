@@ -71,9 +71,14 @@ const LinkGroup = styled.div`
 `;
 
 const NavLink = styled(Link)`
+  display: block;
   color: #bbb;
   margin: 0.5rem auto;
-  &:hover {
+  &:hover,
+  &:focus {
+    color: ${props => props.theme.color.accent};
+  }
+  &[aria-current='page'] {
     color: ${props => props.theme.color.accent};
   }
 `;
