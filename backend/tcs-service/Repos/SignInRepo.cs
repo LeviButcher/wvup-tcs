@@ -112,6 +112,11 @@ namespace tcs_service.Repos
             return await _db.People.AnyAsync(e => e.ID == id);
         }
 
+        public async Task<bool> PersonExist(string email)
+        {
+            return await _db.People.AnyAsync(e => e.Email == email);
+        }
+
         private async Task<bool> SemesterExists(int id)
         {
             return await _db.Semesters.AnyAsync(a => a.ID == id);
@@ -150,6 +155,17 @@ namespace tcs_service.Repos
                 .GroupBy(x => x.PersonId)
                 .Select(e => e.OrderByDescending(t => t.InTime)).FirstOrDefault();
                
+
+            return signIn.First();
+        }
+
+        // needs to be async
+        public SignIn GetMostRecentSignInByEmail(string email)
+        {
+            var signIn = _db.SignIns.Where(p => p.Person.Email == email)
+               .GroupBy(x => x.PersonId)
+               .Select(e => e.OrderByDescending(t => t.InTime)).FirstOrDefault();
+
 
             return signIn.First();
         }

@@ -59,7 +59,7 @@ namespace tcs_service.Repos
             Course first = CourseTable.Where(x => x.CRN == 1).First();
             Course second = CourseTable.Where(x => x.CRN == 2).First();
             Course third = CourseTable.Where(x => x.CRN == 3).First();
-            Course fourth = CourseTable.Where(x => x.CRN == 44).First();
+            Course fourth = CourseTable.Where(x => x.CRN == 4).First();
             schedule.Add(first);
             schedule.Add(second);
             schedule.Add(third);
