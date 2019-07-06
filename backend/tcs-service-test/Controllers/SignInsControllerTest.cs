@@ -65,7 +65,7 @@ namespace tcs_service_test.Controllers
                 .Without(x => x.Courses)
                 .Create();
 
-            var res = await sut.PostSignIn(signIn);
+            var res = await sut.PostSignIn(signIn, false);
             var objectResult = Assert.IsType<BadRequestObjectResult>(res);
             Assert.Equal(400, objectResult.StatusCode);
         }
@@ -78,7 +78,7 @@ namespace tcs_service_test.Controllers
                 .Without(x => x.Reasons)
                 .Create();
 
-            var res = await sut.PostSignIn(signIn);
+            var res = await sut.PostSignIn(signIn, false);
             var objectResult = Assert.IsType<BadRequestObjectResult>(res);
             Assert.Equal(400, objectResult.StatusCode);
         }
@@ -98,7 +98,7 @@ namespace tcs_service_test.Controllers
             vm.Courses.Clear();
             vm.Courses.Add(course);
 
-            var res = await sut.PostSignIn(vm);
+            var res = await sut.PostSignIn(vm, false);
             var objectResult = Assert.IsType<CreatedAtActionResult>(res);
             Assert.Equal(201, objectResult.StatusCode);
         }   

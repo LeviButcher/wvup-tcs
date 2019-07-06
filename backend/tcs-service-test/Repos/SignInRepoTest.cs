@@ -93,10 +93,12 @@ namespace tcs_service_test.Repos
 
             var course = fixture.Build<Course>()
                 .With(x => x.Department, dept)
+                .With(x => x.DepartmentID, dept.Code)
                 .Create();
 
             var course2 = fixture.Build<Course>()
                 .With(x => x.Department, dept)
+                .With(x => x.DepartmentID, dept.Code)
                 .Create();
 
             var res = await signInRepo.AddCourse(course);
