@@ -4,24 +4,24 @@ import { navigate } from '@reach/router';
 import { Input, Button, Header, Card } from '../../ui';
 import callApi from '../../utils/callApi';
 
-const postClassTour = callApi(
-  `${process.env.REACT_APP_BACKEND}classtours/`,
+const postUser = callApi(
+  `${process.env.REACT_APP_BACKEND}users/register`,
   'POST'
 );
 
-function createClassTour(values, { setSubmitting, setStatus }) {
+function createUser(values, { setSubmitting, setStatus }) {
+  console.log(values);
   const message = {};
-  postClassTour(values)
+  postUser(values)
     .then(async res => {
       if (res.status !== 201) {
         throw await res.json();
       }
-      alert(`Created tour for ${values.name}`);
-      navigate('/dashboard/tours');
+      alert(`Created user for ${values.username}`);
+      navigate('/dashboard/admin/users');
     })
     .catch(e => {
-      console.log(e);
-      message.msg = e.message || e.title;
+      message.msg = e.message;
     })
     .finally(() => {
       setSubmitting(false);
@@ -31,20 +31,16 @@ function createClassTour(values, { setSubmitting, setStatus }) {
 
 function updateClassTour(values, { setSubmitting, setStatus }) {
   const message = {};
-  callApi(
-    `${process.env.REACT_APP_BACKEND}classtours/${values.id}`,
-    'PUT',
-    values
-  )
+  callApi(`${process.env.REACT_APP_BACKEND}users/${values.id}`, 'PUT', values)
     .then(async res => {
       if (res.status !== 200) {
         throw await res.json();
       }
-      alert(`Updated tour for ${values.name}`);
-      navigate('/dashboard/tours');
+      alert(`Updated user for ${values.username}`);
+      navigate('/dashboard/admin/users');
     })
     .catch(e => {
-      message.msg = e.message || e.title;
+      message.msg = e.message;
     })
     .finally(() => {
       setSubmitting(false);
@@ -55,59 +51,66 @@ function updateClassTour(values, { setSubmitting, setStatus }) {
 function getSubmitForAction(action) {
   switch (action) {
     case 'Create':
-      return createClassTour;
+      return createUser;
     case 'Update':
       return updateClassTour;
     default:
       return () =>
         console.error(
-          'Never hit a case in transalating a action to a submittion function'
+          'Never hit a case in transalating an action to a submittion function'
         );
   }
 }
 
-const classTourDefault = {
-  name: '',
-  dayVisited: '',
-  numberOfStudents: ''
+const userDefault = {
+  username: '',
+  firstName: '',
+  lastName: ''
 };
 
 // do create and updates tours
-const ClassTourForm = ({ data = classTourDefault, action = 'Create' }) => {
+const UserForm = ({ data = userDefault, action = 'Create' }) => {
   return (
     <Card style={{ margin: 'auto' }}>
-      <Formik initialValues={data} onSubmit={getSubmitForAction(action)}>
-        {({ values, status, isSubmitting }) => (
+      <Formik
+        initialValues={{ ...data, password: '' }}
+        onSubmit={getSubmitForAction(action)}
+      >
+        {({ status, isSubmitting }) => (
           <Form>
-            <Header>{action} Tour</Header>
+            <Header>{action} User</Header>
             {status && status.msg && (
               <div style={{ color: 'red' }}>{status.msg}</div>
             )}
             <Field
-              id="name"
+              id="username"
               type="text"
-              name="name"
+              name="username"
               component={Input}
-              label="Name"
+              label="Username"
+              required
             />
             <Field
-              id="dayVisited"
-              type="date"
-              name="dayVisited"
-              value={
-                values.dayVisited.length > 0
-                  ? new Date(values.dayVisited).toISOString().substr(0, 10)
-                  : ''
-              }
+              id="password"
+              type="password"
+              name="password"
               component={Input}
-              label="Date Toured"
+              label="Password"
+              {...{ required: action === 'Create' }}
             />
             <Field
-              id="numberOfStudents"
-              type="number"
-              name="numberOfStudents"
+              id="firstName"
+              type="text"
+              name="firstName"
               component={Input}
-              label="Number of Tourist"
+              label="firstName"
+            />
+            <Field
+              id="lastName"
+              type="text"
+              name="lastName"
+              component={Input}
+              label="lastName"
             />
             <Button align="right" disabled={isSubmitting} type="Submit">
               {action}
@@ -119,4 +122,4 @@ const ClassTourForm = ({ data = classTourDefault, action = 'Create' }) => {
   );
 };
 
-export default ClassTourForm;
+export default UserForm;

@@ -11,8 +11,6 @@ namespace tcs_service.Repos.Interfaces
     {
         Task<User> Authenticate(string username, string password);
         Task<User> Create(User user, string password);
-        void Update(User user, string password = null);
-        void Delete(int id);
-
+        Task<User> Update(User user, string password = null);
     }
 }
