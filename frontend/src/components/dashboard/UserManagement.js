@@ -1,5 +1,6 @@
 import React from 'react';
 import { pipe } from 'ramda';
+import { Link } from '@reach/router';
 import { Table, Header, Button } from '../../ui';
 import callApi from '../../utils/callApi';
 import useQuery from '../../hooks/useQuery';
@@ -21,7 +22,7 @@ const UserManagement = () => {
 
   return (
     <div>
-      <a href="#">Add User</a>
+      <a href="users/create">Add User</a>
       {users && <UserTable users={users} />}
     </div>
   );
@@ -50,12 +51,13 @@ const UserTable = ({ users }) => (
               intent="secondary"
               style={{ margin: '0 1rem' }}
             >
-              Update
+              <Link to={`update/${user.id}`}>Update</Link>
             </Button>
             <Button
               display="inline-block"
               intent="danger"
               style={{ margin: '0 1rem' }}
+              onClick={() => alert('Yell at levi todo')}
             >
               Delete
             </Button>

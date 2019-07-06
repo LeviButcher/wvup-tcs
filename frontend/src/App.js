@@ -17,12 +17,13 @@ import {
   WeeklyVisitsReport,
   PeakHoursReport,
   ReasonForVisitingReport,
-  UsersManagement
+  UserManagement,
+  UserForm
 } from './components/dashboard';
 import Theme from './theme.json';
 import NotFound from './components/NotFound';
 import ClassTourForm from './components/dashboard/ClassTourForm';
-import FetchClassTour from './components/dashboard/FetchClassTour';
+import Fetch from './components/Fetch';
 import IsAuthenticated from './components/IsAuthenticated';
 
 function App() {
@@ -42,8 +43,9 @@ function App() {
               <Hello path="/" />
               <ClassTourLookup path="/tours" />
               <ClassTourForm path="/tours/create" />
-              <FetchClassTour
-                path="/tours/update/:classTourId"
+              <Fetch
+                url={`${process.env.REACT_APP_BACKEND}classtours/`}
+                path="/tours/update/:id"
                 Component={ClassTourForm}
                 action="Update"
               />
@@ -52,7 +54,14 @@ function App() {
               <WeeklyVisitsReport path="/report/weekly-visits" />
               <PeakHoursReport path="/report/peak-hours" />
               <ReasonForVisitingReport path="/report/reason-for-visiting" />
-              <UsersManagement path="/admin/users" />
+              <UserManagement path="/admin/users" />
+              <UserForm path="/admin/users/create" />
+              <Fetch
+                url={`${process.env.REACT_APP_BACKEND}users/`}
+                path="/admin/users/update/:id"
+                Component={UserForm}
+                action="Update"
+              />
               <NotFound default />
             </DashboardLayout>
           </IsAuthenticated>

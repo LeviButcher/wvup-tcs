@@ -98,9 +98,9 @@ namespace tcs_service.Controllers
         }
 
         [HttpGet("{id}")]
-        public IActionResult GetById(int id)
+        public async Task<IActionResult> GetById(int id)
         {
-            var user = _userRepo.Find(id);
+            var user = await _userRepo.Find(id);
             var userDto = _mapper.Map<UserDto>(user);
             return Ok(userDto);
         }
