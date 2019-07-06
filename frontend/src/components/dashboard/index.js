@@ -8,6 +8,7 @@ import PeakHoursReport from './PeakHoursReport';
 import ReasonForVisitingReport from './ReasonForVisitingReport';
 import UserManagement from './UserManagement';
 import UserForm from './UserForm';
+import SuccessReport from './SuccessReport';
 
 export {
   DashboardLayout,
@@ -20,4 +21,5 @@ export {
   ReasonForVisitingReport,
   UserManagement,
   UserForm
+  SuccessReport
 };
