@@ -6,6 +6,8 @@ import VolunteerReport from './VolunteerReport';
 import WeeklyVisitsReport from './WeeklyVisitsReport';
 import PeakHoursReport from './PeakHoursReport';
 import ReasonForVisitingReport from './ReasonForVisitingReport';
+import UserManagement from './UserManagement';
+import UserForm from './UserForm';
 import SuccessReport from './SuccessReport';
 
 export {
@@ -17,5 +19,7 @@ export {
   WeeklyVisitsReport,
   PeakHoursReport,
   ReasonForVisitingReport,
+  UserManagement,
+  UserForm,
   SuccessReport
 };

@@ -1,3 +1,4 @@
+using System.Reflection;
 using System.Linq;
 using System;
 using AutoFixture;
@@ -100,6 +101,38 @@ namespace tcs_service_test.Controllers {
 
             var res = await usersController.Authenticate(user);
             Assert.IsType<BadRequestObjectResult>(res);
+        }
+
+        [Fact]
+        public async void Delete_HappyPath() {
+            userRepo.Setup(x => x.Remove(It.IsAny<int>()))
+                .ReturnsAsync(() => null);
+
+            var id = fixture.Create<int>();
+            var res = await usersController.Delete(id);
+            Assert.IsType<OkResult>(res);
+        }
+
+        [Fact]
+        public async void Update_HappyPath() {
+            userRepo.Setup(x => x.Update(It.IsAny<User>(), It.IsAny<String>()))
+                .ReturnsAsync(() => null);
+
+            var userDto = fixture.Create<UserDto>();
+            var res = await usersController.Update(userDto.Id, userDto);
+            Assert.IsType<OkResult>(res);
+        }
+
+        [Fact]
+        public async void Update_ThrowsException_ReturnsBadRequestWithMessage()
+        {
+            var message = fixture.Create<String>();
+            userRepo.Setup(x => x.Update(It.IsAny<User>(), It.IsAny<String>()))
+                .ThrowsAsync(new AppException(message));
+
+            var userDto = fixture.Create<UserDto>();
+            var res = await usersController.Update(userDto.Id, userDto);
+            var badRequest = Assert.IsType<BadRequestObjectResult>(res);
         }
     }
 }

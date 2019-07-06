@@ -174,9 +174,9 @@ const ReasonsTable = ({ reasons, name }) => {
       </caption>
       <thead>
         <tr>
-          <td>Course</td>
-          <td>CRN</td>
-          <td>Total Students Visited</td>
+          <th>Course</th>
+          <th>CRN</th>
+          <th>Total Students Visited</th>
         </tr>
       </thead>
       <tbody>
