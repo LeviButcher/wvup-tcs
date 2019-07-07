@@ -98,15 +98,15 @@ namespace tcs_service.Controllers
         }
 
         [HttpGet("{id}")]
-        public IActionResult GetById(int id)
+        public async Task<IActionResult> GetById(int id)
         {
-            var user = _userRepo.Find(id);
+            var user = await _userRepo.Find(id);
             var userDto = _mapper.Map<UserDto>(user);
             return Ok(userDto);
         }
 
         [HttpPut("{id}")]
-        public IActionResult Update(int id, [FromBody]UserDto userDto)
+        public async Task<IActionResult> Update(int id, [FromBody]UserDto userDto)
         {
             // map dto to entity and set id
             var user = _mapper.Map<User>(userDto);
@@ -115,7 +115,7 @@ namespace tcs_service.Controllers
             try
             {
                 // save
-                _userRepo.Update(user, userDto.Password);
+                await _userRepo.Update(user, userDto.Password);
                 return Ok();
             }
             catch (AppException ex)
@@ -126,9 +126,9 @@ namespace tcs_service.Controllers
         }
 
         [HttpDelete("{id}")]
-        public IActionResult Delete(int id)
+        public async Task<IActionResult> Delete(int id)
         {
-            _userRepo.Delete(id);
+            await _userRepo.Remove(id);
             return Ok();
         }
 

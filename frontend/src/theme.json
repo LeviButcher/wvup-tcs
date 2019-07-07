@@ -1,8 +1,12 @@
 {
   "padding": "2rem",
   "color": {
-    "main": "rgb(9, 18, 38)",
-    "accent": "#ffc814"
+    "main": "#091226",
+    "accent": "#ffc814",
+    "primary": "#1C41C7",
+    "secondary": "#31BF20",
+    "warning": "#FADC7A",
+    "danger": "#D40A0A"
   },
   "kioskHeaderSize": "75px"
 }

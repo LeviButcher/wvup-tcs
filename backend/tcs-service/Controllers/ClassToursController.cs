@@ -117,10 +117,5 @@ namespace tcs_service.Controllers
 
             return Ok(tour);
         }
-
-        //public async Task<ActionResult<IEnumerable<ClassTour>>> GetBetweenDates(DateTime start, DateTime end)
-        //{
-        //    return Ok(await _classTourRepo.GetBetweenDates(start, end));
-        //}
     }
 }

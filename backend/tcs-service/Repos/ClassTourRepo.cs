@@ -40,17 +40,12 @@ namespace tcs_service.Repos
             return _db.ClassTours;
         }
 
+
         public async Task<IEnumerable<ClassTour>> GetBetweenDates(DateTime start, DateTime end)
         {
             
             var tours =  _db.ClassTours.Where(a => a.DayVisited > start && a.DayVisited < end);
 
-            //var tour = _db.ClassTours.Where(p =>  == id)
-            //   .GroupBy(x => x.PersonId)
-            //   .Select(e => e.OrderByDescending(t => t.InTime)).FirstOrDefault();
-
-           // result.Add(await _db.ClassTours.FirstOrDefaultAsync(a => a.DayVisited > start && a.DayVisited < end));
-            
             return tours;
         }
 

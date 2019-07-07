@@ -1,16 +1,30 @@
 import React from 'react';
 import { Router } from '@reach/router';
 import { ThemeProvider } from 'styled-components';
-import { KioskLayout, Home, SignIn, SignOut } from './components/kiosk';
+import {
+  KioskLayout,
+  Home,
+  SignIn,
+  SignOut,
+  SignInTeacher
+} from './components/kiosk';
 import {
   DashboardLayout,
   ClassTourLookup,
-  Login
+  Login,
+  ClassTourReport,
+  VolunteerReport,
+  WeeklyVisitsReport,
+  PeakHoursReport,
+  ReasonForVisitingReport,
+  UserManagement,
+  UserForm,
+  SuccessReport
 } from './components/dashboard';
 import Theme from './theme.json';
 import NotFound from './components/NotFound';
 import ClassTourForm from './components/dashboard/ClassTourForm';
-import FetchClassTour from './components/dashboard/FetchClassTour';
+import Fetch from './components/Fetch';
 import IsAuthenticated from './components/IsAuthenticated';
 
 function App() {
@@ -22,6 +36,7 @@ function App() {
             <Home path="/" />
             <SignIn path="/signin" />
             <SignOut path="/signout" />
+            <SignInTeacher path="/signin/teacher" />
             <NotFound default />
           </KioskLayout>
           <IsAuthenticated redirectRoute="/login" path="/dashboard">
@@ -29,10 +44,26 @@ function App() {
               <Hello path="/" />
               <ClassTourLookup path="/tours" />
               <ClassTourForm path="/tours/create" />
-              <FetchClassTour
-                path="/tours/update/:classTourId"
+              <Fetch
+                url={`${process.env.REACT_APP_BACKEND}classtours/`}
+                path="/tours/update/:id"
                 Component={ClassTourForm}
+                action="Update"
               />
+              <ClassTourReport path="/report/tours" />
+              <VolunteerReport path="/report/volunteer" />
+              <WeeklyVisitsReport path="/report/weekly-visits" />
+              <PeakHoursReport path="/report/peak-hours" />
+              <ReasonForVisitingReport path="/report/reason-for-visiting" />
+              <UserManagement path="/admin/users" />
+              <UserForm path="/admin/users/create" />
+              <Fetch
+                url={`${process.env.REACT_APP_BACKEND}users/`}
+                path="/admin/users/update/:id"
+                Component={UserForm}
+                action="Update"
+              />
+              <SuccessReport path="/report/success" />
               <NotFound default />
             </DashboardLayout>
           </IsAuthenticated>
@@ -43,6 +74,8 @@ function App() {
   );
 }
 
-const Hello = () => <div>Yup</div>;
+const Hello = () => (
+  <div>Hey Levi you need to make this default dashboard view</div>
+);
 
 export default App;
