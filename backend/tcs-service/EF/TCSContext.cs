@@ -45,8 +45,12 @@ namespace tcs_service.EF
             }
         }
 
+        internal object Where(Func<object, object> p)
+        {
+            throw new NotImplementedException();
+        }
 
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         base.OnConfiguring(optionsBuilder);
     }

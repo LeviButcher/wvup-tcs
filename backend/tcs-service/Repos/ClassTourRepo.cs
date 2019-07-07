@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using tcs_service.EF;
 using tcs_service.Models;
@@ -11,11 +12,12 @@ namespace tcs_service.Repos
 {
     public class ClassTourRepo : BaseRepo<ClassTour>, IClassTourRepo
     {
-        public ClassTourRepo(TCSContext context)
-        {
-            _db = context;
-        }
 
+        public ClassTourRepo(DbContextOptions options) : base(options)
+        {
+
+        }
+        
         public async Task<ClassTour> Add(ClassTour tour)
         {
             await _db.AddAsync(tour);
@@ -38,9 +40,13 @@ namespace tcs_service.Repos
             return _db.ClassTours;
         }
 
-        public Task<IEnumerable<ClassTour>> GetBetweenDates(DateTime start, DateTime end)
+
+        public async Task<IEnumerable<ClassTour>> GetBetweenDates(DateTime start, DateTime end)
         {
-            throw new NotImplementedException();
+            
+            var tours =  _db.ClassTours.Where(a => a.DayVisited > start && a.DayVisited < end);
+
+            return tours;
         }
 
         public async override Task<ClassTour> Remove(int id)
