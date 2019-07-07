@@ -26,8 +26,7 @@ namespace tcs_service.Controllers
         {
             return await _classTourRepo.Exist(id);
         }
-
-             
+                     
         [HttpGet("{id}")]
         [Produces(typeof(ClassTour))]
         public async Task<IActionResult> GetClassTour([FromRoute] int id)

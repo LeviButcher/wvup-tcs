@@ -88,20 +88,6 @@ namespace tcs_service_test
             Assert.Equal(200, okObjectResult.StatusCode);
         }
 
-        // Test passes but only because Request line is commented out in controller
-        // the line is inconsequential for GetClassTour but using Request will be useful for paging
-        [Fact]
-        public void GetAllTours_ShouldWork_Returns200()
-        { 
-            var tours = fixture.CreateMany<ClassTour>();
-            repository.Setup(x => x.GetAll()).Returns(tours);
-            IActionResult results = sut.GetClassTour();
-            var objectResult = Assert.IsType<ObjectResult>(results);
-
-            Assert.Equal(tours, objectResult.Value);
-            Assert.Equal(200, objectResult.StatusCode);
-        }
-
         [Fact]
         public async void GetClassTourNotInDb_ShouldFail_ReturnsNotFound()
         {
