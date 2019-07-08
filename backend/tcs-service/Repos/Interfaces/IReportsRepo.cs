@@ -11,5 +11,7 @@ namespace tcs_service.Repos.Interfaces
         Task<List<ReportCountViewModel>> WeeklyVisits(DateTime startWeek, DateTime endWeek);
 
         Task<List<ReportCountViewModel>> PeakHours(DateTime startWeek, DateTime endWeek);
+
+        Task<List<ClassTourReportViewModel>> ClassTours(DateTime startWeek, DateTime endWeek);
     }
 }

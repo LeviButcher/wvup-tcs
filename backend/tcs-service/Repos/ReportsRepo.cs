@@ -100,5 +100,37 @@ namespace tcs_service.Repos
             
             return realResult;
        }
+
+        public async Task<List<ClassTourReportViewModel>> ClassTours(DateTime startWeek, DateTime endWeek)
+        {
+            var result = new List<ClassTourReportViewModel>();
+            var tourList = new List<ClassTour>();
+            
+            while (startWeek <= endWeek)
+            {
+                tourList =  _db.ClassTours.Where(x => x.DayVisited >= startWeek && x.DayVisited <= startWeek.AddDays(7))
+                    .ToList();
+
+                startWeek = startWeek.AddDays(7);
+            }
+
+            var finalTourList = new List<ClassTour>();
+            foreach( ClassTour tour in tourList){
+                foreach(ClassTour t in tourList)
+                {
+                    if(tour.Name == t.Name)
+                    {
+                        tour.NumberOfStudents += t.NumberOfStudents;
+                    }
+                }
+                result.Add(new ClassTourReportViewModel
+                {
+                    Students = tour.NumberOfStudents,
+                    Name = tour.Name
+                });
+            };
+            
+            return result;
+        }
     }
 }
