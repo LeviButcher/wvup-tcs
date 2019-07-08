@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { Link } from '@reach/router';
+import { Link, navigate } from '@reach/router';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import { Card, Input, Header, Button, FieldGroup, Checkbox } from '../../ui';
 import useQuery from '../../hooks/useQuery';
+import callApi from '../../utils/callApi';
 
 const SignInSchema = Yup.object().shape({
   email: Yup.string()
@@ -13,25 +14,24 @@ const SignInSchema = Yup.object().shape({
   courses: Yup.array()
     .required('Please select at least one course')
     .min(1),
-  reasons: Yup.array()
-    .required('Please select at least one reason for visiting')
-    .min(1),
+  reasons: Yup.array().min(1),
   tutoring: Yup.boolean()
 });
+
+const postSignIn = callApi(`${process.env.REACT_APP_BACKEND}signins/`, 'POST');
+
+const getStudentInfoWithEmail = email =>
+  callApi(
+    `${process.env.REACT_APP_BACKEND}signins/${email}/email`,
+    'GET',
+    null
+  );
 
 const Reasons = [
   { name: 'Computer Use', id: 1 },
   { name: 'Bone Use', id: 2 },
   { name: 'Lab Use', id: 3 },
   { name: 'Misc', id: 4 }
-];
-
-const Courses = [
-  { courseName: 'CS121', CRN: '31345' },
-  { courseName: 'EDUC101', CRN: '23456' },
-  { courseName: 'GBUS304', CRN: '78924' },
-  { courseName: 'SEC300', CRN: '65798' },
-  { courseName: 'CS129', CRN: '32156' }
 ];
 
 const getReasons = () => {
@@ -42,19 +42,14 @@ const getReasons = () => {
   });
 };
 
-const getCourses = () => {
-  return new Promise(resolve => {
-    setTimeout(() => {
-      resolve(Courses);
-    }, 1000);
-  });
-};
-
 const isWVUPAddress = email => /^[A-Z0-9._%+-]+@wvup.edu$/i.test(email);
 
+const findById = id => idProp => obj => obj[idProp] === id;
+
+// test email = mtmqbude26@wvup.edu
 const SignIn = () => {
   const [reasons] = useQuery(getReasons);
-  const [courses, setCourses] = useState();
+  const [student, setStudent] = useState();
 
   return (
     <FullScreenContainer>
@@ -74,13 +69,36 @@ const SignIn = () => {
               errors.email = 'Must be wvup.edu email address';
             }
             if (!errors.email) {
-              const res = await getCourses();
-              setCourses(res);
+              getStudentInfoWithEmail(values.email)
+                .then(async res => {
+                  const studentInfo = await res.json();
+                  setStudent(studentInfo);
+                })
+                .catch(e => alert(e.message));
             }
             return errors;
           }}
           onSubmit={async (values, { setSubmitting }) => {
-            setSubmitting(false);
+            const signIn = {
+              ...values,
+              personId: student.studentID,
+              semesterId: student.semesterId,
+              courses: values.courses.map(courseCRN => {
+                return student.classSchedule.find(ele => ele.crn === courseCRN);
+              }),
+              reasons: null
+            };
+            postSignIn(signIn)
+              .then(async res => {
+                const bod = await res.json();
+                if (res.status === 201) {
+                  // navigate to home page
+                  alert('You are signed in! ');
+                  navigate('/');
+                }
+              })
+              .catch(e => alert(e.message))
+              .finally(() => setSubmitting(false));
           }}
         >
           {({ isSubmitting, status }) => (
@@ -96,9 +114,9 @@ const SignIn = () => {
               />
 
               {reasons && <ReasonsCheckboxes reasons={reasons} />}
-              {courses && (
+              {student && (
                 <>
-                  <CoursesCheckboxes courses={courses} />
+                  <CoursesCheckboxes courses={student.classSchedule} />
                 </>
               )}
               <br />
@@ -165,12 +183,12 @@ const CoursesCheckboxes = ({ courses }) => (
     <FieldGroup>
       {courses.map(course => (
         <Checkbox
-          key={course.CRN}
-          id={course.CRN}
+          key={course.crn}
+          id={course.crn}
           type="checkbox"
           name="courses"
           label={course.courseName}
-          value={course.CRN}
+          value={course.crn}
         />
       ))}
     </FieldGroup>

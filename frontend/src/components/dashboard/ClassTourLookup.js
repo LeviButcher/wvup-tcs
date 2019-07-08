@@ -14,13 +14,19 @@ import {
 import callApi from '../../utils/callApi';
 
 const getClassTours = (startDate, endDate) =>
-  callApi(`${process.env.REACT_APP_BACKEND}classtours/`, 'GET', null);
+  callApi(
+    `${process.env.REACT_APP_BACKEND}classtours/?start=${startDate}&end=${endDate}`,
+    'GET',
+    null
+  );
 
 const deleteTour = id =>
   callApi(`${process.env.REACT_APP_BACKEND}classtours/${id}`, 'DELETE', null);
 
 const ClassTourLookup = () => {
   const [tours, setTours] = useState();
+  const [start, setStart] = useState();
+  const [end, setEnd] = useState();
 
   const loadTours = (startDate, endDate) =>
     getClassTours(startDate, endDate).then(async res => {
@@ -42,9 +48,16 @@ const ClassTourLookup = () => {
         <Formik
           initialValues={{ startDate: '', endDate: '' }}
           onSubmit={(values, { setSubmitting }) => {
-            loadTours().then(() => {
-              setSubmitting(false);
-            });
+            const { startDate, endDate } = values;
+            loadTours(startDate, endDate)
+              .catch(e => {
+                alert(e.message);
+              })
+              .finally(() => {
+                setStart(startDate);
+                setEnd(endDate);
+                setSubmitting(false);
+              });
           }}
         >
           {({ isSubmitting }) => (
@@ -94,7 +107,7 @@ const ClassTourLookup = () => {
                 <ClassTourRow
                   key={tour.id}
                   tour={tour}
-                  afterDelete={loadTours}
+                  afterDelete={() => loadTours(start, end)}
                 />
               ))}
             </tbody>

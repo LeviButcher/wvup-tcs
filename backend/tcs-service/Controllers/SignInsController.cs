@@ -140,7 +140,7 @@ namespace tcs_service.Controllers
             }
             
             await _iRepo.Add(signIn);
-            return CreatedAtAction("GetSignIn", new { id = signIn.ID }, signIn);
+            return Created("GetSignIn", new { id = signIn.ID });
         }
 
         [HttpPut("/signIns/{id}")]
@@ -211,7 +211,7 @@ namespace tcs_service.Controllers
 
             if (signIn == null)
             {
-                return NotFound();
+                return NotFound(new {message="Student is not signed in"});
             }
 
             if (signIn.OutTime != null)

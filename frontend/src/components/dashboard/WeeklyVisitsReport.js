@@ -8,22 +8,16 @@ import {
   YAxis
 } from 'react-vis';
 import { CSVLink } from 'react-csv';
-import dataPointsConvertor from '../../utils/dataPointsConvertor';
 import { ReportLayout, Table, Header, Card } from '../../ui';
 import StartToEndDateForm from '../StartToEndDateForm';
+import callApi from '../../utils/callApi';
 
-import makeAsync from '../../utils/makeAsync';
-
-const weeklyVisitsData = [
-  { week: 1, totalVisits: 40 },
-  { week: 2, totalVisits: 80 },
-  { week: 3, totalVisits: 120 },
-  { week: 4, totalVisits: 67 },
-  { week: 5, totalVisits: 90 }
-];
-
-const visitsToXYPoint = dataPointsConvertor('week', 'totalVisits');
-const getVisitsSum = makeAsync(1000, weeklyVisitsData);
+const getVisitsSum = (startDate, endDate) =>
+  callApi(
+    `${process.env.REACT_APP_BACKEND}reports/weekly-visits?start=${startDate}&end=${endDate}`,
+    'GET',
+    null
+  );
 
 const WeeklyVisitsReport = () => {
   const [visits, setVisits] = useState();
@@ -32,19 +26,31 @@ const WeeklyVisitsReport = () => {
       <div>
         <StartToEndDateForm
           onSubmit={(values, { setSubmitting }) => {
-            getVisitsSum().then(res => {
-              setVisits(res);
-              setSubmitting(false);
-            });
+            const { startDate, endDate } = values;
+            getVisitsSum(startDate, endDate)
+              .then(async res => {
+                const data = await res.json();
+                setVisits(data);
+              })
+              .catch(e => alert(e.message))
+              .finally(() => setSubmitting(false));
           }}
           name="Weekly Visits"
         />
         {visits && (
           <Card width="600px">
-            <XYPlot height={300} width={500} xType="ordinal" color="#1A70E3">
+            <XYPlot
+              height={300}
+              width={500}
+              xType="ordinal"
+              color="#1A70E3"
+              getX={d => d.item}
+              getY={d => d.count}
+              animate
+            >
               <VerticalGridLines />
               <HorizontalGridLines />
-              <LineSeries data={visits.map(visitsToXYPoint)} />
+              <LineSeries data={visits} />
               <XAxis title="Week" style={{ fill: '#143740' }} />
               <YAxis title="Total Visitors" style={{ fill: '#143740' }} />
             </XYPlot>
@@ -75,9 +81,9 @@ const VisitsTable = ({ visits }) => {
       </thead>
       <tbody>
         {visits.map(visit => (
-          <tr key={visit.week}>
-            <td>{visit.week}</td>
-            <td>{visit.totalVisits}</td>
+          <tr key={visit.item}>
+            <td>{visit.item}</td>
+            <td>{visit.count}</td>
           </tr>
         ))}
       </tbody>

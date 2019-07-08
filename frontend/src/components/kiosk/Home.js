@@ -4,10 +4,10 @@ import { Link, Header, Card } from '../../ui';
 
 const Home = () => (
   <FullScreenContainer>
-    <BoxLink to="/signin" style={{ 'grid-area': 'boxLeft' }}>
+    <BoxLink to="/signin" style={{ gridArea: 'boxLeft' }}>
       <Box>Sign In</Box>
     </BoxLink>
-    <BoxLink to="/signout" style={{ 'grid-area': 'boxRight' }}>
+    <BoxLink to="/signout" style={{ gridArea: 'boxRight' }}>
       <Box>Sign Out</Box>
     </BoxLink>
     <Footer>
