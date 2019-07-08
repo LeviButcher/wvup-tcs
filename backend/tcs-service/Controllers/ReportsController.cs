@@ -25,5 +25,11 @@ namespace tcs_service.Controllers
         {
             return Ok(await _iRepo.WeeklyVisits(start, end));
         }
+
+        [HttpGet("peakhours")]
+        public async Task<ActionResult<IEnumerable<ReportCountViewModel>>> PeakHours([FromQuery] DateTime start, [FromQuery] DateTime end)
+        {
+            return Ok(await _iRepo.PeakHours(start, end));
+        }
     }
 }

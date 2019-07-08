@@ -54,5 +54,51 @@ namespace tcs_service.Repos
             }
             return result;
         }
+
+        public async Task<List<ReportCountViewModel>> PeakHours(DateTime startWeek, DateTime endWeek)
+        {
+            var result = new List<ReportCountViewModel>();
+            var realResult = new List<ReportCountViewModel>();
+            var count = 0;
+
+            while(startWeek <= endWeek)
+            {
+                while (count <= 23 )
+                {
+                    result.Add(new ReportCountViewModel
+                    {
+                        Item = count,
+                        Count = await _db.SignIns.Where(x => x.InTime >= startWeek && x.InTime <= startWeek.AddDays(7) && x.InTime.Value.Hour == count).CountAsync()
+                    });
+                    count++;
+                }
+
+                count = 0;
+                startWeek = startWeek.AddDays(7);
+            }
+
+            var hourCount = 0;
+            var inCount = 0;
+            while(hourCount < 24)
+            {
+                foreach (ReportCountViewModel rc in result)
+                {
+                    if (rc.Item == hourCount)
+                    {
+                        inCount += rc.Count;
+                    }
+                }
+
+                realResult.Add(new ReportCountViewModel
+                {
+                    Item = hourCount,
+                    Count = inCount
+                });
+                hourCount++;
+                inCount = 0;
+            }
+            
+            return realResult;
+       }
     }
 }
