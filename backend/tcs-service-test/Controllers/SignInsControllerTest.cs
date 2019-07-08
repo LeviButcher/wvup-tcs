@@ -99,7 +99,7 @@ namespace tcs_service_test.Controllers
             vm.Courses.Add(course);
 
             var res = await sut.PostSignIn(vm, false);
-            var objectResult = Assert.IsType<CreatedAtActionResult>(res);
+            var objectResult = Assert.IsType<CreatedResult>(res);
             Assert.Equal(201, objectResult.StatusCode);
         }   
     }

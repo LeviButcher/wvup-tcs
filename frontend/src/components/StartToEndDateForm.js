@@ -7,7 +7,10 @@ const StartToEndDateForm = ({ onSubmit, name, ...props }) => {
     <Card {...props}>
       <Header>{name} Report</Header>
       <p>Enter begin and end date to query by</p>
-      <Formik onSubmit={onSubmit}>
+      <Formik
+        onSubmit={onSubmit}
+        initialValues={{ startDate: '', endDate: '' }}
+      >
         {({ isSubmitting }) => (
           <Form>
             <Field
@@ -16,6 +19,7 @@ const StartToEndDateForm = ({ onSubmit, name, ...props }) => {
               name="startDate"
               component={Input}
               label="start Date"
+              required
             />
             <Field
               id="endDate"
@@ -23,6 +27,7 @@ const StartToEndDateForm = ({ onSubmit, name, ...props }) => {
               name="endDate"
               component={Input}
               label="end Date"
+              required
             />
             <Button align="right" intent="primary" disabled={isSubmitting}>
               Run Report
