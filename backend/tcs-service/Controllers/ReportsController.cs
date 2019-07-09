@@ -31,5 +31,11 @@ namespace tcs_service.Controllers
         {
             return Ok(await _iRepo.PeakHours(start, end));
         }
+
+        [HttpGet("classtours")]
+        public async Task<ActionResult<IEnumerable<ClassTourReportViewModel>>> ClassTours([FromQuery] DateTime start, [FromQuery] DateTime end)
+        {
+            return Ok(await _iRepo.ClassTours(start, end));
+        }
     }
 }
