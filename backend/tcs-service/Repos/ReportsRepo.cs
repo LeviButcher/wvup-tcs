@@ -104,32 +104,42 @@ namespace tcs_service.Repos
         public async Task<List<ClassTourReportViewModel>> ClassTours(DateTime startWeek, DateTime endWeek)
         {
             var result = new List<ClassTourReportViewModel>();
-            var tourList = new List<ClassTour>();
-            
+            var temp = new List<ClassTour>();
+
             while (startWeek <= endWeek)
             {
-                tourList =  _db.ClassTours.Where(x => x.DayVisited >= startWeek && x.DayVisited <= startWeek.AddDays(7))
-                    .ToList();
+                var tours = _db.ClassTours.Where(x => x.DayVisited >= startWeek && x.DayVisited <= startWeek.AddDays(7)).ToList();
+                
+                foreach(ClassTour t in tours)
+                {
+                   foreach(ClassTour tour in temp)
+                    {
+                        if (tour != null)
+                        {
+                            if(t.Name == tour.Name)
+                            {
+                                tour.NumberOfStudents += t.NumberOfStudents;
+                                t.Name = null;
+                            }
+                        }
+                    }
+                   if(t.Name != null)
+                    {
+                        temp.Add(t);
+                    }
+                }
 
                 startWeek = startWeek.AddDays(7);
             }
-
-            var finalTourList = new List<ClassTour>();
-            foreach( ClassTour tour in tourList){
-                foreach(ClassTour t in tourList)
-                {
-                    if(tour.Name == t.Name)
-                    {
-                        tour.NumberOfStudents += t.NumberOfStudents;
-                    }
-                }
-                result.Add(new ClassTourReportViewModel
-                {
-                    Students = tour.NumberOfStudents,
-                    Name = tour.Name
-                });
-            };
             
+            foreach(ClassTour t in temp)
+            {                
+                result.Add(new ClassTourReportViewModel {
+                    Name = t.Name,
+                    Students = t.NumberOfStudents
+                });
+            }
+
             return result;
         }
     }
