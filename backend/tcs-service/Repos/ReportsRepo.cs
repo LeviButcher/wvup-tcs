@@ -103,42 +103,7 @@ namespace tcs_service.Repos
 
         public async Task<List<ClassTourReportViewModel>> ClassTours(DateTime startWeek, DateTime endWeek)
         {
-            var result = new List<ClassTourReportViewModel>();
-            var temp = new List<ClassTour>();
-
-            while (startWeek <= endWeek)
-            {
-                var tours = _db.ClassTours.Where(x => x.DayVisited >= startWeek && x.DayVisited <= startWeek.AddDays(7)).ToList();
-                
-                foreach(ClassTour t in tours)
-                {
-                   foreach(ClassTour tour in temp)
-                    {
-                        if (tour != null)
-                        {
-                            if(t.Name == tour.Name)
-                            {
-                                tour.NumberOfStudents += t.NumberOfStudents;
-                                t.Name = null;
-                            }
-                        }
-                    }
-                   if(t.Name != null)
-                    {
-                        temp.Add(t);
-                    }
-                }
-
-                startWeek = startWeek.AddDays(7);
-            }
-            
-            foreach(ClassTour t in temp)
-            {                
-                result.Add(new ClassTourReportViewModel {
-                    Name = t.Name,
-                    Students = t.NumberOfStudents
-                });
-            }
+            var result = _db.ClassTours.Where(x => x.DayVisited >= startWeek && x.DayVisited <= endWeek.AddDays(1)).GroupBy(x => x.Name).Select(x => new ClassTourReportViewModel { Name = x.Key, Students = x.Sum(s => s.NumberOfStudents) }).ToList();
 
             return result;
         }
