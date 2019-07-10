@@ -37,5 +37,11 @@ namespace tcs_service.Controllers
         {
             return Ok(await _iRepo.ClassTours(start, end));
         }
+
+        [HttpGet("volunteers")]
+        public async Task<ActionResult<IEnumerable<TeacherSignInTimeViewModel>>> Volunteers([FromQuery] DateTime start, [FromQuery] DateTime end)
+        {
+            return Ok(await _iRepo.Volunteers(start, end));
+        }
     }
 }
