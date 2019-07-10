@@ -100,5 +100,12 @@ namespace tcs_service.Repos
             
             return realResult;
        }
+
+        public async Task<List<ClassTourReportViewModel>> ClassTours(DateTime startWeek, DateTime endWeek)
+        {
+            var result = _db.ClassTours.Where(x => x.DayVisited >= startWeek && x.DayVisited <= endWeek.AddDays(1)).GroupBy(x => x.Name).Select(x => new ClassTourReportViewModel { Name = x.Key, Students = x.Sum(s => s.NumberOfStudents) }).ToList();
+
+            return result;
+        }
     }
 }
