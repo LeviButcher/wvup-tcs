@@ -173,5 +173,9 @@ namespace tcs_service.Repos
         public abstract StudentInfoViewModel GetStudentInfoWithEmail(string studentEmail);
 
         public abstract StudentInfoViewModel GetStudentInfoWithID(int studentID);
+
+        public abstract TeacherInfoViewModel GetTeacherInfoWithEmail(string teacherEmail);
+                                             
+        public abstract TeacherInfoViewModel GetTeacherInfoWithID(int teacherID);
     }
 }
