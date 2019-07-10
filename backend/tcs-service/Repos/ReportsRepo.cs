@@ -116,5 +116,10 @@ namespace tcs_service.Repos
 
             return result;
         }
+
+        public List<Semester> Semesters()
+        {
+            return _db.Semesters.ToList();
+        }
     }
 }
