@@ -52,7 +52,7 @@ const SideNav = () => {
       <LinkGroup>
         <Header type="h2">Admin</Header>
         <NavLink to="admin/users">Users</NavLink>
-        <NavLink to="admin/">Reason for Visiting</NavLink>
+        <NavLink to="admin/reason">Reason for Visiting</NavLink>
       </LinkGroup>
     </nav>
   );
