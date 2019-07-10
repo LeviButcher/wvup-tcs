@@ -15,6 +15,7 @@ namespace tcs_service.Repos
         public DbSet<Person> PersonTable;
         public DbSet<Course> CourseTable;
         StudentInfoViewModel studentInfoViewModel = new StudentInfoViewModel();
+        TeacherInfoViewModel teacherInfoViewModel = new TeacherInfoViewModel();
 
         public override StudentInfoViewModel GetStudentInfoWithEmail(string studentEmail)
         {
@@ -68,6 +69,39 @@ namespace tcs_service.Repos
             studentInfoViewModel.classSchedule = schedule;
 
             return studentInfoViewModel;
+        }
+
+        public override TeacherInfoViewModel GetTeacherInfoWithEmail(string teacherEmail)
+        {
+            return GetTeacherInfo(teacherInfoViewModel, teacherEmail, -1);
+        }
+
+        public override TeacherInfoViewModel GetTeacherInfoWithID(int teacherID)
+        {
+            return GetTeacherInfo(teacherInfoViewModel, "", teacherID);
+        }
+
+        private TeacherInfoViewModel GetTeacherInfo(TeacherInfoViewModel teacher, String email, int id)
+        {
+            PersonTable = _db.Set<Person>();
+            Person newTeacher = null;
+
+            if (id == -1)
+            {
+                newTeacher = PersonTable.Where(x => x.Email == email).First();
+            }
+            else
+            {
+                newTeacher = PersonTable.Where(x => x.ID == id).First();
+            }
+
+            teacher.teacherEmail = newTeacher.Email;
+            teacher.firstName = newTeacher.FirstName;
+            teacher.lastName = newTeacher.LastName;
+            teacher.teacherID = newTeacher.ID;
+            teacher.semesterId = 201903;
+
+            return teacher;
         }
     }
 }

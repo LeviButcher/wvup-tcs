@@ -236,7 +236,20 @@ namespace tcs_service.Controllers
         {
             return _iRepo.GetStudentInfoWithEmail(studentEmail);
         }
-       
+
+        [HttpGet("{teacherID}/teacher/id")]
+        public TeacherInfoViewModel GetTeacherInfoWithID([FromRoute] int teacherID)
+        {
+            return _iRepo.GetTeacherInfoWithID(teacherID);
+        }
+
+        // GET: api/SignIns/teacher@wvup.edu/teacher/email
+        [HttpGet("{teacherEmail}/teacher/email")]
+        public TeacherInfoViewModel GetTeacherInfoWithEmail([FromRoute] string teacherEmail)
+        {
+            return _iRepo.GetTeacherInfoWithEmail(teacherEmail);
+        }
+
         private async Task<SignIn> GetMostRecentById(int id)
         {
             if(! await _iRepo.PersonExist(id))

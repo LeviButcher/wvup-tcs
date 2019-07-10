@@ -20,5 +20,15 @@ namespace tcs_service.Repos
         {
             throw new NotImplementedException();
         }
+
+        public override TeacherInfoViewModel GetTeacherInfoWithEmail(string teacherEmail)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override TeacherInfoViewModel GetTeacherInfoWithID(int teacherID)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
