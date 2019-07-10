@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using tcs_service.Models;
 using tcs_service.Models.ViewModels;
 using tcs_service.Repos.Interfaces;
 
@@ -42,6 +43,12 @@ namespace tcs_service.Controllers
         public async Task<ActionResult<IEnumerable<TeacherSignInTimeViewModel>>> Volunteers([FromQuery] DateTime start, [FromQuery] DateTime end)
         {
             return Ok(await _iRepo.Volunteers(start, end));
+        }
+
+        [HttpGet("semesters")]
+        public IActionResult Semesters()
+        {
+            return  Ok(_iRepo.Semesters());
         }
     }
 }
