@@ -61,7 +61,8 @@ namespace tcs_service {
             services.AddScoped<IUserRepo, UserRepo> ();
             services.AddScoped<ISignInRepo, DevSignInRepo>();
             services.AddScoped<IReportsRepo, ReportsRepo>();
-              
+            services.AddScoped<IReasonRepo, ReasonRepo>();
+
             services.AddMvc ().SetCompatibilityVersion (CompatibilityVersion.Version_2_2);
             services.AddDbContext<TCSContext> (options =>
                 options.UseSqlServer (Configuration["DB:connectionString"]));

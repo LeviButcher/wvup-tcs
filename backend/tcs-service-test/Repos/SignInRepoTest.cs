@@ -87,30 +87,6 @@ namespace tcs_service_test.Repos
         }
 
         [Fact]
-        public async void AddTwoCourses_WithSameDepartment_ShouldWork()
-        {
-            var dept = fixture.Create<Department>();
-
-            var course = fixture.Build<Course>()
-                .With(x => x.Department, dept)
-                .With(x => x.DepartmentID, dept.Code)
-                .Create();
-
-            var course2 = fixture.Build<Course>()
-                .With(x => x.Department, dept)
-                .With(x => x.DepartmentID, dept.Code)
-                .Create();
-
-            var res = await signInRepo.AddCourse(course);
-
-            var res2 = await signInRepo.AddCourse(course2);
-
-            Assert.True(await signInRepo.DepartmentExist(dept.Code));
-            Assert.Equal(res.CRN, course.CRN);
-            Assert.Equal(res2.CRN, course2.CRN);
-        }
-
-        [Fact]
         public async void AddCourseAndDepartment_ShouldWork()
         {
             var dept = fixture.Create<Department>();
