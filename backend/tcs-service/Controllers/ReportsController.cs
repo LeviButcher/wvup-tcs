@@ -43,5 +43,11 @@ namespace tcs_service.Controllers
         {
             return Ok(await _iRepo.Volunteers(start, end));
         }
+
+        [HttpGet("reasons")]
+        public async Task<ActionResult<IEnumerable<ReasonWithClassVisitsViewModel>>> Reasons([FromQuery] DateTime start, [FromQuery] DateTime end)
+        {
+            return Ok(await _iRepo.Reasons(start, end));
+        }
     }
 }

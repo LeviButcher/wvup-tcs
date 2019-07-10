@@ -15,5 +15,7 @@ namespace tcs_service.Repos.Interfaces
         Task<List<ClassTourReportViewModel>> ClassTours(DateTime startWeek, DateTime endWeek);
 
         Task<List<TeacherSignInTimeViewModel>> Volunteers(DateTime startWeek, DateTime endWeek);
+
+        Task<List<ReasonWithClassVisitsViewModel>> Reasons(DateTime startWeek, DateTime endWeek);
     }
 }

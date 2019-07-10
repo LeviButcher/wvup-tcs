@@ -116,5 +116,10 @@ namespace tcs_service.Repos
 
             return result;
         }
+
+        public async Task<List<ReasonWithClassVisitsViewModel>> Reasons(DateTime startWeek, DateTime endWeek)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
