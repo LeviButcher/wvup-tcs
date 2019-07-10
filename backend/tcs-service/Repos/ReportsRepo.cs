@@ -108,5 +108,13 @@ namespace tcs_service.Repos
 
             return result;
         }
+
+        public async Task<List<TeacherSignInTimeViewModel>> Volunteers(DateTime startWeek, DateTime endWeek)
+        {
+            var result = _db.SignIns.Where(x => x.InTime >= startWeek && x.InTime <= endWeek && x.Person.PersonType == PersonType.Teacher)
+                .Select(x => new TeacherSignInTimeViewModel { teacherName = x.Person.FirstName + x.Person.LastName, teacherEmail = x.Person.Email, signInTime = (DateTime) x.InTime}).ToList();
+
+            return result;
+        }
     }
 }
