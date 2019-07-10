@@ -4,15 +4,14 @@ import { navigate } from '@reach/router';
 import { Input, Button, Header, Card } from '../../ui';
 import callApi from '../../utils/callApi';
 
-const postUser = callApi(
+const postReason = callApi(
   `${process.env.REACT_APP_BACKEND}users/register`,
   'POST'
 );
 
-function createUser(values, { setSubmitting, setStatus }) {
-  console.log(values);
+function createReason(values, { setSubmitting, setStatus }) {
   const message = {};
-  postUser(values)
+  postReason(values)
     .then(async res => {
       if (res.status !== 201) {
         throw await res.json();
@@ -29,14 +28,14 @@ function createUser(values, { setSubmitting, setStatus }) {
     });
 }
 
-function updateUser(values, { setSubmitting, setStatus }) {
+function updateReason(values, { setSubmitting, setStatus }) {
   const message = {};
   callApi(`${process.env.REACT_APP_BACKEND}users/${values.id}`, 'PUT', values)
     .then(async res => {
       if (res.status !== 200) {
         throw await res.json();
       }
-      alert(`Updated user for ${values.username}`);
+      alert(`Updated reason for ${values.username}`);
       navigate('/dashboard/admin/users');
     })
     .catch(e => {
@@ -51,9 +50,9 @@ function updateUser(values, { setSubmitting, setStatus }) {
 function getSubmitForAction(action) {
   switch (action) {
     case 'Create':
-      return createUser;
+      return createReason;
     case 'Update':
-      return updateUser;
+      return updateReason;
     default:
       return () =>
         console.error(
@@ -62,55 +61,38 @@ function getSubmitForAction(action) {
   }
 }
 
-const userDefault = {
-  username: '',
-  firstName: '',
-  lastName: ''
+const reasonDefault = {
+  name: '',
+  active: true
 };
 
 // do create and updates tours
-const UserForm = ({ data = userDefault, action = 'Create' }) => {
+const ReasonForm = ({ data = reasonDefault, action = 'Create' }) => {
   return (
     <Card style={{ margin: 'auto' }}>
-      <Formik
-        initialValues={{ ...data, password: '' }}
-        onSubmit={getSubmitForAction(action)}
-      >
-        {({ status, isSubmitting }) => (
+      <Formik initialValues={data} onSubmit={getSubmitForAction(action)}>
+        {({ values, status, isSubmitting }) => (
           <Form>
-            <Header>{action} User</Header>
+            <Header>{action} Reason</Header>
             {status && status.msg && (
               <div style={{ color: 'red' }}>{status.msg}</div>
             )}
             <Field
-              id="username"
+              id="name"
               type="text"
-              name="username"
+              name="name"
               component={Input}
-              label="Username"
+              label="Name"
               required
             />
+            <label htmlFor="active">Active</label>
             <Field
-              id="password"
-              type="password"
-              name="password"
-              component={Input}
-              label="Password"
-              {...{ required: action === 'Create' }}
-            />
-            <Field
-              id="firstName"
-              type="text"
-              name="firstName"
-              component={Input}
-              label="firstName"
-            />
-            <Field
-              id="lastName"
-              type="text"
-              name="lastName"
-              component={Input}
-              label="lastName"
+              id="active"
+              type="checkbox"
+              name="active"
+              label="active"
+              checked={values.active}
+              disabled={action === 'Create'}
             />
             <Button align="right" disabled={isSubmitting} type="Submit">
               {action}
@@ -122,4 +104,4 @@ const UserForm = ({ data = userDefault, action = 'Create' }) => {
   );
 };
 
-export default UserForm;
+export default ReasonForm;

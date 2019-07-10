@@ -19,7 +19,9 @@ import {
   ReasonForVisitingReport,
   UserManagement,
   UserForm,
-  SuccessReport
+  SuccessReport,
+  ReasonManagement,
+  ReasonForm
 } from './components/dashboard';
 import Theme from './theme.json';
 import NotFound from './components/NotFound';
@@ -64,6 +66,8 @@ function App() {
                 action="Update"
               />
               <SuccessReport path="/report/success" />
+              <ReasonManagement path="/admin/reason" />
+              <ReasonForm path="/admin/reason/create" />
               <NotFound default />
             </DashboardLayout>
           </IsAuthenticated>
