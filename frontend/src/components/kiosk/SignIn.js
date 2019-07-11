@@ -10,6 +10,8 @@ import callApi from '../../utils/callApi';
 const SignInSchema = Yup.object().shape({
   email: Yup.string()
     .email('Invalid email')
+    .matches(/^[A-Z0-9._%+-]+@wvup.edu$/i, 'Must be a wvup email address')
+    .trim()
     .required('Email is required'),
   courses: Yup.array()
     .required('Please select at least one course')
@@ -42,14 +44,19 @@ const getReasons = () => {
   });
 };
 
-const isWVUPAddress = email => /^[A-Z0-9._%+-]+@wvup.edu$/i.test(email);
-
-const findById = id => idProp => obj => obj[idProp] === id;
-
 // test email = mtmqbude26@wvup.edu
 const SignIn = () => {
   const [reasons] = useQuery(getReasons);
   const [student, setStudent] = useState();
+
+  const loadClassList = email => {
+    getStudentInfoWithEmail(email)
+      .then(async res => {
+        const studentInfo = await res.json();
+        setStudent(studentInfo);
+      })
+      .catch(e => alert(e.message));
+  };
 
   return (
     <FullScreenContainer>
@@ -63,21 +70,6 @@ const SignIn = () => {
             courses: []
           }}
           validationSchema={SignInSchema}
-          validate={async values => {
-            const errors = {};
-            if (!isWVUPAddress(values.email)) {
-              errors.email = 'Must be wvup.edu email address';
-            }
-            if (!errors.email) {
-              getStudentInfoWithEmail(values.email)
-                .then(async res => {
-                  const studentInfo = await res.json();
-                  setStudent(studentInfo);
-                })
-                .catch(e => alert(e.message));
-            }
-            return errors;
-          }}
           onSubmit={async (values, { setSubmitting }) => {
             const signIn = {
               ...values,
@@ -90,7 +82,6 @@ const SignIn = () => {
             };
             postSignIn(signIn)
               .then(async res => {
-                const bod = await res.json();
                 if (res.status === 201) {
                   // navigate to home page
                   alert('You are signed in! ');
@@ -101,7 +92,7 @@ const SignIn = () => {
               .finally(() => setSubmitting(false));
           }}
         >
-          {({ isSubmitting, status }) => (
+          {({ values, isSubmitting, status, isValid, handleChange }) => (
             <Form>
               <Header>Student Sign In</Header>
               {status && status.msg && <div>{status.msg}</div>}
@@ -111,8 +102,10 @@ const SignIn = () => {
                 name="email"
                 component={Input}
                 label="Email"
+                onChange={e =>
+                  handleChange(e) && isValid && loadClassList(values.email)
+                }
               />
-
               {reasons && <ReasonsCheckboxes reasons={reasons} />}
               {student && (
                 <>

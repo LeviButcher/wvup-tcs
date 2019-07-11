@@ -11,15 +11,30 @@ import SignIn from './SignIn';
 // put this in jest config
 afterEach(cleanup);
 
-test('Valid Email loads in class list', async () => {
-  const { getByLabelText, getById } = render(<SignIn />);
+const mockSuccess = {};
+const mockFetchPromise = Promise.resolve({
+  // 3
+  json: () => Promise.resolve(mockSuccess)
+});
+jest.spyOn(global, 'fetch').mockImplementation(() => mockFetchPromise);
+
+test('Invalid Email displays error', async () => {
+  const {
+    getByLabelText,
+    getByText,
+    findByLabelText,
+    getById,
+    findByText
+  } = render(<SignIn />);
 
   // Wait for page to update with query text
-  const emailInput = getByLabelText(/emai/i);
-  const email = 'lbutche3@wvup.edu';
+  const emailInput = getByLabelText(/email/i);
+  const email = 'MyFakeEmail@yahoo.com';
 
   fireEvent.change(emailInput, { target: { value: email } });
+  fireEvent.click(getByText(/submit/i));
 
   expect(emailInput.value).toEqual(email);
-  const classList = await waitForElement(() => getByLabelText('courses'));
+  const emailError = await waitForElement(() => findByText(/address/i));
+  expect(emailError).toBeDefined();
 });
