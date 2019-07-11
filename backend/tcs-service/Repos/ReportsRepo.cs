@@ -61,9 +61,9 @@ namespace tcs_service.Repos
             var realResult = new List<ReportCountViewModel>();
             var count = 0;
 
-            while(startWeek <= endWeek)
+            while (startWeek <= endWeek)
             {
-                while (count <= 23 )
+                while (count <= 23)
                 {
                     result.Add(new ReportCountViewModel
                     {
@@ -79,7 +79,7 @@ namespace tcs_service.Repos
 
             var hourCount = 0;
             var inCount = 0;
-            while(hourCount < 24)
+            while (hourCount < 24)
             {
                 foreach (ReportCountViewModel rc in result)
                 {
@@ -97,9 +97,9 @@ namespace tcs_service.Repos
                 hourCount++;
                 inCount = 0;
             }
-            
+
             return realResult;
-       }
+        }
 
         public async Task<List<ClassTourReportViewModel>> ClassTours(DateTime startWeek, DateTime endWeek)
         {
@@ -112,7 +112,7 @@ namespace tcs_service.Repos
         public async Task<List<TeacherSignInTimeViewModel>> Volunteers(DateTime startWeek, DateTime endWeek)
         {
             var result = await _db.SignIns.Where(x => x.InTime >= startWeek && x.InTime <= endWeek && x.Person.PersonType == PersonType.Teacher)
-                .Select(x => new TeacherSignInTimeViewModel { teacherName = x.Person.FirstName + x.Person.LastName, teacherEmail = x.Person.Email, signInTime = (DateTime) x.InTime}).ToListAsync();
+                .Select(x => new TeacherSignInTimeViewModel { teacherName = x.Person.FirstName + x.Person.LastName, teacherEmail = x.Person.Email, signInTime = (DateTime)x.InTime }).ToListAsync();
 
             return result;
         }
@@ -156,4 +156,5 @@ namespace tcs_service.Repos
         {
             return _db.Semesters.ToList();
         }
+    }
 }
