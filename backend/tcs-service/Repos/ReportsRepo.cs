@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -117,6 +117,7 @@ namespace tcs_service.Repos
             return result;
         }
 
+
         public async Task<List<ReasonWithClassVisitsViewModel>> Reasons(DateTime startWeek, DateTime endWeek)
         {
             var result = from signIns in _db.SignIns
@@ -151,5 +152,8 @@ namespace tcs_service.Repos
 
             return resultGroup.ToList();
         }
-    }
+        public List<Semester> Semesters()
+        {
+            return _db.Semesters.ToList();
+        }
 }
