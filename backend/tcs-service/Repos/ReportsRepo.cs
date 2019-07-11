@@ -103,23 +103,53 @@ namespace tcs_service.Repos
 
         public async Task<List<ClassTourReportViewModel>> ClassTours(DateTime startWeek, DateTime endWeek)
         {
-            var result = _db.ClassTours.Where(x => x.DayVisited >= startWeek && x.DayVisited <= endWeek.AddDays(1))
-                .GroupBy(x => x.Name).Select(x => new ClassTourReportViewModel { Name = x.Key, Students = x.Sum(s => s.NumberOfStudents) }).ToList();
+            var result = await _db.ClassTours.Where(x => x.DayVisited >= startWeek && x.DayVisited <= endWeek.AddDays(1))
+                .GroupBy(x => x.Name).Select(x => new ClassTourReportViewModel { Name = x.Key, Students = x.Sum(s => s.NumberOfStudents) }).ToListAsync();
 
             return result;
         }
 
         public async Task<List<TeacherSignInTimeViewModel>> Volunteers(DateTime startWeek, DateTime endWeek)
         {
-            var result = _db.SignIns.Where(x => x.InTime >= startWeek && x.InTime <= endWeek && x.Person.PersonType == PersonType.Teacher)
-                .Select(x => new TeacherSignInTimeViewModel { teacherName = x.Person.FirstName + x.Person.LastName, teacherEmail = x.Person.Email, signInTime = (DateTime) x.InTime}).ToList();
+            var result = await _db.SignIns.Where(x => x.InTime >= startWeek && x.InTime <= endWeek && x.Person.PersonType == PersonType.Teacher)
+                .Select(x => new TeacherSignInTimeViewModel { teacherName = x.Person.FirstName + x.Person.LastName, teacherEmail = x.Person.Email, signInTime = (DateTime) x.InTime}).ToListAsync();
 
             return result;
         }
 
         public async Task<List<ReasonWithClassVisitsViewModel>> Reasons(DateTime startWeek, DateTime endWeek)
         {
-            throw new NotImplementedException();
+            var result = from signIns in _db.SignIns
+                         from reason in signIns.Reasons
+                         from course in signIns.Courses
+                         where signIns.InTime >= startWeek
+                         && signIns.InTime <= endWeek
+                         select new
+                         {
+                             ReasonName = reason.Reason.Name,
+                             ReasonId = reason.ReasonID,
+                             CourseName = course.Course.CourseName,
+                             CourseId = course.CourseID
+                         };
+
+            var resultGroup = from item in result
+                              group item by new
+                              {
+                                  item.CourseId,
+                                  item.ReasonId,
+                                  item.CourseName,
+                                  item.ReasonName
+                              } into grp
+                              select new ReasonWithClassVisitsViewModel()
+                              {
+                                  reasonId = grp.Key.ReasonId,
+                                  reasonName = grp.Key.ReasonName,
+                                  courseCRN = grp.Key.CourseId,
+                                  courseName = grp.Key.CourseName,
+                                  visits = grp.Count()
+                              };
+
+            return resultGroup.ToList();
         }
     }
 }
