@@ -18,6 +18,10 @@ namespace tcs_service.Repos.Interfaces
 
         StudentInfoViewModel GetStudentInfoWithEmail(string studentEmail);
 
+        TeacherInfoViewModel GetTeacherInfoWithID(int teacherID);
+
+        TeacherInfoViewModel GetTeacherInfoWithEmail(string teacherEmail);
+
         Task<Course> AddCourse(Course course);
 
         Task<bool> CourseExist(int id);
