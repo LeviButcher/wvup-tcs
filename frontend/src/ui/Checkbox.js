@@ -2,14 +2,17 @@ import React from 'react';
 import { Field } from 'formik';
 import styled from 'styled-components';
 
-export default function Checkbox({ name, value, label, ...rest }) {
+export default function Checkbox({ name, value, label, id, ...rest }) {
   return (
     <Field name={name}>
       {({ field, form }) => (
-        <StyledCheckbox>
+        <StyledCheckbox name={name} htmlFor={id}>
           {label}
           <input
             type="checkbox"
+            id={id}
+            name={name}
+            label={label}
             {...rest}
             checked={field.value ? field.value.includes(value) : false}
             onChange={() => {
