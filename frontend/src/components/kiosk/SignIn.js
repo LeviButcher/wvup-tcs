@@ -10,11 +10,19 @@ import callApi from '../../utils/callApi';
 const SignInSchema = Yup.object().shape({
   email: Yup.string()
     .email('Invalid email')
+    .matches(/^[A-Z0-9._%+-]+@wvup.edu$/i, 'Must be a wvup email address')
+    .trim()
     .required('Email is required'),
   courses: Yup.array()
-    .required('Please select at least one course')
-    .min(1),
-  reasons: Yup.array().min(1),
+    .min(1)
+    .required('A Course is required'),
+  reasons: Yup.array().when('tutoring', {
+    is: true,
+    then: Yup.array(),
+    otherwise: Yup.array()
+      .min(1)
+      .required()
+  }),
   tutoring: Yup.boolean()
 });
 
@@ -42,14 +50,22 @@ const getReasons = () => {
   });
 };
 
-const isWVUPAddress = email => /^[A-Z0-9._%+-]+@wvup.edu$/i.test(email);
-
-const findById = id => idProp => obj => obj[idProp] === id;
+const isWVUPEmail = email => email.match(/^[A-Z0-9._%+-]+@wvup.edu$/i);
 
 // test email = mtmqbude26@wvup.edu
 const SignIn = () => {
   const [reasons] = useQuery(getReasons);
   const [student, setStudent] = useState();
+
+  const loadClassList = email => {
+    getStudentInfoWithEmail(email)
+      .then(async res => {
+        const studentInfo = await res.json();
+        console.log(studentInfo);
+        setStudent(studentInfo);
+      })
+      .catch(e => alert(e.message));
+  };
 
   return (
     <FullScreenContainer>
@@ -63,21 +79,6 @@ const SignIn = () => {
             courses: []
           }}
           validationSchema={SignInSchema}
-          validate={async values => {
-            const errors = {};
-            if (!isWVUPAddress(values.email)) {
-              errors.email = 'Must be wvup.edu email address';
-            }
-            if (!errors.email) {
-              getStudentInfoWithEmail(values.email)
-                .then(async res => {
-                  const studentInfo = await res.json();
-                  setStudent(studentInfo);
-                })
-                .catch(e => alert(e.message));
-            }
-            return errors;
-          }}
           onSubmit={async (values, { setSubmitting }) => {
             const signIn = {
               ...values,
@@ -90,7 +91,6 @@ const SignIn = () => {
             };
             postSignIn(signIn)
               .then(async res => {
-                const bod = await res.json();
                 if (res.status === 201) {
                   // navigate to home page
                   alert('You are signed in! ');
@@ -101,9 +101,10 @@ const SignIn = () => {
               .finally(() => setSubmitting(false));
           }}
         >
-          {({ isSubmitting, status }) => (
+          {({ values, isSubmitting, status, isValid, handleChange }) => (
             <Form>
               <Header>Student Sign In</Header>
+              <p>Enter in Email to load classlist</p>
               {status && status.msg && <div>{status.msg}</div>}
               <Field
                 id="email"
@@ -111,8 +112,12 @@ const SignIn = () => {
                 name="email"
                 component={Input}
                 label="Email"
+                onChange={e => {
+                  handleChange(e);
+                  if (isWVUPEmail(e.target.value))
+                    loadClassList(e.target.value);
+                }}
               />
-
               {reasons && <ReasonsCheckboxes reasons={reasons} />}
               {student && (
                 <>
@@ -123,7 +128,7 @@ const SignIn = () => {
               <Button
                 type="submit"
                 align="right"
-                disabled={isSubmitting}
+                disabled={isSubmitting || !isValid}
                 intent="primary"
               >
                 Submit
@@ -139,7 +144,8 @@ const SignIn = () => {
 const ReasonsCheckboxes = ({ reasons }) => (
   <>
     <Header type="h4">
-      Reason for Visiting
+      Reason for Visiting{' '}
+      <SmallText>Select Tutoring or at least one other reason</SmallText>
       <ErrorMessage name="reasons">
         {message => <div style={{ color: 'red' }}>{message}</div>}
       </ErrorMessage>
@@ -148,21 +154,21 @@ const ReasonsCheckboxes = ({ reasons }) => (
       </ErrorMessage>
     </Header>
     <FieldGroup>
-      <SingleCheckBoxLabel>
+      <SingleCheckBoxLabel name="tutoring">
         Tutoring
         <Field
           id="tutoring"
           type="checkbox"
           name="tutoring"
           component="input"
-          label="Tutoring"
+          label="tutoring"
           value="Tutoring"
         />
       </SingleCheckBoxLabel>
       {reasons.map(reason => (
         <Checkbox
           key={reason.id}
-          id={reason.id}
+          id={reason.name}
           name="reasons"
           label={reason.name}
           value={reason.id}
@@ -172,28 +178,36 @@ const ReasonsCheckboxes = ({ reasons }) => (
   </>
 );
 
-const CoursesCheckboxes = ({ courses }) => (
-  <>
-    <Header type="h4">
-      Classes visiting for
-      <ErrorMessage name="courses">
-        {message => <div style={{ color: 'red' }}>{message}</div>}
-      </ErrorMessage>
-    </Header>
-    <FieldGroup>
-      {courses.map(course => (
-        <Checkbox
-          key={course.crn}
-          id={course.crn}
-          type="checkbox"
-          name="courses"
-          label={course.courseName}
-          value={course.crn}
-        />
-      ))}
-    </FieldGroup>
-  </>
-);
+const CoursesCheckboxes = ({ courses }) => {
+  console.log(courses);
+  return (
+    <>
+      <Header type="h4">
+        Classes visiting for <SmallText>Select at least one course</SmallText>
+        <ErrorMessage name="courses">
+          {message => <div style={{ color: 'red' }}>{message}</div>}
+        </ErrorMessage>
+      </Header>
+      <FieldGroup>
+        {courses.map(course => (
+          <Checkbox
+            key={course.crn}
+            id={course.crn}
+            type="checkbox"
+            name="courses"
+            label={course.shortName}
+            value={course.crn}
+          />
+        ))}
+      </FieldGroup>
+    </>
+  );
+};
+
+const SmallText = styled.span`
+  color: #aaa;
+  font-size: 0.8em;
+`;
 
 const FullScreenContainer = styled.div`
   padding: ${props => props.theme.padding};
