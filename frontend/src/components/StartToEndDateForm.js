@@ -1,6 +1,16 @@
 import React from 'react';
 import { Formik, Form, Field } from 'formik';
+import * as Yup from 'yup';
 import { Card, Header, Button, Input } from '../ui';
+
+const StartToEndDateSchema = Yup.object().shape({
+  startDate: Yup.date().required(),
+  endDate: Yup.date()
+    .test('date-test', 'Must be after the Start Date', function(endDate) {
+      return this.resolve(Yup.ref('startDate')) < endDate;
+    })
+    .required()
+});
 
 const StartToEndDateForm = ({ onSubmit, name, ...props }) => {
   return (
@@ -9,9 +19,10 @@ const StartToEndDateForm = ({ onSubmit, name, ...props }) => {
       <p>Enter begin and end date to query by</p>
       <Formik
         onSubmit={onSubmit}
+        validationSchema={StartToEndDateSchema}
         initialValues={{ startDate: '', endDate: '' }}
       >
-        {({ isSubmitting }) => (
+        {({ isSubmitting, isValid }) => (
           <Form>
             <Field
               id="startDate"
@@ -33,7 +44,7 @@ const StartToEndDateForm = ({ onSubmit, name, ...props }) => {
               type="submit"
               align="right"
               intent="primary"
-              disabled={isSubmitting}
+              disabled={isSubmitting || !isValid}
             >
               Run Report
             </Button>

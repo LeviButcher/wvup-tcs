@@ -1,11 +1,13 @@
 /* eslint-disable */
 import React from 'react';
+import '@testing-library/jest-dom/extend-expect';
 import {
   render,
   fireEvent,
   cleanup,
   waitForElement,
-  act
+  act,
+  wait
 } from 'CustomReactTestingLibrary'; // eslint-disable-line
 import SignIn from './SignIn';
 
@@ -97,25 +99,27 @@ test('Reasons for visiting is loaded', async () => {
 }, 9999);
 
 // I wasted 4 hours on trying to get this to work, I will come back to this and defeat it
-// test('Ensure Tutoring has to be checked to submit', async () => {
-//   const {
-//     getByLabelText,
-//     getByText,
-//     findByLabelText,
-//     getById,
-//     findByText,
-//     debug
-//   } = render(<SignIn />);
-//
-//   const emailInput = getByLabelText(/email/i);
-//   const email = 'lbutche3@wvup.edu';
-//   const tutoring = await waitForElement(() => findByLabelText(/tutoring/i));
-//
-//   act(() => {
-//     fireEvent.change(emailInput, { target: { value: email } });
-//   });
-//   // fireEvent.click(tutoring);
-//   debug();
-//   const submitButton = getByText(/submit/i);
-//   expect(submitButton.disabled).toBe(true);
-// });
+test('Ensure Tutoring has to be checked to submit', async () => {
+  const {
+    getByLabelText,
+    getByText,
+    findByLabelText,
+    getById,
+    findByText,
+    debug
+  } = render(<SignIn />);
+
+  const emailInput = getByLabelText(/email/i);
+  const email = 'lbutche3@wvup.edu';
+  const tutoring = await waitForElement(() => findByLabelText(/tutoring/i));
+
+  act(() => {
+    fireEvent.change(emailInput, { target: { value: email } });
+  });
+  // fireEvent.click(tutoring);
+  debug();
+  const submitButton = getByText(/submit/i);
+  await wait(() => {
+    expect(submitButton).toBeDisabled();
+  });
+});
