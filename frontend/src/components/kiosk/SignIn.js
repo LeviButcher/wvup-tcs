@@ -51,13 +51,11 @@ const isWVUPEmail = email => email.match(/^[A-Z0-9._%+-]+@wvup.edu$/i);
 const SignIn = () => {
   const [reasons] = useQuery(queryReasons);
   const [student, setStudent] = useState();
-  console.log(reasons);
 
   const loadClassList = email => {
     getStudentInfoWithEmail(email)
       .then(async res => {
         const studentInfo = await res.json();
-        console.log(studentInfo);
         setStudent(studentInfo);
       })
       .catch(e => alert(e.message));
@@ -101,7 +99,7 @@ const SignIn = () => {
               .finally(() => setSubmitting(false));
           }}
         >
-          {({ values, isSubmitting, status, isValid, handleChange }) => (
+          {({ isSubmitting, status, isValid, handleChange }) => (
             <Form>
               <Header>Student Sign In</Header>
               <p>Enter in Email to load classlist</p>

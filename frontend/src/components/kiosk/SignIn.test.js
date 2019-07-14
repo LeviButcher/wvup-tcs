@@ -12,7 +12,7 @@ import SignIn from './SignIn';
 // put this in jest config
 afterEach(cleanup);
 
-const mockSuccess = {
+const studentInfo = {
   studentEmail: 'lbutche3@wvup.edu',
   semesterId: 201903,
   studentID: 1,
@@ -25,10 +25,31 @@ const mockSuccess = {
     }
   ]
 };
-const mockFetchPromise = Promise.resolve({
-  json: () => Promise.resolve(mockSuccess)
-});
-jest.spyOn(global, 'fetch').mockImplementation(() => mockFetchPromise);
+
+const fetchWrapper = data =>
+  Promise.resolve({
+    json: () => Promise.resolve(data)
+  });
+
+const reasons = [
+  {
+    name: 'Computer Use',
+    id: 5
+  }
+];
+
+const mockFetchPromise = api => {
+  // regex .test will return true matching the switch condition
+  switch (true) {
+    case /reasons\/active$/.test(api):
+      return fetchWrapper(reasons);
+    case /email$/.test(api):
+      return fetchWrapper(studentInfo);
+    default:
+      throw Error('Wrong api');
+  }
+};
+jest.spyOn(global, 'fetch').mockImplementation(mockFetchPromise);
 jest.spyOn(global, 'alert').mockImplementation(value => value);
 
 test('Invalid Email displays error', async () => {
