@@ -1,14 +1,6 @@
 import React, { useState } from 'react';
-import {
-  XYPlot,
-  LineSeries,
-  VerticalGridLines,
-  HorizontalGridLines,
-  XAxis,
-  YAxis
-} from 'react-vis';
 import { CSVLink } from 'react-csv';
-import { ReportLayout, Table, Header, Card } from '../../ui';
+import { ReportLayout, Table, Header, Card, LineChart } from '../../ui';
 import StartToEndDateForm from '../StartToEndDateForm';
 import callApi from '../../utils/callApi';
 import ensureResponseCode from '../../utils/ensureResponseCode';
@@ -31,9 +23,7 @@ const PeakHoursReport = () => {
             getPeakHoursSum(startDate, endDate)
               .then(ensureResponseCode(200))
               .then(unwrapToJSON)
-              .then(res => {
-                setPeakHours(res);
-              })
+              .then(setPeakHours)
               .catch(e => setStatus({ msg: e.message }))
               .finally(() => setSubmitting(false));
           }}
@@ -41,20 +31,15 @@ const PeakHoursReport = () => {
         />
         {peakHours && (
           <Card width="600px">
-            <XYPlot
-              height={300}
-              width={500}
-              xType="ordinal"
-              color="#1A70E3"
-              getX={d => d.item}
-              getY={d => d.count}
-            >
-              <VerticalGridLines />
-              <HorizontalGridLines />
-              <LineSeries data={peakHours} />
-              <XAxis title="Hour" style={{ fill: '#143740' }} />
-              <YAxis title="Total Visitors" style={{ fill: '#143740' }} />
-            </XYPlot>
+            <LineChart
+              data={peakHours}
+              x={d => d.item}
+              y={d => d.count}
+              title="Peak Hours"
+              xLabel="Hour"
+              yLabel="Total Visitors"
+              labels={d => d.count}
+            />
           </Card>
         )}
       </div>

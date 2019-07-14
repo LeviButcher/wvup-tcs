@@ -29,7 +29,7 @@ const successData = [
     departmentId: '1',
     departmentName: 'Math',
     courseName: 'Math 211',
-    CRN: '15482',
+    CRN: '15492',
     uniqueStudents: 26,
     droppedStudents: 6,
     completedCourse: 20,
@@ -150,7 +150,7 @@ const SuccessTable = ({ successRecords }) => {
               inDepartment(department)
             );
             const rows = departmentData.map(record => (
-              <tr>
+              <tr key={record.CRN}>
                 <td>{record.courseName}</td>
                 <td>{record.CRN}</td>
                 <td align="center">{record.uniqueStudents}</td>
@@ -161,7 +161,7 @@ const SuccessTable = ({ successRecords }) => {
             ));
             const sumDepartment = departmentData.reduce(successReducer, {});
             rows.push(
-              <SpecialRow>
+              <SpecialRow key={department.departmentName}>
                 <td>Total {department.departmentName}:</td>
                 <td></td>
                 <td align="center">{sumDepartment.uniqueStudents}</td>

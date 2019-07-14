@@ -1,14 +1,6 @@
 import React, { useState } from 'react';
-import {
-  XYPlot,
-  VerticalBarSeries,
-  VerticalGridLines,
-  HorizontalGridLines,
-  XAxis,
-  YAxis
-} from 'react-vis';
 import { CSVLink } from 'react-csv';
-import { ReportLayout, Table, Header, Card } from '../../ui';
+import { ReportLayout, Table, Header, Card, LineChart } from '../../ui';
 import StartToEndDateForm from '../StartToEndDateForm';
 import callApi from '../../utils/callApi';
 import ensureReponseCode from '../../utils/ensureResponseCode';
@@ -40,23 +32,14 @@ const VolunteerReport = () => {
         />
         {volunteers && (
           <Card width="600px">
-            <XYPlot
-              height={300}
-              width={500}
-              xType="ordinal"
-              color="#1A70E3"
-              getX={datum => datum.teacherEmail}
-              getY={datum => datum.signInTime}
-            >
-              <VerticalGridLines />
-              <HorizontalGridLines />
-              <VerticalBarSeries data={volunteers} />
-              <XAxis title="Email" style={{ fill: '#143740' }} />
-              <YAxis
-                title="Total Hours Volunteered"
-                style={{ fill: '#143740' }}
-              />
-            </XYPlot>
+            <LineChart
+              data={volunteers}
+              x={datum => datum.teacherEmail}
+              y={datum => datum.signInTime}
+              xLabel="Email"
+              yLabel="Total Hours Volunteers"
+              title="Volunteer Total Chart"
+            />
           </Card>
         )}
       </div>
