@@ -8,23 +8,18 @@ import {
   YAxis
 } from 'react-vis';
 import { CSVLink } from 'react-csv';
-import dataPointsConvertor from '../../utils/dataPointsConvertor';
 import { ReportLayout, Table, Header, Card } from '../../ui';
 import StartToEndDateForm from '../StartToEndDateForm';
+import callApi from '../../utils/callApi';
+import ensureResponseCode from '../../utils/ensureResponseCode';
+import unwrapToJSON from '../../utils/unwrapToJSON';
 
-import makeAsync from '../../utils/makeAsync';
-
-const peakHoursData = [
-  { hour: '8 - 8:59', totalVisits: 40 },
-  { hour: '9 - 9:59', totalVisits: 80 },
-  { hour: '10 - 10:59', totalVisits: 120 },
-  { hour: '11 - 11:59', totalVisits: 67 },
-  { hour: '12 - 12:59', totalVisits: 90 },
-  { hour: '1 - 1:59', totalVisits: 90 }
-];
-
-const peakHoursToXYPoint = dataPointsConvertor('hour', 'totalVisits');
-const getPeakHoursSum = makeAsync(1000, peakHoursData);
+const getPeakHoursSum = (startDate, endDate) =>
+  callApi(
+    `${process.env.REACT_APP_BACKEND}reports/peakhours?start=${startDate}&end=${endDate}`,
+    'GET',
+    null
+  );
 
 const PeakHoursReport = () => {
   const [peakHours, setPeakHours] = useState();
@@ -32,20 +27,31 @@ const PeakHoursReport = () => {
     <ReportLayout>
       <div>
         <StartToEndDateForm
-          onSubmit={(values, { setSubmitting }) => {
-            getPeakHoursSum().then(res => {
-              setPeakHours(res);
-              setSubmitting(false);
-            });
+          onSubmit={({ startDate, endDate }, { setSubmitting, setStatus }) => {
+            getPeakHoursSum(startDate, endDate)
+              .then(ensureResponseCode(200))
+              .then(unwrapToJSON)
+              .then(res => {
+                setPeakHours(res);
+              })
+              .catch(e => setStatus({ msg: e.message }))
+              .finally(() => setSubmitting(false));
           }}
           name="Peak Hours"
         />
         {peakHours && (
           <Card width="600px">
-            <XYPlot height={300} width={500} xType="ordinal" color="#1A70E3">
+            <XYPlot
+              height={300}
+              width={500}
+              xType="ordinal"
+              color="#1A70E3"
+              getX={d => d.item}
+              getY={d => d.count}
+            >
               <VerticalGridLines />
               <HorizontalGridLines />
-              <LineSeries data={peakHoursData.map(peakHoursToXYPoint)} />
+              <LineSeries data={peakHours} />
               <XAxis title="Hour" style={{ fill: '#143740' }} />
               <YAxis title="Total Visitors" style={{ fill: '#143740' }} />
             </XYPlot>
@@ -76,9 +82,9 @@ const PeakHoursTable = ({ peakHours }) => {
       </thead>
       <tbody>
         {peakHours.map(visit => (
-          <tr key={visit.week}>
-            <td>{visit.hour}</td>
-            <td>{visit.totalVisits}</td>
+          <tr key={visit.item}>
+            <td>{visit.item}</td>
+            <td>{visit.count}</td>
           </tr>
         ))}
       </tbody>
