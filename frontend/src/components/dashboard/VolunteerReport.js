@@ -8,41 +8,49 @@ import {
   YAxis
 } from 'react-vis';
 import { CSVLink } from 'react-csv';
-import dataPointsConvertor from '../../utils/dataPointsConvertor';
 import { ReportLayout, Table, Header, Card } from '../../ui';
 import StartToEndDateForm from '../StartToEndDateForm';
+import callApi from '../../utils/callApi';
+import ensureReponseCode from '../../utils/ensureResponseCode';
 
-import makeAsync from '../../utils/makeAsync';
-
-const volunteerData = [
-  { email: 'gthompson@wvup.edu', fullName: 'Gary Thompson', totalHours: 25 },
-  { email: 'mriddle@wvup.edu', fullName: 'M Riddle', totalHours: 55 },
-  { email: 'calmond@wvup.edu', fullName: 'Charles Almond', totalHours: 30 }
-];
-
-const volunteerToXYPoint = dataPointsConvertor('email', 'totalHours');
-const getVolunteerSum = makeAsync(1000, volunteerData);
+const getVolunteerSum = (startDate, endDate) =>
+  callApi(
+    `${process.env.REACT_APP_BACKEND}reports/volunteers?start=${startDate}&end=${endDate}`,
+    'GET',
+    null
+  );
 
 const VolunteerReport = () => {
   const [volunteers, setVolunteers] = useState();
+  console.log(volunteers);
   return (
     <ReportLayout>
       <div>
         <StartToEndDateForm
-          onSubmit={(values, { setSubmitting }) => {
-            getVolunteerSum().then(res => {
-              setVolunteers(res);
-              setSubmitting(false);
-            });
+          onSubmit={({ startDate, endDate }, { setSubmitting }) => {
+            getVolunteerSum(startDate, endDate)
+              .then(ensureReponseCode(200))
+              .then(async res => {
+                const data = await res.json();
+                setVolunteers(data);
+              })
+              .finally(() => setSubmitting(false));
           }}
           name="Voluteer"
         />
         {volunteers && (
           <Card width="600px">
-            <XYPlot height={300} width={500} xType="ordinal" color="#1A70E3">
+            <XYPlot
+              height={300}
+              width={500}
+              xType="ordinal"
+              color="#1A70E3"
+              getX={datum => datum.teacherEmail}
+              getY={datum => datum.signInTime}
+            >
               <VerticalGridLines />
               <HorizontalGridLines />
-              <VerticalBarSeries data={volunteers.map(volunteerToXYPoint)} />
+              <VerticalBarSeries data={volunteers} />
               <XAxis title="Email" style={{ fill: '#143740' }} />
               <YAxis
                 title="Total Hours Volunteered"
@@ -77,8 +85,8 @@ const VolunteerTable = ({ volunteers }) => {
       </thead>
       <tbody>
         {volunteers.map(volunteer => (
-          <tr key={volunteer.email}>
-            <td>{volunteer.email}</td>
+          <tr key={volunteer.teacherEmail}>
+            <td>{volunteer.teacherEmail}</td>
             <td>{volunteer.fullName}</td>
             <td>{volunteer.totalHours}</td>
           </tr>

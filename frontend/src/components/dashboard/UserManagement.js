@@ -21,17 +21,17 @@ const queryUsers = pipe(
 );
 
 const UserManagement = () => {
-  const [users] = useQuery(queryUsers);
+  const [users, reload] = useQuery(queryUsers);
 
   return (
     <div>
       <a href="users/create">Add User</a>
-      {users && <UserTable users={users} />}
+      {users && <UserTable users={users} afterDelete={reload} />}
     </div>
   );
 };
 
-const UserTable = ({ users }) => (
+const UserTable = ({ users, afterDelete }) => (
   <Table>
     <caption>
       <Header>Users In System</Header>
@@ -69,7 +69,7 @@ const UserTable = ({ users }) => (
                   const goDelete = window.confirm(
                     `Are you sure you want to delete ${user.username}`
                   );
-                  if (goDelete) deleteUser(user.id);
+                  if (goDelete) deleteUser(user.id).then(() => afterDelete());
                 }
               }}
             >

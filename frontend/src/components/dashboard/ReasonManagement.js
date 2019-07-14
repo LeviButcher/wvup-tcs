@@ -3,17 +3,13 @@ import { pipe } from 'ramda';
 import { Link } from '@reach/router';
 import { Table, Header, Button } from '../../ui';
 import useQuery from '../../hooks/useQuery';
+import callApi from '../../utils/callApi';
 
-const reasonData = [
-  { name: 'Bone Use', active: true },
-  { name: 'Lab Time', active: true },
-  { name: 'Computer Use', active: true }
-];
+const getReasons = () =>
+  callApi(`${process.env.REACT_APP_BACKEND}reasons/`, 'GET', null);
 
-const getReasons = () => () => Promise.resolve({ json: () => reasonData });
-
-const unWrapFetch = async fetchFunc => {
-  const res = await fetchFunc(null);
+const unWrapFetch = async fetchPromise => {
+  const res = await fetchPromise;
   return res.json();
 };
 
@@ -24,6 +20,7 @@ const queryReasons = pipe(
 
 const ReasonManagement = () => {
   const [reasons] = useQuery(queryReasons);
+  console.log(reasons);
   return (
     <div>
       <a href="reason/create">Add Reason</a>
@@ -40,38 +37,32 @@ const ReasonTable = ({ reasons }) => (
     <thead align="left">
       <tr>
         <th>Name</th>
-        <th>Active</th>
+        <th>Inactive</th>
         <th>Actions</th>
       </tr>
     </thead>
     <tbody>
-      {reasons.map(reason => (
-        <tr>
-          <td>{reason.name}</td>
-          <td>
-            <input type="checkbox" checked={reason.active} />
-          </td>
-          <td>
-            <Link to={`update/${reason.id}`}>
-              <Button
-                display="inline-block"
-                intent="secondary"
-                style={{ marginRight: '1rem' }}
-              >
-                Update
-              </Button>
-            </Link>
-            <Button
-              display="inline-block"
-              intent="danger"
-              style={{ marginRight: '1rem' }}
-              onClick={() => alert("can't do that yet")}
-            >
-              Delete
-            </Button>
-          </td>
-        </tr>
-      ))}
+      {reasons
+        .sort(ele => ele.deleted)
+        .map(reason => (
+          <tr key={reason.name}>
+            <td>{reason.name}</td>
+            <td>
+              <input type="checkbox" checked={reason.deleted} readOnly />
+            </td>
+            <td>
+              <Link to={`update/${reason.id}`}>
+                <Button
+                  display="inline-block"
+                  intent="secondary"
+                  style={{ marginRight: '1rem' }}
+                >
+                  Update
+                </Button>
+              </Link>
+            </td>
+          </tr>
+        ))}
     </tbody>
   </Table>
 );

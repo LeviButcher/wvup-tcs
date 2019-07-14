@@ -68,6 +68,12 @@ function App() {
               <SuccessReport path="/report/success" />
               <ReasonManagement path="/admin/reason" />
               <ReasonForm path="/admin/reason/create" />
+              <Fetch
+                url={`${process.env.REACT_APP_BACKEND}reasons/`}
+                path="/admin/reason/update/:id"
+                Component={ReasonForm}
+                action="Update"
+              />
               <NotFound default />
             </DashboardLayout>
           </IsAuthenticated>

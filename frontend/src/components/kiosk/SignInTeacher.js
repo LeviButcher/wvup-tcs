@@ -1,19 +1,37 @@
 import React from 'react';
+import { navigate } from '@reach/router';
 import styled from 'styled-components';
 import EmailForm from '../EmailForm';
+import callApi from '../../utils/callApi';
+import ensureResponseCode from '../../utils/ensureResponseCode';
 
+const postSignOut = email =>
+  callApi(
+    `${process.env.REACT_APP_BACKEND}signins/${email}/signout`,
+    'PUT',
+    null
+  );
+
+// test email : teacher@wvup.edu
 const SignInTeacher = () => {
+  const handleSubmit = async (values, { setSubmitting, setStatus }) => {
+    postSignOut(values.email)
+      .then(ensureResponseCode(200))
+      .then(() => {
+        alert('You have signed in!');
+        navigate('/');
+      })
+      .catch(e => {
+        setStatus({ msg: e.message });
+      })
+      .finally(() => {
+        setSubmitting(false);
+      });
+  };
+
   return (
     <FullScreenContainer>
-      <EmailForm
-        title="Teacher Sign In"
-        onSubmit={(values, { setSubmitting }) => {
-          setTimeout(() => {
-            alert('Sign in for teacher is not connected to backend yet');
-            setSubmitting(false);
-          }, 1000);
-        }}
-      />
+      <EmailForm title="Teacher Sign In" onSubmit={handleSubmit} />
     </FullScreenContainer>
   );
 };

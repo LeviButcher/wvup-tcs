@@ -1,29 +1,31 @@
 import React from 'react';
 import { Link } from '@reach/router';
 import { Formik, Form, Field } from 'formik';
+import * as Yup from 'yup';
 import { Card, Input, Header, Button } from '../ui';
+
+const emailSchema = Yup.object().shape({
+  email: Yup.string()
+    .email('Invalid email')
+    .matches(/^[A-Z0-9._%+-]+@wvup.edu$/i, 'Must be a wvup email address')
+    .trim()
+    .required('Email is required')
+});
 
 const EmailForm = ({ title, onSubmit }) => (
   <Card>
     <Link to="/">Go Back</Link>
     <Formik
       initialValues={{ email: '' }}
-      validate={values => {
-        const errors = {};
-        if (!values.email) {
-          errors.email = 'Required';
-        } else if (
-          !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(values.email)
-        ) {
-          errors.email = 'Invalid email address';
-        }
-        return errors;
-      }}
+      validationSchema={emailSchema}
       onSubmit={onSubmit}
     >
-      {({ isSubmitting }) => (
+      {({ isSubmitting, isValid, status }) => (
         <Form>
           <Header>{title}</Header>
+          {status && status.msg && (
+            <div style={{ color: 'red' }}>{status.msg}</div>
+          )}
           <Field
             id="email"
             type="email"
@@ -34,7 +36,7 @@ const EmailForm = ({ title, onSubmit }) => (
           <Button
             type="submit"
             align="right"
-            disabled={isSubmitting}
+            disabled={isSubmitting || !isValid}
             intent="primary"
           >
             Submit
