@@ -4,97 +4,27 @@ import { CSVLink } from 'react-csv';
 import { clone } from 'ramda';
 import { ReportLayout, Table, Header, Card } from '../../ui';
 import StartToEndDateForm from '../StartToEndDateForm';
+import callApi from '../../utils/callApi';
+import ensureResponseCode from '../../utils/ensureResponseCode';
+import unwrapToJSON from '../../utils/unwrapToJSON';
 
-import makeAsync from '../../utils/makeAsync';
-
-const reasonForVisitingData = [
-  {
-    course: 'Math 126',
-    CRN: '11554',
-    totalStudents: 29,
-    reason: 'Computer Use'
-  },
-  {
-    course: 'English 102',
-    CRN: '11555',
-    totalStudents: 50,
-    reason: 'Computer Use'
-  },
-  {
-    course: 'Physics 101',
-    CRN: '11556',
-    totalStudents: 18,
-    reason: 'Computer Use'
-  },
-  {
-    course: 'No Class Given',
-    totalStudents: 18,
-    reason: 'Computer Use'
-  },
-  {
-    course: 'Math 126',
-    CRN: '11554',
-    totalStudents: 20,
-    reason: 'Study Time'
-  },
-  {
-    course: 'English 102',
-    CRN: '11555',
-    totalStudents: 13,
-    reason: 'Study Time'
-  },
-  {
-    course: 'Physics 101',
-    CRN: '11556',
-    totalStudents: 12,
-    reason: 'Study Time'
-  },
-  {
-    course: 'No Class Given',
-    totalStudents: 2,
-    reason: 'Study Time'
-  },
-  {
-    course: 'CS 122',
-    CRN: '11554',
-    totalStudents: 20,
-    reason: 'Written Paper Review'
-  },
-  {
-    course: 'English 102',
-    CRN: '11555',
-    totalStudents: 13,
-    reason: 'Written Paper Review'
-  },
-  {
-    course: 'Physics 101',
-    CRN: '11556',
-    totalStudents: 12,
-    reason: 'Written Paper Review'
-  },
-  {
-    course: 'No Class Given',
-    totalStudents: 2,
-    reason: 'Written Paper Review'
-  }
-];
 // take all reasons and split up into reason groups
 
-const filterReason = reason => element => element.reason === reason;
+const filterReason = reason => element => element.reasonName === reason;
 
 // reducer to give reason, filter by reason
 const reasonForVisitingToReasonsReducer = (acc, reasonForVisiting) => {
-  const found = acc.find(element => element === reasonForVisiting.reason);
+  const found = acc.find(element => element === reasonForVisiting.reasonName);
   if (found) return acc;
-  acc.push(reasonForVisiting.reason);
+  acc.push(reasonForVisiting.reasonName);
   return acc;
 };
 
 const reasonTotalStudentReducer = (acc, reason) => {
   // reason already in acc, add to totalStudents
-  const index = acc.findIndex(filterReason(reason.reason));
+  const index = acc.findIndex(filterReason(reason.reasonName));
   if (index !== -1) {
-    acc[index].totalStudents += reason.totalStudents;
+    acc[index].visits += reason.visits;
   } else {
     acc.push(clone(reason));
   }
@@ -102,11 +32,16 @@ const reasonTotalStudentReducer = (acc, reason) => {
 };
 
 const reasonsToAngle = reason => ({
-  angle: reason.totalStudents,
-  label: reason.reason
+  angle: reason.visits,
+  label: reason.reasonName
 });
 
-const getReasons = makeAsync(1000, reasonForVisitingData);
+const getReasons = (startDate, endDate) =>
+  callApi(
+    `${process.env.REACT_APP_BACKEND}reports/reasons?start=${startDate}&end=${endDate}`,
+    'GET',
+    null
+  );
 
 const ReasonsReport = () => {
   const [reasonsForVisiting, setReasonsForVisiting] = useState();
@@ -114,11 +49,12 @@ const ReasonsReport = () => {
     <ReportLayout>
       <div>
         <StartToEndDateForm
-          onSubmit={(values, { setSubmitting }) => {
-            getReasons().then(res => {
-              setReasonsForVisiting(res);
-              setSubmitting(false);
-            });
+          onSubmit={({ startDate, endDate }, { setSubmitting }) => {
+            getReasons(startDate, endDate)
+              .then(ensureResponseCode(200))
+              .then(unwrapToJSON)
+              .then(setReasonsForVisiting)
+              .finally(() => setSubmitting(false));
           }}
           name="Reason For Visiting"
         />
@@ -150,6 +86,7 @@ const ReasonsReport = () => {
               .reduce(reasonForVisitingToReasonsReducer, [])
               .map(reason => (
                 <ReasonsTable
+                  key={reason}
                   name={reason}
                   reasons={reasonsForVisiting.filter(filterReason(reason))}
                 />
@@ -172,7 +109,7 @@ const ReasonsTable = ({ reasons, name }) => {
           </CSVLink>
         </Header>
       </caption>
-      <thead>
+      <thead align="left">
         <tr>
           <th>Course</th>
           <th>CRN</th>
@@ -181,10 +118,10 @@ const ReasonsTable = ({ reasons, name }) => {
       </thead>
       <tbody>
         {reasons.map(reason => (
-          <tr key={reason.week}>
-            <td>{reason.course}</td>
-            <td>{reason.CRN}</td>
-            <td>{reason.totalStudents}</td>
+          <tr key={reason.courseName + reason.reasonName}>
+            <td>{reason.courseName}</td>
+            <td>{reason.courseCRN}</td>
+            <td>{reason.visits}</td>
           </tr>
         ))}
       </tbody>
