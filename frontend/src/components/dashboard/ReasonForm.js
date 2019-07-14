@@ -4,10 +4,14 @@ import { navigate } from '@reach/router';
 import { Input, Button, Header, Card } from '../../ui';
 import callApi from '../../utils/callApi';
 
-const postReason = callApi(
-  `${process.env.REACT_APP_BACKEND}users/register`,
-  'POST'
-);
+const postReason = callApi(`${process.env.REACT_APP_BACKEND}reasons/`, 'POST');
+
+const putReason = reason =>
+  callApi(
+    `${process.env.REACT_APP_BACKEND}reasons/${reason.id}`,
+    'PUT',
+    reason
+  );
 
 function createReason(values, { setSubmitting, setStatus }) {
   const message = {};
@@ -16,8 +20,8 @@ function createReason(values, { setSubmitting, setStatus }) {
       if (res.status !== 201) {
         throw await res.json();
       }
-      alert(`Created user for ${values.username}`);
-      navigate('/dashboard/admin/users');
+      alert(`Created reason - ${values.name}`);
+      navigate('/dashboard/admin/reason');
     })
     .catch(e => {
       message.msg = e.message;
@@ -30,13 +34,13 @@ function createReason(values, { setSubmitting, setStatus }) {
 
 function updateReason(values, { setSubmitting, setStatus }) {
   const message = {};
-  callApi(`${process.env.REACT_APP_BACKEND}users/${values.id}`, 'PUT', values)
+  putReason(values)
     .then(async res => {
       if (res.status !== 200) {
         throw await res.json();
       }
-      alert(`Updated reason for ${values.username}`);
-      navigate('/dashboard/admin/users');
+      alert(`Updated reason - ${values.name}`);
+      navigate('/dashboard/admin/reason');
     })
     .catch(e => {
       message.msg = e.message;
@@ -63,7 +67,7 @@ function getSubmitForAction(action) {
 
 const reasonDefault = {
   name: '',
-  active: true
+  deleted: false
 };
 
 // do create and updates tours
@@ -85,13 +89,13 @@ const ReasonForm = ({ data = reasonDefault, action = 'Create' }) => {
               label="Name"
               required
             />
-            <label htmlFor="active">Active</label>
+            <label htmlFor="deleted">Inactive</label>
             <Field
-              id="active"
+              id="deleted"
               type="checkbox"
-              name="active"
-              label="active"
-              checked={values.active}
+              name="deleted"
+              label="deleted"
+              checked={values.deleted}
               disabled={action === 'Create'}
             />
             <Button align="right" disabled={isSubmitting} type="Submit">

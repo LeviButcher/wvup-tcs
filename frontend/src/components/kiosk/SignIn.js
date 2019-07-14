@@ -3,6 +3,8 @@ import styled from 'styled-components';
 import { Link, navigate } from '@reach/router';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
+import { pipe } from 'ramda';
+import unWrapToJSON from '../../utils/unwrapToJSON';
 import { Card, Input, Header, Button, FieldGroup, Checkbox } from '../../ui';
 import useQuery from '../../hooks/useQuery';
 import callApi from '../../utils/callApi';
@@ -35,27 +37,21 @@ const getStudentInfoWithEmail = email =>
     null
   );
 
-const Reasons = [
-  { name: 'Computer Use', id: 1 },
-  { name: 'Bone Use', id: 2 },
-  { name: 'Lab Use', id: 3 },
-  { name: 'Misc', id: 4 }
-];
+const getReasons = () =>
+  callApi(`${process.env.REACT_APP_BACKEND}reasons/active`, 'GET', null);
 
-const getReasons = () => {
-  return new Promise(resolve => {
-    setTimeout(() => {
-      resolve(Reasons);
-    }, 1000);
-  });
-};
+const queryReasons = pipe(
+  getReasons,
+  unWrapToJSON
+);
 
 const isWVUPEmail = email => email.match(/^[A-Z0-9._%+-]+@wvup.edu$/i);
 
 // test email = mtmqbude26@wvup.edu
 const SignIn = () => {
-  const [reasons] = useQuery(getReasons);
+  const [reasons] = useQuery(queryReasons);
   const [student, setStudent] = useState();
+  console.log(reasons);
 
   const loadClassList = email => {
     getStudentInfoWithEmail(email)
@@ -80,17 +76,21 @@ const SignIn = () => {
           }}
           validationSchema={SignInSchema}
           onSubmit={async (values, { setSubmitting }) => {
+            // massage data back into server format
             const signIn = {
               ...values,
               personId: student.studentID,
               semesterId: student.semesterId,
-              courses: values.courses.map(courseCRN => {
-                return student.classSchedule.find(ele => ele.crn === courseCRN);
-              }),
-              reasons: null
+              courses: values.courses.map(courseCRN =>
+                student.classSchedule.find(ele => ele.crn === courseCRN)
+              ),
+              reasons: values.reasons.map(id =>
+                reasons.find(ele => ele.id === id)
+              )
             };
             postSignIn(signIn)
               .then(async res => {
+                // console.log(await res.text());
                 if (res.status === 201) {
                   // navigate to home page
                   alert('You are signed in! ');
@@ -179,7 +179,6 @@ const ReasonsCheckboxes = ({ reasons }) => (
 );
 
 const CoursesCheckboxes = ({ courses }) => {
-  console.log(courses);
   return (
     <>
       <Header type="h4">

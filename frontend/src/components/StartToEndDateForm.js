@@ -29,7 +29,12 @@ const StartToEndDateForm = ({ onSubmit, name, ...props }) => {
               label="end Date"
               required
             />
-            <Button align="right" intent="primary" disabled={isSubmitting}>
+            <Button
+              type="submit"
+              align="right"
+              intent="primary"
+              disabled={isSubmitting}
+            >
               Run Report
             </Button>
           </Form>

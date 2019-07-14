@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { navigate } from '@reach/router';
 import EmailForm from '../EmailForm';
 import callApi from '../../utils/callApi';
+import ensureResponseCode from '../../utils/ensureResponseCode';
 
 const putSignOut = email =>
   callApi(
@@ -16,19 +17,14 @@ const SignOut = () => (
   <FullScreenContainer>
     <EmailForm
       title="Sign Out"
-      onSubmit={(values, { setSubmitting }) => {
-        const { email } = values;
+      onSubmit={({ email }, { setSubmitting, setStatus }) => {
         putSignOut(email)
-          .then(async res => {
-            if (res.status === 200) {
-              alert('You have signed out!');
-              navigate('/');
-            } else {
-              const data = await res.json();
-              throw Error(data);
-            }
+          .then(ensureResponseCode(200))
+          .then(() => {
+            alert('You have signed out!');
+            navigate('/');
           })
-          .catch(e => alert(e.message))
+          .catch(e => setStatus({ msg: e.message }))
           .finally(() => setSubmitting(false));
       }}
     />
