@@ -1,14 +1,6 @@
 import React, { useState } from 'react';
-import {
-  XYPlot,
-  VerticalBarSeries,
-  VerticalGridLines,
-  HorizontalGridLines,
-  XAxis,
-  YAxis
-} from 'react-vis';
 import { CSVLink } from 'react-csv';
-import { Card, Header, Table, ReportLayout } from '../../ui';
+import { Card, Header, Table, ReportLayout, BarChart } from '../../ui';
 import StartToEndDateForm from '../StartToEndDateForm';
 import callApi from '../../utils/callApi';
 import ensureResponseCode from '../../utils/ensureResponseCode';
@@ -38,21 +30,16 @@ const ClassTourReport = () => {
           name="Class Tour"
         />
         {tours && (
-          <Card width="600px">
-            <XYPlot
-              height={300}
-              width={500}
-              xType="ordinal"
-              color="#1A70E3"
-              getX={d => d.name}
-              getY={d => d.students}
-            >
-              <VerticalGridLines />
-              <HorizontalGridLines />
-              <VerticalBarSeries data={tours} />
-              <XAxis title="Tour Groups" style={{ fill: '#143740' }} />
-              <YAxis title="Total Tourists" style={{ fill: '#143740' }} />
-            </XYPlot>
+          <Card width="700px">
+            <BarChart
+              data={tours}
+              x={d => d.name}
+              y={d => d.students}
+              title="Class Tour Chart"
+              xLabel="Name"
+              yLabel="# of Students"
+              labels={d => d.students}
+            />
           </Card>
         )}
       </div>

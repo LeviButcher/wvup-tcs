@@ -7,6 +7,9 @@ import Table from './Table';
 import Link from './Link';
 import Checkbox from './Checkbox';
 import ReportLayout from './ReportLayout';
+import LineChart from './LineChart';
+import BarChart from './BarChart';
+import PieChart from './PieChart';
 
 export {
   Card,
@@ -17,5 +20,8 @@ export {
   Table,
   Link,
   Checkbox,
-  ReportLayout
+  ReportLayout,
+  LineChart,
+  BarChart,
+  PieChart
 };

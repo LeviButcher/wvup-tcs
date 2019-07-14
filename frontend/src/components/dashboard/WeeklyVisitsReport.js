@@ -1,14 +1,6 @@
 import React, { useState } from 'react';
-import {
-  XYPlot,
-  LineSeries,
-  VerticalGridLines,
-  HorizontalGridLines,
-  XAxis,
-  YAxis
-} from 'react-vis';
 import { CSVLink } from 'react-csv';
-import { ReportLayout, Table, Header, Card } from '../../ui';
+import { ReportLayout, Table, Header, Card, LineChart } from '../../ui';
 import StartToEndDateForm from '../StartToEndDateForm';
 import callApi from '../../utils/callApi';
 
@@ -39,21 +31,15 @@ const WeeklyVisitsReport = () => {
         />
         {visits && (
           <Card width="600px">
-            <XYPlot
-              height={300}
-              width={500}
-              xType="ordinal"
-              color="#1A70E3"
-              getX={d => d.item}
-              getY={d => d.count}
-              animate
-            >
-              <VerticalGridLines />
-              <HorizontalGridLines />
-              <LineSeries data={visits} />
-              <XAxis title="Week" style={{ fill: '#143740' }} />
-              <YAxis title="Total Visitors" style={{ fill: '#143740' }} />
-            </XYPlot>
+            <LineChart
+              title="Weekly Visits"
+              data={visits}
+              x={d => d.item}
+              y={d => d.count}
+              xLabel="Week"
+              yLabel="Total Visitors"
+              labels={d => d.count}
+            />
           </Card>
         )}
       </div>

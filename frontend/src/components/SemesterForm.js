@@ -20,7 +20,12 @@ const StartToEndDateForm = ({ onSubmit, name, ...props }) => {
               <option>201902</option>
               <option>201903</option>
             </Field>
-            <Button align="right" intent="primary" disabled={isSubmitting}>
+            <Button
+              type="submit"
+              align="right"
+              intent="primary"
+              disabled={isSubmitting}
+            >
               Run Report
             </Button>
           </Form>

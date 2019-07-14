@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
-import { RadialChart } from 'react-vis';
 import { CSVLink } from 'react-csv';
 import { clone } from 'ramda';
-import { ReportLayout, Table, Header, Card } from '../../ui';
+import { ReportLayout, Table, Header, Card, PieChart } from '../../ui';
 import StartToEndDateForm from '../StartToEndDateForm';
 import callApi from '../../utils/callApi';
 import ensureResponseCode from '../../utils/ensureResponseCode';
@@ -59,16 +58,16 @@ const ReasonsReport = () => {
           name="Reason For Visiting"
         />
         {reasonsForVisiting && (
-          <Card width="fit-content">
-            <RadialChart
+          <Card width="600px" padding={0}>
+            <PieChart
               data={reasonsForVisiting
                 .reduce(reasonTotalStudentReducer, [])
                 .map(reasonsToAngle)}
-              width={400}
-              height={400}
-              showLabels
-              labelsStyle={{ fontSize: 16, fill: '#222' }}
-              labelsRadiusMultiplier={1.1}
+              x={d => d.label}
+              y={d => d.angle}
+              labels={d => `${d.label}: ${d.angle}`}
+              title="Reason For Visiting Percentages"
+              padding={80}
             />
           </Card>
         )}
