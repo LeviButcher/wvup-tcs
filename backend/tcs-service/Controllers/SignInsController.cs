@@ -191,7 +191,7 @@ namespace tcs_service.Controllers
 
             if (signIn.OutTime != null)
             {
-                return BadRequest("Student is not signed in");
+                return BadRequest("You are not signed in");
             }
 
             signIn.OutTime = DateTime.Now;
@@ -211,12 +211,12 @@ namespace tcs_service.Controllers
 
             if (signIn == null)
             {
-                return NotFound(new {message="Student is not signed in"});
+                return NotFound(new {message="You are not signed in"});
             }
 
             if (signIn.OutTime != null)
             {
-                return BadRequest("Student is not signed in");
+                return BadRequest("You are not signed in");
             }
 
             signIn.OutTime = DateTime.Now;
@@ -257,7 +257,7 @@ namespace tcs_service.Controllers
                 return null;
             }
 
-            return  _iRepo.GetMostRecentSignInByID(id);
+            return  await _iRepo.GetMostRecentSignInByID(id);
         }
 
         private async Task<SignIn> GetMostRecentByEmail(string email)
@@ -267,7 +267,7 @@ namespace tcs_service.Controllers
                 return null;
             }
 
-            return _iRepo.GetMostRecentSignInByEmail(email);
+            return await _iRepo.GetMostRecentSignInByEmail(email);
         }
     }
 }
