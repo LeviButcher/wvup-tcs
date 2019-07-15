@@ -1,22 +1,46 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { navigate } from '@reach/router';
 import styled from 'styled-components';
 import EmailForm from '../EmailForm';
 import callApi from '../../utils/callApi';
 import ensureResponseCode from '../../utils/ensureResponseCode';
+import unWrapToJSON from '../../utils/unwrapToJSON';
 
-const postSignOut = email =>
+const postSignInTeacher = callApi(
+  `${process.env.REACT_APP_BACKEND}signins?teacher=true`,
+  'POST'
+);
+
+const getTeacherInfoWithEmail = email =>
   callApi(
-    `${process.env.REACT_APP_BACKEND}signins/${email}/signout`,
-    'PUT',
+    `${process.env.REACT_APP_BACKEND}signins/${email}/teacher/email`,
+    'GET',
     null
   );
 
+// get teacher information
+// transform that into signIn
+// send to post
+
 // test email : teacher@wvup.edu
 const SignInTeacher = () => {
-  const handleSubmit = async (values, { setSubmitting, setStatus }) => {
-    postSignOut(values.email)
+  const loadTeacherInfo = email =>
+    getTeacherInfoWithEmail(email)
       .then(ensureResponseCode(200))
+      .then(unWrapToJSON);
+
+  const handleSubmit = async ({ email }, { setSubmitting, setStatus }) => {
+    loadTeacherInfo(email)
+      .catch(() => {
+        throw new Error(`Can't find your information`);
+      })
+      .then(teacher => ({
+        ...teacher,
+        id: teacher.teacherId,
+        email: teacher.teacherEmail
+      }))
+      .then(signIn => postSignInTeacher(signIn))
+      .then(ensureResponseCode(201))
       .then(() => {
         alert('You have signed in!');
         navigate('/');
@@ -31,7 +55,7 @@ const SignInTeacher = () => {
 
   return (
     <FullScreenContainer>
-      <EmailForm title="Teacher Sign In" onSubmit={handleSubmit} />
+      <EmailForm title="Teacher Sign In" onSubmit={handleSubmit} disabled />
     </FullScreenContainer>
   );
 };
