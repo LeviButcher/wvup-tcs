@@ -148,26 +148,26 @@ namespace tcs_service.Repos
             return semester.Entity;
         }
 
-        // needs to be async
-        public SignIn GetMostRecentSignInByID(int id)
+     
+        public async Task<SignIn> GetMostRecentSignInByID(int id)
         {
-             var signIn = _db.SignIns.Where(p => p.PersonId == id)
+             var signIn = await _db.SignIns.Where(p => p.PersonId == id)
                 .GroupBy(x => x.PersonId)
-                .Select(e => e.OrderByDescending(t => t.InTime)).FirstOrDefault();
+                .Select(e => e.OrderByDescending(t => t.InTime)).FirstOrDefaultAsync();
                
 
-            return signIn.First();
+            return signIn.Last();
         }
 
         // needs to be async
-        public SignIn GetMostRecentSignInByEmail(string email)
+        public async Task<SignIn> GetMostRecentSignInByEmail(string email)
         {
-            var signIn = _db.SignIns.Where(p => p.Person.Email == email)
+            var signIn = await _db.SignIns.Where(p => p.Person.Email == email)
                .GroupBy(x => x.PersonId)
-               .Select(e => e.OrderByDescending(t => t.InTime)).FirstOrDefault();
+               .Select(e => e.OrderByDescending(t => t.InTime)).FirstOrDefaultAsync();
 
 
-            return signIn.First();
+            return signIn.Last();
         }
 
         public abstract StudentInfoViewModel GetStudentInfoWithEmail(string studentEmail);

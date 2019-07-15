@@ -122,6 +122,7 @@ namespace tcs_service.Repos
         {
             var result = from signIns in _db.SignIns
                          from reason in signIns.Reasons
+                         where reason.Reason.Name != "Tutoring"
                          from course in signIns.Courses
                          where signIns.InTime >= startWeek
                          && signIns.InTime <= endWeek
