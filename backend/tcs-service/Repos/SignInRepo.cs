@@ -165,7 +165,14 @@ namespace tcs_service.Repos
             return signIn;
         }
 
-        private async Task<SignIn> GetMostRecentSignIn(int personId) => await _db.SignIns.Where(p => p.PersonId == personId).LastAsync();
+        private async Task<SignIn> GetMostRecentSignIn(int personId)
+        {
+            if(await _db.SignIns.Where(x => x.PersonId == personId).AnyAsync())
+            {
+                return await _db.SignIns.Where(p => p.PersonId == personId).LastAsync();
+            }
+            return null;           
+        }
 
         public abstract StudentInfoViewModel GetStudentInfoWithEmail(string studentEmail);
 
