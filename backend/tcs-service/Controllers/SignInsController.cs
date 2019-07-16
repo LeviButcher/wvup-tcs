@@ -80,7 +80,14 @@ namespace tcs_service.Controllers
                 await _iRepo.AddPerson(person);
             }
 
-            if(!teacher)
+            var recent = await GetMostRecentById(signIn.PersonId);
+
+            if (recent != null && recent.OutTime == null)
+            {
+                return BadRequest("You are already signed in");
+            }
+
+            if (!teacher)
             {
                 if (signInViewModel.Tutoring && signInViewModel.Courses == null)
                 {
