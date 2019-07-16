@@ -62,6 +62,7 @@ namespace tcs_service {
             services.AddScoped<ISignInRepo, DevSignInRepo>();
             services.AddScoped<IReportsRepo, DevReportsRepo>();
             services.AddScoped<IReasonRepo, ReasonRepo>();
+            services.AddScoped<ILookupRepo, LookupRepo>();
 
             services.AddMvc ().SetCompatibilityVersion (CompatibilityVersion.Version_2_2);
             services.AddDbContext<TCSContext> (options =>
