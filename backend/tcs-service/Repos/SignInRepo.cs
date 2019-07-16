@@ -154,20 +154,18 @@ namespace tcs_service.Repos
             var person = await _db.People.Where(x => x.ID == id).FirstOrDefaultAsync();
             var signIn = await GetMostRecentSignIn(person.ID);
 
-            return signIn.First();
+            return signIn;
         }
 
         public async Task<SignIn> GetMostRecentSignInByEmail(string email)
         {
             var person = await _db.People.Where(x => x.Email == email).FirstAsync();
             var signIn = await GetMostRecentSignIn(person.ID);
-           
-            return signIn.First();
+
+            return signIn;
         }
 
-        private async Task<IEnumerable<SignIn>> GetMostRecentSignIn(int personId) => await _db.SignIns.Where(p => p.PersonId == personId)
-               .GroupBy(x => x.PersonId)
-               .Select(e => e.OrderBy(t => t.InTime).ThenBy(t => t.InTime.Value.Hour).ThenBy(t => t.InTime.Value.Minute).ThenBy(t => t.InTime.Value.Second)).FirstOrDefaultAsync();
+        private async Task<SignIn> GetMostRecentSignIn(int personId) => await _db.SignIns.Where(p => p.PersonId == personId).LastAsync();
 
         public abstract StudentInfoViewModel GetStudentInfoWithEmail(string studentEmail);
 
