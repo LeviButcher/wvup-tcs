@@ -11,7 +11,7 @@ using tcs_service.Repos.Interfaces;
 
 namespace tcs_service.Repos
 {
-    public class ReportsRepo : BaseRepo<SignIn>, IReportsRepo
+    public abstract class ReportsRepo : BaseRepo<SignIn>, IReportsRepo
     {
         public ReportsRepo(DbContextOptions options) : base(options)
         {
@@ -157,5 +157,7 @@ namespace tcs_service.Repos
         {
             return _db.Semesters.ToList();
         }
+
+        public abstract Task<List<CourseWithSuccessCountViewModel>> SuccessReport(int semesterId);
     }
 }
