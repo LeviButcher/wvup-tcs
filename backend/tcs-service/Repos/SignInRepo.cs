@@ -151,24 +151,23 @@ namespace tcs_service.Repos
      
         public async Task<SignIn> GetMostRecentSignInByID(int id)
         {
-             var signIn = await _db.SignIns.Where(p => p.PersonId == id)
-                .GroupBy(x => x.PersonId)
-                .Select(e => e.OrderByDescending(t => t.InTime)).FirstOrDefaultAsync();
-               
+            var person = await _db.People.Where(x => x.ID == id).FirstOrDefaultAsync();
+            var signIn = await GetMostRecentSignIn(person.ID);
 
-            return signIn.Last();
+            return signIn.First();
         }
 
-        // needs to be async
         public async Task<SignIn> GetMostRecentSignInByEmail(string email)
         {
-            var signIn = await _db.SignIns.Where(p => p.Person.Email == email)
-               .GroupBy(x => x.PersonId)
-               .Select(e => e.OrderByDescending(t => t.InTime)).FirstOrDefaultAsync();
-
-
-            return signIn.Last();
+            var person = await _db.People.Where(x => x.Email == email).FirstAsync();
+            var signIn = await GetMostRecentSignIn(person.ID);
+           
+            return signIn.First();
         }
+
+        private async Task<IEnumerable<SignIn>> GetMostRecentSignIn(int personId) => await _db.SignIns.Where(p => p.PersonId == personId)
+               .GroupBy(x => x.PersonId)
+               .Select(e => e.OrderBy(t => t.InTime).ThenBy(t => t.InTime.Value.Hour).ThenBy(t => t.InTime.Value.Minute).ThenBy(t => t.InTime.Value.Second)).FirstOrDefaultAsync();
 
         public abstract StudentInfoViewModel GetStudentInfoWithEmail(string studentEmail);
 
