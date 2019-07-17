@@ -21,7 +21,8 @@ import {
   UserForm,
   SuccessReport,
   ReasonManagement,
-  ReasonForm
+  ReasonForm,
+  SignInLookup
 } from './components/dashboard';
 import Theme from './theme.json';
 import NotFound from './components/NotFound';
@@ -44,6 +45,8 @@ function App() {
           <IsAuthenticated redirectRoute="/login" path="/dashboard">
             <DashboardLayout path="/">
               <Hello path="/" />
+              <SignInLookup path="/signins/" />
+              <SignInLookup path="/signins/:startDate/:endDate/:page" />
               <ClassTourLookup path="/tours" />
               <ClassTourForm path="/tours/create" />
               <Fetch
