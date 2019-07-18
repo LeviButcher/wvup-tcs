@@ -117,7 +117,7 @@ namespace tcs_service.Repos
                            && signIn.Person.PersonType == PersonType.Teacher
                            select new
                            {
-                               teacherName = $"{signIn.Person.FirstName} {signIn.Person.LastName}",
+                               fullName = $"{signIn.Person.FirstName} {signIn.Person.LastName}",
                                teacherEmail = signIn.Person.Email,
                                totalHours = signIn.OutTime.Value.Ticks - signIn.InTime.Value.Ticks
                            };
@@ -127,12 +127,12 @@ namespace tcs_service.Repos
                          group item by new
                          {
                              item.teacherEmail,
-                             item.teacherName
+                             item.fullName
                          }
                          into grp
                          select new TeacherSignInTimeViewModel()
                          {
-                             teacherName = grp.Key.teacherName,
+                             fullName = grp.Key.fullName,
                              teacherEmail = grp.Key.teacherEmail,
                              totalHours = new TimeSpan(grp.Sum(x => x.totalHours))
                          };

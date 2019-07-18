@@ -9,7 +9,7 @@ namespace tcs_service.Models.ViewModels
     {
         public string teacherEmail { get; set; }
 
-        public string teacherName { get; set; }
+        public string fullName { get; set; }
 
         public TimeSpan? totalHours { get; set; }
     }
