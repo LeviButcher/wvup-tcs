@@ -11,6 +11,6 @@ namespace tcs_service.Models.ViewModels
 
         public string fullName { get; set; }
 
-        public TimeSpan? totalHours { get; set; }
+        public decimal totalHours { get; set; }
     }
 }

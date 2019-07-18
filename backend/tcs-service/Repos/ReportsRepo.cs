@@ -119,7 +119,7 @@ namespace tcs_service.Repos
                            {
                                fullName = $"{signIn.Person.FirstName} {signIn.Person.LastName}",
                                teacherEmail = signIn.Person.Email,
-                               totalHours = signIn.OutTime.Value.Ticks - signIn.InTime.Value.Ticks
+                               totalHours = Convert.ToDecimal(signIn.OutTime.Value.Ticks) - Convert.ToDecimal(signIn.InTime.Value.Ticks)
                            };
 
 
@@ -134,7 +134,7 @@ namespace tcs_service.Repos
                          {
                              fullName = grp.Key.fullName,
                              teacherEmail = grp.Key.teacherEmail,
-                             totalHours = new TimeSpan(grp.Sum(x => x.totalHours))
+                             totalHours = Math.Round(grp.Sum(x => x.totalHours)/600000000, 2)
                          };
 
             return await result.ToListAsync();
