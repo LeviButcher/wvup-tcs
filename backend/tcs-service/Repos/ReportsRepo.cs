@@ -134,6 +134,19 @@ namespace tcs_service.Repos
                              CourseId = course.CourseID
                          };
 
+            var tutoringResult = from signIns in _db.SignIns
+                                 from reason in signIns.Reasons
+                                 from course in signIns.Courses
+                                 where signIns.Tutoring == true
+                                 && signIns.InTime >= startWeek
+                                 && signIns.InTime <= endWeek
+                                 select new
+                                 {
+   
+                                     CourseName = course.Course.CourseName,
+                                     CourseId = course.CourseID
+                                 };
+
             var resultGroup = from item in result
                               group item by new
                               {
@@ -151,7 +164,24 @@ namespace tcs_service.Repos
                                   visits = grp.Count()
                               };
 
-            return resultGroup.ToList();
+            var tutorResult = from item in tutoringResult
+                              group item by new
+                              {
+                                  item.CourseId,
+                                  item.CourseName
+                              } into grp
+                              select new ReasonWithClassVisitsViewModel()
+                              {
+                                  reasonId = 0,
+                                  reasonName = "Tutoring",
+                                  courseCRN = grp.Key.CourseId,
+                                  courseName = grp.Key.CourseName,
+                                  visits = grp.Count()
+                              };
+
+            var finalResult = resultGroup.Concat(tutorResult);
+
+            return await finalResult.ToListAsync();
         }
         public List<Semester> Semesters()
         {
