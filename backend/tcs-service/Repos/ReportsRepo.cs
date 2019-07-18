@@ -111,10 +111,33 @@ namespace tcs_service.Repos
 
         public async Task<List<TeacherSignInTimeViewModel>> Volunteers(DateTime startWeek, DateTime endWeek)
         {
-            var result = await _db.SignIns.Where(x => x.InTime >= startWeek && x.InTime <= endWeek && x.Person.PersonType == PersonType.Teacher)
-                .Select(x => new TeacherSignInTimeViewModel { teacherName = x.Person.FirstName + x.Person.LastName, teacherEmail = x.Person.Email, signInTime = (DateTime)x.InTime }).ToListAsync();
+            var teachers = from signIn in _db.SignIns
+                           where signIn.InTime >= startWeek
+                           && signIn.InTime <= endWeek
+                           && signIn.Person.PersonType == PersonType.Teacher
+                           select new
+                           {
+                               teacherName = $"{signIn.Person.FirstName} {signIn.Person.LastName}",
+                               teacherEmail = signIn.Person.Email,
+                               totalHours = signIn.OutTime.Value.Ticks - signIn.InTime.Value.Ticks
+                           };
 
-            return result;
+
+            var result = from item in teachers
+                         group item by new
+                         {
+                             item.teacherEmail,
+                             item.teacherName
+                         }
+                         into grp
+                         select new TeacherSignInTimeViewModel()
+                         {
+                             teacherName = grp.Key.teacherName,
+                             teacherEmail = grp.Key.teacherEmail,
+                             totalHours = new TimeSpan(grp.Sum(x => x.totalHours))
+                         };
+
+            return await result.ToListAsync();
         }
 
 

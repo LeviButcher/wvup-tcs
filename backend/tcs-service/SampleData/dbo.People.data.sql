@@ -100,4 +100,5 @@ INSERT INTO [dbo].[People] ([ID], [Email], [PersonType], [FirstName], [LastName]
 INSERT INTO [dbo].[People] ([ID], [Email], [PersonType], [FirstName], [LastName]) VALUES (99, N'dtxz62@wvup.edu', 0, N'Kate', N'Pineda')
 INSERT INTO [dbo].[People] ([ID], [Email], [PersonType], [FirstName], [LastName]) VALUES (771771771, N'teacher@wvup.edu', 1, N'Derrick', N'Hancock')
 INSERT INTO [dbo].[People] ([ID], [Email], [PersonType], [FirstName], [LastName]) VALUES (991991991, N'molson@wvup.edu', 0, N'Mary', N'Olson')
+INSERT INTO [dbo].[People] ([ID], [Email], [PersonType], [FirstName], [LastName]) VALUES (881881881, N'teach@wvup.edu', 1, N'Teacher', N'Name')
 

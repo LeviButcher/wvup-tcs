@@ -11,6 +11,6 @@ namespace tcs_service.Models.ViewModels
 
         public string teacherName { get; set; }
 
-        public DateTime signInTime { get; set; }
+        public TimeSpan? totalHours { get; set; }
     }
 }
