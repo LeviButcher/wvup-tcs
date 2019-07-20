@@ -9,7 +9,7 @@ import {
   act,
   wait
 } from 'CustomReactTestingLibrary'; // eslint-disable-line
-import SignIn from './SignIn';
+import SignInForm from './SignInForm';
 
 // put this in jest config
 afterEach(cleanup);
@@ -61,7 +61,7 @@ test('Invalid Email displays error', async () => {
     findByLabelText,
     getById,
     findByText
-  } = render(<SignIn />);
+  } = render(<SignInForm />);
 
   const emailInput = getByLabelText(/email/i);
   const email = 'MyFakeEmail@yahoo.com';
@@ -87,7 +87,7 @@ test('Reasons for visiting is loaded', async () => {
     getAllByLabelText,
     getById,
     findByText
-  } = render(<SignIn />);
+  } = render(<SignInForm />);
 
   const [tutoring, computerUse] = await waitForElement(() => [
     findByLabelText(/tutoring/i),
@@ -105,9 +105,8 @@ test('Ensure Tutoring has to be checked to submit', async () => {
     getByText,
     findByLabelText,
     getById,
-    findByText,
-    debug
-  } = render(<SignIn />);
+    findByText
+  } = render(<SignInForm />);
 
   const emailInput = getByLabelText(/email/i);
   const email = 'lbutche3@wvup.edu';
@@ -117,7 +116,6 @@ test('Ensure Tutoring has to be checked to submit', async () => {
     fireEvent.change(emailInput, { target: { value: email } });
   });
   // fireEvent.click(tutoring);
-  debug();
   const submitButton = getByText(/submit/i);
   await wait(() => {
     expect(submitButton).toBeDisabled();
