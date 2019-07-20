@@ -12,6 +12,7 @@ import UserForm from './UserForm';
 import SuccessReport from './SuccessReport';
 import ReasonForm from './ReasonForm';
 import SignInLookup from './SignInLookup';
+import SignInForm from './SignInForm';
 
 export {
   DashboardLayout,
@@ -27,5 +28,6 @@ export {
   SuccessReport,
   ReasonManagement,
   ReasonForm,
-  SignInLookup
+  SignInLookup,
+  SignInForm
 };

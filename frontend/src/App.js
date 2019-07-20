@@ -1,13 +1,7 @@
 import React from 'react';
-import { Router } from '@reach/router';
+import { Router, navigate } from '@reach/router';
 import { ThemeProvider } from 'styled-components';
-import {
-  KioskLayout,
-  Home,
-  SignIn,
-  SignOut,
-  SignInTeacher
-} from './components/kiosk';
+import { KioskLayout, Home, SignOut, SignInTeacher } from './components/kiosk';
 import {
   DashboardLayout,
   ClassTourLookup,
@@ -22,7 +16,8 @@ import {
   SuccessReport,
   ReasonManagement,
   ReasonForm,
-  SignInLookup
+  SignInLookup,
+  SignInForm
 } from './components/dashboard';
 import Theme from './theme.json';
 import NotFound from './components/NotFound';
@@ -37,7 +32,13 @@ function App() {
         <Router>
           <KioskLayout path="/">
             <Home path="/" />
-            <SignIn path="/signin" />
+            <SignInForm
+              path="/signin"
+              afterSuccessfulSubmit={() => {
+                alert('You have signed in! ');
+                navigate('/');
+              }}
+            />
             <SignOut path="/signout" />
             <SignInTeacher path="/signin/teacher" />
             <NotFound default />
@@ -45,8 +46,15 @@ function App() {
           <IsAuthenticated redirectRoute="/login" path="/dashboard">
             <DashboardLayout path="/">
               <Hello path="/" />
-              <SignInLookup path="/signins/" />
               <SignInLookup path="/signins/:startDate/:endDate/:page" />
+              <SignInLookup path="/signins/" />
+              <SignInForm
+                path="/signins/create"
+                afterSuccessfulSubmit={() => {
+                  alert('You created a signIn! ');
+                  navigate('/dashboard/signins');
+                }}
+              />
               <ClassTourLookup path="/tours" />
               <ClassTourForm path="/tours/create" />
               <Fetch

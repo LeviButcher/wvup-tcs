@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { Link, navigate } from '@reach/router';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import { pipe } from 'ramda';
@@ -8,6 +7,7 @@ import unWrapToJSON from '../../utils/unwrapToJSON';
 import { Card, Input, Header, Button, FieldGroup, Checkbox } from '../../ui';
 import useQuery from '../../hooks/useQuery';
 import callApi from '../../utils/callApi';
+import ensureResponseCode from '../../utils/ensureResponseCode';
 
 const SignInSchema = Yup.object().shape({
   email: Yup.string()
@@ -48,23 +48,21 @@ const queryReasons = pipe(
 const isWVUPEmail = email => email.match(/^[A-Z0-9._%+-]+@wvup.edu$/i);
 
 // test email = mtmqbude26@wvup.edu
-const SignIn = () => {
+const SignIn = ({ afterSuccessfulSubmit }) => {
   const [reasons] = useQuery(queryReasons);
   const [student, setStudent] = useState();
 
   const loadClassList = email => {
     getStudentInfoWithEmail(email)
-      .then(async res => {
-        const studentInfo = await res.json();
-        setStudent(studentInfo);
-      })
+      .then(ensureResponseCode(200))
+      .then(unWrapToJSON)
+      .then(setStudent)
       .catch(e => alert(e.message));
   };
 
   return (
     <FullScreenContainer>
       <Card>
-        <Link to="/">Go Back</Link>
         <Formik
           initialValues={{
             email: '',
@@ -87,14 +85,8 @@ const SignIn = () => {
               )
             };
             postSignIn(signIn)
-              .then(async res => {
-                // console.log(await res.text());
-                if (res.status === 201) {
-                  // navigate to home page
-                  alert('You are signed in! ');
-                  navigate('/');
-                }
-              })
+              .then(ensureResponseCode(201))
+              .then(afterSuccessfulSubmit)
               .catch(e => alert(e.message))
               .finally(() => setSubmitting(false));
           }}

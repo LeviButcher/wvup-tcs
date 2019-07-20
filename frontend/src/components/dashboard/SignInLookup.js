@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import StartToEndDate from '../StartToEndDateForm';
-import { Table } from '../../ui';
+import { Table, Paging, Link } from '../../ui';
 import ensureResponseCode from '../../utils/ensureResponseCode';
 import unwrapToJSON from '../../utils/unwrapToJSON';
 
@@ -51,7 +51,11 @@ const SignInLookup = ({ startDate, endDate, page }) => {
           return response;
         })
         .then(unwrapToJSON)
-        .then(setSignIns);
+        .then(setSignIns)
+        .then(() => {
+          setStart(startDate);
+          setEnd(endDate);
+        });
     }
     return () => {
       setSignIns([]);
@@ -62,6 +66,11 @@ const SignInLookup = ({ startDate, endDate, page }) => {
 
   return (
     <div>
+      <div>
+        <h3>Additional Actions</h3>
+        <Link to="/dashboard/signins/create">Create Sign In</Link>
+      </div>
+
       <StartToEndDate
         name="Sign In Lookup"
         onSubmit={(values, { setSubmitting, setStatus }) => {
@@ -85,8 +94,16 @@ const SignInLookup = ({ startDate, endDate, page }) => {
         endDate={end}
         submitText="Run Lookup"
       />
-      {signIns && <SignInsTable signIns={signIns} />}
-      {signIns && (
+      {signIns && start && end && (
+        <Paging
+          currentPage={page}
+          next={next}
+          prev={prev}
+          baseURL={`/dashboard/signins/${start}/${end}/`}
+        />
+      )}
+      {signIns && start && end && <SignInsTable signIns={signIns} />}
+      {signIns && start && end && (
         <Paging
           currentPage={page}
           next={next}
@@ -95,17 +112,6 @@ const SignInLookup = ({ startDate, endDate, page }) => {
         />
       )}
     </div>
-  );
-};
-
-const Paging = ({ next, prev, currentPage = 1, baseURL }) => {
-  const page = Number(currentPage);
-  return (
-    <nav>
-      {page > 1 && prev && <a href={`${baseURL}${page - 1}`}>Prev</a>}
-      <i>{page}</i>
-      {next && <a href={`${baseURL}${page + 1}`}>Next</a>}
-    </nav>
   );
 };
 
