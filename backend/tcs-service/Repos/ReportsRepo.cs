@@ -11,7 +11,7 @@ using tcs_service.Repos.Interfaces;
 
 namespace tcs_service.Repos
 {
-    public class ReportsRepo : BaseRepo<SignIn>, IReportsRepo
+    public abstract class ReportsRepo : BaseRepo<SignIn>, IReportsRepo
     {
         public ReportsRepo(DbContextOptions options) : base(options)
         {
@@ -111,10 +111,33 @@ namespace tcs_service.Repos
 
         public async Task<List<TeacherSignInTimeViewModel>> Volunteers(DateTime startWeek, DateTime endWeek)
         {
-            var result = await _db.SignIns.Where(x => x.InTime >= startWeek && x.InTime <= endWeek && x.Person.PersonType == PersonType.Teacher)
-                .Select(x => new TeacherSignInTimeViewModel { teacherName = x.Person.FirstName + x.Person.LastName, teacherEmail = x.Person.Email, signInTime = (DateTime)x.InTime }).ToListAsync();
+            var teachers = from signIn in _db.SignIns
+                           where signIn.InTime >= startWeek
+                           && signIn.InTime <= endWeek
+                           && signIn.Person.PersonType == PersonType.Teacher
+                           select new
+                           {
+                               fullName = $"{signIn.Person.FirstName} {signIn.Person.LastName}",
+                               teacherEmail = signIn.Person.Email,
+                               totalHours = Convert.ToDecimal(signIn.OutTime.Value.Ticks) - Convert.ToDecimal(signIn.InTime.Value.Ticks)
+                           };
 
-            return result;
+
+            var result = from item in teachers
+                         group item by new
+                         {
+                             item.teacherEmail,
+                             item.fullName
+                         }
+                         into grp
+                         select new TeacherSignInTimeViewModel()
+                         {
+                             fullName = grp.Key.fullName,
+                             teacherEmail = grp.Key.teacherEmail,
+                             totalHours = Math.Round(grp.Sum(x => x.totalHours)/600000000, 2)
+                         };
+
+            return await result.ToListAsync();
         }
 
 
@@ -134,6 +157,19 @@ namespace tcs_service.Repos
                              CourseId = course.CourseID
                          };
 
+            var tutoringResult = from signIns in _db.SignIns
+                                 from reason in signIns.Reasons
+                                 from course in signIns.Courses
+                                 where signIns.Tutoring == true
+                                 && signIns.InTime >= startWeek
+                                 && signIns.InTime <= endWeek
+                                 select new
+                                 {
+   
+                                     CourseName = course.Course.CourseName,
+                                     CourseId = course.CourseID
+                                 };
+
             var resultGroup = from item in result
                               group item by new
                               {
@@ -151,11 +187,30 @@ namespace tcs_service.Repos
                                   visits = grp.Count()
                               };
 
-            return resultGroup.ToList();
+            var tutorResult = from item in tutoringResult
+                              group item by new
+                              {
+                                  item.CourseId,
+                                  item.CourseName
+                              } into grp
+                              select new ReasonWithClassVisitsViewModel()
+                              {
+                                  reasonId = 0,
+                                  reasonName = "Tutoring",
+                                  courseCRN = grp.Key.CourseId,
+                                  courseName = grp.Key.CourseName,
+                                  visits = grp.Count()
+                              };
+
+            var finalResult = resultGroup.Concat(tutorResult);
+
+            return await finalResult.ToListAsync();
         }
         public List<Semester> Semesters()
         {
             return _db.Semesters.ToList();
         }
+
+        public abstract Task<List<CourseWithSuccessCountViewModel>> SuccessReport(int semesterId);
     }
 }

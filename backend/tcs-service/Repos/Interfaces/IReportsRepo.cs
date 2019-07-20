@@ -19,6 +19,8 @@ namespace tcs_service.Repos.Interfaces
 
         Task<List<ReasonWithClassVisitsViewModel>> Reasons(DateTime startWeek, DateTime endWeek);
 
+        Task<List<CourseWithSuccessCountViewModel>> SuccessReport(int semesterId);
+
         List<Semester> Semesters();
     }
 }

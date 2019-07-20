@@ -55,5 +55,11 @@ namespace tcs_service.Controllers
         {
             return  Ok(_iRepo.Semesters());
         }
+
+        [HttpGet("success")]
+        public async Task<IActionResult> SuccessReport([FromQuery] int semesterId)
+        {
+            return Ok(await _iRepo.SuccessReport(semesterId));
+        }
     }
 }

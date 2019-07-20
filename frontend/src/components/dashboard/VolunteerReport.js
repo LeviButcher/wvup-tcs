@@ -28,7 +28,7 @@ const VolunteerReport = () => {
               })
               .finally(() => setSubmitting(false));
           }}
-          name="Voluteer"
+          name="Volunteer"
         />
         {volunteers && (
           <Card width="600px">
@@ -53,7 +53,7 @@ const VolunteerTable = ({ volunteers }) => {
     <Table>
       <caption>
         <Header>
-          Voluteers Total Hours -{' '}
+          Volunteers Total Hours -{' '}
           <CSVLink data={volunteers} filename="classTourReport">
             Download
           </CSVLink>
