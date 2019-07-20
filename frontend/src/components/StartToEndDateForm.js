@@ -12,15 +12,28 @@ const StartToEndDateSchema = Yup.object().shape({
     .required()
 });
 
-const StartToEndDateForm = ({ onSubmit, name, ...props }) => {
+const StartToEndDateForm = ({
+  onSubmit,
+  name,
+  submitText,
+  startDate = '',
+  endDate = '',
+  ...props
+}) => {
   return (
-    <Card {...props}>
-      <Header>{name} Report</Header>
+    <Card>
+      <Header>{name}</Header>
       <p>Enter begin and end date to query by</p>
       <Formik
         onSubmit={onSubmit}
         validationSchema={StartToEndDateSchema}
-        initialValues={{ startDate: '', endDate: '' }}
+        initialValues={{ startDate, endDate }}
+        isInitialValid={e => {
+          return StartToEndDateSchema.validate(e.initialValues)
+            .then(() => true)
+            .catch(() => false);
+        }}
+        {...props}
       >
         {({ isSubmitting, isValid }) => (
           <Form>
@@ -46,7 +59,7 @@ const StartToEndDateForm = ({ onSubmit, name, ...props }) => {
               intent="primary"
               disabled={isSubmitting || !isValid}
             >
-              Run Report
+              {submitText || 'Run Report'}
             </Button>
           </Form>
         )}
