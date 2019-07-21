@@ -17,7 +17,8 @@ import {
   ReasonManagement,
   ReasonForm,
   SignInLookup,
-  SignInForm
+  SignInForm,
+  SignInFormUpdate
 } from './components/dashboard';
 import Theme from './theme.json';
 import NotFound from './components/NotFound';
@@ -54,6 +55,12 @@ function App() {
                   alert('You created a signIn! ');
                   navigate('/dashboard/signins');
                 }}
+              />
+              <Fetch
+                path="/signins/:id"
+                url={`${process.env.REACT_APP_BACKEND}signins/`}
+                Component={SignInFormUpdate}
+                action="Update"
               />
               <ClassTourLookup path="/tours" />
               <ClassTourForm path="/tours/create" />

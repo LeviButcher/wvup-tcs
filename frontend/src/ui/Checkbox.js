@@ -6,7 +6,7 @@ export default function Checkbox({ name, value, label, id, ...rest }) {
   return (
     <Field name={name}>
       {({ field, form }) => (
-        <StyledCheckbox name={name} htmlFor={id}>
+        <StyledCheckbox name={name} htmlFor={id} {...rest}>
           {label}
           <input
             type="checkbox"

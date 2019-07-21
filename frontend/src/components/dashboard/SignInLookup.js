@@ -1,38 +1,23 @@
 import React, { useState, useEffect } from 'react';
+import { GoTrashcan, GoGear } from 'react-icons/go';
 import StartToEndDate from '../StartToEndDateForm';
 import { Table, Paging, Link } from '../../ui';
 import ensureResponseCode from '../../utils/ensureResponseCode';
 import unwrapToJSON from '../../utils/unwrapToJSON';
-
-const signInData = [
-  {
-    id: 1,
-    email: 'lbutche3@wvup.edu',
-    fullName: 'Levi Butcher',
-    inTime: new Date(),
-    outTime: new Date(),
-    tutored: 'true',
-    courses: [
-      { courseName: 'CS101' },
-      { courseName: 'CS121' },
-      { courseName: 'CS126' }
-    ],
-    reasons: [{ reasonName: 'Computer Use' }, { reasonName: 'Chair Use' }]
-  }
-];
+import callApi from '../../utils/callApi';
 
 const extraHeaderKey = key => response => response[key];
 
+const take = 20;
 const getSignInData = (start, end, page = 1) =>
-  Promise.resolve({
-    status: 200,
-    json: () => Promise.resolve(signInData),
-    headers: {
-      Prev: 'api/lookup/whatever/1',
-      Next: 'api/lookup/whatever/1',
-      'Page-Count': '50'
-    }
-  });
+  callApi(
+    `${
+      process.env.REACT_APP_BACKEND
+    }lookups/?start=${start}&end=${end}&skip=${page * take -
+      take}&take=${take}`,
+    'GET',
+    null
+  );
 
 const SignInLookup = ({ startDate, endDate, page }) => {
   const [signIns, setSignIns] = useState([]);
@@ -126,6 +111,7 @@ const SignInsTable = ({ signIns }) => {
           <th>OutTime</th>
           <th>Courses</th>
           <th>Reasons</th>
+          <th>Actions</th>
         </tr>
       </thead>
       <tbody>
@@ -137,20 +123,37 @@ const SignInsTable = ({ signIns }) => {
   );
 };
 
+const dateOptions = {
+  weekday: 'long',
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric',
+  hourCycle: 'h12',
+  hour: '2-digit',
+  minute: '2-digit'
+};
+
 const SignInRow = ({
-  signIn: { email, fullName, courses, reasons, inTime, outTime, tutored }
+  signIn: { id, email, fullName, courses, reasons, inTime, outTime, tutored }
 }) => (
   <tr>
     <td>{email}</td>
     <td>{fullName}</td>
-    <td>{inTime.toLocaleString()}</td>
-    <td>{outTime.toLocaleString()}</td>
-    <td>{courses.map(course => course.courseName).join(', ')}</td>
+    <td>{new Date(inTime).toLocaleDateString('default', dateOptions)}</td>
+    <td>{new Date(outTime).toLocaleDateString('default', dateOptions)}</td>
+    <td>{courses.map(course => course.shortName).join(', ')}</td>
     <td>
       {reasons
-        .map(reason => reason.reasonName)
+        .map(reason => reason.name)
         .concat([tutored ? 'Tutoring' : ''])
         .join(', ')}
+    </td>
+    <td>
+      <Link to={`/dashboard/signins/${id}`}>
+        <GoGear />
+      </Link>
+      |
+      <GoTrashcan onClick={() => alert('Not implemented yet')} />
     </td>
   </tr>
 );

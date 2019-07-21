@@ -39,11 +39,13 @@ const SemesterForm = ({ onSubmit, name, ...props }) => {
             >
               <option style={{ display: 'none' }}>Select a Value</option>
               {semesters &&
-                semesters.map(semester => (
-                  <option value={semester.id} key={semester.id}>
-                    {semester.name}
-                  </option>
-                ))}
+                semesters
+                  .sort(x => x.id)
+                  .map(semester => (
+                    <option value={semester.id} key={semester.id}>
+                      {semester.name}
+                    </option>
+                  ))}
             </Field>
             <Button
               type="submit"
