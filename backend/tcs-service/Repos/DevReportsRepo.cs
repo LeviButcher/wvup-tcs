@@ -18,6 +18,7 @@ namespace tcs_service.Repos
             success.Add(new CourseWithSuccessCountViewModel
             {
                 ClassName = "History 101",
+                DepartmentName = "English",
                 CRN = 1411,
                 UniqueStudentCount = 54,
                 DroppedStudentCount = 4,

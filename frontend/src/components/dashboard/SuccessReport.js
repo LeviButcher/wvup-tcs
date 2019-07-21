@@ -3,59 +3,9 @@ import { CSVLink } from 'react-csv';
 import styled from 'styled-components';
 import { ReportLayout, Table, Header } from '../../ui';
 import SemesterForm from '../SemesterForm';
-
-const successData = [
-  {
-    departmentId: '1',
-    departmentName: 'Math',
-    courseName: 'Math 121',
-    CRN: '15142',
-    uniqueStudents: 50,
-    droppedStudents: 5,
-    completedCourse: 45,
-    cOrHigherStudents: 20
-  },
-  {
-    departmentId: '1',
-    departmentName: 'Math',
-    courseName: 'Math 126',
-    CRN: '15482',
-    uniqueStudents: 43,
-    droppedStudents: 3,
-    completedCourse: 40,
-    cOrHigherStudents: 25
-  },
-  {
-    departmentId: '1',
-    departmentName: 'Math',
-    courseName: 'Math 211',
-    CRN: '15492',
-    uniqueStudents: 26,
-    droppedStudents: 6,
-    completedCourse: 20,
-    cOrHigherStudents: 15
-  },
-  {
-    departmentId: '2',
-    departmentName: 'English',
-    courseName: 'Eng 101',
-    CRN: '15484',
-    uniqueStudents: 16,
-    droppedStudents: 6,
-    completedCourse: 10,
-    cOrHigherStudents: 10
-  },
-  {
-    departmentId: '2',
-    departmentName: 'English',
-    courseName: 'Eng 102',
-    CRN: '15485',
-    uniqueStudents: 42,
-    droppedStudents: 2,
-    completedCourse: 40,
-    cOrHigherStudents: 26
-  }
-];
+import ensureResponseCode from '../../utils/ensureResponseCode';
+import unwrapToJSON from '../../utils/unwrapToJSON';
+import callApi from '../../utils/callApi';
 
 const inDepartment = department => record =>
   department.departmentName === record.departmentName;
@@ -75,29 +25,37 @@ const successReducer = (acc, curr, index) => {
   if (index === 0) {
     return { ...curr };
   }
-  acc.uniqueStudents += curr.uniqueStudents;
-  acc.droppedStudents += curr.droppedStudents;
-  acc.completedCourse += curr.completedCourse;
-  acc.cOrHigherStudents += curr.cOrHigherStudents;
+  acc.uniqueStudentCount += curr.uniqueStudentCount;
+  acc.droppedStudentCount += curr.droppedStudentCount;
+  acc.completedCourseCount += curr.completedCourseCount;
+  acc.passedSuccessfullyCount += curr.passedSuccessfullyCount;
   return acc;
 };
 
-const getSuccessData = () => Promise.resolve(successData);
+const getSuccessData = semesterId =>
+  callApi(
+    `${process.env.REACT_APP_BACKEND}reports/success?semesterId=${semesterId}`,
+    'GET',
+    null
+  );
 
 const SuccessReport = () => {
   const [successRecords, setSuccessRecords] = useState();
-
+  console.log(successRecords);
   return (
     <ReportLayout>
       <div>
         <SemesterForm
           name="Success"
           width="400px"
-          onSubmit={(values, { setSubmitting }) => {
-            getSuccessData().then(res => {
-              setSuccessRecords(res);
-              setSubmitting(false);
-            });
+          onSubmit={({ semester }, { setSubmitting }) => {
+            getSuccessData(semester)
+              .then(ensureResponseCode(200))
+              .then(unwrapToJSON)
+              .then(setSuccessRecords)
+              .finally(() => {
+                setSubmitting(false);
+              });
           }}
         />
       </div>
@@ -112,10 +70,10 @@ const SuccessTable = ({ successRecords }) => {
     <tr align="left">
       <th>Total All:</th>
       <th></th>
-      <th align="center">{sumOfAll.uniqueStudents}</th>
-      <th align="center">{sumOfAll.droppedStudents}</th>
-      <th align="center">{sumOfAll.completedCourse}</th>
-      <th align="center">{sumOfAll.cOrHigherStudents}</th>
+      <th align="center">{sumOfAll.uniqueStudentCount}</th>
+      <th align="center">{sumOfAll.droppedStudentCount}</th>
+      <th align="center">{sumOfAll.completedCourseCount}</th>
+      <th align="center">{sumOfAll.passedSuccessfullyCount}</th>
     </tr>
   );
   return (
@@ -150,13 +108,13 @@ const SuccessTable = ({ successRecords }) => {
               inDepartment(department)
             );
             const rows = departmentData.map(record => (
-              <tr key={record.CRN}>
-                <td>{record.courseName}</td>
-                <td>{record.CRN}</td>
-                <td align="center">{record.uniqueStudents}</td>
-                <td align="center">{record.droppedStudents}</td>
-                <td align="center">{record.completedCourse}</td>
-                <td align="center">{record.cOrHigherStudents}</td>
+              <tr key={record.crn}>
+                <td>{record.className}</td>
+                <td>{record.crn}</td>
+                <td align="center">{record.uniqueStudentCount}</td>
+                <td align="center">{record.droppedStudentCount}</td>
+                <td align="center">{record.completedCourseCount}</td>
+                <td align="center">{record.passedSuccessfullyCount}</td>
               </tr>
             ));
             const sumDepartment = departmentData.reduce(successReducer, {});
@@ -164,10 +122,10 @@ const SuccessTable = ({ successRecords }) => {
               <SpecialRow key={department.departmentName}>
                 <td>Total {department.departmentName}:</td>
                 <td></td>
-                <td align="center">{sumDepartment.uniqueStudents}</td>
-                <td align="center">{sumDepartment.droppedStudents}</td>
-                <td align="center">{sumDepartment.completedCourse}</td>
-                <td align="center">{sumDepartment.cOrHigherStudents}</td>
+                <td align="center">{sumDepartment.uniqueStudentCount}</td>
+                <td align="center">{sumDepartment.droppedStudentCount}</td>
+                <td align="center">{sumDepartment.completedCourseCount}</td>
+                <td align="center">{sumDepartment.passedSuccessfullyCount}</td>
               </SpecialRow>
             );
             return rows;
