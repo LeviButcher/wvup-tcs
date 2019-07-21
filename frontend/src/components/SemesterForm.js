@@ -1,30 +1,55 @@
 import React from 'react';
 import { Formik, Form, Field } from 'formik';
+import { pipe } from 'ramda';
+import * as Yup from 'yup';
 import { Card, Header, Button } from '../ui';
+import useQuery from '../hooks/useQuery';
+import callApi from '../utils/callApi';
+import ensureResponseCode from '../utils/ensureResponseCode';
+import unwrapToJSON from '../utils/unwrapToJSON';
 
-const StartToEndDateForm = ({ onSubmit, name, ...props }) => {
+const semesterSchema = Yup.object().shape({
+  semester: Yup.string().required()
+});
+
+const getSemesters = () =>
+  callApi(`${process.env.REACT_APP_BACKEND}reports/semesters`, 'GET', null);
+
+const querySemesters = pipe(
+  getSemesters,
+  ensureResponseCode(200),
+  unwrapToJSON
+);
+
+const SemesterForm = ({ onSubmit, name, ...props }) => {
+  const [semesters] = useQuery(querySemesters);
   return (
     <Card {...props}>
       <Header>{name} Report</Header>
       <p>Choose Semester to create a report for</p>
-      <Formik onSubmit={onSubmit}>
-        {({ isSubmitting }) => (
+      <Formik onSubmit={onSubmit} validationSchema={semesterSchema}>
+        {({ isSubmitting, isValid }) => (
           <Form>
             <Field
               id="semester"
               name="semester"
               component="select"
               label="Semester"
+              defaultValue="None"
             >
-              <option>201901</option>
-              <option>201902</option>
-              <option>201903</option>
+              <option style={{ display: 'none' }}>Select a Value</option>
+              {semesters &&
+                semesters.map(semester => (
+                  <option value={semester.id} key={semester.id}>
+                    {semester.name}
+                  </option>
+                ))}
             </Field>
             <Button
               type="submit"
               align="right"
               intent="primary"
-              disabled={isSubmitting}
+              disabled={isSubmitting || !isValid}
             >
               Run Report
             </Button>
@@ -35,4 +60,4 @@ const StartToEndDateForm = ({ onSubmit, name, ...props }) => {
   );
 };
 
-export default StartToEndDateForm;
+export default SemesterForm;
