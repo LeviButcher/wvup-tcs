@@ -3,6 +3,8 @@ import { CSVLink } from 'react-csv';
 import { ReportLayout, Table, Header, Card, LineChart } from '../../ui';
 import StartToEndDateForm from '../StartToEndDateForm';
 import callApi from '../../utils/callApi';
+import ensureReponseCode from '../../utils/ensureResponseCode';
+import unwraptoJSON from '../../utils/unwrapToJSON';
 
 const getVisitsSum = (startDate, endDate) =>
   callApi(
@@ -20,10 +22,9 @@ const WeeklyVisitsReport = () => {
           onSubmit={(values, { setSubmitting }) => {
             const { startDate, endDate } = values;
             getVisitsSum(startDate, endDate)
-              .then(async res => {
-                const data = await res.json();
-                setVisits(data);
-              })
+              .then(ensureReponseCode(200))
+              .then(unwraptoJSON)
+              .then(setVisits)
               .catch(e => alert(e.message))
               .finally(() => setSubmitting(false));
           }}
@@ -32,13 +33,14 @@ const WeeklyVisitsReport = () => {
         {visits && (
           <Card width="600px">
             <LineChart
-              title="Weekly Visits"
               data={visits}
               x={d => d.item}
               y={d => d.count}
               xLabel="Week"
               yLabel="Total Visitors"
+              title="Weekly Visits"
               labels={d => d.count}
+              domain={{ x: [1, 2], y: [1, 2] }}
             />
           </Card>
         )}

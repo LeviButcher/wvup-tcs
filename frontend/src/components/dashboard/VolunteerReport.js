@@ -4,6 +4,7 @@ import { ReportLayout, Table, Header, Card, LineChart } from '../../ui';
 import StartToEndDateForm from '../StartToEndDateForm';
 import callApi from '../../utils/callApi';
 import ensureReponseCode from '../../utils/ensureResponseCode';
+import unwraptoJSON from '../../utils/unwrapToJSON';
 
 const getVolunteerSum = (startDate, endDate) =>
   callApi(
@@ -14,7 +15,6 @@ const getVolunteerSum = (startDate, endDate) =>
 
 const VolunteerReport = () => {
   const [volunteers, setVolunteers] = useState();
-  console.log(volunteers);
   return (
     <ReportLayout>
       <div>
@@ -22,23 +22,23 @@ const VolunteerReport = () => {
           onSubmit={({ startDate, endDate }, { setSubmitting }) => {
             getVolunteerSum(startDate, endDate)
               .then(ensureReponseCode(200))
-              .then(async res => {
-                const data = await res.json();
-                setVolunteers(data);
-              })
+              .then(unwraptoJSON)
+              .then(setVolunteers)
               .finally(() => setSubmitting(false));
           }}
-          name="Volunteer"
+          name="Volunteer Report"
         />
         {volunteers && (
           <Card width="600px">
             <LineChart
               data={volunteers}
-              x={datum => datum.teacherEmail}
-              y={datum => datum.signInTime}
+              x={d => d.fullName}
+              y={d => d.totalHours}
               xLabel="Email"
-              yLabel="Total Hours Volunteers"
+              yLabel="Total Hours"
               title="Volunteer Total Chart"
+              labels={d => d.totalHours}
+              domain={{ y: [0, 10] }}
             />
           </Card>
         )}

@@ -39,6 +39,7 @@ const PeakHoursReport = () => {
               xLabel="Hour"
               yLabel="Total Visitors"
               labels={d => d.count}
+              domain={{ x: [1, 2], y: [1, 2] }}
             />
           </Card>
         )}
