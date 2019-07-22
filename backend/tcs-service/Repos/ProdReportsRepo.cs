@@ -11,7 +11,7 @@ namespace tcs_service.Repos
     {
         public ProdReportsRepo(DbContextOptions options) : base(options) { }
 
-        public override async Task<List<CourseWithSuccessCountViewModel>> SuccessReport(int semesterId)
+        public override async Task<List<CourseWithGradeViewModel>> SuccessReport(int semesterId)
         {
             throw new NotImplementedException();
         }

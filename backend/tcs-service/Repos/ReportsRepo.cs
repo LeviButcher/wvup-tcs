@@ -211,6 +211,6 @@ namespace tcs_service.Repos
             return _db.Semesters.ToList();
         }
 
-        public abstract Task<List<CourseWithSuccessCountViewModel>> SuccessReport(int semesterId);
+        public abstract Task<List<CourseWithGradeViewModel>> SuccessReport(int semesterId);
     }
 }
