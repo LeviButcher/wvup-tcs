@@ -2,25 +2,20 @@ import React from 'react';
 import { Form, Field, Formik } from 'formik';
 import { navigate } from '@reach/router';
 import { Input, Button, Header, Card } from '../../ui';
-import callApi from '../../utils/callApi';
+import { callApi, ensureResponseCode, unwrapToJSON } from '../../utils';
 
-const postClassTour = callApi(
-  `${process.env.REACT_APP_BACKEND}classtours/`,
-  'POST'
-);
+const postClassTour = callApi(`classtours/`, 'POST');
 
 function createClassTour(values, { setSubmitting, setStatus }) {
   const message = {};
   postClassTour(values)
-    .then(async res => {
-      if (res.status !== 201) {
-        throw await res.json();
-      }
+    .then(ensureResponseCode(201))
+    .then(unwrapToJSON)
+    .then(() => {
       alert(`Created tour for ${values.name}`);
       navigate('/dashboard/tours');
     })
     .catch(e => {
-      console.log(e);
       message.msg = e.message || e.title;
     })
     .finally(() => {
@@ -31,15 +26,10 @@ function createClassTour(values, { setSubmitting, setStatus }) {
 
 function updateClassTour(values, { setSubmitting, setStatus }) {
   const message = {};
-  callApi(
-    `${process.env.REACT_APP_BACKEND}classtours/${values.id}`,
-    'PUT',
-    values
-  )
-    .then(async res => {
-      if (res.status !== 200) {
-        throw await res.json();
-      }
+  callApi(`classtours/${values.id}`, 'PUT', values)
+    .then(ensureResponseCode(200))
+    .then(unwrapToJSON)
+    .then(() => {
       alert(`Updated tour for ${values.name}`);
       navigate('/dashboard/tours');
     })

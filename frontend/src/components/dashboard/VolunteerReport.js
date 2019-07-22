@@ -2,16 +2,10 @@ import React, { useState } from 'react';
 import { CSVLink } from 'react-csv';
 import { ReportLayout, Table, Header, Card, LineChart } from '../../ui';
 import StartToEndDateForm from '../StartToEndDateForm';
-import callApi from '../../utils/callApi';
-import ensureReponseCode from '../../utils/ensureResponseCode';
-import unwraptoJSON from '../../utils/unwrapToJSON';
+import { callApi, ensureResponseCode, unwrapToJSON } from '../../utils';
 
 const getVolunteerSum = (startDate, endDate) =>
-  callApi(
-    `${process.env.REACT_APP_BACKEND}reports/volunteers?start=${startDate}&end=${endDate}`,
-    'GET',
-    null
-  );
+  callApi(`reports/volunteers?start=${startDate}&end=${endDate}`, 'GET', null);
 
 const VolunteerReport = () => {
   const [volunteers, setVolunteers] = useState();
@@ -21,8 +15,8 @@ const VolunteerReport = () => {
         <StartToEndDateForm
           onSubmit={({ startDate, endDate }, { setSubmitting }) => {
             getVolunteerSum(startDate, endDate)
-              .then(ensureReponseCode(200))
-              .then(unwraptoJSON)
+              .then(ensureResponseCode(200))
+              .then(unwrapToJSON)
               .then(setVolunteers)
               .finally(() => setSubmitting(false));
           }}

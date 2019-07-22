@@ -2,22 +2,17 @@ import React from 'react';
 import { pipe } from 'ramda';
 import { Link } from '@reach/router';
 import { Table, Header, Button } from '../../ui';
-import callApi from '../../utils/callApi';
+import { callApi, ensureResponseCode, unwrapToJSON } from '../../utils';
+import { Gear, Trashcan } from '../../ui/icons';
 import useQuery from '../../hooks/useQuery';
 
-const getUsers = callApi(`${process.env.REACT_APP_BACKEND}users/`, 'GET');
-
-const deleteUser = id =>
-  callApi(`${process.env.REACT_APP_BACKEND}users/${id}`, 'DELETE', null);
-
-const unWrapFetch = async fetchFunc => {
-  const res = await fetchFunc(null);
-  return res.json();
-};
+const getUsers = () => callApi(`users/`, 'GET', null);
+const deleteUser = id => callApi(`users/${id}`, 'DELETE', null);
 
 const queryUsers = pipe(
   getUsers,
-  unWrapFetch
+  ensureResponseCode(200),
+  unwrapToJSON
 );
 
 const UserManagement = () => {
@@ -45,23 +40,14 @@ const UserTable = ({ users, afterDelete }) => (
     </thead>
     <tbody>
       {users.map(user => (
-        <tr>
+        <tr key={user.id}>
           <td>{user.username}</td>
           <td>{`${user.firstName} ${user.lastName}`}</td>
           <td>
             <Link to={`update/${user.id}`}>
-              <Button
-                display="inline-block"
-                intent="secondary"
-                style={{ margin: '0 1rem' }}
-              >
-                Update
-              </Button>
+              <Gear />
             </Link>
-            <Button
-              display="inline-block"
-              intent="danger"
-              style={{ margin: '0 1rem' }}
+            <Trashcan
               onClick={() => {
                 if (user.username === localStorage.getItem('username')) {
                   alert("You can't delete yourself silly");
@@ -72,9 +58,7 @@ const UserTable = ({ users, afterDelete }) => (
                   if (goDelete) deleteUser(user.id).then(() => afterDelete());
                 }
               }}
-            >
-              Delete
-            </Button>
+            />
           </td>
         </tr>
       ))}

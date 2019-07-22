@@ -1,6 +1,6 @@
 import { curry } from 'ramda';
 
-function callApi(url, method, data) {
+function callApi(uri, method, data) {
   const options = {
     method,
     headers: {
@@ -14,7 +14,7 @@ function callApi(url, method, data) {
     options.body = JSON.stringify(data);
   }
 
-  return fetch(url, options);
+  return fetch(`${process.env.REACT_APP_BACKEND}${uri}`, options);
 }
 
 export default curry(callApi);

@@ -2,16 +2,10 @@ import React, { useState } from 'react';
 import { CSVLink } from 'react-csv';
 import { ReportLayout, Table, Header, Card, LineChart } from '../../ui';
 import StartToEndDateForm from '../StartToEndDateForm';
-import callApi from '../../utils/callApi';
-import ensureResponseCode from '../../utils/ensureResponseCode';
-import unwrapToJSON from '../../utils/unwrapToJSON';
+import { callApi, ensureResponseCode, unwrapToJSON } from '../../utils';
 
 const getPeakHoursSum = (startDate, endDate) =>
-  callApi(
-    `${process.env.REACT_APP_BACKEND}reports/peakhours?start=${startDate}&end=${endDate}`,
-    'GET',
-    null
-  );
+  callApi(`reports/peakhours?start=${startDate}&end=${endDate}`, 'GET', null);
 
 const PeakHoursReport = () => {
   const [peakHours, setPeakHours] = useState();

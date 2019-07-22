@@ -1,19 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { GoTrashcan, GoGear } from 'react-icons/go';
 import StartToEndDate from '../StartToEndDateForm';
-import { Table, Paging, Link } from '../../ui';
-import ensureResponseCode from '../../utils/ensureResponseCode';
-import unwrapToJSON from '../../utils/unwrapToJSON';
-import callApi from '../../utils/callApi';
+import { Table, Paging, Link, Card, Button } from '../../ui';
+import { Gear, Trashcan } from '../../ui/icons';
+import { callApi, ensureResponseCode, unwrapToJSON } from '../../utils';
 
 const extraHeaderKey = key => response => response[key];
 
 const take = 20;
 const getSignInData = (start, end, page = 1) =>
   callApi(
-    `${
-      process.env.REACT_APP_BACKEND
-    }lookups/?start=${start}&end=${end}&skip=${page * take -
+    `lookups/?start=${start}&end=${end}&skip=${page * take -
       take}&take=${take}`,
     'GET',
     null
@@ -51,10 +47,12 @@ const SignInLookup = ({ startDate, endDate, page }) => {
 
   return (
     <div>
-      <div>
+      <Card>
         <h3>Additional Actions</h3>
-        <Link to="/dashboard/signins/create">Create Sign In</Link>
-      </div>
+        <Link to="/dashboard/signins/create">
+          <Button align="left">Create Sign In</Button>
+        </Link>
+      </Card>
 
       <StartToEndDate
         name="Sign In Lookup"
@@ -148,12 +146,11 @@ const SignInRow = ({
         .concat([tutored ? 'Tutoring' : ''])
         .join(', ')}
     </td>
-    <td>
+    <td style={{ display: 'flex', justifyContent: 'space-evenly' }}>
       <Link to={`/dashboard/signins/${id}`}>
-        <GoGear />
+        <Gear />
       </Link>
-      |
-      <GoTrashcan onClick={() => alert('Not implemented yet')} />
+      <Trashcan onClick={() => alert('Not implemented yet')} />
     </td>
   </tr>
 );

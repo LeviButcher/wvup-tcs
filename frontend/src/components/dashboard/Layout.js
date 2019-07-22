@@ -33,7 +33,9 @@ const LayoutGrid = styled.div`
 const SideNav = () => {
   return (
     <nav>
-      <MainHeader align="center">TCS</MainHeader>
+      <MainHeader align="center">
+        <Link to="/dashboard">TCS</Link>
+      </MainHeader>
       <Logout />
       <LinkGroup>
         <Header type="h2">Lookups</Header>
@@ -60,6 +62,12 @@ const SideNav = () => {
 
 const MainHeader = styled(Header)`
   color: ${props => props.theme.color.accent};
+  & a {
+    color: ${props => props.theme.color.accent};
+  }
+  & a:visited {
+    color: ${props => props.theme.color.accent};
+  }
 `;
 
 const LinkGroup = styled.div`

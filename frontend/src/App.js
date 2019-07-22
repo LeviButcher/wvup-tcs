@@ -58,14 +58,14 @@ function App() {
               />
               <Fetch
                 path="/signins/:id"
-                url={`${process.env.REACT_APP_BACKEND}signins/`}
+                url="signins/"
                 Component={SignInFormUpdate}
                 action="Update"
               />
               <ClassTourLookup path="/tours" />
               <ClassTourForm path="/tours/create" />
               <Fetch
-                url={`${process.env.REACT_APP_BACKEND}classtours/`}
+                url="classtours/"
                 path="/tours/update/:id"
                 Component={ClassTourForm}
                 action="Update"
@@ -78,7 +78,7 @@ function App() {
               <UserManagement path="/admin/users" />
               <UserForm path="/admin/users/create" />
               <Fetch
-                url={`${process.env.REACT_APP_BACKEND}users/`}
+                url="users/"
                 path="/admin/users/update/:id"
                 Component={UserForm}
                 action="Update"
@@ -87,7 +87,7 @@ function App() {
               <ReasonManagement path="/admin/reason" />
               <ReasonForm path="/admin/reason/create" />
               <Fetch
-                url={`${process.env.REACT_APP_BACKEND}reasons/`}
+                url="reasons/"
                 path="/admin/reason/update/:id"
                 Component={ReasonForm}
                 action="Update"

@@ -3,12 +3,14 @@ import { CSVLink } from 'react-csv';
 import { clone } from 'ramda';
 import { ReportLayout, Table, Header, Card, PieChart } from '../../ui';
 import StartToEndDateForm from '../StartToEndDateForm';
-import callApi from '../../utils/callApi';
-import ensureResponseCode from '../../utils/ensureResponseCode';
-import unwrapToJSON from '../../utils/unwrapToJSON';
+import {
+  callApi,
+  ensureResponseCode,
+  unwrapToJSON,
+  errorToMessage
+} from '../../utils';
 
 // take all reasons and split up into reason groups
-
 const filterReason = reason => element => element.reasonName === reason;
 
 // reducer to give reason, filter by reason
@@ -36,11 +38,7 @@ const reasonsToAngle = reason => ({
 });
 
 const getReasons = (startDate, endDate) =>
-  callApi(
-    `${process.env.REACT_APP_BACKEND}reports/reasons?start=${startDate}&end=${endDate}`,
-    'GET',
-    null
-  );
+  callApi(`reports/reasons?start=${startDate}&end=${endDate}`, 'GET', null);
 
 const ReasonsReport = () => {
   const [reasonsForVisiting, setReasonsForVisiting] = useState();
@@ -48,11 +46,13 @@ const ReasonsReport = () => {
     <ReportLayout>
       <div>
         <StartToEndDateForm
-          onSubmit={({ startDate, endDate }, { setSubmitting }) => {
+          onSubmit={({ startDate, endDate }, { setSubmitting, setStatus }) => {
             getReasons(startDate, endDate)
               .then(ensureResponseCode(200))
               .then(unwrapToJSON)
               .then(setReasonsForVisiting)
+              .catch(errorToMessage)
+              .then(setStatus)
               .finally(() => setSubmitting(false));
           }}
           name="Reason For Visiting"
