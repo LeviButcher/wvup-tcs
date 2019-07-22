@@ -1,4 +1,5 @@
-﻿using AutoFixture;
+﻿using System.Numerics;
+using AutoFixture;
 using AutoFixture.AutoMoq;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
@@ -49,9 +50,9 @@ namespace tcs_service_test.Controllers
         [Fact]
         public async void GetSignInByID_IdIsFound_ShouldPass()
         {
-            var signIn = fixture.Create<SignIn>();
-            signInRepo.Setup(x => x.Find(signIn.ID)).ReturnsAsync(signIn);
-            var res = await sut.GetSignIn(signIn.ID);
+            var signIn = fixture.Create<SignInViewModel>();
+            signInRepo.Setup(x => x.GetSignInViewModel(It.IsAny<int>())).ReturnsAsync(signIn);
+            var res = await sut.GetSignIn(signIn.Id);
 
             var objectResult = Assert.IsType<OkObjectResult>(res);
             Assert.Equal(objectResult.Value, signIn);
