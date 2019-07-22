@@ -3,24 +3,19 @@ import { pipe } from 'ramda';
 import { Link } from '@reach/router';
 import { Table, Header, Button } from '../../ui';
 import useQuery from '../../hooks/useQuery';
-import callApi from '../../utils/callApi';
+import { Gear, Trashcan } from '../../ui/icons';
+import { callApi, unwrapToJSON, ensureResponseCode } from '../../utils';
 
-const getReasons = () =>
-  callApi(`${process.env.REACT_APP_BACKEND}reasons/`, 'GET', null);
-
-const unWrapFetch = async fetchPromise => {
-  const res = await fetchPromise;
-  return res.json();
-};
+const getReasons = () => callApi(`reasons/`, 'GET', null);
 
 const queryReasons = pipe(
   getReasons,
-  unWrapFetch
+  ensureResponseCode(200),
+  unwrapToJSON
 );
 
 const ReasonManagement = () => {
   const [reasons] = useQuery(queryReasons);
-  console.log(reasons);
   return (
     <div>
       <a href="reason/create">Add Reason</a>
@@ -52,13 +47,7 @@ const ReasonTable = ({ reasons }) => (
             </td>
             <td>
               <Link to={`update/${reason.id}`}>
-                <Button
-                  display="inline-block"
-                  intent="secondary"
-                  style={{ marginRight: '1rem' }}
-                >
-                  Update
-                </Button>
+                <Gear />
               </Link>
             </td>
           </tr>

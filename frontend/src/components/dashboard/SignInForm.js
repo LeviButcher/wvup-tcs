@@ -3,11 +3,9 @@ import styled from 'styled-components';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import { pipe } from 'ramda';
-import unWrapToJSON from '../../utils/unwrapToJSON';
 import { Card, Input, Header, Button, FieldGroup, Checkbox } from '../../ui';
 import useQuery from '../../hooks/useQuery';
-import callApi from '../../utils/callApi';
-import ensureResponseCode from '../../utils/ensureResponseCode';
+import { callApi, unwrapToJSON, ensureResponseCode } from '../../utils';
 
 const SignInSchema = Yup.object().shape({
   email: Yup.string()
@@ -28,21 +26,16 @@ const SignInSchema = Yup.object().shape({
   tutoring: Yup.boolean()
 });
 
-const postSignIn = callApi(`${process.env.REACT_APP_BACKEND}signins/`, 'POST');
+const postSignIn = callApi(`signins/`, 'POST');
 
 const getStudentInfoWithEmail = email =>
-  callApi(
-    `${process.env.REACT_APP_BACKEND}signins/${email}/email`,
-    'GET',
-    null
-  );
+  callApi(`signins/${email}/email`, 'GET', null);
 
-const getReasons = () =>
-  callApi(`${process.env.REACT_APP_BACKEND}reasons/active`, 'GET', null);
+const getReasons = () => callApi(`reasons/active`, 'GET', null);
 
 const queryReasons = pipe(
   getReasons,
-  unWrapToJSON
+  unwrapToJSON
 );
 
 const isWVUPEmail = email => email.match(/^[A-Z0-9._%+-]+@wvup.edu$/i);
@@ -55,7 +48,7 @@ const SignIn = ({ afterSuccessfulSubmit }) => {
   const loadClassList = email => {
     getStudentInfoWithEmail(email)
       .then(ensureResponseCode(200))
-      .then(unWrapToJSON)
+      .then(unwrapToJSON)
       .then(setStudent)
       .catch(e => alert(e.message));
   };

@@ -12,8 +12,7 @@ const semesterSchema = Yup.object().shape({
   semester: Yup.string().required()
 });
 
-const getSemesters = () =>
-  callApi(`${process.env.REACT_APP_BACKEND}reports/semesters`, 'GET', null);
+const getSemesters = () => callApi(`reports/semesters`, 'GET', null);
 
 const querySemesters = pipe(
   getSemesters,

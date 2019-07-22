@@ -3,9 +3,7 @@ import { CSVLink } from 'react-csv';
 import styled from 'styled-components';
 import { ReportLayout, Table, Header } from '../../ui';
 import SemesterForm from '../SemesterForm';
-import ensureResponseCode from '../../utils/ensureResponseCode';
-import unwrapToJSON from '../../utils/unwrapToJSON';
-import callApi from '../../utils/callApi';
+import { callApi, ensureResponseCode, unwrapToJSON } from '../../utils';
 
 const inDepartment = department => record =>
   department.departmentName === record.departmentName;
@@ -33,15 +31,10 @@ const successReducer = (acc, curr, index) => {
 };
 
 const getSuccessData = semesterId =>
-  callApi(
-    `${process.env.REACT_APP_BACKEND}reports/success?semesterId=${semesterId}`,
-    'GET',
-    null
-  );
+  callApi(`reports/success?semesterId=${semesterId}`, 'GET', null);
 
 const SuccessReport = () => {
   const [successRecords, setSuccessRecords] = useState();
-  console.log(successRecords);
   return (
     <ReportLayout>
       <div>

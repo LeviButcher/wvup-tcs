@@ -1,27 +1,17 @@
 import React, { useState } from 'react';
-import { Form, Field, Formik } from 'formik';
 import { CSVLink } from 'react-csv';
-import {
-  Link,
-  Input,
-  Button,
-  Card,
-  Table,
-  Header,
-  ReportLayout
-} from '../../ui';
+import StartToEndDateForm from '../StartToEndDateForm';
+import { Link, Table, Header, ReportLayout, Button, Card } from '../../ui';
+import { Gear, Trashcan } from '../../ui/icons';
+import unwrapToJSON from '../../utils/unwrapToJSON';
+import ensureResponseCode from '../../utils/ensureResponseCode';
 
 import callApi from '../../utils/callApi';
 
 const getClassTours = (startDate, endDate) =>
-  callApi(
-    `${process.env.REACT_APP_BACKEND}classtours/?start=${startDate}&end=${endDate}`,
-    'GET',
-    null
-  );
+  callApi(`classtours/?start=${startDate}&end=${endDate}`, 'GET', null);
 
-const deleteTour = id =>
-  callApi(`${process.env.REACT_APP_BACKEND}classtours/${id}`, 'DELETE', null);
+const deleteTour = id => callApi(`classtours/${id}`, 'DELETE', null);
 
 const ClassTourLookup = () => {
   const [tours, setTours] = useState();
@@ -29,29 +19,30 @@ const ClassTourLookup = () => {
   const [end, setEnd] = useState();
 
   const loadTours = (startDate, endDate) =>
-    getClassTours(startDate, endDate).then(async res => {
-      const returnedTours = await res.json();
-      setTours(returnedTours);
-    });
+    getClassTours(startDate, endDate)
+      .then(ensureResponseCode(200))
+      .then(unwrapToJSON)
+      .then(setTours);
 
   return (
     <ReportLayout>
-      <Card width="500px">
-        <Header type="h4">
-          Lookup ClassTours
+      <div>
+        <Card>
+          <Header type="h3">Additional Actions</Header>
           <Link to="create">
-            <Button align="right" intent="secondary">
+            <Button intent="secondary" align="left">
               Add Class Tour
             </Button>
           </Link>
-        </Header>
-        <Formik
+        </Card>
+        <StartToEndDateForm
+          name="ClassTour Lookup"
           initialValues={{ startDate: '', endDate: '' }}
-          onSubmit={(values, { setSubmitting }) => {
+          onSubmit={(values, { setSubmitting, setStatus }) => {
             const { startDate, endDate } = values;
             loadTours(startDate, endDate)
               .catch(e => {
-                alert(e.message);
+                setStatus({ msg: e.message });
               })
               .finally(() => {
                 setStart(startDate);
@@ -59,30 +50,8 @@ const ClassTourLookup = () => {
                 setSubmitting(false);
               });
           }}
-        >
-          {({ isSubmitting }) => (
-            <Form>
-              <Field
-                id="startDate"
-                type="date"
-                name="startDate"
-                component={Input}
-                label="Start Date"
-              />
-              <Field
-                id="endDate"
-                type="date"
-                name="endDate"
-                component={Input}
-                label="End Date"
-              />
-              <Button type="Submit" align="right" disabled={isSubmitting}>
-                Lookup
-              </Button>
-            </Form>
-          )}
-        </Formik>
-      </Card>
+        />
+      </div>
       {tours && (
         <>
           <Table>
@@ -97,12 +66,12 @@ const ClassTourLookup = () => {
             <thead align="left">
               <tr>
                 <th>Name</th>
-                <th>Total Tourists</th>
-                <th>Date</th>
-                <th align="center">Actions</th>
+                <th align="center">Total Tourists</th>
+                <th align="center">Date</th>
+                <th>Actions</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody align="left">
               {tours.map(tour => (
                 <ClassTourRow
                   key={tour.id}
@@ -125,30 +94,19 @@ const ClassTourRow = ({
   <tr>
     <td>{name}</td>
     <td align="center">{numberOfStudents}</td>
-    <td>{new Date(dayVisited).toLocaleString()}</td>
-    <td align="right">
+    <td align="center">{new Date(dayVisited).toLocaleString()}</td>
+    <td style={{ display: 'flex', justifyContent: 'space-evenly' }}>
       <Link to={`update/${id}`}>
-        <Button
-          display="inline-block"
-          intent="secondary"
-          style={{ margin: '0 1rem' }}
-        >
-          Update
-        </Button>
+        <Gear />
       </Link>
-      <Button
-        display="inline-block"
-        intent="danger"
-        style={{ margin: '0 1rem' }}
+      <Trashcan
         onClick={() => {
           const goDelete = window.confirm(
             `You sure you want to delete ${name} record`
           );
           if (goDelete) deleteTour(id).then(afterDelete);
         }}
-      >
-        Delete
-      </Button>
+      />
     </td>
   </tr>
 );

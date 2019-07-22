@@ -2,52 +2,43 @@ import React from 'react';
 import { Form, Field, Formik } from 'formik';
 import { navigate } from '@reach/router';
 import { Input, Button, Header, Card } from '../../ui';
-import callApi from '../../utils/callApi';
+import {
+  callApi,
+  ensureResponseCode,
+  unwrapToJSON,
+  errorToMessage
+} from '../../utils';
 
-const postReason = callApi(`${process.env.REACT_APP_BACKEND}reasons/`, 'POST');
-
-const putReason = reason =>
-  callApi(
-    `${process.env.REACT_APP_BACKEND}reasons/${reason.id}`,
-    'PUT',
-    reason
-  );
+const postReason = callApi(`reasons/`, 'POST');
+const putReason = reason => callApi(`reasons/${reason.id}`, 'PUT', reason);
 
 function createReason(values, { setSubmitting, setStatus }) {
-  const message = {};
   postReason(values)
-    .then(async res => {
-      if (res.status !== 201) {
-        throw await res.json();
-      }
+    .then(ensureResponseCode(201))
+    .then(unwrapToJSON)
+    .then(() => {
       alert(`Created reason - ${values.name}`);
       navigate('/dashboard/admin/reason');
     })
-    .catch(e => {
-      message.msg = e.message;
-    })
+    .catch(errorToMessage)
+    .then(setStatus)
     .finally(() => {
       setSubmitting(false);
-      setStatus(message);
     });
 }
 
 function updateReason(values, { setSubmitting, setStatus }) {
-  const message = {};
   putReason(values)
-    .then(async res => {
-      if (res.status !== 200) {
-        throw await res.json();
-      }
+    .then(ensureResponseCode(200))
+    .then(unwrapToJSON)
+    .then(() => {
       alert(`Updated reason - ${values.name}`);
       navigate('/dashboard/admin/reason');
     })
-    .catch(e => {
-      message.msg = e.message;
-    })
+    .catch(errorToMessage)
+    .then(setStatus)
     .finally(() => {
       setSubmitting(false);
-      setStatus(message);
     });
 }
 

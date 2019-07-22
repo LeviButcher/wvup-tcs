@@ -2,16 +2,10 @@ import React, { useState } from 'react';
 import { CSVLink } from 'react-csv';
 import { Card, Header, Table, ReportLayout, BarChart } from '../../ui';
 import StartToEndDateForm from '../StartToEndDateForm';
-import callApi from '../../utils/callApi';
-import ensureResponseCode from '../../utils/ensureResponseCode';
-import unwrapToJSON from '../../utils/unwrapToJSON';
+import { callApi, ensureResponseCode, unwrapToJSON } from "../../utils";
 
 const getClassTourSum = (startDate, endDate) =>
-  callApi(
-    `${process.env.REACT_APP_BACKEND}reports/classtours?start=${startDate}&end=${endDate}`,
-    'GET',
-    null
-  );
+  callApi(`reports/classtours?start=${startDate}&end=${endDate}`, 'GET', null);
 
 const ClassTourReport = () => {
   const [tours, setTours] = useState();

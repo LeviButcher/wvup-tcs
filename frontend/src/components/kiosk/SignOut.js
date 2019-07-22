@@ -5,12 +5,7 @@ import EmailForm from '../EmailForm';
 import callApi from '../../utils/callApi';
 import ensureResponseCode from '../../utils/ensureResponseCode';
 
-const putSignOut = email =>
-  callApi(
-    `${process.env.REACT_APP_BACKEND}signins/${email}/signout`,
-    'PUT',
-    null
-  );
+const putSignOut = email => callApi(`signins/${email}/signout`, 'PUT', null);
 
 // test email: mtmqbude26@wvup.edu
 const SignOut = () => (
