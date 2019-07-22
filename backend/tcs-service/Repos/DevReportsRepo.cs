@@ -13,7 +13,16 @@ namespace tcs_service.Repos
         
         public override async Task<List<CourseWithGradeViewModel>> SuccessReport(int semesterID)
         {
-            // Enum is defined in CourseWithGradeViewModel.cs
+            // Enum is defined in CourseWithGradeViewModel.cs--copied and pasted for convenience
+            //A = 1,
+            //B = 2,
+            //C = 3,
+            //I = 4,
+            //D = 5,
+            //F = 6,
+            //W = 7,
+            //FIW = 8
+
             var grades = Enum.GetValues(typeof(Grade));
             
             // gets each signIn with unique pair of personID & CRN 
@@ -26,7 +35,7 @@ namespace tcs_service.Repos
                               course.Course
                           };
 
-            // for each unique pair, creates a courseWithGradeViewModel with CourseInformation and random grade value
+            // for each unique pair, creates a courseWithGradeViewModel with Course Information and random grade value
             var resultGroup = from item in results
                               select new CourseWithGradeViewModel()
                               {
@@ -36,21 +45,47 @@ namespace tcs_service.Repos
                                   Grade = (Grade)grades.GetValue(new Random().Next(grades.Length))
                               };
 
-            // the idea was to get a count of successful(grade higher than I) students for each CRN
-            var passedCount = from item in resultGroup
-                              where item.Grade <= Grade.I
-                              group item by new
-                              {
-                                  item.CRN
-                              }
-                              into grp
-                              select new
-                              {
-                                  passed = grp.Count(),
-                                  CRN = grp.Key.CRN
-                              };
 
+            var successCount = from item in resultGroup
+                               group item by new
+                               {
+                                   item.CourseName,
+                                   item.CRN,
+                                   item.DepartmentName
+                               }
+                               into grp
+                               select new CourseWithSuccessCountViewModel()
+                               {
+                                   ClassName = grp.Key.CourseName,
+                                   CRN = grp.Key.CRN,
+                                   DepartmentName = grp.Key.DepartmentName,
+                                   UniqueStudentCount = grp.Count(),
+                                   PassedSuccessfullyCount = GetPassed(resultGroup, grp.Key.CRN)
+                               };
+
+
+            // using this to determine number of passing/unique students for each CRN
+            var iWishIWereDead = successCount.ToList();
+
+            // Comparing ^^ to the output of this, and checking if it matches and it never does :-/ 
             return resultGroup.ToList();
+        }
+
+        private int GetPassed(IQueryable<CourseWithGradeViewModel> results, int crn)
+        {
+            var passed = 0;
+            foreach(var r in results)
+            {
+                // if i'm not completely insane, <= Grade.I should be 1, 2, 3, & 4 (A, B, C, I)
+                if (r.CRN == crn )
+                {
+                    if((int)r.Grade <= (int)Grade.I)
+                    {
+                        passed++;
+                    }
+                }
+            }
+            return passed;
         }
     }
 }
