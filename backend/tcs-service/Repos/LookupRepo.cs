@@ -26,6 +26,7 @@ namespace tcs_service.Repos
         public async Task<IEnumerable<SignInViewModel>> Get(DateTime start, DateTime end, int skip, int take)
         {
             var result = await _db.SignIns.Where(x => x.InTime >= start && x.InTime <= end)
+            .Include(x => x.Courses).ThenInclude(x => x.Course).Include(x => x.Reasons).ThenInclude(x => x.Reason)
                                             .Skip(skip).Take(take)
                                             .Select(x => new SignInViewModel()
                                             {
@@ -39,7 +40,9 @@ namespace tcs_service.Repos
                                                 Tutoring = x.Tutoring,
                                                 SemesterId = x.SemesterId,
                                                 PersonId = x.PersonId,
-                                                Id = x.ID                                                
+                                                Id = x.ID,
+                                                Courses = x.Courses.Select(signInCourse => signInCourse.Course).ToList(),
+                                                Reasons = x.Reasons.Select(signInReason => signInReason.Reason).ToList()
                                             }).ToListAsync();
             return result;
         }
