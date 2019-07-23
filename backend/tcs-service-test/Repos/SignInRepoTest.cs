@@ -24,9 +24,9 @@ namespace tcs_service_test.Repos
 
         public SignInRepoTest()
         {
-            AppSettings appSettings = new AppSettings() { Secret = secret };
-            mockAppSettings = new Mock<IOptions<AppSettings>>();
-            mockAppSettings.Setup(ap => ap.Value).Returns(appSettings);
+
+            var dbOptions = DbInMemory.getDbInMemoryOptions(dbName);
+            db = new TCSContext(dbOptions);
             signInRepo = new SignInRepo(DbInMemory.getDbInMemoryOptions(dbName), null);
             fixture = new Fixture()
               .Customize(new AutoMoqCustomization());
