@@ -21,10 +21,7 @@ const LineChart = ({ data, x, y, xLabel, yLabel, title, labels, ...props }) => (
       dependentAxis
       style={{ axisLabel: { padding: 40 } }}
     />
-    <VictoryAxis
-      label={xLabel}
-      style={{ axisLabel: { padding: 40 }, tickLabels: { angle: -60 } }}
-    />
+    <VictoryAxis label={xLabel} style={{ axisLabel: { padding: 40 } }} />
     <VictoryLine
       data={data}
       x={x}

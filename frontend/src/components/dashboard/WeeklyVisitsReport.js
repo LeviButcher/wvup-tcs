@@ -15,35 +15,37 @@ const WeeklyVisitsReport = () => {
   const [visits, setVisits] = useState();
   return (
     <ReportLayout>
-      <div>
-        <StartToEndDateForm
-          onSubmit={(values, { setSubmitting }) => {
-            const { startDate, endDate } = values;
-            getVisitsSum(startDate, endDate)
-              .then(ensureResponseCode(200))
-              .then(unwrapToJSON)
-              .then(setVisits)
-              .catch(e => alert(e.message))
-              .finally(() => setSubmitting(false));
-          }}
-          name="Weekly Visits"
-        />
-        {visits && (
-          <Card width="600px">
-            <LineChart
-              data={visits}
-              x={d => d.item}
-              y={d => d.count}
-              xLabel="Week"
-              yLabel="Total Visitors"
-              title="Weekly Visits"
-              labels={d => d.count}
-              domain={{ x: [1, 2], y: [1, 2] }}
-            />
-          </Card>
-        )}
-      </div>
-      <div>{visits && <VisitsTable visits={visits} />}</div>
+      <StartToEndDateForm
+        onSubmit={(values, { setSubmitting }) => {
+          const { startDate, endDate } = values;
+          getVisitsSum(startDate, endDate)
+            .then(ensureResponseCode(200))
+            .then(unwrapToJSON)
+            .then(setVisits)
+            .catch(e => alert(e.message))
+            .finally(() => setSubmitting(false));
+        }}
+        name="Weekly Visits Report"
+      />
+      {visits && visits.length > 0 && (
+        <Card>
+          <LineChart
+            data={visits}
+            x={d => d.item}
+            y={d => d.count}
+            xLabel="Week"
+            yLabel="Total Visitors"
+            title="Weekly Visits"
+            labels={d => d.count}
+            domain={{ x: [1, 2], y: [1, 2] }}
+          />
+        </Card>
+      )}
+      {visits && (
+        <Card>
+          <VisitsTable visits={visits} />
+        </Card>
+      )}
     </ReportLayout>
   );
 };

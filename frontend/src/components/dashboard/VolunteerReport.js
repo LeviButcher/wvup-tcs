@@ -11,33 +11,35 @@ const VolunteerReport = () => {
   const [volunteers, setVolunteers] = useState();
   return (
     <ReportLayout>
-      <div>
-        <StartToEndDateForm
-          onSubmit={({ startDate, endDate }, { setSubmitting }) => {
-            getVolunteerSum(startDate, endDate)
-              .then(ensureResponseCode(200))
-              .then(unwrapToJSON)
-              .then(setVolunteers)
-              .finally(() => setSubmitting(false));
-          }}
-          name="Volunteer Report"
-        />
-        {volunteers && (
-          <Card width="600px">
-            <LineChart
-              data={volunteers}
-              x={d => d.fullName}
-              y={d => d.totalHours}
-              xLabel="Email"
-              yLabel="Total Hours"
-              title="Volunteer Total Chart"
-              labels={d => d.totalHours}
-              domain={{ y: [0, 10] }}
-            />
-          </Card>
-        )}
-      </div>
-      <div>{volunteers && <VolunteerTable volunteers={volunteers} />}</div>
+      <StartToEndDateForm
+        onSubmit={({ startDate, endDate }, { setSubmitting }) => {
+          getVolunteerSum(startDate, endDate)
+            .then(ensureResponseCode(200))
+            .then(unwrapToJSON)
+            .then(setVolunteers)
+            .finally(() => setSubmitting(false));
+        }}
+        name="Volunteer Report"
+      />
+      {volunteers && volunteers.length > 0 && (
+        <Card width="600px">
+          <LineChart
+            data={volunteers}
+            x={d => d.fullName}
+            y={d => d.totalHours}
+            xLabel="Email"
+            yLabel="Total Hours"
+            title="Volunteer Total Chart"
+            labels={d => d.totalHours}
+            domain={{ y: [0, 10] }}
+          />
+        </Card>
+      )}
+      {volunteers && (
+        <Card width="900px">
+          <VolunteerTable volunteers={volunteers} />
+        </Card>
+      )}
     </ReportLayout>
   );
 };

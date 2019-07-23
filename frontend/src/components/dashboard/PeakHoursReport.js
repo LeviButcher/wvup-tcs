@@ -11,34 +11,39 @@ const PeakHoursReport = () => {
   const [peakHours, setPeakHours] = useState();
   return (
     <ReportLayout>
-      <div>
-        <StartToEndDateForm
-          onSubmit={({ startDate, endDate }, { setSubmitting, setStatus }) => {
-            getPeakHoursSum(startDate, endDate)
-              .then(ensureResponseCode(200))
-              .then(unwrapToJSON)
-              .then(setPeakHours)
-              .catch(e => setStatus({ msg: e.message }))
-              .finally(() => setSubmitting(false));
-          }}
-          name="Peak Hours"
-        />
-        {peakHours && peakHours.length > 0 && (
-          <Card width="600px">
-            <LineChart
-              data={peakHours}
-              x={d => d.hour}
-              y={d => d.count}
-              title="Peak Hours"
-              xLabel="Hour"
-              yLabel="Total Visitors"
-              labels={d => d.count}
-              domain={{ x: [1, 2], y: [1, 2] }}
-            />
-          </Card>
-        )}
-      </div>
-      <div>{peakHours && <PeakHoursTable peakHours={peakHours} />}</div>
+      <StartToEndDateForm
+        onSubmit={({ startDate, endDate }, { setSubmitting, setStatus }) => {
+          getPeakHoursSum(startDate, endDate)
+            .then(ensureResponseCode(200))
+            .then(unwrapToJSON)
+            .then(setPeakHours)
+            .catch(e => setStatus({ msg: e.message }))
+            .finally(() => setSubmitting(false));
+        }}
+        name="Peak Hours Report"
+      />
+      {peakHours && peakHours.length > 0 && (
+        <Card width="500px" padding="0.75rem">
+          <LineChart
+            data={peakHours}
+            x={d => d.hour}
+            y={d => d.count}
+            title="Peak Hours"
+            xLabel="Hour"
+            yLabel="Total Visitors"
+            labels={d => d.count}
+            domain={{ x: [1, 2], y: [1, 2] }}
+          />
+        </Card>
+      )}
+      {peakHours && (
+        <Card width="800px">
+          <PeakHoursTable
+            peakHours={peakHours}
+            style={{ fontSize: '1.4rem' }}
+          />
+        </Card>
+      )}
     </ReportLayout>
   );
 };

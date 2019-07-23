@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { CSVLink } from 'react-csv';
 import { Card, Header, Table, ReportLayout, BarChart } from '../../ui';
 import StartToEndDateForm from '../StartToEndDateForm';
-import { callApi, ensureResponseCode, unwrapToJSON } from "../../utils";
+import { callApi, ensureResponseCode, unwrapToJSON } from '../../utils';
 
 const getClassTourSum = (startDate, endDate) =>
   callApi(`reports/classtours?start=${startDate}&end=${endDate}`, 'GET', null);
@@ -11,39 +11,35 @@ const ClassTourReport = () => {
   const [tours, setTours] = useState();
   return (
     <ReportLayout>
-      <div>
-        <StartToEndDateForm
-          onSubmit={({ startDate, endDate }, { setSubmitting, setStatus }) => {
-            getClassTourSum(startDate, endDate)
-              .then(ensureResponseCode(200))
-              .then(unwrapToJSON)
-              .then(setTours)
-              .catch(e => setStatus({ msg: e.message }))
-              .finally(() => setSubmitting(false));
-          }}
-          name="Class Tour"
-        />
-        {tours && (
-          <Card width="700px">
-            <BarChart
-              data={tours}
-              x={d => d.name}
-              y={d => d.students}
-              title="Class Tour Chart"
-              xLabel="Name"
-              yLabel="# of Students"
-              labels={d => d.students}
-            />
-          </Card>
-        )}
-      </div>
-      <div>
-        {tours && (
-          <>
-            <ClassTourSumTable classTours={tours} />
-          </>
-        )}
-      </div>
+      <StartToEndDateForm
+        onSubmit={({ startDate, endDate }, { setSubmitting, setStatus }) => {
+          getClassTourSum(startDate, endDate)
+            .then(ensureResponseCode(200))
+            .then(unwrapToJSON)
+            .then(setTours)
+            .catch(e => setStatus({ msg: e.message }))
+            .finally(() => setSubmitting(false));
+        }}
+        name="Class Tour Report"
+      />
+      {tours && (
+        <Card>
+          <BarChart
+            data={tours}
+            x={d => d.name}
+            y={d => d.students}
+            title="Class Tour Chart"
+            xLabel="Name"
+            yLabel="# of Students"
+            labels={d => d.students}
+          />
+        </Card>
+      )}
+      {tours && (
+        <Card width="900px">
+          <ClassTourSumTable classTours={tours} />
+        </Card>
+      )}
     </ReportLayout>
   );
 };
