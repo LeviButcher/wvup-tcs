@@ -1,9 +1,9 @@
 import React from 'react';
 import { pipe } from 'ramda';
 import { Link } from '@reach/router';
-import { Table, Header, Button } from '../../ui';
+import { Table, Header } from '../../ui';
 import useQuery from '../../hooks/useQuery';
-import { Gear, Trashcan } from '../../ui/icons';
+import { Gear } from '../../ui/icons';
 import { callApi, unwrapToJSON, ensureResponseCode } from '../../utils';
 
 const getReasons = () => callApi(`reasons/`, 'GET', null);

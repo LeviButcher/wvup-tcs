@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { CSVLink } from 'react-csv';
 import styled from 'styled-components';
-import { ReportLayout, Table, Header } from '../../ui';
+import { ReportLayout, Table, Header, Card } from '../../ui';
 import SemesterForm from '../SemesterForm';
 import { callApi, ensureResponseCode, unwrapToJSON } from '../../utils';
 
@@ -37,22 +37,24 @@ const SuccessReport = () => {
   const [successRecords, setSuccessRecords] = useState();
   return (
     <ReportLayout>
-      <div>
-        <SemesterForm
-          name="Success"
-          width="400px"
-          onSubmit={({ semester }, { setSubmitting }) => {
-            getSuccessData(semester)
-              .then(ensureResponseCode(200))
-              .then(unwrapToJSON)
-              .then(setSuccessRecords)
-              .finally(() => {
-                setSubmitting(false);
-              });
-          }}
-        />
-      </div>
-      {successRecords && <SuccessTable successRecords={successRecords} />}
+      <SemesterForm
+        name="Success"
+        width="400px"
+        onSubmit={({ semester }, { setSubmitting }) => {
+          getSuccessData(semester)
+            .then(ensureResponseCode(200))
+            .then(unwrapToJSON)
+            .then(setSuccessRecords)
+            .finally(() => {
+              setSubmitting(false);
+            });
+        }}
+      />
+      {successRecords && (
+        <Card width="900px">
+          <SuccessTable successRecords={successRecords} />
+        </Card>
+      )}
     </ReportLayout>
   );
 };
