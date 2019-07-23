@@ -45,8 +45,6 @@ namespace tcs_service_test.Repos
         public void Dispose()
         {
             db.Database.EnsureDeleted();
-            userRepo = null;
-            fixture = null;
         }
 
         [Fact]
@@ -130,12 +128,12 @@ namespace tcs_service_test.Repos
             var createdUser = await userRepo.Create(user, password);
             var originalName = createdUser.Username;
             var updatedUser = createdUser;
-            
+
             updatedUser.Username = updateUserName;
             var updateRes = await userRepo.Update(updatedUser);
-            
+
             Assert.NotEqual(originalName, updateRes.Username);
-            Assert.Equal(updateRes.Username, updateUserName);   
+            Assert.Equal(updateRes.Username, updateUserName);
         }
 
         [Fact]
@@ -145,7 +143,7 @@ namespace tcs_service_test.Repos
             var user = fixture.Create<User>();
             var password = fixture.Create<String>();
             var createdUser = await userRepo.Create(user, password);
-            
+
             var originalName = createdUser.Username;
             var updatedUser = createdUser;
 
@@ -154,7 +152,8 @@ namespace tcs_service_test.Repos
         }
 
         [Fact]
-        public async void UpdateUser_ChangePassword_HappyPath() {
+        public async void UpdateUser_ChangePassword_HappyPath()
+        {
             var user = fixture.Create<User>();
             var password = fixture.Create<String>();
             var createdUser = await userRepo.Create(user, password);
@@ -167,7 +166,8 @@ namespace tcs_service_test.Repos
         }
 
         [Fact]
-        public async void UpdateUser_ChangePasswordWithNull_DoesNotChangeHash() {
+        public async void UpdateUser_ChangePasswordWithNull_DoesNotChangeHash()
+        {
             var user = fixture.Create<User>();
             var password = fixture.Create<String>();
             var createdUser = await userRepo.Create(user, password);
@@ -183,14 +183,15 @@ namespace tcs_service_test.Repos
         // Have to create a copy to give a new reference so to not automatically updating 
         // the tom stored in memory db's Username
         [Fact]
-        public async void UpdateUser_UsernameAlreadyTaken_ThrowsException() {
+        public async void UpdateUser_UsernameAlreadyTaken_ThrowsException()
+        {
             var password = fixture.Create<String>();
-            
+
             var bob = fixture.Build<User>().With(x => x.Username, "bob").Create();
             bob = await userRepo.Create(bob, password);
             var tom = fixture.Build<User>().With(x => x.Username, "tom").Create();
             tom = await userRepo.Create(tom, password);
-            
+
             var newTom = tom.Copy();
             newTom.Username = "bob";
 
@@ -198,12 +199,13 @@ namespace tcs_service_test.Repos
         }
 
         [Fact]
-        public async void RemoveUser_HappyPath() {
+        public async void RemoveUser_HappyPath()
+        {
             var password = fixture.Create<String>();
 
             var bob = fixture.Build<User>().Create();
             bob = await userRepo.Create(bob, password);
-            
+
             await userRepo.Remove(bob.ID);
             var found = await userRepo.Find(bob.ID);
 
