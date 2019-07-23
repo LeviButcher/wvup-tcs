@@ -236,9 +236,14 @@ namespace tcs_service.Repos
 
             foreach(var course in coursesWithGrades)
             {
-                if (Added(course))
+                CourseWithSuccessCountViewModel successCount = null;
+
+                if (coursesWithSuccessCount.Any(x => x.CRN == course.CRN))
                 {
-                    var successCount = coursesWithSuccessCount.Where(x => x.CRN == course.CRN).FirstOrDefault();
+                    successCount = coursesWithSuccessCount.Where(x => x.CRN == course.CRN).First();
+                }               
+                if (successCount != null)
+                {
                     DetermineSuccess(course.Grade, successCount);
                 }
                 else
@@ -257,21 +262,6 @@ namespace tcs_service.Repos
 
             return await Task.FromResult(coursesWithSuccessCount);
 
-        }
-
-        private bool Added(CourseWithGradeViewModel course)
-        {
-            List<CourseWithGradeViewModel> added = new List<CourseWithGradeViewModel>();
-
-            if(added.Contains(course))
-            {
-                return true;
-            }
-            else
-            {
-                added.Add(course);
-                return false;
-            }
         }
 
         private void DetermineSuccess(Grade grade, CourseWithSuccessCountViewModel vm)
