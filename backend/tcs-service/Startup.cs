@@ -13,6 +13,8 @@ using tcs_service.EF;
 using tcs_service.Helpers;
 using tcs_service.Repos;
 using tcs_service.Repos.Interfaces;
+using tcs_service.Services;
+using tcs_service.Services.Interfaces;
 
 namespace tcs_service {
     public class Startup {
@@ -57,10 +59,13 @@ namespace tcs_service {
                     };
                 });
 
+
+
+            services.AddScoped<IBannerService, MockBannerService>();
             services.AddScoped<IClassTourRepo, ClassTourRepo> ();
             services.AddScoped<IUserRepo, UserRepo> ();
-            services.AddScoped<ISignInRepo, DevSignInRepo>();
-            services.AddScoped<IReportsRepo, DevReportsRepo>();
+            services.AddScoped<ISignInRepo, SignInRepo>();
+            services.AddScoped<IReportsRepo, ReportsRepo>();
             services.AddScoped<IReasonRepo, ReasonRepo>();
             services.AddScoped<ILookupRepo, LookupRepo>();
 

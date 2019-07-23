@@ -2,27 +2,61 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using tcs_service.EF;
 using tcs_service.Models;
 using tcs_service.Models.ViewModels;
+using tcs_service.Services.Interfaces;
 
-namespace tcs_service.Repos
+namespace tcs_service.Services
 {
-    public class DevSignInRepo : SignInRepo
+    public class MockBannerService : IBannerService
     {
-        public DevSignInRepo(DbContextOptions options) : base(options) { }
+        protected TCSContext _db;
+
+        protected MockBannerService()
+        {
+            _db = new TCSContext();
+        }
+
+        public MockBannerService(DbContextOptions options)
+        {
+            _db = new TCSContext(options);
+        }
+
+
+        public CourseWithGradeViewModel GetStudentGrade(int studentId, Course course, Department department)
+        {
+            var grades = Enum.GetValues(typeof(Grade));
+
+            var courseWithGrade = new CourseWithGradeViewModel();
+            courseWithGrade.CRN = course.CRN;
+            courseWithGrade.CourseName = course.CourseName;
+            courseWithGrade.DepartmentName = department.Name;
+            courseWithGrade.Grade = (Grade)new Random().Next(grades.Length);
+
+            return courseWithGrade;
+
+            //return new CourseWithGradeViewModel()
+            //{
+            //    CRN = course.CRN,
+            //    CourseName = course.CourseName,
+            //    DepartmentName = course.Department.Name,
+            //    Grade = (Grade)new Random().Next(grades.Length)
+            //};
+        }
 
         public DbSet<Person> PersonTable;
         public DbSet<Course> CourseTable;
         StudentInfoViewModel studentInfoViewModel = new StudentInfoViewModel();
         TeacherInfoViewModel teacherInfoViewModel = new TeacherInfoViewModel();
 
-        public override StudentInfoViewModel GetStudentInfoWithEmail(string studentEmail)
+        public StudentInfoViewModel GetStudentInfoWithEmail(string studentEmail)
         {
             return GetStudentInfo(studentInfoViewModel, studentEmail, -1);
         }
 
-        public override StudentInfoViewModel GetStudentInfoWithID(int studentID)
+        public StudentInfoViewModel GetStudentInfoWithID(int studentID)
         {
             return GetStudentInfo(studentInfoViewModel, " ", studentID);
         }
@@ -71,12 +105,12 @@ namespace tcs_service.Repos
             return studentInfoViewModel;
         }
 
-        public override TeacherInfoViewModel GetTeacherInfoWithEmail(string teacherEmail)
+        public TeacherInfoViewModel GetTeacherInfoWithEmail(string teacherEmail)
         {
             return GetTeacherInfo(teacherInfoViewModel, teacherEmail, -1);
         }
 
-        public override TeacherInfoViewModel GetTeacherInfoWithID(int teacherID)
+        public TeacherInfoViewModel GetTeacherInfoWithID(int teacherID)
         {
             return GetTeacherInfo(teacherInfoViewModel, "", teacherID);
         }
@@ -105,4 +139,3 @@ namespace tcs_service.Repos
         }
     }
 }
-

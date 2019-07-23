@@ -8,14 +8,16 @@ using tcs_service.Models;
 using tcs_service.Models.ViewModels;
 using tcs_service.Repos.Base;
 using tcs_service.Repos.Interfaces;
+using tcs_service.Services.Interfaces;
 
 namespace tcs_service.Repos
 {
-    public abstract class ReportsRepo : BaseRepo<SignIn>, IReportsRepo
+    public class ReportsRepo : BaseRepo<SignIn>, IReportsRepo
     {
-        public ReportsRepo(DbContextOptions options) : base(options)
+        IBannerService _bannerService;
+        public ReportsRepo(DbContextOptions options, IBannerService bannerService) : base(options)
         {
-
+            _bannerService = bannerService;
         }
 
         public override Task<bool> Exist(int id)
@@ -211,6 +213,83 @@ namespace tcs_service.Repos
             return _db.Semesters.ToList();
         }
 
-        public abstract Task<List<CourseWithGradeViewModel>> SuccessReport(int semesterId);
+        public async Task<List<CourseWithSuccessCountViewModel>> SuccessReport(int semesterId)
+        {
+            var studentCourses = from item in _db.SignIns
+                          from course in item.Courses
+                          where item.SemesterId == semesterId
+                          select new
+                          {
+                              item.PersonId,
+                              course.Course,
+                              course.Course.Department,
+                          };
+
+            List<CourseWithGradeViewModel> coursesWithGrades = new List<CourseWithGradeViewModel>();
+
+            foreach(var item in studentCourses.Distinct())
+            {
+                coursesWithGrades.Add( _bannerService.GetStudentGrade(item.PersonId, item.Course, item.Course.Department));
+            }
+
+            List<CourseWithSuccessCountViewModel> coursesWithSuccessCount = new List<CourseWithSuccessCountViewModel>();
+
+            foreach(var course in coursesWithGrades)
+            {
+                if (Added(course))
+                {
+                    var successCount = coursesWithSuccessCount.Where(x => x.CRN == course.CRN).FirstOrDefault();
+                    DetermineSuccess(course.Grade, successCount);
+                }
+                else
+                {
+                    var successCourse = new CourseWithSuccessCountViewModel()
+                    {
+                        ClassName = course.CourseName,
+                        CRN = course.CRN,
+                        DepartmentName = course.DepartmentName
+                    };
+
+                    DetermineSuccess(course.Grade, successCourse);
+                    coursesWithSuccessCount.Add(successCourse);
+                }
+            }
+
+            return await Task.FromResult(coursesWithSuccessCount);
+
+        }
+
+        private bool Added(CourseWithGradeViewModel course)
+        {
+            List<CourseWithGradeViewModel> added = new List<CourseWithGradeViewModel>();
+
+            if(added.Contains(course))
+            {
+                return true;
+            }
+            else
+            {
+                added.Add(course);
+                return false;
+            }
+        }
+
+        private void DetermineSuccess(Grade grade, CourseWithSuccessCountViewModel vm)
+        {
+            if (grade <= Grade.I)
+            {
+                vm.PassedSuccessfullyCount++;
+            }
+            else if (grade <= Grade.F)
+            {
+                vm.CompletedCourseCount++;
+            }
+            else
+            {
+                vm.DroppedStudentCount++;
+            }
+
+            vm.UniqueStudentCount++;
+        }
     }
 }
