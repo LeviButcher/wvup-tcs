@@ -7,15 +7,16 @@ using tcs_service.Models;
 using tcs_service.Models.ViewModels;
 using tcs_service.Repos.Base;
 using tcs_service.Repos.Interfaces;
+using tcs_service.Services.Interfaces;
 
 namespace tcs_service.Repos
 {
-    public abstract class SignInRepo : BaseRepo<SignIn>, ISignInRepo
+    public class SignInRepo : BaseRepo<SignIn>, ISignInRepo
     {
-
-        public SignInRepo(DbContextOptions options) : base(options)
+        private IBannerService _bannerService;
+        public SignInRepo(DbContextOptions options, IBannerService bannerService) : base(options)
         {
-
+            _bannerService = bannerService;
         }
 
         public async Task<SignIn> Add(SignIn signIn)
@@ -194,12 +195,24 @@ namespace tcs_service.Repos
             return null;           
         }
 
-        public abstract StudentInfoViewModel GetStudentInfoWithEmail(string studentEmail);
+        public StudentInfoViewModel GetStudentInfoWithEmail(string studentEmail)
+        {
+            return _bannerService.GetStudentInfoWithEmail(studentEmail);
+        }
 
-        public abstract StudentInfoViewModel GetStudentInfoWithID(int studentID);
+        public StudentInfoViewModel GetStudentInfoWithID(int studentID)
+        {
+            return _bannerService.GetStudentInfoWithID(studentID);
+        }
 
-        public abstract TeacherInfoViewModel GetTeacherInfoWithEmail(string teacherEmail);
+        public TeacherInfoViewModel GetTeacherInfoWithEmail(string teacherEmail)
+        {
+            return _bannerService.GetTeacherInfoWithEmail(teacherEmail);
+        }
                                              
-        public abstract TeacherInfoViewModel GetTeacherInfoWithID(int teacherID);
+        public TeacherInfoViewModel GetTeacherInfoWithID(int teacherID)
+        {
+            return _bannerService.GetTeacherInfoWithID(teacherID);
+        }
     }
 }

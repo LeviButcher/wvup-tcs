@@ -24,9 +24,10 @@ namespace tcs_service_test.Repos
 
         public SignInRepoTest()
         {
+
             var dbOptions = DbInMemory.getDbInMemoryOptions(dbName);
             db = new TCSContext(dbOptions);
-            signInRepo = new ProdSignInRepo(dbOptions);
+            signInRepo = new SignInRepo(DbInMemory.getDbInMemoryOptions(dbName), null);
             fixture = new Fixture()
               .Customize(new AutoMoqCustomization());
         }

@@ -11,7 +11,7 @@ namespace tcs_service.Models.ViewModels
 
         public string ClassName { get; set; }
 
-        public string DepartmentName {get;set;}
+        public string DepartmentName { get; set; }
 
         public int UniqueStudentCount { get; set; }
 
