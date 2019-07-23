@@ -31,14 +31,14 @@ const successReducer = (acc, curr, index) => {
 };
 
 const getSuccessData = semesterId =>
-  callApi(`reports/success?semesterId=${semesterId}`, 'GET', null);
+  callApi(`reports/success/${semesterId}`, 'GET', null);
 
 const SuccessReport = () => {
   const [successRecords, setSuccessRecords] = useState();
   return (
     <ReportLayout>
       <SemesterForm
-        name="Success"
+        name="Success Report"
         width="400px"
         onSubmit={({ semester }, { setSubmitting }) => {
           getSuccessData(semester)

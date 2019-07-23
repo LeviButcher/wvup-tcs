@@ -39,7 +39,7 @@ const SemesterForm = ({ onSubmit, name, ...props }) => {
               <option style={{ display: 'none' }}>Select a Value</option>
               {semesters &&
                 semesters
-                  .sort(x => x.id)
+                  .sort((a, b) => b.id - a.id)
                   .map(semester => (
                     <option value={semester.id} key={semester.id}>
                       {semester.name}
