@@ -7,11 +7,11 @@ using tcs_service.Models.ViewModels;
 
 namespace tcs_service.Repos.Interfaces
 {
-    public interface IReportsRepo 
+    public interface IReportsRepo
     {
         Task<List<ReportCountViewModel>> WeeklyVisits(DateTime startWeek, DateTime endWeek);
 
-        Task<List<ReportCountViewModel>> PeakHours(DateTime startWeek, DateTime endWeek);
+        Task<List<PeakHoursViewModel>> PeakHours(DateTime startWeek, DateTime endWeek);
 
         Task<List<ClassTourReportViewModel>> ClassTours(DateTime startWeek, DateTime endWeek);
 

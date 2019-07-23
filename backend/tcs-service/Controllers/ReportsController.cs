@@ -27,7 +27,7 @@ namespace tcs_service.Controllers
         }
 
         [HttpGet("peakhours")]
-        public async Task<ActionResult<IEnumerable<ReportCountViewModel>>> PeakHours([FromQuery] DateTime start, [FromQuery] DateTime end)
+        public async Task<ActionResult<IEnumerable<PeakHoursViewModel>>> PeakHours([FromQuery] DateTime start, [FromQuery] DateTime end)
         {
             return Ok(await _iRepo.PeakHours(start, end));
         }
@@ -53,7 +53,7 @@ namespace tcs_service.Controllers
         [HttpGet("semesters")]
         public IActionResult Semesters()
         {
-            return  Ok(_iRepo.Semesters());
+            return Ok(_iRepo.Semesters());
         }
 
         [HttpGet("success")]
