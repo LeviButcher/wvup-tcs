@@ -2,7 +2,14 @@ import React from 'react';
 import styled from 'styled-components';
 import Link from './Link';
 
-const Paging = ({ className, next, prev, currentPage = 1, baseURL }) => {
+const Paging = ({
+  className,
+  next,
+  prev,
+  currentPage = 1,
+  totalPages,
+  baseURL
+}) => {
   const page = Number(currentPage);
   return (
     <nav className={className} aria-label="Pagination Navigation">
@@ -11,7 +18,9 @@ const Paging = ({ className, next, prev, currentPage = 1, baseURL }) => {
           Prev
         </Link>
       )}
-      <i>{page} of ?</i>
+      <i>
+        {page} of {totalPages}
+      </i>
       {next && (
         <Link to={`${baseURL}${page + 1}`} aria-label="Next Page">
           Next
