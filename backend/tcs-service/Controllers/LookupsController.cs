@@ -4,7 +4,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using tcs_service.Helpers;
 using tcs_service.Models;
+using tcs_service.Models.ViewModels;
+using tcs_service.Repos;
 using tcs_service.Repos.Interfaces;
 
 namespace tcs_service.Controllers
@@ -21,9 +24,22 @@ namespace tcs_service.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<SignIn>>> Get([FromQuery] DateTime start, [FromQuery] DateTime end, [FromQuery] int skip = 0, [FromQuery] int take = 20)
+        public async Task<ActionResult<PagingModel<SignInViewModel>>> Get([FromQuery] DateTime start, [FromQuery] DateTime end, [FromQuery] int skip = 0, [FromQuery] int take = 20)
         {
-            return Ok(await _iRepo.Get(start, end, skip, take));
+            var page = await _iRepo.Get(start, end, skip, take);
+            if (page.isNext)
+            {
+                Response.Headers.Add("Next", $"/api/lookups/?start={start}&end={end}&skip={page.Skip + page.Take}&take={page.Take}");
+            }
+            if (page.isPrev)
+            {
+                Response.Headers.Add("Prev", $"/api/lookups/?start={start}&end={end}&skip={page.Skip - page.Take}&take={page.Take}");
+            }
+            Response.Headers.Add("Total-Pages", $"{page.TotalPages}");
+            Response.Headers.Add("Total-Records", $"{page.TotalDataCount}");
+            Response.Headers.Add("Current-Page", $"{page.CurrentPage}");
+
+            return Ok(page.data);
         }
     }
 }

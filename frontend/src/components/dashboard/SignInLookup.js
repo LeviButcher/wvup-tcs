@@ -4,7 +4,11 @@ import { Table, Paging, Link, Card, Button, ReportLayout } from '../../ui';
 import { Gear, Trashcan } from '../../ui/icons';
 import { callApi, ensureResponseCode, unwrapToJSON } from '../../utils';
 
-const extraHeaderKey = key => response => response[key];
+const extraHeaderKey = key => response => response.headers.get(key);
+const getNextHeader = extraHeaderKey('Next');
+const getPrevHeader = extraHeaderKey('Prev');
+const getCurrentPageHeader = extraHeaderKey('Current-Page');
+const getTotalPagesHeader = extraHeaderKey('Total-Pages');
 
 const take = 20;
 const getSignInData = (start, end, page = 1) =>
@@ -14,21 +18,29 @@ const getSignInData = (start, end, page = 1) =>
     'GET',
     null
   );
-
+const defaultPagingState = {
+  next: false,
+  prev: false,
+  page: 1,
+  totalPages: 1
+};
 const SignInLookup = ({ startDate, endDate, page }) => {
   const [signIns, setSignIns] = useState([]);
   const [start, setStart] = useState(startDate);
   const [end, setEnd] = useState(endDate);
-  const [next, setNext] = useState(false);
-  const [prev, setPrev] = useState(false);
+  const [paging, setPaging] = useState({ ...defaultPagingState, page });
 
   useEffect(() => {
     if (page !== undefined) {
       getSignInData(start, end, page)
         .then(ensureResponseCode(200))
         .then(response => {
-          setNext(extraHeaderKey('Next', response) !== undefined);
-          setPrev(extraHeaderKey('Prev', response) !== undefined);
+          setPaging({
+            next: getNextHeader(response) !== null,
+            prev: getPrevHeader(response) !== null,
+            page: getCurrentPageHeader(response),
+            totalPages: getTotalPagesHeader(response)
+          });
           return response;
         })
         .then(unwrapToJSON)
@@ -42,6 +54,7 @@ const SignInLookup = ({ startDate, endDate, page }) => {
       setSignIns([]);
       setStart('');
       setEnd('');
+      setPaging(defaultPagingState);
     };
   }, [startDate, endDate, page]);
 
@@ -61,8 +74,12 @@ const SignInLookup = ({ startDate, endDate, page }) => {
             getSignInData(values.startDate, values.endDate)
               .then(ensureResponseCode(200))
               .then(response => {
-                setNext(extraHeaderKey('Next', response) !== 'undefined');
-                setPrev(extraHeaderKey('Prev', response) !== 'undefined');
+                setPaging({
+                  next: getNextHeader(response) !== null,
+                  prev: getPrevHeader(response) !== null,
+                  page: getCurrentPageHeader(response),
+                  totalPages: getTotalPagesHeader(response)
+                });
                 return response;
               })
               .then(unwrapToJSON)
@@ -82,16 +99,18 @@ const SignInLookup = ({ startDate, endDate, page }) => {
       {signIns && start && end && (
         <Card width="1200px">
           <Paging
-            currentPage={page}
-            next={next}
-            prev={prev}
+            currentPage={paging.page}
+            totalPages={paging.totalPages}
+            next={paging.next}
+            prev={paging.prev}
             baseURL={`/dashboard/signins/${start}/${end}/`}
           />
           <SignInsTable signIns={signIns} />
           <Paging
-            currentPage={page}
-            next={next}
-            prev={prev}
+            currentPage={paging.page}
+            totalPages={paging.totalPages}
+            next={paging.next}
+            prev={paging.prev}
             baseURL={`/dashboard/signins/${start}/${end}/`}
           />
         </Card>
