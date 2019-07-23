@@ -19,12 +19,12 @@ namespace tcs_service.Models.ViewModels
 
 public enum Grade
 {
-    A=1,
-    B=2,
-    C=3,
-    I=4,
-    D=5,
-    F=6,
-    W=7,
-    FIW=8
+    A=0,
+    B=1,
+    C=2,
+    I=3,
+    D=4,
+    F=5,
+    W=6,
+    FIW=7
 }
