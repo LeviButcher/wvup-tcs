@@ -57,51 +57,14 @@ namespace tcs_service.Repos
             return result;
         }
 
-        public async Task<List<ReportCountViewModel>> PeakHours(DateTime startWeek, DateTime endWeek)
-        {
-            var result = new List<ReportCountViewModel>();
-            var realResult = new List<ReportCountViewModel>();
-            var count = 0;
+        // Get All SignIns between Start and End Date, group by Hour, count number of records for each hour
+        public async Task<List<PeakHoursViewModel>> PeakHours(DateTime startWeek, DateTime endWeek)
+             => await _db.SignIns.Where(x => x.InTime >= startWeek && x.InTime <= endWeek)
+                .GroupBy(x => x.InTime.Value.Hour)
+                .Where(x => x.Count() > 1)
+                .Select(x => new PeakHoursViewModel(x.Key, x.Count()))
+                .ToListAsync();
 
-            while (startWeek <= endWeek)
-            {
-                while (count <= 23)
-                {
-                    result.Add(new ReportCountViewModel
-                    {
-                        Item = count,
-                        Count = await _db.SignIns.Where(x => x.InTime >= startWeek && x.InTime <= startWeek.AddDays(7) && x.InTime.Value.Hour == count).CountAsync()
-                    });
-                    count++;
-                }
-
-                count = 0;
-                startWeek = startWeek.AddDays(7);
-            }
-
-            var hourCount = 0;
-            var inCount = 0;
-            while (hourCount < 24)
-            {
-                foreach (ReportCountViewModel rc in result)
-                {
-                    if (rc.Item == hourCount)
-                    {
-                        inCount += rc.Count;
-                    }
-                }
-
-                realResult.Add(new ReportCountViewModel
-                {
-                    Item = hourCount,
-                    Count = inCount
-                });
-                hourCount++;
-                inCount = 0;
-            }
-
-            return realResult;
-        }
 
         public async Task<List<ClassTourReportViewModel>> ClassTours(DateTime startWeek, DateTime endWeek)
         {
@@ -136,7 +99,7 @@ namespace tcs_service.Repos
                          {
                              fullName = grp.Key.fullName,
                              teacherEmail = grp.Key.teacherEmail,
-                             totalHours = Math.Round(grp.Sum(x => x.totalHours)/600000000, 2)
+                             totalHours = Math.Round(grp.Sum(x => x.totalHours) / 600000000, 2)
                          };
 
             return await result.ToListAsync();
@@ -167,7 +130,7 @@ namespace tcs_service.Repos
                                  && signIns.InTime <= endWeek
                                  select new
                                  {
-   
+
                                      CourseName = course.Course.CourseName,
                                      CourseId = course.CourseID
                                  };

@@ -10,6 +10,7 @@ import ReportLayout from './ReportLayout';
 import LineChart from './LineChart';
 import BarChart from './BarChart';
 import PieChart from './PieChart';
+import Paging from './Paging';
 
 export {
   Card,
@@ -23,5 +24,6 @@ export {
   ReportLayout,
   LineChart,
   BarChart,
-  PieChart
+  PieChart,
+  Paging
 };

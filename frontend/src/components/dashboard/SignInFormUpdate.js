@@ -1,13 +1,11 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { Link, navigate } from '@reach/router';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import { pipe } from 'ramda';
-import unWrapToJSON from '../../utils/unwrapToJSON';
 import { Card, Input, Header, Button, FieldGroup, Checkbox } from '../../ui';
 import useQuery from '../../hooks/useQuery';
-import callApi from '../../utils/callApi';
+import { callApi, unwrapToJSON, ensureResponseCode } from '../../utils';
 
 const SignInSchema = Yup.object().shape({
   email: Yup.string()
@@ -28,49 +26,42 @@ const SignInSchema = Yup.object().shape({
   tutoring: Yup.boolean()
 });
 
-const postSignIn = callApi(`${process.env.REACT_APP_BACKEND}signins/`, 'POST');
+const putSignIn = callApi(`signins/`, 'PUT');
 
 const getStudentInfoWithEmail = email =>
-  callApi(
-    `${process.env.REACT_APP_BACKEND}signins/${email}/email`,
-    'GET',
-    null
-  );
+  callApi(`signins/${email}/email`, 'GET', null);
 
-const getReasons = () =>
-  callApi(`${process.env.REACT_APP_BACKEND}reasons/active`, 'GET', null);
+const getReasons = () => callApi(`reasons`, 'GET', null);
 
 const queryReasons = pipe(
   getReasons,
-  unWrapToJSON
+  ensureResponseCode(200),
+  unwrapToJSON
 );
 
 const isWVUPEmail = email => email.match(/^[A-Z0-9._%+-]+@wvup.edu$/i);
 
 // test email = mtmqbude26@wvup.edu
-const SignIn = () => {
+const SignIn = ({ afterSuccessfulSubmit, data }) => {
   const [reasons] = useQuery(queryReasons);
-  const [student, setStudent] = useState();
-
+  const [student, setStudent] = useState(data);
   const loadClassList = email => {
     getStudentInfoWithEmail(email)
-      .then(async res => {
-        const studentInfo = await res.json();
-        setStudent(studentInfo);
-      })
+      .then(ensureResponseCode(200))
+      .then(unwrapToJSON)
+      .then(setStudent)
       .catch(e => alert(e.message));
   };
 
   return (
     <FullScreenContainer>
       <Card>
-        <Link to="/">Go Back</Link>
         <Formik
           initialValues={{
-            email: '',
-            reasons: [],
-            tutoring: false,
-            courses: []
+            email: student.email,
+            reasons: student.reasons.map(reason => reason.id),
+            tutoring: student.tutoring,
+            courses: student.courses.map(course => course.crn)
           }}
           validationSchema={SignInSchema}
           onSubmit={async (values, { setSubmitting }) => {
@@ -86,15 +77,9 @@ const SignIn = () => {
                 reasons.find(ele => ele.id === id)
               )
             };
-            postSignIn(signIn)
-              .then(async res => {
-                // console.log(await res.text());
-                if (res.status === 201) {
-                  // navigate to home page
-                  alert('You are signed in! ');
-                  navigate('/');
-                }
-              })
+            putSignIn(signIn)
+              .then(ensureResponseCode(201))
+              .then(afterSuccessfulSubmit)
               .catch(e => alert(e.message))
               .finally(() => setSubmitting(false));
           }}
@@ -115,11 +100,14 @@ const SignIn = () => {
                   if (isWVUPEmail(e.target.value))
                     loadClassList(e.target.value);
                 }}
+                disabled
               />
               {reasons && <ReasonsCheckboxes reasons={reasons} />}
               {student && (
                 <>
-                  <CoursesCheckboxes courses={student.classSchedule} />
+                  <CoursesCheckboxes
+                    courses={student.classSchedule || student.courses}
+                  />
                 </>
               )}
               <br />
@@ -167,9 +155,14 @@ const ReasonsCheckboxes = ({ reasons }) => (
         <Checkbox
           key={reason.id}
           id={reason.name}
+          type="checkbox"
           name="reasons"
-          label={reason.name}
+          label={`${reason.name}`}
           value={reason.id}
+          style={{
+            color: reason.deleted ? 'red' : 'green'
+          }}
+          title={`This reason is ${reason.deleted ? 'deleted' : 'active'}`}
         />
       ))}
     </FieldGroup>
@@ -180,7 +173,7 @@ const CoursesCheckboxes = ({ courses }) => {
   return (
     <>
       <Header type="h4">
-        Classes visiting for <SmallText>Select at least one course</SmallText>
+        Classes Visiting for <SmallText>Select at least one course</SmallText>
         <ErrorMessage name="courses">
           {message => <div style={{ color: 'red' }}>{message}</div>}
         </ErrorMessage>

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { navigate } from '@reach/router';
 import styled from 'styled-components';
 import EmailForm from '../EmailForm';
@@ -6,17 +6,10 @@ import callApi from '../../utils/callApi';
 import ensureResponseCode from '../../utils/ensureResponseCode';
 import unWrapToJSON from '../../utils/unwrapToJSON';
 
-const postSignInTeacher = callApi(
-  `${process.env.REACT_APP_BACKEND}signins?teacher=true`,
-  'POST'
-);
+const postSignInTeacher = callApi(`signins?teacher=true`, 'POST');
 
 const getTeacherInfoWithEmail = email =>
-  callApi(
-    `${process.env.REACT_APP_BACKEND}signins/${email}/teacher/email`,
-    'GET',
-    null
-  );
+  callApi(`signins/${email}/teacher/email`, 'GET', null);
 
 // get teacher information
 // transform that into signIn

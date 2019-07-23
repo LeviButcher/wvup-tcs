@@ -34,7 +34,7 @@ namespace tcs_service.Controllers
         }
 
         [HttpGet("{id}")]
-        [Produces(typeof(SignIn))]
+        [Produces(typeof(SignInViewModel))]
         public async Task<IActionResult> GetSignIn([FromRoute] int id)
         {
             if (!ModelState.IsValid)
@@ -42,7 +42,7 @@ namespace tcs_service.Controllers
                 return BadRequest(ModelState);
             }
 
-            var signIn = await _iRepo.Find(id);
+            var signIn = await _iRepo.GetSignInViewModel(id);
 
             if (signIn == null)
             {

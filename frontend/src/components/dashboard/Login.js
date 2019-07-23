@@ -2,13 +2,10 @@ import React from 'react';
 import styled from 'styled-components';
 import { Form, Field, Formik } from 'formik';
 import { navigate } from '@reach/router';
-import callApi from '../../utils/callApi';
+import { callApi, ensureResponseCode, unwrapToJSON } from '../../utils';
 import { Card, Header, Input, Button } from '../../ui';
 
-const postToAuthApi = callApi(
-  `${process.env.REACT_APP_BACKEND}users/authenticate`,
-  'POST'
-);
+const postToAuthApi = callApi(`users/authenticate`, 'POST');
 
 const Login = () => {
   return (
@@ -20,12 +17,10 @@ const Login = () => {
           onSubmit={async (values, { setSubmitting, setStatus }) => {
             const message = {};
             postToAuthApi(values)
-              .then(async res => {
-                if (res.status !== 200) {
-                  throw await res.json();
-                }
-                // put token in localstorage
-                const user = await res.json();
+              .then(ensureResponseCode(200))
+              .then(unwrapToJSON)
+              .then(user => {
+                // put user in local storage
                 localStorage.setItem(
                   `${process.env.REACT_APP_TOKEN}`,
                   user.token

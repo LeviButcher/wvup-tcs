@@ -2,48 +2,44 @@ import React, { useState } from 'react';
 import { CSVLink } from 'react-csv';
 import { ReportLayout, Table, Header, Card, LineChart } from '../../ui';
 import StartToEndDateForm from '../StartToEndDateForm';
-import callApi from '../../utils/callApi';
-import ensureReponseCode from '../../utils/ensureResponseCode';
+import { callApi, ensureResponseCode, unwrapToJSON } from '../../utils';
 
 const getVolunteerSum = (startDate, endDate) =>
-  callApi(
-    `${process.env.REACT_APP_BACKEND}reports/volunteers?start=${startDate}&end=${endDate}`,
-    'GET',
-    null
-  );
+  callApi(`reports/volunteers?start=${startDate}&end=${endDate}`, 'GET', null);
 
 const VolunteerReport = () => {
   const [volunteers, setVolunteers] = useState();
-  console.log(volunteers);
   return (
     <ReportLayout>
-      <div>
-        <StartToEndDateForm
-          onSubmit={({ startDate, endDate }, { setSubmitting }) => {
-            getVolunteerSum(startDate, endDate)
-              .then(ensureReponseCode(200))
-              .then(async res => {
-                const data = await res.json();
-                setVolunteers(data);
-              })
-              .finally(() => setSubmitting(false));
-          }}
-          name="Volunteer"
-        />
-        {volunteers && (
-          <Card width="600px">
-            <LineChart
-              data={volunteers}
-              x={datum => datum.teacherEmail}
-              y={datum => datum.signInTime}
-              xLabel="Email"
-              yLabel="Total Hours Volunteers"
-              title="Volunteer Total Chart"
-            />
-          </Card>
-        )}
-      </div>
-      <div>{volunteers && <VolunteerTable volunteers={volunteers} />}</div>
+      <StartToEndDateForm
+        onSubmit={({ startDate, endDate }, { setSubmitting }) => {
+          getVolunteerSum(startDate, endDate)
+            .then(ensureResponseCode(200))
+            .then(unwrapToJSON)
+            .then(setVolunteers)
+            .finally(() => setSubmitting(false));
+        }}
+        name="Volunteer Report"
+      />
+      {volunteers && volunteers.length > 0 && (
+        <Card width="600px">
+          <LineChart
+            data={volunteers}
+            x={d => d.fullName}
+            y={d => d.totalHours}
+            xLabel="Email"
+            yLabel="Total Hours"
+            title="Volunteer Total Chart"
+            labels={d => d.totalHours}
+            domain={{ y: [0, 10] }}
+          />
+        </Card>
+      )}
+      {volunteers && (
+        <Card width="900px">
+          <VolunteerTable volunteers={volunteers} />
+        </Card>
+      )}
     </ReportLayout>
   );
 };

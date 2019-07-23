@@ -2,10 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { navigate } from '@reach/router';
 import callApi from '../utils/callApi';
 
-const checkAuth = callApi(
-  `${process.env.REACT_APP_BACKEND}users/IsAuthenticate`,
-  'GET'
-);
+const checkAuth = callApi(`users/IsAuthenticate`, 'GET');
 
 // Redirect to route is not signed in, else render component
 // Need to add loading state

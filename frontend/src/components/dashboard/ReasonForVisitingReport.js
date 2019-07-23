@@ -3,12 +3,14 @@ import { CSVLink } from 'react-csv';
 import { clone } from 'ramda';
 import { ReportLayout, Table, Header, Card, PieChart } from '../../ui';
 import StartToEndDateForm from '../StartToEndDateForm';
-import callApi from '../../utils/callApi';
-import ensureResponseCode from '../../utils/ensureResponseCode';
-import unwrapToJSON from '../../utils/unwrapToJSON';
+import {
+  callApi,
+  ensureResponseCode,
+  unwrapToJSON,
+  errorToMessage
+} from '../../utils';
 
 // take all reasons and split up into reason groups
-
 const filterReason = reason => element => element.reasonName === reason;
 
 // reducer to give reason, filter by reason
@@ -36,63 +38,57 @@ const reasonsToAngle = reason => ({
 });
 
 const getReasons = (startDate, endDate) =>
-  callApi(
-    `${process.env.REACT_APP_BACKEND}reports/reasons?start=${startDate}&end=${endDate}`,
-    'GET',
-    null
-  );
+  callApi(`reports/reasons?start=${startDate}&end=${endDate}`, 'GET', null);
 
 const ReasonsReport = () => {
   const [reasonsForVisiting, setReasonsForVisiting] = useState();
   return (
     <ReportLayout>
-      <div>
-        <StartToEndDateForm
-          onSubmit={({ startDate, endDate }, { setSubmitting }) => {
-            getReasons(startDate, endDate)
-              .then(ensureResponseCode(200))
-              .then(unwrapToJSON)
-              .then(setReasonsForVisiting)
-              .finally(() => setSubmitting(false));
-          }}
-          name="Reason For Visiting"
-        />
-        {reasonsForVisiting && (
-          <Card width="600px" padding={0}>
-            <PieChart
-              data={reasonsForVisiting
-                .reduce(reasonTotalStudentReducer, [])
-                .map(reasonsToAngle)}
-              x={d => d.label}
-              y={d => d.angle}
-              labels={d => `${d.label}: ${d.angle}`}
-              title="Reason For Visiting Percentages"
-              padding={80}
-            />
-          </Card>
-        )}
-      </div>
-      <div>
-        {reasonsForVisiting && (
-          <>
-            <Header align="center">
-              Reason for Visiting Summary -{' '}
-              <CSVLink data={reasonsForVisiting} filename="reasonForVisiting">
-                Download All Data
-              </CSVLink>
-            </Header>
-            {reasonsForVisiting
-              .reduce(reasonForVisitingToReasonsReducer, [])
-              .map(reason => (
-                <ReasonsTable
-                  key={reason}
-                  name={reason}
-                  reasons={reasonsForVisiting.filter(filterReason(reason))}
-                />
-              ))}
-          </>
-        )}
-      </div>
+      <StartToEndDateForm
+        onSubmit={({ startDate, endDate }, { setSubmitting, setStatus }) => {
+          getReasons(startDate, endDate)
+            .then(ensureResponseCode(200))
+            .then(unwrapToJSON)
+            .then(setReasonsForVisiting)
+            .catch(errorToMessage)
+            .then(setStatus)
+            .finally(() => setSubmitting(false));
+        }}
+        name="Reason For Visiting Report"
+      />
+      {reasonsForVisiting && (
+        <Card width="600px" padding={0}>
+          <PieChart
+            data={reasonsForVisiting
+              .reduce(reasonTotalStudentReducer, [])
+              .map(reasonsToAngle)}
+            x={d => d.label}
+            y={d => d.angle}
+            labels={d => `${d.label}: ${d.angle}`}
+            title="Reason For Visiting Percentages"
+            padding={80}
+          />
+        </Card>
+      )}
+      {reasonsForVisiting && (
+        <Card width="900px">
+          <Header align="center">
+            Reason for Visiting Summary -{' '}
+            <CSVLink data={reasonsForVisiting} filename="reasonForVisiting">
+              Download All Data
+            </CSVLink>
+          </Header>
+          {reasonsForVisiting
+            .reduce(reasonForVisitingToReasonsReducer, [])
+            .map(reason => (
+              <ReasonsTable
+                key={reason}
+                name={reason}
+                reasons={reasonsForVisiting.filter(filterReason(reason))}
+              />
+            ))}
+        </Card>
+      )}
     </ReportLayout>
   );
 };

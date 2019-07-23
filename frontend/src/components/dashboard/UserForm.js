@@ -2,49 +2,36 @@ import React from 'react';
 import { Form, Field, Formik } from 'formik';
 import { navigate } from '@reach/router';
 import { Input, Button, Header, Card } from '../../ui';
-import callApi from '../../utils/callApi';
+import { callApi, ensureResponseCode, errorToMessage } from '../../utils';
 
-const postUser = callApi(
-  `${process.env.REACT_APP_BACKEND}users/register`,
-  'POST'
-);
+const postUser = callApi(`users/register`, 'POST');
+const putUser = values => callApi(`users/${values.id}`, 'PUT', values);
 
 function createUser(values, { setSubmitting, setStatus }) {
-  console.log(values);
-  const message = {};
   postUser(values)
-    .then(async res => {
-      if (res.status !== 201) {
-        throw await res.json();
-      }
+    .then(ensureResponseCode(201))
+    .then(() => {
       alert(`Created user for ${values.username}`);
       navigate('/dashboard/admin/users');
     })
-    .catch(e => {
-      message.msg = e.message;
-    })
+    .catch(errorToMessage)
+    .then(setStatus)
     .finally(() => {
       setSubmitting(false);
-      setStatus(message);
     });
 }
 
 function updateUser(values, { setSubmitting, setStatus }) {
-  const message = {};
-  callApi(`${process.env.REACT_APP_BACKEND}users/${values.id}`, 'PUT', values)
-    .then(async res => {
-      if (res.status !== 200) {
-        throw await res.json();
-      }
+  putUser(values)
+    .then(ensureResponseCode(200))
+    .then(() => {
       alert(`Updated user for ${values.username}`);
       navigate('/dashboard/admin/users');
     })
-    .catch(e => {
-      message.msg = e.message;
-    })
+    .catch(errorToMessage)
+    .then(setStatus)
     .finally(() => {
       setSubmitting(false);
-      setStatus(message);
     });
 }
 

@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using tcs_service.EF;
 using tcs_service.Models;
 using tcs_service.Models.ViewModels;
 using tcs_service.Repos.Base;
@@ -39,8 +38,29 @@ namespace tcs_service.Repos
 
         public async override Task<SignIn> Find(int id)
         {
-            return await _db.SignIns.SingleOrDefaultAsync(a => a.ID == id);
+            return await _db.SignIns.Include(x => x.Courses).Include(x => x.Reasons).SingleOrDefaultAsync(a => a.ID == id);
         }
+
+        public async Task<SignInViewModel> GetSignInViewModel(int id) => 
+            await _db.SignIns.Include(x => x.Courses).ThenInclude(x => x.Course)
+            .Include(x => x.Reasons).ThenInclude(x => x.Reason)
+            .Include(x => x.Person)
+            .Include(x => x.Semester)
+            .Select(x => new SignInViewModel(){
+                Email = x.Person.Email,
+                Courses = x.Courses.Select(sc => sc.Course).ToList(),
+                Reasons = x.Reasons.Select(sr => sr.Reason).ToList(),
+                Id = x.ID,
+                SemesterId = x.SemesterId,
+                Tutoring = x.Tutoring,
+                PersonId = x.PersonId,
+                InTime = x.InTime,
+                OutTime = x.OutTime,
+                SemesterName = x.Semester.Name,
+            })
+            .SingleOrDefaultAsync(a => a.Id == id);
+
+
 
         public override IEnumerable<SignIn> GetAll()
         {

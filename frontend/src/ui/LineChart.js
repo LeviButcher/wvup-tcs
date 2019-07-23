@@ -6,15 +6,16 @@ import {
   VictoryAxis,
   VictoryLabel,
   VictoryTheme,
-  VictoryVoronoiContainer
+  VictoryVoronoiContainer,
+  VictoryScatter
 } from 'victory';
 
-const LineChart = ({ data, x, y, xLabel, yLabel, title, labels }) => (
+const LineChart = ({ data, x, y, xLabel, yLabel, title, labels, ...props }) => (
   <VictoryChart
     theme={VictoryTheme.material}
     containerComponent={<VictoryVoronoiContainer />}
   >
-    <VictoryLabel text={title} x="50%" y={30} textAnchor="middle" />
+    <VictoryLabel text={title} x={180} y={30} textAnchor="middle" />
     <VictoryAxis
       label={yLabel}
       dependentAxis
@@ -28,7 +29,9 @@ const LineChart = ({ data, x, y, xLabel, yLabel, title, labels }) => (
       theme={VictoryTheme.material}
       labels={labels}
       labelComponent={<VictoryTooltip />}
+      {...props}
     />
+    <VictoryScatter data={data} x={x} y={y} />
   </VictoryChart>
 );
 

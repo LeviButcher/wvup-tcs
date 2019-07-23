@@ -1,13 +1,7 @@
 import React from 'react';
-import { Router } from '@reach/router';
+import { Router, navigate } from '@reach/router';
 import { ThemeProvider } from 'styled-components';
-import {
-  KioskLayout,
-  Home,
-  SignIn,
-  SignOut,
-  SignInTeacher
-} from './components/kiosk';
+import { KioskLayout, Home, SignOut, SignInTeacher } from './components/kiosk';
 import {
   DashboardLayout,
   ClassTourLookup,
@@ -21,7 +15,10 @@ import {
   UserForm,
   SuccessReport,
   ReasonManagement,
-  ReasonForm
+  ReasonForm,
+  SignInLookup,
+  SignInForm,
+  SignInFormUpdate
 } from './components/dashboard';
 import Theme from './theme.json';
 import NotFound from './components/NotFound';
@@ -36,7 +33,13 @@ function App() {
         <Router>
           <KioskLayout path="/">
             <Home path="/" />
-            <SignIn path="/signin" />
+            <SignInForm
+              path="/signin"
+              afterSuccessfulSubmit={() => {
+                alert('You have signed in! ');
+                navigate('/');
+              }}
+            />
             <SignOut path="/signout" />
             <SignInTeacher path="/signin/teacher" />
             <NotFound default />
@@ -44,10 +47,25 @@ function App() {
           <IsAuthenticated redirectRoute="/login" path="/dashboard">
             <DashboardLayout path="/">
               <Hello path="/" />
+              <SignInLookup path="/signins/:startDate/:endDate/:page" />
+              <SignInLookup path="/signins/" />
+              <SignInForm
+                path="/signins/create"
+                afterSuccessfulSubmit={() => {
+                  alert('You created a signIn! ');
+                  navigate('/dashboard/signins');
+                }}
+              />
+              <Fetch
+                path="/signins/:id"
+                url="signins/"
+                Component={SignInFormUpdate}
+                action="Update"
+              />
               <ClassTourLookup path="/tours" />
               <ClassTourForm path="/tours/create" />
               <Fetch
-                url={`${process.env.REACT_APP_BACKEND}classtours/`}
+                url="classtours/"
                 path="/tours/update/:id"
                 Component={ClassTourForm}
                 action="Update"
@@ -60,7 +78,7 @@ function App() {
               <UserManagement path="/admin/users" />
               <UserForm path="/admin/users/create" />
               <Fetch
-                url={`${process.env.REACT_APP_BACKEND}users/`}
+                url="users/"
                 path="/admin/users/update/:id"
                 Component={UserForm}
                 action="Update"
@@ -69,7 +87,7 @@ function App() {
               <ReasonManagement path="/admin/reason" />
               <ReasonForm path="/admin/reason/create" />
               <Fetch
-                url={`${process.env.REACT_APP_BACKEND}reasons/`}
+                url="reasons/"
                 path="/admin/reason/update/:id"
                 Component={ReasonForm}
                 action="Update"

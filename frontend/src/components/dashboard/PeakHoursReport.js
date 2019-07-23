@@ -2,48 +2,48 @@ import React, { useState } from 'react';
 import { CSVLink } from 'react-csv';
 import { ReportLayout, Table, Header, Card, LineChart } from '../../ui';
 import StartToEndDateForm from '../StartToEndDateForm';
-import callApi from '../../utils/callApi';
-import ensureResponseCode from '../../utils/ensureResponseCode';
-import unwrapToJSON from '../../utils/unwrapToJSON';
+import { callApi, ensureResponseCode, unwrapToJSON } from '../../utils';
 
 const getPeakHoursSum = (startDate, endDate) =>
-  callApi(
-    `${process.env.REACT_APP_BACKEND}reports/peakhours?start=${startDate}&end=${endDate}`,
-    'GET',
-    null
-  );
+  callApi(`reports/peakhours?start=${startDate}&end=${endDate}`, 'GET', null);
 
 const PeakHoursReport = () => {
   const [peakHours, setPeakHours] = useState();
   return (
     <ReportLayout>
-      <div>
-        <StartToEndDateForm
-          onSubmit={({ startDate, endDate }, { setSubmitting, setStatus }) => {
-            getPeakHoursSum(startDate, endDate)
-              .then(ensureResponseCode(200))
-              .then(unwrapToJSON)
-              .then(setPeakHours)
-              .catch(e => setStatus({ msg: e.message }))
-              .finally(() => setSubmitting(false));
-          }}
-          name="Peak Hours"
-        />
-        {peakHours && (
-          <Card width="600px">
-            <LineChart
-              data={peakHours}
-              x={d => d.item}
-              y={d => d.count}
-              title="Peak Hours"
-              xLabel="Hour"
-              yLabel="Total Visitors"
-              labels={d => d.count}
-            />
-          </Card>
-        )}
-      </div>
-      <div>{peakHours && <PeakHoursTable peakHours={peakHours} />}</div>
+      <StartToEndDateForm
+        onSubmit={({ startDate, endDate }, { setSubmitting, setStatus }) => {
+          getPeakHoursSum(startDate, endDate)
+            .then(ensureResponseCode(200))
+            .then(unwrapToJSON)
+            .then(setPeakHours)
+            .catch(e => setStatus({ msg: e.message }))
+            .finally(() => setSubmitting(false));
+        }}
+        name="Peak Hours Report"
+      />
+      {peakHours && peakHours.length > 0 && (
+        <Card width="500px" padding="0.75rem">
+          <LineChart
+            data={peakHours}
+            x={d => d.hour}
+            y={d => d.count}
+            title="Peak Hours"
+            xLabel="Hour"
+            yLabel="Total Visitors"
+            labels={d => d.count}
+            domain={{ x: [1, 2], y: [1, 2] }}
+          />
+        </Card>
+      )}
+      {peakHours && (
+        <Card width="800px">
+          <PeakHoursTable
+            peakHours={peakHours}
+            style={{ fontSize: '1.4rem' }}
+          />
+        </Card>
+      )}
     </ReportLayout>
   );
 };
@@ -67,8 +67,8 @@ const PeakHoursTable = ({ peakHours }) => {
       </thead>
       <tbody>
         {peakHours.map(visit => (
-          <tr key={visit.item}>
-            <td>{visit.item}</td>
+          <tr key={visit.hour}>
+            <td>{visit.hour}</td>
             <td>{visit.count}</td>
           </tr>
         ))}

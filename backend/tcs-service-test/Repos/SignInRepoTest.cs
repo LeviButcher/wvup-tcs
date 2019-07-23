@@ -3,6 +3,7 @@ using AutoFixture.AutoMoq;
 using Microsoft.Extensions.Options;
 using Moq;
 using System;
+using tcs_service.EF;
 using tcs_service.Helpers;
 using tcs_service.Models;
 using tcs_service.Repos;
@@ -17,11 +18,9 @@ namespace tcs_service_test.Repos
 
         string dbName = "SignInRepoTest";
 
-        readonly string secret = "supersecretpassphrasethatissuperlongbecauseithastobe";
-
         IFixture fixture;
 
-        Mock<IOptions<AppSettings>> mockAppSettings;
+        TCSContext db;
 
         public SignInRepoTest()
         {
@@ -35,8 +34,7 @@ namespace tcs_service_test.Repos
 
         public void Dispose()
         {
-            signInRepo = null;
-            fixture = null;
+            db.Database.EnsureDeleted();
         }
 
         [Fact]
