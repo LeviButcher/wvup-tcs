@@ -143,7 +143,8 @@ const SignInRow = ({
     <td>
       {reasons
         .map(reason => reason.name)
-        .concat([tutored ? 'Tutoring' : ''])
+        .concat([tutored ? 'Tutoring' : null])
+        .filter(x => x !== null)
         .join(', ')}
     </td>
     <td style={{ display: 'flex', justifyContent: 'space-evenly' }}>
