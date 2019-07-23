@@ -23,11 +23,11 @@ const PeakHoursReport = () => {
           }}
           name="Peak Hours"
         />
-        {peakHours && (
+        {peakHours && peakHours.length > 0 && (
           <Card width="600px">
             <LineChart
               data={peakHours}
-              x={d => d.item}
+              x={d => d.hour}
               y={d => d.count}
               title="Peak Hours"
               xLabel="Hour"
@@ -62,8 +62,8 @@ const PeakHoursTable = ({ peakHours }) => {
       </thead>
       <tbody>
         {peakHours.map(visit => (
-          <tr key={visit.item}>
-            <td>{visit.item}</td>
+          <tr key={visit.hour}>
+            <td>{visit.hour}</td>
             <td>{visit.count}</td>
           </tr>
         ))}
