@@ -97,7 +97,7 @@ const SignInLookup = ({ startDate, endDate, page }) => {
         />
       </div>
       {signIns && start && end && (
-        <Card width="1200px">
+        <Card width="1400px">
           <Paging
             currentPage={paging.page}
             totalPages={paging.totalPages}
@@ -126,8 +126,9 @@ const SignInsTable = ({ signIns }) => {
         <tr>
           <th>Email</th>
           <th>Full Name</th>
-          <th>InTime</th>
-          <th>OutTime</th>
+          <th align="center">In</th>
+          <th align="center">Out</th>
+          <th align="center">~Total Hours</th>
           <th>Courses</th>
           <th>Reasons</th>
           <th>Actions</th>
@@ -143,9 +144,8 @@ const SignInsTable = ({ signIns }) => {
 };
 
 const dateOptions = {
-  weekday: 'long',
-  year: 'numeric',
-  month: 'long',
+  year: '2-digit',
+  month: 'numeric',
   day: 'numeric',
   hourCycle: 'h12',
   hour: '2-digit',
@@ -158,8 +158,15 @@ const SignInRow = ({
   <tr>
     <td>{email}</td>
     <td>{fullName}</td>
-    <td>{new Date(inTime).toLocaleDateString('default', dateOptions)}</td>
-    <td>{new Date(outTime).toLocaleDateString('default', dateOptions)}</td>
+    <td align="center">
+      {new Date(inTime).toLocaleDateString('default', dateOptions)}
+    </td>
+    <td align="center">
+      {new Date(outTime).toLocaleDateString('default', dateOptions)}
+    </td>
+    <td align="center">
+      {new Date(outTime).getHours() - new Date(inTime).getHours()}
+    </td>
     <td>{courses.map(course => course.shortName).join(', ')}</td>
     <td>
       {reasons
