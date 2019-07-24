@@ -53,7 +53,7 @@ const ClassTourLookup = () => {
         />
       </div>
       {tours && (
-        <>
+        <Card width="900px">
           <Table>
             <caption>
               <Header>
@@ -81,7 +81,7 @@ const ClassTourLookup = () => {
               ))}
             </tbody>
           </Table>
-        </>
+        </Card>
       )}
     </ReportLayout>
   );
