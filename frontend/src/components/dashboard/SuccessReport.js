@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { CSVLink } from 'react-csv';
 import styled from 'styled-components';
-import { ReportLayout, Table, Header, Card } from '../../ui';
+import { ReportLayout, Table, Header, Card, PieChart } from '../../ui';
 import SemesterForm from '../SemesterForm';
 import { callApi, ensureResponseCode, unwrapToJSON } from '../../utils';
 
@@ -18,7 +18,7 @@ const successToDepartmentReducer = (acc, curr) => {
   return acc;
 };
 
-// sum important columns
+// sum important columns for pie chart
 const successReducer = (acc, curr, index) => {
   if (index === 0) {
     return { ...curr };
@@ -28,6 +28,25 @@ const successReducer = (acc, curr, index) => {
   acc.completedCourseCount += curr.completedCourseCount;
   acc.passedSuccessfullyCount += curr.passedSuccessfullyCount;
   return acc;
+};
+
+const sumColumnsForPieChartsReducer = (acc, cur) => {
+  const completed = acc.find(x => x.name === 'Completed') || {
+    name: 'Completed',
+    value: 0
+  };
+  const dropped = acc.find(x => x.name === 'Dropped') || {
+    name: 'Dropped',
+    value: 0
+  };
+  const passed = acc.find(x => x.name === 'Passed') || {
+    name: 'Passed',
+    value: 0
+  };
+  completed.value += cur.completedCourseCount;
+  dropped.value += cur.droppedStudentCount;
+  passed.value += cur.passedSuccessfullyCount;
+  return [completed, dropped, passed];
 };
 
 const getSuccessData = semesterId =>
@@ -50,6 +69,21 @@ const SuccessReport = () => {
             });
         }}
       />
+      {successRecords &&
+        successRecords
+          .reduce(successToDepartmentReducer, [])
+          .map(department => (
+            <Card width="400px">
+              <PieChart
+                title={department.departmentName}
+                data={successRecords
+                  .filter(inDepartment(department))
+                  .reduce(sumColumnsForPieChartsReducer, [])}
+                x={x => x.name}
+                y={y => y.value}
+              />
+            </Card>
+          ))}
       {successRecords && (
         <Card width="1200px">
           <SuccessTable successRecords={successRecords} />
