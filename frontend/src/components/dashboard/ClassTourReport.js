@@ -23,13 +23,12 @@ const ClassTourReport = () => {
         name="Class Tour Report"
       />
       {tours && (
-        <Card>
+        <Card width="500px">
           <BarChart
             data={tours}
             x={d => d.name}
             y={d => d.students}
             title="Class Tour Chart"
-            xLabel="Name"
             yLabel="# of Students"
             labels={d => d.students}
           />

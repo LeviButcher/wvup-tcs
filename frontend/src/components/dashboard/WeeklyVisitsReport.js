@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { CSVLink } from 'react-csv';
-import { ReportLayout, Table, Header, Card, LineChart } from '../../ui';
+import { ReportLayout, Table, Header, Card, ZoomedLineChart } from '../../ui';
 import StartToEndDateForm from '../StartToEndDateForm';
 import { callApi, ensureResponseCode, unwrapToJSON } from '../../utils';
 
@@ -29,7 +29,7 @@ const WeeklyVisitsReport = () => {
       />
       {visits && visits.length > 0 && (
         <Card>
-          <LineChart
+          <ZoomedLineChart
             data={visits}
             x={d => d.item}
             y={d => d.count}

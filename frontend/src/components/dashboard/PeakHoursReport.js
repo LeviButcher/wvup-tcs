@@ -23,7 +23,7 @@ const PeakHoursReport = () => {
         name="Peak Hours Report"
       />
       {peakHours && peakHours.length > 0 && (
-        <Card width="500px" padding="0.75rem">
+        <Card width="600px" padding="0.75rem">
           <LineChart
             data={peakHours}
             x={d => d.hour}

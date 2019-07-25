@@ -14,6 +14,7 @@ const LineChart = ({ data, x, y, xLabel, yLabel, title, labels, ...props }) => (
   <VictoryChart
     theme={VictoryTheme.material}
     containerComponent={<VictoryVoronoiContainer />}
+    animate={{ duration: 1000 }}
   >
     <VictoryLabel text={title} x={180} y={30} textAnchor="middle" />
     <VictoryAxis
@@ -21,14 +22,18 @@ const LineChart = ({ data, x, y, xLabel, yLabel, title, labels, ...props }) => (
       dependentAxis
       style={{ axisLabel: { padding: 40 } }}
     />
-    <VictoryAxis label={xLabel} style={{ axisLabel: { padding: 40 } }} />
+    <VictoryAxis
+      label={xLabel}
+      style={{ axisLabel: { padding: 40 } }}
+      fixLabelOverlap
+    />
     <VictoryLine
       data={data}
       x={x}
       y={y}
       theme={VictoryTheme.material}
       labels={labels}
-      labelComponent={<VictoryTooltip />}
+      labelComponent={<VictoryTooltip text={d => `${x(d)}: ${y(d)}`} />}
       {...props}
     />
     <VictoryScatter data={data} x={x} y={y} />
