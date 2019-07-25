@@ -52,5 +52,34 @@ namespace tcs_service.Repos
 
             return new PagingModel<SignInViewModel>(skip, take, totalDataCount, pageData);
         }
+
+        public async Task<PagingModel<SignInViewModel>> Daily(int skip, int take)
+        {
+            var dailySignIns = _db.SignIns.Where(x => x.InTime.Value.Day == DateTime.Now.Day )
+               .Include(x => x.Courses).ThenInclude(x => x.Course)
+               .Include(x => x.Reasons).ThenInclude(x => x.Reason);
+
+            var totalDataCount = await dailySignIns.CountAsync();
+            var pageData = dailySignIns
+                .Skip(skip).Take(take)
+                .Select(x => new SignInViewModel()
+                {
+                    Email = x.Person.Email,
+                    FirstName = x.Person.FirstName,
+                    FullName = x.Person.FirstName + " " + x.Person.LastName,
+                    LastName = x.Person.LastName,
+                    InTime = x.InTime,
+                    OutTime = x.OutTime,
+                    SemesterName = x.Semester.Name,
+                    Tutoring = x.Tutoring,
+                    SemesterId = x.SemesterId,
+                    PersonId = x.PersonId,
+                    Id = x.ID,
+                    Courses = x.Courses.Select(signInCourse => signInCourse.Course).ToList(),
+                    Reasons = x.Reasons.Select(signInReason => signInReason.Reason).ToList()
+                });
+
+            return new PagingModel<SignInViewModel>(skip, take, totalDataCount, pageData);
+        }
     }
 }
