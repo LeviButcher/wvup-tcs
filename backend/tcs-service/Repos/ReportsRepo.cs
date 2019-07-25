@@ -48,7 +48,7 @@ namespace tcs_service.Repos
             {
                 result.Add(new WeeklyVisitsViewModel
                 {
-                    Item = "" + startWeek.Date.ToShortDateString() + " - " + startWeek.Date.AddDays(7 * count).ToShortDateString(),
+                    Item = "" + startWeek.Date.ToShortDateString() + " - " + startWeek.Date.AddDays(6).ToShortDateString(),
                     Count = await _db.SignIns.Where(x => x.InTime >= startWeek && x.InTime <= startWeek.AddDays(7)).CountAsync()
                 }) ;
                 count++;
