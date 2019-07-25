@@ -5,9 +5,9 @@ using System.Threading.Tasks;
 
 namespace tcs_service.Models.ViewModels
 {
-    public class ReportCountViewModel
+    public class WeeklyVisitsViewModel
     {
-        public int Item { get; set; }
+        public string Item { get; set; }
 
         public int Count { get; set; }
     }

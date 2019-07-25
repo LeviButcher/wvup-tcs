@@ -21,7 +21,7 @@ namespace tcs_service.Controllers
         }
 
         [HttpGet("weekly-visits")]
-        public async Task<ActionResult<IEnumerable<ReportCountViewModel>>> Get([FromQuery] DateTime start, [FromQuery] DateTime end)
+        public async Task<ActionResult<IEnumerable<WeeklyVisitsViewModel>>> Get([FromQuery] DateTime start, [FromQuery] DateTime end)
         {
             return Ok(await _iRepo.WeeklyVisits(start, end));
         }
