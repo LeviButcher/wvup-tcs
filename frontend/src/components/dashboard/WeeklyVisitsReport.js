@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { CSVLink } from 'react-csv';
-import { ReportLayout, Table, Header, Card, ZoomedLineChart } from '../../ui';
+import { ReportLayout, Table, Header, Card, LineChart } from '../../ui';
 import StartToEndDateForm from '../StartToEndDateForm';
 import { callApi, ensureResponseCode, unwrapToJSON } from '../../utils';
 
@@ -16,6 +16,7 @@ const WeeklyVisitsReport = () => {
   return (
     <ReportLayout>
       <StartToEndDateForm
+        style={{ gridArea: 'form' }}
         onSubmit={(values, { setSubmitting }) => {
           const { startDate, endDate } = values;
           getVisitsSum(startDate, endDate)
@@ -29,7 +30,8 @@ const WeeklyVisitsReport = () => {
       />
       {visits && visits.length > 0 && (
         <Card>
-          <ZoomedLineChart
+          <LineChart
+            style={{ gridArea: 'chart' }}
             data={visits}
             x={d => d.item}
             y={d => d.count}
@@ -42,7 +44,7 @@ const WeeklyVisitsReport = () => {
         </Card>
       )}
       {visits && (
-        <Card>
+        <Card style={{ gridArea: 'table' }}>
           <VisitsTable visits={visits} />
         </Card>
       )}

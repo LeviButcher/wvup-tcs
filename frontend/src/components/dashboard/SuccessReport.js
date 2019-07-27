@@ -54,56 +54,70 @@ const getSuccessData = semesterId =>
 
 const SuccessReport = () => {
   const [successRecords, setSuccessRecords] = useState();
+  const [pieChartData, setPieChartData] = useState();
+
   return (
     <ReportLayout>
       <SemesterForm
+        style={{ gridArea: 'form' }}
         name="Success Report"
         width="400px"
         onSubmit={({ semester }, { setSubmitting }) => {
           getSuccessData(semester)
             .then(ensureResponseCode(200))
             .then(unwrapToJSON)
-            .then(setSuccessRecords)
+            .then(data => {
+              setSuccessRecords(data);
+              setPieChartData({ records: data, name: 'Total of Everything' });
+            })
             .finally(() => {
               setSubmitting(false);
             });
         }}
       />
-      {successRecords &&
-        successRecords
-          .reduce(successToDepartmentReducer, [])
-          .map(department => (
-            <Card width="400px">
-              <PieChart
-                title={department.departmentName}
-                data={successRecords
-                  .filter(inDepartment(department))
-                  .reduce(sumColumnsForPieChartsReducer, [])}
-                x={x => x.name}
-                y={y => y.value}
-              />
-            </Card>
-          ))}
       {successRecords && (
-        <Card width="1200px">
-          <SuccessTable successRecords={successRecords} />
+        <Card width="1000px" style={{ gridArea: 'table' }}>
+          <SuccessTable
+            successRecords={successRecords}
+            setPieChartData={setPieChartData}
+          />
+        </Card>
+      )}
+      {pieChartData && (
+        <Card width="500px" style={{ gridArea: 'chart' }}>
+          <PieChart
+            title={pieChartData.name}
+            data={pieChartData.records.reduce(
+              sumColumnsForPieChartsReducer,
+              []
+            )}
+            x={x => x.name}
+            y={y => y.value}
+          />
         </Card>
       )}
     </ReportLayout>
   );
 };
 
-const SuccessTable = ({ successRecords }) => {
+const SuccessTable = ({ successRecords, setPieChartData }) => {
   const sumOfAll = successRecords.reduce(successReducer, {});
   const sumRecord = (
-    <tr align="left">
-      <th>Total All:</th>
+    <SpecialRow
+      onClick={() =>
+        setPieChartData({
+          records: successRecords,
+          name: 'Total of Everything'
+        })
+      }
+    >
+      <th align="left">Total All:</th>
       <th></th>
       <th align="center">{sumOfAll.uniqueStudentCount}</th>
       <th align="center">{sumOfAll.droppedStudentCount}</th>
       <th align="center">{sumOfAll.completedCourseCount}</th>
       <th align="center">{sumOfAll.passedSuccessfullyCount}</th>
-    </tr>
+    </SpecialRow>
   );
   const allRows = successRecords
     .reduce(successToDepartmentReducer, [])
@@ -121,7 +135,15 @@ const SuccessTable = ({ successRecords }) => {
       ));
       const sumDepartment = departmentData.reduce(successReducer, {});
       rows.push(
-        <SpecialRow key={department.departmentName}>
+        <SpecialRow
+          key={department.departmentName}
+          onClick={() =>
+            setPieChartData({
+              records: departmentData,
+              name: `${department.departmentName}`
+            })
+          }
+        >
           <td>Total {department.departmentName}:</td>
           <td></td>
           <td align="center">{sumDepartment.uniqueStudentCount}</td>
@@ -165,6 +187,9 @@ const SuccessTable = ({ successRecords }) => {
 
 const SpecialRow = styled.tr`
   font-weight: 800;
+  &:hover {
+    cursor: pointer;
+  }
 `;
 
 export default SuccessReport;

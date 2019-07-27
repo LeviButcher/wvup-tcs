@@ -45,6 +45,7 @@ const ReasonsReport = () => {
   return (
     <ReportLayout>
       <StartToEndDateForm
+        style={{ gridArea: 'form' }}
         onSubmit={({ startDate, endDate }, { setSubmitting, setStatus }) => {
           getReasons(startDate, endDate)
             .then(ensureResponseCode(200))
@@ -57,21 +58,17 @@ const ReasonsReport = () => {
         name="Reason For Visiting Report"
       />
       {reasonsForVisiting && (
-        <Card width="600px" padding={0}>
+        <Card width="600px" style={{ gridArea: 'chart' }}>
           <PieChart
-            data={reasonsForVisiting
-              .reduce(reasonTotalStudentReducer, [])
-              .map(reasonsToAngle)}
-            x={d => d.label}
-            y={d => d.angle}
-            labels={d => `${d.label}: ${d.angle}`}
+            data={reasonsForVisiting.reduce(reasonTotalStudentReducer, [])}
+            x={d => d.reasonName}
+            y={d => d.visits}
             title="Reason For Visiting Percentages"
-            padding={80}
           />
         </Card>
       )}
       {reasonsForVisiting && (
-        <Card width="900px">
+        <Card width="900px" style={{ gridArea: 'table' }}>
           <Header align="center">
             Reason for Visiting Summary -{' '}
             <CSVLink data={reasonsForVisiting} filename="reasonForVisiting">

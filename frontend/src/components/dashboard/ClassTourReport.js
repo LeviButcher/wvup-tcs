@@ -12,6 +12,7 @@ const ClassTourReport = () => {
   return (
     <ReportLayout>
       <StartToEndDateForm
+        style={{ gridArea: 'form' }}
         onSubmit={({ startDate, endDate }, { setSubmitting, setStatus }) => {
           getClassTourSum(startDate, endDate)
             .then(ensureResponseCode(200))
@@ -23,7 +24,7 @@ const ClassTourReport = () => {
         name="Class Tour Report"
       />
       {tours && (
-        <Card width="500px">
+        <Card width="600px" style={{ gridArea: 'chart' }}>
           <BarChart
             data={tours}
             x={d => d.name}
@@ -31,11 +32,12 @@ const ClassTourReport = () => {
             title="Class Tour Chart"
             yLabel="# of Students"
             labels={d => d.students}
+            padding={{ left: 75, right: 75, top: 50, bottom: 50 }}
           />
         </Card>
       )}
       {tours && (
-        <Card width="900px">
+        <Card width="900px" style={{ gridArea: 'table' }}>
           <ClassTourSumTable classTours={tours} />
         </Card>
       )}

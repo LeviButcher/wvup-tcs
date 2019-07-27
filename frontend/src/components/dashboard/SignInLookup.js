@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import StartToEndDate from '../StartToEndDateForm';
-import { Table, Paging, Link, Card, Button, ReportLayout } from '../../ui';
+import { Table, Paging, Link, Card, Button } from '../../ui';
 import { Gear, Trashcan } from '../../ui/icons';
 import { callApi, ensureResponseCode, unwrapToJSON } from '../../utils';
 
@@ -59,7 +59,7 @@ const SignInLookup = ({ startDate, endDate, page }) => {
   }, [startDate, endDate, page]);
 
   return (
-    <ReportLayout>
+    <>
       <div>
         <Card>
           <h3>Additional Actions</h3>
@@ -115,7 +115,7 @@ const SignInLookup = ({ startDate, endDate, page }) => {
           />
         </Card>
       )}
-    </ReportLayout>
+    </>
   );
 };
 

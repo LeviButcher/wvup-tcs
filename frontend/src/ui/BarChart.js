@@ -8,12 +8,13 @@ import {
   VictoryTooltip
 } from 'victory';
 
-const BarChart = ({ data, x, y, xLabel, yLabel, title, labels }) => (
+const BarChart = ({ data, x, y, xLabel, yLabel, title, labels, ...props }) => (
   <VictoryChart
     theme={VictoryTheme.material}
     domainPadding={20}
     horizontal
     animate={{ duration: 1000 }}
+    {...props}
   >
     <VictoryAxis
       label={yLabel}
