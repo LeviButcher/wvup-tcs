@@ -12,6 +12,7 @@ const VolunteerReport = () => {
   return (
     <ReportLayout>
       <StartToEndDateForm
+        style={{ gridArea: 'form' }}
         onSubmit={({ startDate, endDate }, { setSubmitting }) => {
           getVolunteerSum(startDate, endDate)
             .then(ensureResponseCode(200))
@@ -22,7 +23,7 @@ const VolunteerReport = () => {
         name="Volunteer Report"
       />
       {volunteers && volunteers.length > 0 && (
-        <Card width="600px">
+        <Card width="600px" style={{ gridArea: 'chart' }}>
           <LineChart
             data={volunteers}
             x={d => d.fullName}
@@ -36,7 +37,7 @@ const VolunteerReport = () => {
         </Card>
       )}
       {volunteers && (
-        <Card width="900px">
+        <Card width="900px" style={{ gridArea: 'table' }}>
           <VolunteerTable volunteers={volunteers} />
         </Card>
       )}

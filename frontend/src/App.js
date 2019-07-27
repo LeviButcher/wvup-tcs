@@ -28,7 +28,7 @@ import IsAuthenticated from './components/IsAuthenticated';
 
 function App() {
   return (
-    <div>
+    <>
       <ThemeProvider theme={Theme}>
         <Router>
           <KioskLayout path="/">
@@ -98,7 +98,7 @@ function App() {
           <Login path="/login" />
         </Router>
       </ThemeProvider>
-    </div>
+    </>
   );
 }
 

@@ -16,6 +16,7 @@ const WeeklyVisitsReport = () => {
   return (
     <ReportLayout>
       <StartToEndDateForm
+        style={{ gridArea: 'form' }}
         onSubmit={(values, { setSubmitting }) => {
           const { startDate, endDate } = values;
           getVisitsSum(startDate, endDate)
@@ -30,6 +31,7 @@ const WeeklyVisitsReport = () => {
       {visits && visits.length > 0 && (
         <Card>
           <LineChart
+            style={{ gridArea: 'chart' }}
             data={visits}
             x={d => d.item}
             y={d => d.count}
@@ -42,7 +44,7 @@ const WeeklyVisitsReport = () => {
         </Card>
       )}
       {visits && (
-        <Card>
+        <Card style={{ gridArea: 'table' }}>
           <VisitsTable visits={visits} />
         </Card>
       )}

@@ -12,6 +12,7 @@ const PeakHoursReport = () => {
   return (
     <ReportLayout>
       <StartToEndDateForm
+        style={{ gridArea: 'form' }}
         onSubmit={({ startDate, endDate }, { setSubmitting, setStatus }) => {
           getPeakHoursSum(startDate, endDate)
             .then(ensureResponseCode(200))
@@ -23,7 +24,7 @@ const PeakHoursReport = () => {
         name="Peak Hours Report"
       />
       {peakHours && peakHours.length > 0 && (
-        <Card width="500px" padding="0.75rem">
+        <Card width="600px" style={{ gridArea: 'chart' }}>
           <LineChart
             data={peakHours}
             x={d => d.hour}
@@ -37,7 +38,7 @@ const PeakHoursReport = () => {
         </Card>
       )}
       {peakHours && (
-        <Card width="800px">
+        <Card width="800px" style={{ gridArea: 'table' }}>
           <PeakHoursTable
             peakHours={peakHours}
             style={{ fontSize: '1.4rem' }}
