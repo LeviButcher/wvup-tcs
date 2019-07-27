@@ -40,17 +40,17 @@ namespace tcs_service.Repos
             throw new NotImplementedException();
         }
 
-        public async Task<List<ReportCountViewModel>> WeeklyVisits(DateTime startWeek, DateTime endWeek)
+        public async Task<List<WeeklyVisitsViewModel>> WeeklyVisits(DateTime startWeek, DateTime endWeek)
         {
-            var result = new List<ReportCountViewModel>();
+            var result = new List<WeeklyVisitsViewModel>();
             var count = 1;
             while (startWeek <= endWeek)
             {
-                result.Add(new ReportCountViewModel
+                result.Add(new WeeklyVisitsViewModel
                 {
-                    Item = count,
+                    Item = "" + startWeek.Date.ToShortDateString() + " - " + startWeek.Date.AddDays(6).ToShortDateString(),
                     Count = await _db.SignIns.Where(x => x.InTime >= startWeek && x.InTime <= startWeek.AddDays(7)).CountAsync()
-                });
+                }) ;
                 count++;
                 startWeek = startWeek.AddDays(7);
             }

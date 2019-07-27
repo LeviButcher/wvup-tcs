@@ -44,7 +44,7 @@ namespace tcs_service.Repos
         public async Task<IEnumerable<ClassTour>> GetBetweenDates(DateTime start, DateTime end)
         {
             
-            var tours =  _db.ClassTours.Where(a => a.DayVisited > start && a.DayVisited < end);
+            var tours = _db.ClassTours.Where(a => a.DayVisited > start && a.DayVisited < end);
 
             return tours;
         }

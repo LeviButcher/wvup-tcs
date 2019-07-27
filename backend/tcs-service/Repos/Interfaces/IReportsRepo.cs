@@ -9,7 +9,7 @@ namespace tcs_service.Repos.Interfaces
 {
     public interface IReportsRepo
     {
-        Task<List<ReportCountViewModel>> WeeklyVisits(DateTime startWeek, DateTime endWeek);
+        Task<List<WeeklyVisitsViewModel>> WeeklyVisits(DateTime startWeek, DateTime endWeek);
 
         Task<List<PeakHoursViewModel>> PeakHours(DateTime startWeek, DateTime endWeek);
 

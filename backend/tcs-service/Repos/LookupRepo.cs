@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using tcs_service.EF;
@@ -31,7 +31,52 @@ namespace tcs_service.Repos
                 .Include(x => x.Reasons).ThenInclude(x => x.Reason);
 
             var totalDataCount = await signInsBetweenDate.CountAsync();
-            var pageData = signInsBetweenDate
+            var pageData = GetPageData(signInsBetweenDate, skip, take);
+
+            return new PagingModel<SignInViewModel>(skip, take, totalDataCount, pageData);
+        }
+
+        public async Task<PagingModel<SignInViewModel>> Daily(int skip, int take)
+        {
+            var dailySignIns = _db.SignIns.Where(x => x.InTime.Value.Day == DateTime.Now.Day
+                && x.InTime.Value.Month == DateTime.Now.Month
+                && x.InTime.Value.Year == DateTime.Now.Year)
+               .Include(x => x.Courses).ThenInclude(x => x.Course)
+               .Include(x => x.Reasons).ThenInclude(x => x.Reason);
+
+            var totalDataCount = await dailySignIns.CountAsync();
+            var pageData = GetPageData(dailySignIns, skip, take);
+
+            return new PagingModel<SignInViewModel>(skip, take, totalDataCount, pageData);
+        }
+
+        public async Task<PagingModel<SignInViewModel>> GetByCRN(int crn, DateTime start, DateTime end, int skip, int take)
+        {
+            var signInsBetweenDateByCRN = _db.SignIns.Where(x => x.InTime >= start && x.InTime <= end && x.Courses.Any(y => y.CourseID == crn))
+                .Include(x => x.Courses).ThenInclude(x => x.Course)
+                .Include(x => x.Reasons).ThenInclude(x => x.Reason);
+
+            var totalDataCount = await signInsBetweenDateByCRN.CountAsync();
+            var pageData = GetPageData(signInsBetweenDateByCRN, skip, take);
+            
+            return new PagingModel<SignInViewModel>(skip, take, totalDataCount, pageData);
+        }
+
+        public async Task<PagingModel<SignInViewModel>> GetByEmail(string email, DateTime start, DateTime end, int skip, int take)
+        {
+            var signInsBetweenDateByEmail = _db.SignIns.Where(x => x.InTime >= start && x.InTime <= end && x.Person.Email == email)
+                .Include(x => x.Courses).ThenInclude(x => x.Course)
+                .Include(x => x.Reasons).ThenInclude(x => x.Reason);
+
+            var totalDataCount = await signInsBetweenDateByEmail.CountAsync();
+            var pageData = GetPageData(signInsBetweenDateByEmail, skip, take);
+
+            return new PagingModel<SignInViewModel>(skip, take, totalDataCount, pageData);
+        }
+
+        private IQueryable<SignInViewModel> GetPageData(IIncludableQueryable<Models.SignIn, Models.Reason> signIns, int skip, int take)
+        {
+            return signIns
                 .Skip(skip).Take(take)
                 .Select(x => new SignInViewModel()
                 {
@@ -49,8 +94,6 @@ namespace tcs_service.Repos
                     Courses = x.Courses.Select(signInCourse => signInCourse.Course).ToList(),
                     Reasons = x.Reasons.Select(signInReason => signInReason.Reason).ToList()
                 });
-
-            return new PagingModel<SignInViewModel>(skip, take, totalDataCount, pageData);
         }
     }
 }
