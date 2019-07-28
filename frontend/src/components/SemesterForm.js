@@ -24,7 +24,7 @@ const SemesterForm = ({ onSubmit, name, ...props }) => {
   const [semesters] = useQuery(querySemesters);
   return (
     <Card {...props}>
-      <Header>{name} Report</Header>
+      <Header>{name}</Header>
       <p>Choose Semester to create a report for</p>
       <Formik onSubmit={onSubmit} validationSchema={semesterSchema}>
         {({ isSubmitting, isValid }) => (
