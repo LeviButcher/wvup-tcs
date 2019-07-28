@@ -12,7 +12,7 @@ const CoursesCheckboxes = ({ courses, errors }) => {
     <>
       <Header type="h4">
         Classes Visiting for <SmallText>Select at least one course</SmallText>
-        <div style={{ color: 'red' }}>{errors.courses}</div>
+        <div style={{ color: 'red' }}>{errors && errors.courses}</div>
       </Header>
       <FieldGroup>
         {courses.map(course => (
