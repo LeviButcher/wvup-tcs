@@ -8,7 +8,7 @@ const ReasonsCheckboxes = ({ className, reasons, values, errors }) => (
     <Header type="h4">
       Reason for Visiting{' '}
       <SmallText>Select Tutoring or at least one other reason</SmallText>
-      <div style={{ color: 'red' }}>{errors && errors.reasons}</div>
+      <div style={{ color: 'red' }}>{errors && errors.reasons}</div>q
     </Header>
     <FieldGroup>
       <SingleCheckBoxLabel name="tutoring">
