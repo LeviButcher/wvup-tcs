@@ -87,10 +87,9 @@ const SuccessReport = () => {
         <Card width="500px" style={{ gridArea: 'chart' }}>
           <PieChart
             title={pieChartData.name}
-            data={pieChartData.records.reduce(
-              sumColumnsForPieChartsReducer,
-              []
-            )}
+            data={pieChartData.records
+              .reduce(sumColumnsForPieChartsReducer, [])
+              .filter(x => x.value > 0)}
             x={x => x.name}
             y={y => y.value}
           />
