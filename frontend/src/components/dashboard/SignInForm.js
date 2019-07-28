@@ -8,25 +8,7 @@ import useQuery from '../../hooks/useQuery';
 import { callApi, unwrapToJSON, ensureResponseCode } from '../../utils';
 import CoursesCheckboxes from '../CoursesCheckboxes';
 import ReasonCheckboxes from '../ReasonCheckboxes';
-
-const SignInSchema = Yup.object().shape({
-  email: Yup.string()
-    .email('Invalid email')
-    .matches(/^[A-Z0-9._%+-]+@wvup.edu$/i, 'Must be a wvup email address')
-    .trim()
-    .required('Email is required'),
-  courses: Yup.array()
-    .min(1)
-    .required('A Course is required'),
-  reasons: Yup.array().when('tutoring', {
-    is: true,
-    then: Yup.array(),
-    otherwise: Yup.array()
-      .min(1)
-      .required()
-  }),
-  tutoring: Yup.boolean()
-});
+import SignInSchema from '../../schemas/SignInFormScema';
 
 const postSignIn = callApi(`signins/`, 'POST');
 

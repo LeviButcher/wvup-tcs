@@ -153,7 +153,7 @@ const dateOptions = {
 };
 
 const SignInRow = ({
-  signIn: { id, email, fullName, courses, reasons, inTime, outTime, tutored }
+  signIn: { id, email, fullName, courses, reasons, inTime, outTime, tutoring }
 }) => (
   <tr>
     <td>{email}</td>
@@ -171,7 +171,7 @@ const SignInRow = ({
     <td>
       {reasons
         .map(reason => reason.name)
-        .concat([tutored ? 'Tutoring' : null])
+        .concat([tutoring ? 'Tutoring' : null])
         .filter(x => x !== null)
         .join(', ')}
     </td>

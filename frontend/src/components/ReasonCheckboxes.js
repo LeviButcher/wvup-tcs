@@ -1,19 +1,14 @@
 import React from 'react';
-import { Field, ErrorMessage } from 'formik';
+import { Field } from 'formik';
 import styled from 'styled-components';
 import { Header, FieldGroup, Checkbox } from '../ui';
 
-const ReasonsCheckboxes = ({ reasons, values }) => (
-  <>
+const ReasonsCheckboxes = ({ className, reasons, values, errors }) => (
+  <div className={className}>
     <Header type="h4">
       Reason for Visiting{' '}
       <SmallText>Select Tutoring or at least one other reason</SmallText>
-      <ErrorMessage name="reasons">
-        {message => <div style={{ color: 'red' }}>{message}</div>}
-      </ErrorMessage>
-      <ErrorMessage name="tutoring">
-        {message => <div style={{ color: 'red' }}>{message}</div>}
-      </ErrorMessage>
+      <div style={{ color: 'red' }}>{errors.reasons}</div>
     </Header>
     <FieldGroup>
       <SingleCheckBoxLabel name="tutoring">
@@ -36,14 +31,12 @@ const ReasonsCheckboxes = ({ reasons, values }) => (
           name="reasons"
           label={`${reason.name}`}
           value={reason.id}
-          style={{
-            color: reason.deleted ? 'red' : 'green'
-          }}
+          data-deleted={reason.deleted}
           title={`This reason is ${reason.deleted ? 'deleted' : 'active'}`}
         />
       ))}
     </FieldGroup>
-  </>
+  </div>
 );
 
 const SmallText = styled.span`

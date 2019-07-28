@@ -1,5 +1,4 @@
 import React from 'react';
-import { ErrorMessage } from 'formik';
 import styled from 'styled-components';
 import { Header, FieldGroup, Checkbox } from '../ui';
 
@@ -8,14 +7,12 @@ const SmallText = styled.span`
   font-size: 0.8em;
 `;
 
-const CoursesCheckboxes = ({ courses }) => {
+const CoursesCheckboxes = ({ courses, errors }) => {
   return (
     <>
       <Header type="h4">
         Classes Visiting for <SmallText>Select at least one course</SmallText>
-        <ErrorMessage name="courses">
-          {message => <div style={{ color: 'red' }}>{message}</div>}
-        </ErrorMessage>
+        <div style={{ color: 'red' }}>{errors.courses}</div>
       </Header>
       <FieldGroup>
         {courses.map(course => (

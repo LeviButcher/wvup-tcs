@@ -1,34 +1,45 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { Formik, Form, Field } from 'formik';
-import * as Yup from 'yup';
 import { pipe } from 'ramda';
+import * as Yup from 'yup';
 import { Card, Input, Header, Button } from '../../ui';
 import useQuery from '../../hooks/useQuery';
 import { callApi, unwrapToJSON, ensureResponseCode } from '../../utils';
 import CoursesCheckboxes from '../CoursesCheckboxes';
 import ReasonCheckboxes from '../ReasonCheckboxes';
+import SignInSchema from '../../schemas/SignInFormScema';
 
-const SignInSchema = Yup.object().shape({
-  email: Yup.string()
-    .email('Invalid email')
-    .matches(/^[A-Z0-9._%+-]+@wvup.edu$/i, 'Must be a wvup email address')
-    .trim()
-    .required('Email is required'),
-  courses: Yup.array()
-    .min(1)
-    .required('A Course is required'),
-  reasons: Yup.array().when('tutoring', {
-    is: true,
-    then: Yup.array(),
-    otherwise: Yup.array()
-      .min(1)
-      .required()
-  }),
-  tutoring: Yup.boolean(),
-  inTime: Yup.date().required(),
-  outTime: Yup.date().required()
-});
+const SignInUpdateSchema = SignInSchema.shape({
+  inTime: Yup.date()
+    .typeError('Invalid Date format')
+    .required(),
+  outTime: Yup.date()
+    .typeError('Invalid Date format')
+    .test('date-test', 'Must be after In Time', function(outTime) {
+      return this.resolve(Yup.ref('inTime')) < outTime;
+    })
+    .required()
+})
+  .from('inTime', 'startDate', true)
+  .from('outTime', 'endDate', true);
+
+const FullScreenContainer = styled.div`
+  padding: ${props => props.theme.padding};
+  height: calc(100vh - 75px);
+  display: flex;
+  align-items: center;
+  justify-content: space-evenly;
+`;
+
+const StyledReasonCheckboxes = styled(ReasonCheckboxes)`
+  & label[data-deleted='true'] {
+    color: red;
+  }
+  & label[data-deleted='false'] {
+    color: green;
+  }
+`;
 
 const putSignIn = signIn => callApi(`signIns/${signIn.id}`, 'PUT', signIn);
 
@@ -72,7 +83,7 @@ const SignIn = ({ afterSuccessfulSubmit, data }) => {
       );
     });
   }, [student]);
-  console.log(student);
+
   return (
     <FullScreenContainer>
       <Card>
@@ -85,8 +96,7 @@ const SignIn = ({ afterSuccessfulSubmit, data }) => {
             inTime: student.inTime,
             outTime: student.outTime
           }}
-          isInitialValid
-          validationSchema={SignInSchema}
+          validationSchema={SignInUpdateSchema}
           onSubmit={async (values, { setSubmitting }) => {
             // massage data back into server format
             const signIn = {
@@ -110,7 +120,14 @@ const SignIn = ({ afterSuccessfulSubmit, data }) => {
               .finally(() => setSubmitting(false));
           }}
         >
-          {({ values, isSubmitting, status, isValid, handleChange }) => (
+          {({
+            values,
+            isSubmitting,
+            status,
+            isValid,
+            handleChange,
+            errors
+          }) => (
             <Form>
               <Header>Student Sign In</Header>
               <p>Enter in Email to load classlist</p>
@@ -143,11 +160,15 @@ const SignIn = ({ afterSuccessfulSubmit, data }) => {
                 label="Out Time"
               />
               {reasons && (
-                <ReasonCheckboxes reasons={reasons} values={values} />
+                <StyledReasonCheckboxes
+                  reasons={reasons}
+                  values={values}
+                  errors={errors}
+                />
               )}
               {student && (
                 <>
-                  <CoursesCheckboxes courses={classes} />
+                  <CoursesCheckboxes courses={classes} errors={errors} />
                 </>
               )}
               <br />
@@ -166,13 +187,5 @@ const SignIn = ({ afterSuccessfulSubmit, data }) => {
     </FullScreenContainer>
   );
 };
-
-const FullScreenContainer = styled.div`
-  padding: ${props => props.theme.padding};
-  height: calc(100vh - 75px);
-  display: flex;
-  align-items: center;
-  justify-content: space-evenly;
-`;
 
 export default SignIn;

@@ -3,7 +3,7 @@ import styled from 'styled-components';
 
 const Input = ({
   field, // { name, value, onChange, onBlur }
-  form: { touched, errors }, // also values, setXXXX, handleXXXX, dirty, isValid, status, etc.
+  form: { errors }, // also values, setXXXX, handleXXXX, dirty, isValid, status, etc.
   className,
   label,
   type,
@@ -13,7 +13,7 @@ const Input = ({
   <div className={className}>
     <label htmlFor={id} style={{ textTransform: 'capitalize' }}>
       {label || field.name}
-      {touched[field.name] && errors[field.name] && (
+      {errors[field.name] && (
         <div style={{ color: 'red' }}>{errors[field.name]}</div>
       )}
     </label>
