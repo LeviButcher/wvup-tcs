@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { Formik, Form, Field, ErrorMessage } from 'formik';
+import { Formik, Form, Field } from 'formik';
 import * as Yup from 'yup';
 import { pipe } from 'ramda';
-import { Card, Input, Header, Button, FieldGroup, Checkbox } from '../../ui';
+import { Card, Input, Header, Button } from '../../ui';
 import useQuery from '../../hooks/useQuery';
 import { callApi, unwrapToJSON, ensureResponseCode } from '../../utils';
+import CoursesCheckboxes from '../CoursesCheckboxes';
+import ReasonCheckboxes from '../ReasonCheckboxes';
 
 const SignInSchema = Yup.object().shape({
   email: Yup.string()
@@ -84,7 +86,7 @@ const SignIn = ({ afterSuccessfulSubmit }) => {
               .finally(() => setSubmitting(false));
           }}
         >
-          {({ isSubmitting, status, isValid, handleChange }) => (
+          {({ values, isSubmitting, status, isValid, handleChange }) => (
             <Form>
               <Header>Student Sign In</Header>
               <p>Enter in Email to load classlist</p>
@@ -101,7 +103,9 @@ const SignIn = ({ afterSuccessfulSubmit }) => {
                     loadClassList(e.target.value);
                 }}
               />
-              {reasons && <ReasonsCheckboxes reasons={reasons} />}
+              {reasons && (
+                <ReasonCheckboxes reasons={reasons} values={values} />
+              )}
               {student && (
                 <>
                   <CoursesCheckboxes courses={student.classSchedule} />
@@ -124,85 +128,12 @@ const SignIn = ({ afterSuccessfulSubmit }) => {
   );
 };
 
-const ReasonsCheckboxes = ({ reasons }) => (
-  <>
-    <Header type="h4">
-      Reason for Visiting{' '}
-      <SmallText>Select Tutoring or at least one other reason</SmallText>
-      <ErrorMessage name="reasons">
-        {message => <div style={{ color: 'red' }}>{message}</div>}
-      </ErrorMessage>
-      <ErrorMessage name="tutoring">
-        {message => <div style={{ color: 'red' }}>{message}</div>}
-      </ErrorMessage>
-    </Header>
-    <FieldGroup>
-      <SingleCheckBoxLabel name="tutoring">
-        Tutoring
-        <Field
-          id="tutoring"
-          type="checkbox"
-          name="tutoring"
-          component="input"
-          label="tutoring"
-          value="Tutoring"
-        />
-      </SingleCheckBoxLabel>
-      {reasons.map(reason => (
-        <Checkbox
-          key={reason.id}
-          id={reason.name}
-          name="reasons"
-          label={reason.name}
-          value={reason.id}
-        />
-      ))}
-    </FieldGroup>
-  </>
-);
-
-const CoursesCheckboxes = ({ courses }) => {
-  return (
-    <>
-      <Header type="h4">
-        Classes Visiting for <SmallText>Select at least one course</SmallText>
-        <ErrorMessage name="courses">
-          {message => <div style={{ color: 'red' }}>{message}</div>}
-        </ErrorMessage>
-      </Header>
-      <FieldGroup>
-        {courses.map(course => (
-          <Checkbox
-            key={course.crn}
-            id={course.crn}
-            type="checkbox"
-            name="courses"
-            label={course.shortName}
-            value={course.crn}
-          />
-        ))}
-      </FieldGroup>
-    </>
-  );
-};
-
-const SmallText = styled.span`
-  color: #aaa;
-  font-size: 0.8em;
-`;
-
 const FullScreenContainer = styled.div`
   padding: ${props => props.theme.padding};
   height: calc(100vh - 75px);
   display: flex;
   align-items: center;
   justify-content: space-evenly;
-`;
-
-const SingleCheckBoxLabel = styled.label`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
 `;
 
 export default SignIn;

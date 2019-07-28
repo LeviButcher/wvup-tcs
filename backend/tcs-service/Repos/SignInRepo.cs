@@ -77,6 +77,10 @@ namespace tcs_service.Repos
 
         public async Task<SignIn> Update(SignIn signIn)
         {
+            var oldSignInCourses = _db.SignInCourses.Where(x => x.SignInID == signIn.ID);
+            var oldSignInReasons = _db.SignInReasons.Where(x => x.SignInID == signIn.ID);
+            _db.SignInCourses.RemoveRange(oldSignInCourses);
+            _db.SignInReasons.RemoveRange(oldSignInReasons);
             _db.SignIns.Update(signIn);
             await _db.SaveChangesAsync();
             return signIn;

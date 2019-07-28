@@ -150,7 +150,7 @@ namespace tcs_service.Controllers
             return Created("GetSignIn", new { id = signIn.ID });
         }
 
-        [HttpPut("/signIns/{id}")]
+        [HttpPut("{id}")]
         public async Task<IActionResult> PutSignIn([FromRoute] int id, [FromBody] SignIn signIn)
         {
             if (!ModelState.IsValid)
@@ -181,7 +181,7 @@ namespace tcs_service.Controllers
             }
         }
 
-        [HttpPut("{id}/IDsignOut")]
+        [HttpPut("{id}/signOut/id")]
         public async Task<IActionResult> SignOut([FromRoute] int id)
         {
             if (!ModelState.IsValid)

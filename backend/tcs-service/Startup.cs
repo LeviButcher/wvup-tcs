@@ -9,6 +9,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json;
 using tcs_service.EF;
 using tcs_service.Helpers;
 using tcs_service.Repos;
@@ -79,7 +80,11 @@ namespace tcs_service
             services.AddScoped<IReasonRepo, ReasonRepo>();
             services.AddScoped<ILookupRepo, LookupRepo>();
 
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+            services.AddMvc().AddJsonOptions(options => {
+                options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
+            })
+            .SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+            
             services.AddDbContext<TCSContext>(options =>
                options.UseSqlServer(Configuration["DB:connectionString"]));
         }

@@ -1,11 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import { Formik, Form, Field, ErrorMessage } from 'formik';
+import { Formik, Form, Field } from 'formik';
 import * as Yup from 'yup';
 import { pipe } from 'ramda';
-import { Card, Input, Header, Button, FieldGroup, Checkbox } from '../../ui';
+import { Card, Input, Header, Button } from '../../ui';
 import useQuery from '../../hooks/useQuery';
 import { callApi, unwrapToJSON, ensureResponseCode } from '../../utils';
+import CoursesCheckboxes from '../CoursesCheckboxes';
+import ReasonCheckboxes from '../ReasonCheckboxes';
 
 const SignInSchema = Yup.object().shape({
   email: Yup.string()
@@ -23,10 +25,12 @@ const SignInSchema = Yup.object().shape({
       .min(1)
       .required()
   }),
-  tutoring: Yup.boolean()
+  tutoring: Yup.boolean(),
+  inTime: Yup.date().required(),
+  outTime: Yup.date().required()
 });
 
-const putSignIn = callApi(`signins/`, 'PUT');
+const putSignIn = signIn => callApi(`signIns/${signIn.id}`, 'PUT', signIn);
 
 const getStudentInfoWithEmail = email =>
   callApi(`signins/${email}/email`, 'GET', null);
@@ -41,18 +45,34 @@ const queryReasons = pipe(
 
 const isWVUPEmail = email => email.match(/^[A-Z0-9._%+-]+@wvup.edu$/i);
 
+const reduceToUniqueClasses = (acc, curr) => {
+  const found = acc.find(ele => ele.crn === curr.crn);
+  if (!found) acc.push(curr);
+  return acc;
+};
+
+const loadClassList = email =>
+  getStudentInfoWithEmail(email)
+    .then(ensureResponseCode(200))
+    .then(unwrapToJSON)
+    .then(res => res.classSchedule)
+    .catch(e => alert(e.message));
+
 // test email = mtmqbude26@wvup.edu
 const SignIn = ({ afterSuccessfulSubmit, data }) => {
   const [reasons] = useQuery(queryReasons);
-  const [student, setStudent] = useState(data);
-  const loadClassList = email => {
-    getStudentInfoWithEmail(email)
-      .then(ensureResponseCode(200))
-      .then(unwrapToJSON)
-      .then(setStudent)
-      .catch(e => alert(e.message));
-  };
+  const [student] = useState(data);
+  const [classes, setClasses] = useState(student.courses);
 
+  useEffect(() => {
+    loadClassList(student.email).then(currentCourses => {
+      // Class loaded could have a repeat class in it, reduce to only unique classes
+      setClasses(
+        [...classes, ...currentCourses].reduce(reduceToUniqueClasses, [])
+      );
+    });
+  }, [student]);
+  console.log(student);
   return (
     <FullScreenContainer>
       <Card>
@@ -61,30 +81,36 @@ const SignIn = ({ afterSuccessfulSubmit, data }) => {
             email: student.email,
             reasons: student.reasons.map(reason => reason.id),
             tutoring: student.tutoring,
-            courses: student.courses.map(course => course.crn)
+            courses: student.courses.map(course => course.crn),
+            inTime: student.inTime,
+            outTime: student.outTime
           }}
+          isInitialValid
           validationSchema={SignInSchema}
           onSubmit={async (values, { setSubmitting }) => {
             // massage data back into server format
             const signIn = {
               ...values,
-              personId: student.studentID,
+              id: student.id,
+              personId: student.personId,
               semesterId: student.semesterId,
-              courses: values.courses.map(courseCRN =>
-                student.classSchedule.find(ele => ele.crn === courseCRN)
-              ),
-              reasons: values.reasons.map(id =>
-                reasons.find(ele => ele.id === id)
-              )
+              courses: values.courses.map(courseCRN => ({
+                courseId: courseCRN
+              })),
+              reasons: values.reasons.map(id => ({ reasonId: id }))
             };
             putSignIn(signIn)
-              .then(ensureResponseCode(201))
+              .then(ensureResponseCode(200))
               .then(afterSuccessfulSubmit)
+              .then(() => {
+                alert('Successfuly updated');
+                window.history.back();
+              })
               .catch(e => alert(e.message))
               .finally(() => setSubmitting(false));
           }}
         >
-          {({ isSubmitting, status, isValid, handleChange }) => (
+          {({ values, isSubmitting, status, isValid, handleChange }) => (
             <Form>
               <Header>Student Sign In</Header>
               <p>Enter in Email to load classlist</p>
@@ -102,12 +128,26 @@ const SignIn = ({ afterSuccessfulSubmit, data }) => {
                 }}
                 disabled
               />
-              {reasons && <ReasonsCheckboxes reasons={reasons} />}
+              <Field
+                id="inTime"
+                type="datetime-local"
+                name="inTime"
+                component={Input}
+                label="In Time"
+              />
+              <Field
+                id="outTime"
+                type="datetime-local"
+                name="outTime"
+                component={Input}
+                label="Out Time"
+              />
+              {reasons && (
+                <ReasonCheckboxes reasons={reasons} values={values} />
+              )}
               {student && (
                 <>
-                  <CoursesCheckboxes
-                    courses={student.classSchedule || student.courses}
-                  />
+                  <CoursesCheckboxes courses={classes} />
                 </>
               )}
               <br />
@@ -127,90 +167,12 @@ const SignIn = ({ afterSuccessfulSubmit, data }) => {
   );
 };
 
-const ReasonsCheckboxes = ({ reasons }) => (
-  <>
-    <Header type="h4">
-      Reason for Visiting{' '}
-      <SmallText>Select Tutoring or at least one other reason</SmallText>
-      <ErrorMessage name="reasons">
-        {message => <div style={{ color: 'red' }}>{message}</div>}
-      </ErrorMessage>
-      <ErrorMessage name="tutoring">
-        {message => <div style={{ color: 'red' }}>{message}</div>}
-      </ErrorMessage>
-    </Header>
-    <FieldGroup>
-      <SingleCheckBoxLabel name="tutoring">
-        Tutoring
-        <Field
-          id="tutoring"
-          type="checkbox"
-          name="tutoring"
-          component="input"
-          label="tutoring"
-          value="Tutoring"
-        />
-      </SingleCheckBoxLabel>
-      {reasons.map(reason => (
-        <Checkbox
-          key={reason.id}
-          id={reason.name}
-          type="checkbox"
-          name="reasons"
-          label={`${reason.name}`}
-          value={reason.id}
-          style={{
-            color: reason.deleted ? 'red' : 'green'
-          }}
-          title={`This reason is ${reason.deleted ? 'deleted' : 'active'}`}
-        />
-      ))}
-    </FieldGroup>
-  </>
-);
-
-const CoursesCheckboxes = ({ courses }) => {
-  return (
-    <>
-      <Header type="h4">
-        Classes Visiting for <SmallText>Select at least one course</SmallText>
-        <ErrorMessage name="courses">
-          {message => <div style={{ color: 'red' }}>{message}</div>}
-        </ErrorMessage>
-      </Header>
-      <FieldGroup>
-        {courses.map(course => (
-          <Checkbox
-            key={course.crn}
-            id={course.crn}
-            type="checkbox"
-            name="courses"
-            label={course.shortName}
-            value={course.crn}
-          />
-        ))}
-      </FieldGroup>
-    </>
-  );
-};
-
-const SmallText = styled.span`
-  color: #aaa;
-  font-size: 0.8em;
-`;
-
 const FullScreenContainer = styled.div`
   padding: ${props => props.theme.padding};
   height: calc(100vh - 75px);
   display: flex;
   align-items: center;
   justify-content: space-evenly;
-`;
-
-const SingleCheckBoxLabel = styled.label`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
 `;
 
 export default SignIn;
