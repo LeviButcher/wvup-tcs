@@ -145,7 +145,7 @@ namespace tcs_service.Controllers
                     }
                 }
             }
-            
+
             await _iRepo.Add(signIn);
             return Created("GetSignIn", new { id = signIn.ID });
         }
@@ -191,7 +191,7 @@ namespace tcs_service.Controllers
 
             var signIn = await GetMostRecentById(id);
 
-            if(signIn == null)
+            if (signIn == null)
             {
                 return NotFound();
             }
@@ -218,7 +218,7 @@ namespace tcs_service.Controllers
 
             if (signIn == null)
             {
-                return NotFound(new {message="You are not signed in"});
+                return NotFound(new { message = "You are not signed in" });
             }
 
             if (signIn.OutTime != null)
@@ -259,12 +259,12 @@ namespace tcs_service.Controllers
 
         private async Task<SignIn> GetMostRecentById(int id)
         {
-            if(! await _iRepo.PersonExist(id))
+            if (!await _iRepo.PersonExist(id))
             {
                 return null;
             }
 
-            return  await _iRepo.GetMostRecentSignInByID(id);
+            return await _iRepo.GetMostRecentSignInByID(id);
         }
 
         private async Task<SignIn> GetMostRecentByEmail(string email)

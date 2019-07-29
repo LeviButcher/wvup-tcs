@@ -11,7 +11,7 @@ const BigText = styled.span`
 
 const Welcome = () => {
   const [loading, data, errors] = useApiWithHeaders('lookups/daily');
-  const totalVisits = (data && data.headers['total-records']) || 0;
+  const totalVisits = (data && Number(data.headers['total-records'])) || 0;
   console.log(data);
   return (
     <div>
@@ -21,12 +21,14 @@ const Welcome = () => {
         <>
           <Header align="center" type="h2">
             <BigText>{totalVisits}</BigText>{' '}
-            {totalVisits > 1 ? 'Students' : 'Student'} Helped Today
+            {totalVisits !== 1 ? 'Students' : 'Student'} Helped Today
           </Header>
-          <div>
-            <h4>Most Recent Visitors</h4>
-            <SignInsTable signIns={data.body} />
-          </div>
+          {data.body.length >= 1 && (
+            <div>
+              <h4>Most Recent Visitors</h4>
+              <SignInsTable signIns={data.body} />
+            </div>
+          )}
         </>
       )}
       {errors && <div>{errors}</div>}

@@ -24,10 +24,29 @@ namespace tcs_service.Models
         [ForeignKey(nameof(SemesterId))]
         public Semester Semester { get; set; }
 
-        [Required]
-        public DateTime? InTime { get; set; }
+        private DateTime? inTime;
 
-        public DateTime? OutTime { get; set; }
+        [Required]
+        public DateTime? InTime
+        {
+            get
+            {
+                if (!inTime.HasValue) return null;
+                return inTime.Value.AddTicks(-inTime.Value.Ticks % TimeSpan.TicksPerSecond);
+            }
+            set => inTime = value;
+        }
+
+        private DateTime? outTime;
+        public DateTime? OutTime
+        {
+            get
+            {
+                if (!outTime.HasValue) return null;
+                return outTime.Value.AddTicks(-outTime.Value.Ticks % TimeSpan.TicksPerSecond);
+            }
+            set => outTime = value;
+        }
 
         public bool Tutoring { get; set; }
 

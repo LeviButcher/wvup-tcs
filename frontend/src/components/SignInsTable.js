@@ -52,7 +52,7 @@ const SignInRow = ({
     <td align="center">
       {outTime
         ? new Date(outTime).getHours() - new Date(inTime).getHours()
-        : 'Not signed out'}
+        : ''}
     </td>
     <td>{courses.map(course => course.shortName).join(', ')}</td>
     <td>

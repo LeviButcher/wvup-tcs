@@ -105,9 +105,13 @@ const SignIn = ({ afterSuccessfulSubmit, data }) => {
               personId: student.personId,
               semesterId: student.semesterId,
               courses: values.courses.map(courseCRN => ({
-                courseId: courseCRN
+                courseId: courseCRN,
+                signInID: student.id
               })),
-              reasons: values.reasons.map(id => ({ reasonId: id }))
+              reasons: values.reasons.map(id => ({
+                reasonId: id,
+                signInID: student.id
+              }))
             };
             putSignIn(signIn)
               .then(ensureResponseCode(200))
