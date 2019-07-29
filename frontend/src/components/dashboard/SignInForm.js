@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import { Formik, Form, Field } from 'formik';
-import * as Yup from 'yup';
 import { pipe } from 'ramda';
 import { Card, Input, Header, Button } from '../../ui';
 import useQuery from '../../hooks/useQuery';
