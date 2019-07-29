@@ -18,7 +18,8 @@ import {
   ReasonForm,
   SignInLookup,
   SignInForm,
-  SignInFormUpdate
+  SignInFormUpdate,
+  Welcome
 } from './components/dashboard';
 import Theme from './theme.json';
 import NotFound from './components/NotFound';
@@ -46,7 +47,7 @@ function App() {
           </KioskLayout>
           <IsAuthenticated redirectRoute="/login" path="/dashboard">
             <DashboardLayout path="/">
-              <Hello path="/" />
+              <Welcome path="/" />
               <SignInLookup path="/signins/:startDate/:endDate/:page" />
               <SignInLookup path="/signins/" />
               <SignInForm
@@ -101,9 +102,5 @@ function App() {
     </>
   );
 }
-
-const Hello = () => (
-  <div>Hey Levi you need to make this default dashboard view</div>
-);
 
 export default App;

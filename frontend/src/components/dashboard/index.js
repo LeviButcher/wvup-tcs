@@ -14,6 +14,7 @@ import ReasonForm from './ReasonForm';
 import SignInLookup from './SignInLookup';
 import SignInForm from './SignInForm';
 import SignInFormUpdate from './SignInFormUpdate';
+import Welcome from './Welcome';
 
 export {
   DashboardLayout,
@@ -31,5 +32,6 @@ export {
   ReasonForm,
   SignInLookup,
   SignInForm,
-  SignInFormUpdate
+  SignInFormUpdate,
+  Welcome
 };
