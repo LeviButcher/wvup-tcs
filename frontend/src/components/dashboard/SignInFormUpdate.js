@@ -113,6 +113,7 @@ const SignIn = ({ afterSuccessfulSubmit, data }) => {
                 signInID: student.id
               }))
             };
+            console.log(signIn);
             putSignIn(signIn)
               .then(ensureResponseCode(200))
               .then(afterSuccessfulSubmit)
