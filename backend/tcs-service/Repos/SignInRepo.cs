@@ -21,7 +21,7 @@ namespace tcs_service.Repos
 
         public async Task<SignIn> Add(SignIn signIn)
         {
-            if ( ! await SemesterExists(signIn.SemesterId))
+            if (!await SemesterExists(signIn.SemesterId))
             {
                 await AddSemester(signIn.SemesterId);
             }
@@ -41,12 +41,13 @@ namespace tcs_service.Repos
             return await _db.SignIns.Include(x => x.Courses).Include(x => x.Reasons).SingleOrDefaultAsync(a => a.ID == id);
         }
 
-        public async Task<SignInViewModel> GetSignInViewModel(int id) => 
+        public async Task<SignInViewModel> GetSignInViewModel(int id) =>
             await _db.SignIns.Include(x => x.Courses).ThenInclude(x => x.Course)
             .Include(x => x.Reasons).ThenInclude(x => x.Reason)
             .Include(x => x.Person)
             .Include(x => x.Semester)
-            .Select(x => new SignInViewModel(){
+            .Select(x => new SignInViewModel()
+            {
                 Email = x.Person.Email,
                 Courses = x.Courses.Select(sc => sc.Course).ToList(),
                 Reasons = x.Reasons.Select(sr => sr.Reason).ToList(),
@@ -77,13 +78,40 @@ namespace tcs_service.Repos
 
         public async Task<SignIn> Update(SignIn signIn)
         {
-            var oldSignInCourses = _db.SignInCourses.Where(x => x.SignInID == signIn.ID);
-            var oldSignInReasons = _db.SignInReasons.Where(x => x.SignInID == signIn.ID);
-            _db.SignInCourses.RemoveRange(oldSignInCourses);
-            _db.SignInReasons.RemoveRange(oldSignInReasons);
-            _db.SignIns.Update(signIn);
+            var signInInDB = await _db.SignIns.Where(x => x.ID == signIn.ID)
+                .Include(x => x.Courses).Include(x => x.Reasons).SingleOrDefaultAsync();
+
+            // All the stuff to no remove
+            var trackedCourses = signIn.Courses.Aggregate(new List<SignInCourse>(), (acc, curr) =>
+            {
+                var found = _db.SignInCourses.Any(x => x.CourseID == curr.CourseID);
+                if (found) return acc.Append(curr).ToList();
+
+                return acc.Append(new SignInCourse()
+                {
+                    CourseID = curr.CourseID
+                }).ToList();
+            });
+
+            var trackedReasons = signIn.Reasons.Aggregate(new List<SignInReason>(), (acc, curr) =>
+            {
+                var found = _db.SignInReasons.Any(x => x.ReasonID == curr.ReasonID);
+                if (found) return acc.Append(curr).ToList();
+
+                return acc.Append(new SignInReason()
+                {
+                    ReasonID = curr.ReasonID
+                }).ToList();
+            });
+            signInInDB.OutTime = signIn.OutTime;
+            signInInDB.InTime = signIn.InTime;
+            signInInDB.PersonId = signIn.PersonId;
+            signInInDB.Courses = trackedCourses;
+            signInInDB.Reasons = trackedReasons;
+
+            _db.SignIns.Update(signInInDB);
             await _db.SaveChangesAsync();
-            return signIn;
+            return signInInDB;
         }
 
         public async Task<Course> AddCourse(Course course)
@@ -164,7 +192,7 @@ namespace tcs_service.Repos
             }
 
 
-             var semester = await _db.Semesters.AddAsync(new Semester
+            var semester = await _db.Semesters.AddAsync(new Semester
             {
                 ID = id,
                 Name = name
@@ -173,7 +201,7 @@ namespace tcs_service.Repos
             return semester.Entity;
         }
 
-     
+
         public async Task<SignIn> GetMostRecentSignInByID(int id)
         {
             var person = await _db.People.Where(x => x.ID == id).FirstOrDefaultAsync();
@@ -192,11 +220,11 @@ namespace tcs_service.Repos
 
         private async Task<SignIn> GetMostRecentSignIn(int personId)
         {
-            if(await _db.SignIns.Where(x => x.PersonId == personId).AnyAsync())
+            if (await _db.SignIns.Where(x => x.PersonId == personId).AnyAsync())
             {
-                return await _db.SignIns.Where(p => p.PersonId == personId).LastAsync();
+                return await _db.SignIns.Include(x => x.Courses).Include(x => x.Reasons).Where(p => p.PersonId == personId).LastAsync();
             }
-            return null;           
+            return null;
         }
 
         public StudentInfoViewModel GetStudentInfoWithEmail(string studentEmail)
@@ -213,7 +241,7 @@ namespace tcs_service.Repos
         {
             return _bannerService.GetTeacherInfoWithEmail(teacherEmail);
         }
-                                             
+
         public TeacherInfoViewModel GetTeacherInfoWithID(int teacherID)
         {
             return _bannerService.GetTeacherInfoWithID(teacherID);

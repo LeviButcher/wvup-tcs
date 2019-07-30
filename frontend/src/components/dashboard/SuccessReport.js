@@ -61,7 +61,7 @@ const SuccessReport = () => {
       <SemesterForm
         style={{ gridArea: 'form' }}
         name="Success Report"
-        width="400px"
+        width="500px"
         onSubmit={({ semester }, { setSubmitting }) => {
           getSuccessData(semester)
             .then(ensureResponseCode(200))

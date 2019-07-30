@@ -5,6 +5,7 @@ import { Header, FieldGroup, Checkbox } from '../ui';
 const SmallText = styled.span`
   color: #aaa;
   font-size: 0.8em;
+  font-weight: normal;
 `;
 
 const CoursesCheckboxes = ({ courses, errors }) => {

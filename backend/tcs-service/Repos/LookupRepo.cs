@@ -26,7 +26,8 @@ namespace tcs_service.Repos
 
         public async Task<PagingModel<SignInViewModel>> Get(DateTime start, DateTime end, int skip, int take)
         {
-            var signInsBetweenDate = _db.SignIns.Where(x => x.InTime >= start && x.InTime <= end)
+            var signInsBetweenDate = _db.SignIns.OrderBy(x => x.InTime)
+                .Where(x => x.InTime >= start && x.InTime <= end)
                 .Include(x => x.Courses).ThenInclude(x => x.Course)
                 .Include(x => x.Reasons).ThenInclude(x => x.Reason);
 
@@ -38,7 +39,9 @@ namespace tcs_service.Repos
 
         public async Task<PagingModel<SignInViewModel>> Daily(int skip, int take)
         {
-            var dailySignIns = _db.SignIns.Where(x => x.InTime.Value.Day == DateTime.Now.Day
+            var dailySignIns = _db.SignIns
+                .OrderByDescending(x => x.InTime)
+                .Where(x => x.InTime.Value.Day == DateTime.Now.Day
                 && x.InTime.Value.Month == DateTime.Now.Month
                 && x.InTime.Value.Year == DateTime.Now.Year)
                .Include(x => x.Courses).ThenInclude(x => x.Course)
@@ -58,7 +61,7 @@ namespace tcs_service.Repos
 
             var totalDataCount = await signInsBetweenDateByCRN.CountAsync();
             var pageData = GetPageData(signInsBetweenDateByCRN, skip, take);
-            
+
             return new PagingModel<SignInViewModel>(skip, take, totalDataCount, pageData);
         }
 

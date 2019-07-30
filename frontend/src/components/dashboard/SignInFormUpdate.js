@@ -83,7 +83,7 @@ const SignIn = ({ afterSuccessfulSubmit, data }) => {
       );
     });
   }, [student]);
-
+  console.log(student);
   return (
     <FullScreenContainer>
       <Card>
@@ -107,8 +107,11 @@ const SignIn = ({ afterSuccessfulSubmit, data }) => {
               courses: values.courses.map(courseCRN => ({
                 courseId: courseCRN
               })),
-              reasons: values.reasons.map(id => ({ reasonId: id }))
+              reasons: values.reasons.map(id => ({
+                reasonId: id
+              }))
             };
+            console.log(signIn);
             putSignIn(signIn)
               .then(ensureResponseCode(200))
               .then(afterSuccessfulSubmit)
