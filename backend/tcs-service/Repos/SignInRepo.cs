@@ -76,34 +76,42 @@ namespace tcs_service.Repos
             return signIn;
         }
 
-        // Precondition: Must pass in SignIn with courses and reasons attached
         public async Task<SignIn> Update(SignIn signIn)
         {
-            var removeCourses = _db.SignInCourses.Where(x => x.SignInID == signIn.ID);
-            _db.SignInCourses.RemoveRange(removeCourses);
+            var signInInDB = await _db.SignIns.Where(x => x.ID == signIn.ID)
+                .Include(x => x.Courses).Include(x => x.Reasons).SingleOrDefaultAsync();
 
-            signIn.Courses.ForEach(course =>
+            // All the stuff to no remove
+            var trackedCourses = signIn.Courses.Aggregate(new List<SignInCourse>(), (acc, curr) =>
             {
-                if (!_db.SignInCourses.Any(c => c.SignInID == course.SignInID && c.CourseID == course.CourseID))
+                var found = _db.SignInCourses.Any(x => x.CourseID == curr.CourseID);
+                if (found) return acc.Append(curr).ToList();
+
+                return acc.Append(new SignInCourse()
                 {
-                    _db.SignInCourses.Add(course);
-                }
+                    CourseID = curr.CourseID
+                }).ToList();
             });
 
-            var removeReasons = _db.SignInReasons.Where(x => x.SignInID == signIn.ID);
-            _db.SignInReasons.RemoveRange(removeReasons);
-            signIn.Reasons.ForEach(reason =>
+            var trackedReasons = signIn.Reasons.Aggregate(new List<SignInReason>(), (acc, curr) =>
             {
-                if (!_db.SignInReasons.Any(c => c.SignInID == reason.SignInID && c.ReasonID == reason.ReasonID))
+                var found = _db.SignInReasons.Any(x => x.ReasonID == curr.ReasonID);
+                if (found) return acc.Append(curr).ToList();
+
+                return acc.Append(new SignInReason()
                 {
-                    _db.SignInReasons.Add(reason);
-                }
+                    ReasonID = curr.ReasonID
+                }).ToList();
             });
+            signInInDB.OutTime = signIn.OutTime;
+            signInInDB.InTime = signIn.InTime;
+            signInInDB.PersonId = signIn.PersonId;
+            signInInDB.Courses = trackedCourses;
+            signInInDB.Reasons = trackedReasons;
 
-
-            _db.SignIns.Update(signIn);
+            _db.SignIns.Update(signInInDB);
             await _db.SaveChangesAsync();
-            return signIn;
+            return signInInDB;
         }
 
         public async Task<Course> AddCourse(Course course)

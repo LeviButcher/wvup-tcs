@@ -83,7 +83,7 @@ const SignIn = ({ afterSuccessfulSubmit, data }) => {
       );
     });
   }, [student]);
-
+  console.log(student);
   return (
     <FullScreenContainer>
       <Card>
@@ -105,12 +105,10 @@ const SignIn = ({ afterSuccessfulSubmit, data }) => {
               personId: student.personId,
               semesterId: student.semesterId,
               courses: values.courses.map(courseCRN => ({
-                courseId: courseCRN,
-                signInID: student.id
+                courseId: courseCRN
               })),
               reasons: values.reasons.map(id => ({
-                reasonId: id,
-                signInID: student.id
+                reasonId: id
               }))
             };
             console.log(signIn);

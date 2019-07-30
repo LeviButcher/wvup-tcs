@@ -165,8 +165,8 @@ namespace tcs_service.Controllers
 
             try
             {
-                await _iRepo.Update(signIn);
-                return Ok(signIn);
+                var result = await _iRepo.Update(signIn);
+                return Ok(result);
             }
             catch (DbUpdateConcurrencyException)
             {
