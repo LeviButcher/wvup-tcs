@@ -32,15 +32,19 @@ const useApiWithHeaders = uri => {
   });
 
   useEffect(() => {
+    if (uri === null || uri.length < 1) {
+      console.log('HIT');
+      dispatch({ type: loadingStates.done });
+      return;
+    }
     dispatch({ type: loadingStates.loading });
     getApiData(uri)
       .then(ensureResponseCode(200))
       .then(async response => {
         const buildData = { headers: {} };
-        for (const headerTuple of response.headers) {
-          const [key, value] = headerTuple;
+        response.headers.forEach((value, key) => {
           buildData.headers[key] = value;
-        }
+        });
         buildData.body = await response.json();
         dispatch({ type: loadingStates.done, data: buildData });
       })

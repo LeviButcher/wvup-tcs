@@ -7,17 +7,24 @@ const Paging = ({
   next,
   prev,
   currentPage = 1,
-  totalPages,
+  totalPages = 1,
   baseURL,
   queries
 }) => {
   const page = Number(currentPage);
-  console.log(queries);
-  const queryString = Object.keys(queries).reduce((acc, key) => {
-    const value = queries[key];
-    if (value) return acc.concat('', `&${key}=${value}`);
-    return acc;
-  }, '');
+  const queryString = [
+    ...Object.keys(queries)
+      .reduce((acc, key) => {
+        const value = queries[key];
+        if (value) return [...acc, `${key}=${value}`];
+        return acc;
+      }, [])
+      .join('&')
+  ]
+    .reverse()
+    .concat(['?'])
+    .reverse()
+    .join('');
   return (
     <nav className={className} aria-label="Pagination Navigation">
       {page > 1 && prev && (
