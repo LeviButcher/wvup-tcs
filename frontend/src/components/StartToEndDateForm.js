@@ -9,6 +9,7 @@ const StartToEndDateForm = ({
   submitText,
   startDate = '',
   endDate = '',
+  children,
   ...props
 }) => {
   return (
@@ -44,6 +45,7 @@ const StartToEndDateForm = ({
               label="end Date"
               required
             />
+            {children}
             <Button
               type="submit"
               align="right"

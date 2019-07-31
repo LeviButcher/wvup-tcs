@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
 using System;
+using System.Collections;
 using System.Linq;
 using System.Threading.Tasks;
 using tcs_service.EF;
@@ -26,36 +27,21 @@ namespace tcs_service.Repos
 
         public async Task<PagingModel<SignInViewModel>> Get(DateTime start, DateTime end, int? crn, string email, int skip, int take)
         {
-            IIncludableQueryable<Models.SignIn, Models.Reason> signInsBetweenDate = null;
-            if (crn == null && email == "")
+
+            var signInsBetweenDate = _db.SignIns.OrderBy(x => x.InTime)
+               .Include(x => x.Courses).ThenInclude(x => x.Course)
+               .Include(x => x.Reasons).ThenInclude(x => x.Reason)
+               .Where(x => x.InTime >= start && x.InTime <= end);
+
+            if (crn != null)
             {
-                 signInsBetweenDate = _db.SignIns.OrderBy(x => x.InTime)
-                .Where(x => x.InTime >= start && x.InTime <= end)
-                .Include(x => x.Courses).ThenInclude(x => x.Course)
-                .Include(x => x.Reasons).ThenInclude(x => x.Reason);
+                signInsBetweenDate = signInsBetweenDate.Where(x => x.Courses.Any(y => y.CourseID == crn));
             }
-            else if(crn == null)
+
+            if (email != null && !email.Equals(""))
             {
-                 signInsBetweenDate = _db.SignIns.OrderBy(x => x.InTime)
-                .Where(x => x.InTime >= start && x.InTime <= end && x.Person.Email == email)
-                .Include(x => x.Courses).ThenInclude(x => x.Course)
-                .Include(x => x.Reasons).ThenInclude(x => x.Reason);
+                signInsBetweenDate = signInsBetweenDate.Where(x => x.Person.Email.Equals(email));
             }
-            else if(email == "")
-            {
-                 signInsBetweenDate = _db.SignIns.OrderBy(x => x.InTime)
-                .Where(x => x.InTime >= start && x.InTime <= end && x.Courses.Any(y => y.CourseID == crn))
-                .Include(x => x.Courses).ThenInclude(x => x.Course)
-                .Include(x => x.Reasons).ThenInclude(x => x.Reason);
-            }
-            else
-            {
-                 signInsBetweenDate = _db.SignIns.OrderBy(x => x.InTime)
-                .Where(x => x.InTime >= start && x.InTime <= end && x.Courses.Any(y => y.CourseID == crn) && x.Person.Email == email)
-                .Include(x => x.Courses).ThenInclude(x => x.Course)
-                .Include(x => x.Reasons).ThenInclude(x => x.Reason);
-            }
-            
 
             var totalDataCount = await signInsBetweenDate.CountAsync();
             var pageData = GetPageData(signInsBetweenDate, skip, take);
@@ -103,7 +89,7 @@ namespace tcs_service.Repos
             return new PagingModel<SignInViewModel>(skip, take, totalDataCount, pageData);
         }
 
-        private IQueryable<SignInViewModel> GetPageData(IIncludableQueryable<Models.SignIn, Models.Reason> signIns, int skip, int take)
+        private IQueryable<SignInViewModel> GetPageData(IQueryable<Models.SignIn> signIns, int skip, int take)
         {
             return signIns
                 .Skip(skip).Take(take)
