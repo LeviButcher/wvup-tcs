@@ -19,16 +19,16 @@ namespace tcs_service.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<PagingModel<SignInViewModel>>> Get([FromQuery] DateTime start, [FromQuery] DateTime end, [FromQuery] int skip = 0, [FromQuery] int take = 20)
+        public async Task<ActionResult<PagingModel<SignInViewModel>>> Get([FromQuery] DateTime start, [FromQuery] DateTime end, [FromQuery] int crn, [FromQuery] string email, [FromQuery] int skip = 0, [FromQuery] int take = 20)
         {
-            var page = await _iRepo.Get(start, end, skip, take);
+            var page = await _iRepo.Get(start, end, crn, email, skip, take);
             if (page.isNext)
             {
-                Response.Headers.Add("Next", $"/api/lookups/?start={start}&end={end}&skip={page.Skip + page.Take}&take={page.Take}");
+                Response.Headers.Add("Next", $"/api/lookups/?start={start}&end={end}&crn={crn}&email={email}&skip={page.Skip + page.Take}&take={page.Take}");
             }
             if (page.isPrev)
             {
-                Response.Headers.Add("Prev", $"/api/lookups/?start={start}&end={end}&skip={page.Skip - page.Take}&take={page.Take}");
+                Response.Headers.Add("Prev", $"/api/lookups/?start={start}&end={end}&crn={crn}&email={email}&skip={page.Skip - page.Take}&take={page.Take}");
             }
             Response.Headers.Add("Total-Pages", $"{page.TotalPages}");
             Response.Headers.Add("Total-Records", $"{page.TotalDataCount}");

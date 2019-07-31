@@ -24,12 +24,38 @@ namespace tcs_service.Repos
             _db = new TCSContext(options);
         }
 
-        public async Task<PagingModel<SignInViewModel>> Get(DateTime start, DateTime end, int skip, int take)
+        public async Task<PagingModel<SignInViewModel>> Get(DateTime start, DateTime end, int? crn, string email, int skip, int take)
         {
-            var signInsBetweenDate = _db.SignIns.OrderBy(x => x.InTime)
+            IIncludableQueryable<Models.SignIn, Models.Reason> signInsBetweenDate = null;
+            if (crn == null && email == "")
+            {
+                 signInsBetweenDate = _db.SignIns.OrderBy(x => x.InTime)
                 .Where(x => x.InTime >= start && x.InTime <= end)
                 .Include(x => x.Courses).ThenInclude(x => x.Course)
                 .Include(x => x.Reasons).ThenInclude(x => x.Reason);
+            }
+            else if(crn == null)
+            {
+                 signInsBetweenDate = _db.SignIns.OrderBy(x => x.InTime)
+                .Where(x => x.InTime >= start && x.InTime <= end && x.Person.Email == email)
+                .Include(x => x.Courses).ThenInclude(x => x.Course)
+                .Include(x => x.Reasons).ThenInclude(x => x.Reason);
+            }
+            else if(email == "")
+            {
+                 signInsBetweenDate = _db.SignIns.OrderBy(x => x.InTime)
+                .Where(x => x.InTime >= start && x.InTime <= end && x.Courses.Any(y => y.CourseID == crn))
+                .Include(x => x.Courses).ThenInclude(x => x.Course)
+                .Include(x => x.Reasons).ThenInclude(x => x.Reason);
+            }
+            else
+            {
+                 signInsBetweenDate = _db.SignIns.OrderBy(x => x.InTime)
+                .Where(x => x.InTime >= start && x.InTime <= end && x.Courses.Any(y => y.CourseID == crn) && x.Person.Email == email)
+                .Include(x => x.Courses).ThenInclude(x => x.Course)
+                .Include(x => x.Reasons).ThenInclude(x => x.Reason);
+            }
+            
 
             var totalDataCount = await signInsBetweenDate.CountAsync();
             var pageData = GetPageData(signInsBetweenDate, skip, take);
