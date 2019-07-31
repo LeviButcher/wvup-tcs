@@ -19,7 +19,7 @@ namespace tcs_service.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<PagingModel<SignInViewModel>>> Get([FromQuery] DateTime start, [FromQuery] DateTime end, [FromQuery] int crn, [FromQuery] string email, [FromQuery] int skip = 0, [FromQuery] int take = 20)
+        public async Task<ActionResult<PagingModel<SignInViewModel>>> Get([FromQuery] DateTime start, [FromQuery] DateTime end, [FromQuery] int? crn, [FromQuery] string email, [FromQuery] int skip = 0, [FromQuery] int take = 20)
         {
             var page = await _iRepo.Get(start, end, crn, email, skip, take);
             if (page.isNext)

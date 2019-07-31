@@ -1,63 +1,48 @@
 import React, { useState, useEffect } from 'react';
+import { Field } from 'formik';
+import * as Yup from 'yup';
+import ScaleLoader from 'react-spinners/ScaleLoader';
+import StartToEndDateSchema from '../../schemas/StartToEndDateSchema';
 import StartToEndDate from '../StartToEndDateForm';
-import { Paging, Link, Card, Button } from '../../ui';
-import { callApi, ensureResponseCode, unwrapToJSON } from '../../utils';
+import { Paging, Link, Card, Button, Input } from '../../ui';
 import SignInsTable from '../SignInsTable';
+import useApiWithHeaders from '../../hooks/useApiWithHeaders';
 
-const extraHeaderKey = key => response => response.headers.get(key);
-const getNextHeader = extraHeaderKey('Next');
-const getPrevHeader = extraHeaderKey('Prev');
-const getCurrentPageHeader = extraHeaderKey('Current-Page');
-const getTotalPagesHeader = extraHeaderKey('Total-Pages');
+const SignInLookupSchema = StartToEndDateSchema.shape({
+  email: Yup.string()
+    .email('Invalid email')
+    .matches(/^[A-Z0-9._%+-]+@wvup.edu$/i, 'Must be a wvup email address')
+    .trim(),
+  crn: Yup.number()
+    .positive()
+    .typeError('Must be a number')
+});
 
 const take = 20;
-const getSignInData = (start, end, page = 1) =>
-  callApi(
-    `lookups/?start=${start}&end=${end}&skip=${page * take -
-      take}&take=${take}`,
-    'GET',
-    null
-  );
-const defaultPagingState = {
-  next: false,
-  prev: false,
-  page: 1,
-  totalPages: 1
+const getSignInUrl = (start, end, crn = '', email = '', page = 1) => {
+  if (start == null || end == null) return '';
+  const requiredEndpoint = `lookups/?start=${start}&end=${end}&skip=${page *
+    take -
+    take}&take=${take}`;
+  const crnQuery = crn !== '' ? `&crn=${crn}` : '';
+  const emailQuery = email !== '' ? `&email=${email}` : '';
+  const endPoint = requiredEndpoint.concat('', crnQuery).concat('', emailQuery);
+  return endPoint;
 };
-const SignInLookup = ({ startDate, endDate, page }) => {
-  const [signIns, setSignIns] = useState([]);
-  const [start, setStart] = useState(startDate);
-  const [end, setEnd] = useState(endDate);
-  const [paging, setPaging] = useState({ ...defaultPagingState, page });
 
-  useEffect(() => {
-    if (page !== undefined) {
-      getSignInData(start, end, page)
-        .then(ensureResponseCode(200))
-        .then(response => {
-          setPaging({
-            next: getNextHeader(response) !== null,
-            prev: getPrevHeader(response) !== null,
-            page: getCurrentPageHeader(response),
-            totalPages: getTotalPagesHeader(response)
-          });
-          return response;
-        })
-        .then(unwrapToJSON)
-        .then(setSignIns)
-        .then(() => {
-          setStart(startDate);
-          setEnd(endDate);
-        });
-    }
-    return () => {
-      setSignIns([]);
-      setStart('');
-      setEnd('');
-      setPaging(defaultPagingState);
-    };
-  }, [startDate, endDate, page]);
+const getQueryParams = url => {
+  const queries = new URLSearchParams(url);
+  const params = {};
+  queries.forEach((value, name) => {
+    params[name] = value;
+  });
+  return params;
+};
 
+const SignInLookup = ({ startDate, endDate, page, navigate }) => {
+  const { email, crn } = getQueryParams(window.location.search);
+  const endPoint = getSignInUrl(startDate, endDate, crn, email, page);
+  const [loading, data] = useApiWithHeaders(endPoint);
   return (
     <>
       <div>
@@ -70,51 +55,72 @@ const SignInLookup = ({ startDate, endDate, page }) => {
 
         <StartToEndDate
           name="Sign In Lookup"
-          onSubmit={(values, { setSubmitting, setStatus }) => {
-            getSignInData(values.startDate, values.endDate)
-              .then(ensureResponseCode(200))
-              .then(response => {
-                setPaging({
-                  next: getNextHeader(response) !== null,
-                  prev: getPrevHeader(response) !== null,
-                  page: getCurrentPageHeader(response),
-                  totalPages: getTotalPagesHeader(response)
-                });
-                return response;
-              })
-              .then(unwrapToJSON)
-              .then(setSignIns)
-              .then(() => {
-                setStart(values.startDate);
-                setEnd(values.endDate);
-              })
-              .catch(e => setStatus({ msg: e.message }))
-              .finally(() => setSubmitting(false));
+          onSubmit={(values, { setSubmitting }) => {
+            navigate(
+              `/dashboard/signins/${values.startDate}/${values.endDate}/1/?email=${values.email}&crn=${values.crn}`
+            );
+            setSubmitting(false);
           }}
-          startDate={start}
-          endDate={end}
           submitText="Run Lookup"
-        />
+          initialValues={{
+            startDate: startDate || '',
+            endDate: endDate || '',
+            email: email || '',
+            crn: crn || ''
+          }}
+          isInitialValid={e => {
+            try {
+              return SignInLookupSchema.validateSync(e.initialValues);
+            } catch {
+              return false;
+            }
+          }}
+          validationSchema={SignInLookupSchema}
+          enableReinitialize
+        >
+          <Field
+            id="email"
+            type="text"
+            name="email"
+            component={Input}
+            label="*Email"
+          />
+          <Field
+            id="crn"
+            type="text"
+            name="crn"
+            component={Input}
+            label="*CRN"
+          />
+        </StartToEndDate>
       </div>
-      {signIns && start && end && (
-        <Card width="1400px">
-          <Paging
-            currentPage={paging.page}
-            totalPages={paging.totalPages}
-            next={paging.next}
-            prev={paging.prev}
-            baseURL={`/dashboard/signins/${start}/${end}/`}
-          />
-          <SignInsTable signIns={signIns} />
-          <Paging
-            currentPage={paging.page}
-            totalPages={paging.totalPages}
-            next={paging.next}
-            prev={paging.prev}
-            baseURL={`/dashboard/signins/${start}/${end}/`}
-          />
-        </Card>
-      )}
+      <ScaleLoader sizeUnit="px" size={150} loading={loading} align="center" />
+      {!loading &&
+        data &&
+        data.headers &&
+        data.body.length >= 1 &&
+        startDate &&
+        endDate && (
+          <Card width="1400px">
+            <Paging
+              currentPage={data.headers['current-page']}
+              totalPages={data.headers['total-pages']}
+              next={data.headers.next}
+              prev={data.headers.prev}
+              queries={{ email, crn }}
+              baseURL={`/dashboard/signins/${startDate}/${endDate}/`}
+            />
+            <SignInsTable signIns={data.body} />
+            <Paging
+              currentPage={data.headers['current-page']}
+              totalPages={data.headers['total-pages']}
+              next={data.headers.next}
+              prev={data.headers.prev}
+              queries={{ email, crn }}
+              baseURL={`/dashboard/signins/${startDate}/${endDate}/`}
+            />
+          </Card>
+        )}
     </>
   );
 };

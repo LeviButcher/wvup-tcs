@@ -16,7 +16,7 @@ const Welcome = () => {
   return (
     <div>
       <CustomHeader align="center">Tutoring Center System</CustomHeader>
-      <ScaleLoader sizeUnit="px" size={150} loading={loading} />
+      <ScaleLoader sizeUnit="px" size={150} loading={loading} align="center" />
       {!loading && (
         <>
           <Header align="center" type="h2">
