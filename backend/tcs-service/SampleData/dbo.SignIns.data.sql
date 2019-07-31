@@ -97,7 +97,7 @@ INSERT INTO [dbo].[SignIns] ([ID], [PersonId], [SemesterId], [InTime], [OutTime]
 INSERT INTO [dbo].[SignIns] ([ID], [PersonId], [SemesterId], [InTime], [OutTime], [Tutoring]) VALUES (96, 61, 201903, N'2019-01-11 12:14:13', N'2019-01-11 13:57:04', 1)
 INSERT INTO [dbo].[SignIns] ([ID], [PersonId], [SemesterId], [InTime], [OutTime], [Tutoring]) VALUES (97, 24, 201901, N'2019-06-17 15:25:59', N'2019-06-17 18:14:08', 0)
 INSERT INTO [dbo].[SignIns] ([ID], [PersonId], [SemesterId], [InTime], [OutTime], [Tutoring]) VALUES (98, 10, 201901, N'2018-08-22 14:37:48', N'2018-08-22 16:11:39', 1)
-INSERT INTO [dbo].[SignIns] ([ID], [PersonId], [SemesterId], [InTime], [OutTime], [Tutoring]) VALUES (99, 771771771, 201901, N'2019-09-04 13:02:45', N'2019-09-04 00:04:40', 1)
+INSERT INTO [dbo].[SignIns] ([ID], [PersonId], [SemesterId], [InTime], [OutTime], [Tutoring]) VALUES (99, 771771771, 201901, N'2019-09-04 13:02:45', N'2019-09-04 16:04:40', 1)
 INSERT INTO [dbo].[SignIns] ([ID], [PersonId], [SemesterId], [InTime], [OutTime], [Tutoring]) VALUES (100, 991991991, 201903, N'2018-09-04 13:02:45', null, 0)
 INSERT INTO [dbo].[SignIns] ([ID], [PersonId], [SemesterId], [InTime], [OutTime], [Tutoring]) VALUES (101, 881881881, 201903, N'2018-09-04 13:02:45', N'2018-09-04 17:05:45', 0)
 INSERT INTO [dbo].[SignIns] ([ID], [PersonId], [SemesterId], [InTime], [OutTime], [Tutoring]) VALUES (102, 771771771, 201901, N'2019-09-04 13:03:45', N'2019-09-04 13:45:13', 1)
