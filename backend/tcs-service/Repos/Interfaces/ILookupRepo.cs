@@ -7,7 +7,7 @@ namespace tcs_service.Repos.Interfaces
 {
     public interface ILookupRepo
     {
-        Task<PagingModel<SignInViewModel>> Get(DateTime start, DateTime end, int skip, int take);
+        Task<PagingModel<SignInViewModel>> Get(DateTime start, DateTime end, int? crn, string email, int skip, int take);
 
         Task<PagingModel<SignInViewModel>> Daily(int skip, int take);
 
