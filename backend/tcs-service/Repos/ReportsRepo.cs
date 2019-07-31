@@ -99,7 +99,7 @@ namespace tcs_service.Repos
                          {
                              fullName = grp.Key.fullName,
                              teacherEmail = grp.Key.teacherEmail,
-                             totalHours = Math.Round(grp.Sum(x => x.totalHours) / 600000000, 2)
+                             totalHours = Math.Round(grp.Sum(x => x.totalHours/600000000) / 60, 2)
                          };
 
             return await result.ToListAsync();
