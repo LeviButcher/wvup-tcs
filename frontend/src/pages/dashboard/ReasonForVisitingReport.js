@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { CSVLink } from 'react-csv';
 import { clone } from 'ramda';
 import { ReportLayout, Table, Header, Card, PieChart } from '../../ui';
-import StartToEndDateForm from '../StartToEndDateForm';
+import StartToEndDateForm from '../../components/StartToEndDateForm';
 import {
   callApi,
   ensureResponseCode,

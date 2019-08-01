@@ -5,8 +5,8 @@ import { pipe } from 'ramda';
 import { Card, Input, Header, Button } from '../../ui';
 import useQuery from '../../hooks/useQuery';
 import { callApi, unwrapToJSON, ensureResponseCode } from '../../utils';
-import CoursesCheckboxes from '../CoursesCheckboxes';
-import ReasonCheckboxes from '../ReasonCheckboxes';
+import CoursesCheckboxes from '../../components/CoursesCheckboxes';
+import ReasonCheckboxes from '../../components/ReasonCheckboxes';
 import SignInSchema from '../../schemas/SignInFormScema';
 
 const postSignIn = callApi(`signins/`, 'POST');
