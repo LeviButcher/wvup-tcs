@@ -70,7 +70,7 @@ function App() {
                 Component={ClassTourForm}
                 action="Update"
               />
-              <ClassTourReport path="/report/tours" />
+              <ClassTourReport path="/report/tours/*" />
               <VolunteerReport path="/report/volunteer" />
               <WeeklyVisitsReport path="/report/weekly-visits" />
               <PeakHoursReport path="/report/peak-hours" />
