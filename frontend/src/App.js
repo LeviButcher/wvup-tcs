@@ -1,7 +1,7 @@
 import React from 'react';
 import { Router, navigate } from '@reach/router';
 import { ThemeProvider } from 'styled-components';
-import { KioskLayout, Home, SignOut, SignInTeacher } from './components/kiosk';
+import { KioskLayout, Home, SignOut, SignInTeacher } from './pages/kiosk';
 import {
   DashboardLayout,
   ClassTourLookup,
@@ -20,10 +20,10 @@ import {
   SignInForm,
   SignInFormUpdate,
   Welcome
-} from './components/dashboard';
+} from './pages/dashboard';
 import Theme from './theme.json';
-import NotFound from './components/NotFound';
-import ClassTourForm from './components/dashboard/ClassTourForm';
+import NotFound from './pages/NotFound';
+import ClassTourForm from './pages/dashboard/ClassTourForm';
 import Fetch from './components/Fetch';
 import IsAuthenticated from './components/IsAuthenticated';
 

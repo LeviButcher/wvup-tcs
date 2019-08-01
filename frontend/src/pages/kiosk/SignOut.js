@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { navigate } from '@reach/router';
-import EmailForm from '../EmailForm';
+import EmailForm from '../../components/EmailForm';
 import callApi from '../../utils/callApi';
 import ensureResponseCode from '../../utils/ensureResponseCode';
 

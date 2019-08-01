@@ -4,9 +4,9 @@ import * as Yup from 'yup';
 import ScaleLoader from 'react-spinners/ScaleLoader';
 import { Router } from '@reach/router';
 import StartToEndDateSchema from '../../schemas/StartToEndDateSchema';
-import StartToEndDate from '../StartToEndDateForm';
+import StartToEndDate from '../../components/StartToEndDateForm';
 import { Paging, Link, Card, Button, Input } from '../../ui';
-import SignInsTable from '../SignInsTable';
+import SignInsTable from '../../components/SignInsTable';
 import useApiWithHeaders from '../../hooks/useApiWithHeaders';
 
 const SignInLookupSchema = StartToEndDateSchema.shape({
@@ -68,13 +68,7 @@ const SignInLookup = ({ navigate }) => {
             email: email || '',
             crn: crn || ''
           }}
-          isInitialValid={e => {
-            try {
-              return SignInLookupSchema.validateSync(e.initialValues);
-            } catch {
-              return false;
-            }
-          }}
+          isInitialValid={false}
           validationSchema={SignInLookupSchema}
           enableReinitialize
         >

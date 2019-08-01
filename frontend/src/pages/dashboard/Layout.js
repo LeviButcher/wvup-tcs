@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { Header, Link } from '../../ui';
-import Logout from '../Logout';
+import Logout from '../../components/Logout';
 
 const Layout = ({ children }) => (
   <LayoutGrid>

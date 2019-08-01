@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { CSVLink } from 'react-csv';
 import { Card, Header, Table, ReportLayout, BarChart } from '../../ui';
-import StartToEndDateForm from '../StartToEndDateForm';
+import StartToEndDateForm from '../../components/StartToEndDateForm';
 import { callApi, ensureResponseCode, unwrapToJSON } from '../../utils';
 
 const getClassTourSum = (startDate, endDate) =>

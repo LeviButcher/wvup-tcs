@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { CSVLink } from 'react-csv';
 import styled from 'styled-components';
 import { ReportLayout, Table, Header, Card, PieChart } from '../../ui';
-import SemesterForm from '../SemesterForm';
+import SemesterForm from '../../components/SemesterForm';
 import { callApi, ensureResponseCode, unwrapToJSON } from '../../utils';
 
 const inDepartment = department => record =>
