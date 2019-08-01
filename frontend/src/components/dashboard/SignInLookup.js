@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Field } from 'formik';
 import * as Yup from 'yup';
 import ScaleLoader from 'react-spinners/ScaleLoader';
+import { Router } from '@reach/router';
 import StartToEndDateSchema from '../../schemas/StartToEndDateSchema';
 import StartToEndDate from '../StartToEndDateForm';
 import { Paging, Link, Card, Button, Input } from '../../ui';
@@ -39,10 +40,9 @@ const getQueryParams = url => {
   return params;
 };
 
-const SignInLookup = ({ startDate, endDate, page, navigate }) => {
-  const { email, crn } = getQueryParams(window.location.search);
-  const endPoint = getSignInUrl(startDate, endDate, crn, email, page);
-  const [loading, data] = useApiWithHeaders(endPoint);
+const SignInLookup = ({ navigate }) => {
+  const [{ startDate, endDate, email, crn }, setFormValues] = useState({});
+
   return (
     <>
       <div>
@@ -57,7 +57,7 @@ const SignInLookup = ({ startDate, endDate, page, navigate }) => {
           name="Sign In Lookup"
           onSubmit={(values, { setSubmitting }) => {
             navigate(
-              `/dashboard/signins/${values.startDate}/${values.endDate}/1/?email=${values.email}&crn=${values.crn}`
+              `${values.startDate}/${values.endDate}/1/?email=${values.email}&crn=${values.crn}`
             );
             setSubmitting(false);
           }}
@@ -93,34 +93,50 @@ const SignInLookup = ({ startDate, endDate, page, navigate }) => {
             label="*CRN"
           />
         </StartToEndDate>
+        <Router primary={false}>
+          <LookupResults
+            path=":startDate/:endDate/:page"
+            setFormValues={setFormValues}
+          />
+        </Router>
       </div>
+    </>
+  );
+};
+
+const LookupResults = ({ startDate, endDate, page, setFormValues }) => {
+  const { email, crn } = getQueryParams(window.location.search);
+  const endPoint = getSignInUrl(startDate, endDate, crn, email, page);
+  const [loading, data] = useApiWithHeaders(endPoint);
+  useEffect(() => {
+    setFormValues({ startDate, endDate, email, crn });
+  }, [startDate, endDate, email, crn]);
+
+  return (
+    <>
       <ScaleLoader sizeUnit="px" size={150} loading={loading} align="center" />
-      {!loading &&
-        data &&
-        data.headers &&
-        data.body.length >= 1 &&
-        startDate &&
-        endDate && (
-          <Card width="1400px">
-            <Paging
-              currentPage={data.headers['current-page']}
-              totalPages={data.headers['total-pages']}
-              next={data.headers.next}
-              prev={data.headers.prev}
-              queries={{ email, crn }}
-              baseURL={`/dashboard/signins/${startDate}/${endDate}/`}
-            />
-            <SignInsTable signIns={data.body} />
-            <Paging
-              currentPage={data.headers['current-page']}
-              totalPages={data.headers['total-pages']}
-              next={data.headers.next}
-              prev={data.headers.prev}
-              queries={{ email, crn }}
-              baseURL={`/dashboard/signins/${startDate}/${endDate}/`}
-            />
-          </Card>
-        )}
+      {!loading && data.body.length < 1 && <h3>No records found for search</h3>}
+      {!loading && data && data.headers && data.body.length > 1 && (
+        <Card width="1400px">
+          <Paging
+            currentPage={data.headers['current-page']}
+            totalPages={data.headers['total-pages']}
+            next={data.headers.next}
+            prev={data.headers.prev}
+            queries={{ email, crn }}
+            baseURL={`/dashboard/signins/${startDate}/${endDate}/`}
+          />
+          <SignInsTable signIns={data.body} />
+          <Paging
+            currentPage={data.headers['current-page']}
+            totalPages={data.headers['total-pages']}
+            next={data.headers.next}
+            prev={data.headers.prev}
+            queries={{ email, crn }}
+            baseURL={`/dashboard/signins/${startDate}/${endDate}/`}
+          />
+        </Card>
+      )}
     </>
   );
 };

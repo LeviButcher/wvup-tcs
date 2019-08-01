@@ -48,8 +48,7 @@ function App() {
           <IsAuthenticated redirectRoute="/login" path="/dashboard">
             <DashboardLayout path="/">
               <Welcome path="/" />
-              <SignInLookup path="/signins/:startDate/:endDate/:page" />
-              <SignInLookup path="/signins/" />
+              <SignInLookup path="/signins/*" />
               <SignInForm
                 path="/signins/create"
                 afterSuccessfulSubmit={() => {
