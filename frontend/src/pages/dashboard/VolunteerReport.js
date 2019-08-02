@@ -1,79 +1,85 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { CSVLink } from 'react-csv';
+import { Router } from '@reach/router';
 import { ReportLayout, Table, Header, Card, LineChart } from '../../ui';
 import StartToEndDateForm from '../../components/StartToEndDateForm';
-import { callApi, ensureResponseCode, unwrapToJSON } from '../../utils';
+import useApiWithHeaders from '../../hooks/useApiWithHeaders';
+import LoadingContent from '../../components/LoadingContent';
 
-const getVolunteerSum = (startDate, endDate) =>
-  callApi(`reports/volunteers?start=${startDate}&end=${endDate}`, 'GET', null);
-
-const VolunteerReport = () => {
-  const [volunteers, setVolunteers] = useState();
+const VolunteerReport = ({ navigate, '*': unMatchedUri }) => {
+  const [start, end] = unMatchedUri.split('/');
   return (
     <ReportLayout>
       <StartToEndDateForm
         style={{ gridArea: 'form' }}
         onSubmit={({ startDate, endDate }, { setSubmitting }) => {
-          getVolunteerSum(startDate, endDate)
-            .then(ensureResponseCode(200))
-            .then(unwrapToJSON)
-            .then(setVolunteers)
-            .finally(() => setSubmitting(false));
+          navigate(`${startDate}/${endDate}`);
+          setSubmitting(false);
         }}
+        startDate={start}
+        endDate={end}
         name="Volunteer Report"
       />
-      {volunteers && volunteers.length > 0 && (
-        <Card width="600px" style={{ gridArea: 'chart' }}>
-          <LineChart
-            data={volunteers}
-            x={d => d.fullName}
-            y={d => d.totalHours}
-            xLabel="Email"
-            yLabel="Total Hours"
-            title="Volunteer Total Chart"
-            labels={d => d.totalHours}
-            domain={{ y: [0, 10] }}
-          />
-        </Card>
-      )}
-      {volunteers && (
-        <Card width="900px" style={{ gridArea: 'table' }}>
-          <VolunteerTable volunteers={volunteers} />
-        </Card>
-      )}
+      <Router primary={false} component={({ children }) => <>{children}</>}>
+        <VolunteerResult path=":startDate/:endDate" />
+      </Router>
     </ReportLayout>
   );
 };
 
-const VolunteerTable = ({ volunteers }) => {
+const VolunteerResult = ({ startDate, endDate }) => {
+  const [loading, data, errors] = useApiWithHeaders(
+    `reports/volunteers?start=${startDate}&end=${endDate}`
+  );
+
   return (
-    <Table>
-      <caption>
-        <Header>
-          Volunteers Total Hours -{' '}
-          <CSVLink data={volunteers} filename="classTourReport">
-            Download
-          </CSVLink>
-        </Header>
-      </caption>
-      <thead>
-        <tr>
-          <td>Email</td>
-          <td>Full Name</td>
-          <td>Total Hours</td>
-        </tr>
-      </thead>
-      <tbody>
-        {volunteers.map(volunteer => (
-          <tr key={volunteer.teacherEmail}>
-            <td>{volunteer.teacherEmail}</td>
-            <td>{volunteer.fullName}</td>
-            <td>{volunteer.totalHours}</td>
-          </tr>
-        ))}
-      </tbody>
-    </Table>
+    <LoadingContent loading={loading} data={data} errors={errors}>
+      <Card width="600px" style={{ gridArea: 'chart' }}>
+        <LineChart
+          data={data.body}
+          x={d => d.fullName}
+          y={d => d.totalHours}
+          xLabel="Email"
+          yLabel="Total Hours"
+          title="Volunteer Total Chart"
+          labels={d => d.totalHours}
+          domain={{ y: [0, 10] }}
+        />
+      </Card>
+      <Card width="900px" style={{ gridArea: 'table' }}>
+        <VolunteerTable volunteers={data.body} />
+      </Card>
+    </LoadingContent>
   );
 };
+
+const VolunteerTable = ({ volunteers }) => (
+  <Table>
+    <caption>
+      <Header>
+        Volunteers Total Hours -{' '}
+        <CSVLink data={volunteers} filename="classTourReport">
+          Download
+        </CSVLink>
+      </Header>
+    </caption>
+    <thead>
+      <tr>
+        <td>Email</td>
+        <td>Full Name</td>
+        <td>Total Hours</td>
+      </tr>
+    </thead>
+    <tbody>
+      {volunteers.map(volunteer => (
+        <tr key={volunteer.teacherEmail}>
+          <td>{volunteer.teacherEmail}</td>
+          <td>{volunteer.fullName}</td>
+          <td>{volunteer.totalHours}</td>
+        </tr>
+      ))}
+    </tbody>
+  </Table>
+);
 
 export default VolunteerReport;

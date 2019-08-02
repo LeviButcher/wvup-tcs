@@ -70,11 +70,11 @@ function App() {
                 Component={ClassTourForm}
                 action="Update"
               />
-              <ClassTourReport path="/report/tours" />
-              <VolunteerReport path="/report/volunteer" />
-              <WeeklyVisitsReport path="/report/weekly-visits" />
-              <PeakHoursReport path="/report/peak-hours" />
-              <ReasonForVisitingReport path="/report/reason-for-visiting" />
+              <ClassTourReport path="/report/tours/*" />
+              <VolunteerReport path="/report/volunteer/*" />
+              <WeeklyVisitsReport path="/report/weekly-visits/*" />
+              <PeakHoursReport path="/report/peak-hours/*" />
+              <ReasonForVisitingReport path="/report/reason-for-visiting/*" />
               <UserManagement path="/admin/users" />
               <UserForm path="/admin/users/create" />
               <Fetch
@@ -83,7 +83,7 @@ function App() {
                 Component={UserForm}
                 action="Update"
               />
-              <SuccessReport path="/report/success" />
+              <SuccessReport path="/report/success/*" />
               <ReasonManagement path="/admin/reason" />
               <ReasonForm path="/admin/reason/create" />
               <Fetch

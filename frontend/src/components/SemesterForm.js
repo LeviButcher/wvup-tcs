@@ -20,13 +20,18 @@ const querySemesters = pipe(
   unwrapToJSON
 );
 
-const SemesterForm = ({ onSubmit, name, ...props }) => {
+const SemesterForm = ({ onSubmit, name, initialValues, ...props }) => {
   const [semesters] = useQuery(querySemesters);
   return (
     <Card {...props}>
       <Header>{name}</Header>
       <p>Choose Semester to create a report for</p>
-      <Formik onSubmit={onSubmit} validationSchema={semesterSchema}>
+      <Formik
+        onSubmit={onSubmit}
+        validationSchema={semesterSchema}
+        initialValues={initialValues}
+        enableReinitialize
+      >
         {({ isSubmitting, isValid }) => (
           <Form>
             <Field
@@ -34,15 +39,14 @@ const SemesterForm = ({ onSubmit, name, ...props }) => {
               name="semester"
               component="select"
               label="Semester"
-              defaultValue="None"
             >
               <option style={{ display: 'none' }}>Select a Value</option>
               {semesters &&
                 semesters
                   .sort((a, b) => b.id - a.id)
-                  .map(semester => (
-                    <option value={semester.id} key={semester.id}>
-                      {semester.name}
+                  .map(({ id, name: semesterName }) => (
+                    <option value={id} key={id}>
+                      {semesterName}
                     </option>
                   ))}
             </Field>

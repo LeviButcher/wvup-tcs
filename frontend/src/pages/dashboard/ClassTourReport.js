@@ -1,47 +1,53 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { CSVLink } from 'react-csv';
+import { Router } from '@reach/router';
 import { Card, Header, Table, ReportLayout, BarChart } from '../../ui';
 import StartToEndDateForm from '../../components/StartToEndDateForm';
-import { callApi, ensureResponseCode, unwrapToJSON } from '../../utils';
+import LoadingContent from '../../components/LoadingContent';
+import useApiWithHeaders from '../../hooks/useApiWithHeaders';
 
-const getClassTourSum = (startDate, endDate) =>
-  callApi(`reports/classtours?start=${startDate}&end=${endDate}`, 'GET', null);
-
-const ClassTourReport = () => {
-  const [tours, setTours] = useState();
+const ClassTourReport = ({ navigate, '*': unMatchedUri }) => {
+  const [start, end] = unMatchedUri.split('/');
   return (
     <ReportLayout>
       <StartToEndDateForm
         style={{ gridArea: 'form' }}
-        onSubmit={({ startDate, endDate }, { setSubmitting, setStatus }) => {
-          getClassTourSum(startDate, endDate)
-            .then(ensureResponseCode(200))
-            .then(unwrapToJSON)
-            .then(setTours)
-            .catch(e => setStatus({ msg: e.message }))
-            .finally(() => setSubmitting(false));
+        onSubmit={({ startDate, endDate }, { setSubmitting }) => {
+          navigate(`${startDate}/${endDate}`);
+          setSubmitting(false);
         }}
+        startDate={start}
+        endDate={end}
         name="Class Tour Report"
       />
-      {tours && (
-        <Card width="600px" style={{ gridArea: 'chart' }}>
-          <BarChart
-            data={tours}
-            x={d => d.name}
-            y={d => d.students}
-            title="Class Tour Chart"
-            yLabel="# of Students"
-            labels={d => d.students}
-            padding={{ left: 75, right: 75, top: 50, bottom: 50 }}
-          />
-        </Card>
-      )}
-      {tours && (
-        <Card width="900px" style={{ gridArea: 'table' }}>
-          <ClassTourSumTable classTours={tours} />
-        </Card>
-      )}
+      <Router primary={false} component={({ children }) => <>{children}</>}>
+        <ClassTourResult path=":startDate/:endDate" />
+      </Router>
     </ReportLayout>
+  );
+};
+
+const ClassTourResult = ({ startDate, endDate }) => {
+  const [loading, data, errors] = useApiWithHeaders(
+    `reports/classtours?start=${startDate}&end=${endDate}`
+  );
+  return (
+    <LoadingContent loading={loading} data={data} errors={errors}>
+      <Card width="900px" style={{ gridArea: 'table' }}>
+        <ClassTourSumTable classTours={data.body} />
+      </Card>
+      <Card width="600px" style={{ gridArea: 'chart' }}>
+        <BarChart
+          data={data.body}
+          x={d => d.name}
+          y={d => d.students}
+          title="Class Tour Chart"
+          yLabel="# of Students"
+          labels={d => d.students}
+          padding={{ left: 75, right: 75, top: 50, bottom: 50 }}
+        />
+      </Card>
+    </LoadingContent>
   );
 };
 

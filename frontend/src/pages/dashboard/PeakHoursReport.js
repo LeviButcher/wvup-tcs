@@ -1,51 +1,54 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { CSVLink } from 'react-csv';
+import { Router } from '@reach/router';
 import { ReportLayout, Table, Header, Card, LineChart } from '../../ui';
 import StartToEndDateForm from '../../components/StartToEndDateForm';
-import { callApi, ensureResponseCode, unwrapToJSON } from '../../utils';
+import LoadingContent from '../../components/LoadingContent';
+import useApiWithHeaders from '../../hooks/useApiWithHeaders';
 
-const getPeakHoursSum = (startDate, endDate) =>
-  callApi(`reports/peakhours?start=${startDate}&end=${endDate}`, 'GET', null);
-
-const PeakHoursReport = () => {
-  const [peakHours, setPeakHours] = useState();
+const PeakHoursReport = ({ navigate, '*': unMatchedUri }) => {
+  const [start, end] = unMatchedUri.split('/');
   return (
     <ReportLayout>
       <StartToEndDateForm
         style={{ gridArea: 'form' }}
-        onSubmit={({ startDate, endDate }, { setSubmitting, setStatus }) => {
-          getPeakHoursSum(startDate, endDate)
-            .then(ensureResponseCode(200))
-            .then(unwrapToJSON)
-            .then(setPeakHours)
-            .catch(e => setStatus({ msg: e.message }))
-            .finally(() => setSubmitting(false));
+        onSubmit={({ startDate, endDate }, { setSubmitting }) => {
+          navigate(`${startDate}/${endDate}`);
+          setSubmitting(false);
         }}
+        startDate={start}
+        endDate={end}
         name="Peak Hours Report"
       />
-      {peakHours && peakHours.length > 0 && (
-        <Card width="600px" style={{ gridArea: 'chart' }}>
-          <LineChart
-            data={peakHours}
-            x={d => d.hour}
-            y={d => d.count}
-            title="Peak Hours"
-            xLabel="Hour"
-            yLabel="Total Visitors"
-            labels={d => d.count}
-            domain={{ x: [1, 2], y: [1, 2] }}
-          />
-        </Card>
-      )}
-      {peakHours && (
-        <Card width="800px" style={{ gridArea: 'table' }}>
-          <PeakHoursTable
-            peakHours={peakHours}
-            style={{ fontSize: '1.4rem' }}
-          />
-        </Card>
-      )}
+      <Router primary={false} component={({ children }) => <>{children}</>}>
+        <PeakHoursResult path=":startDate/:endDate" />
+      </Router>
     </ReportLayout>
+  );
+};
+
+const PeakHoursResult = ({ startDate, endDate }) => {
+  const [loading, data, errors] = useApiWithHeaders(
+    `reports/peakhours?start=${startDate}&end=${endDate}`
+  );
+  return (
+    <LoadingContent loading={loading} data={data} errors={errors}>
+      <Card width="600px" style={{ gridArea: 'chart' }}>
+        <LineChart
+          data={data.body}
+          x={d => d.hour}
+          y={d => d.count}
+          title="Peak Hours"
+          xLabel="Hour"
+          yLabel="Total Visitors"
+          labels={d => d.count}
+          domain={{ x: [1, 2], y: [1, 2] }}
+        />
+      </Card>
+      <Card width="800px" style={{ gridArea: 'table' }}>
+        <PeakHoursTable peakHours={data.body} style={{ fontSize: '1.4rem' }} />
+      </Card>
+    </LoadingContent>
   );
 };
 
