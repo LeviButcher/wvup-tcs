@@ -1,13 +1,13 @@
 import React from 'react';
 import { CSVLink } from 'react-csv';
 import { Router } from '@reach/router';
-import ScaleLoader from 'react-spinners/ScaleLoader';
 import { Card, Header, Table, ReportLayout, BarChart } from '../../ui';
 import StartToEndDateForm from '../../components/StartToEndDateForm';
+import LoadingContent from '../../components/LoadingContent';
 import useApiWithHeaders from '../../hooks/useApiWithHeaders';
 
-// Need to set up way to set StartDate and endDate in form on mount
-const ClassTourReport = ({ navigate }) => {
+const ClassTourReport = ({ navigate, '*': unMatchedUri }) => {
+  const [start, end] = unMatchedUri.split('/');
   return (
     <ReportLayout>
       <StartToEndDateForm
@@ -16,6 +16,8 @@ const ClassTourReport = ({ navigate }) => {
           navigate(`${startDate}/${endDate}`);
           setSubmitting(false);
         }}
+        startDate={start}
+        endDate={end}
         name="Class Tour Report"
       />
       <Router primary={false} component={({ children }) => <>{children}</>}>
@@ -26,31 +28,26 @@ const ClassTourReport = ({ navigate }) => {
 };
 
 const ClassTourResult = ({ startDate, endDate }) => {
-  const [loading, data] = useApiWithHeaders(
+  const [loading, data, errors] = useApiWithHeaders(
     `reports/classtours?start=${startDate}&end=${endDate}`
   );
   return (
-    <>
-      <ScaleLoader sizeUnit="px" size={150} loading={loading} align="center" />
-      {data && data.body && (
-        <>
-          <Card width="900px" style={{ gridArea: 'table' }}>
-            <ClassTourSumTable classTours={data.body} />
-          </Card>
-          <Card width="600px" style={{ gridArea: 'chart' }}>
-            <BarChart
-              data={data.body}
-              x={d => d.name}
-              y={d => d.students}
-              title="Class Tour Chart"
-              yLabel="# of Students"
-              labels={d => d.students}
-              padding={{ left: 75, right: 75, top: 50, bottom: 50 }}
-            />
-          </Card>
-        </>
-      )}
-    </>
+    <LoadingContent loading={loading} data={data} errors={errors}>
+      <Card width="900px" style={{ gridArea: 'table' }}>
+        <ClassTourSumTable classTours={data.body} />
+      </Card>
+      <Card width="600px" style={{ gridArea: 'chart' }}>
+        <BarChart
+          data={data.body}
+          x={d => d.name}
+          y={d => d.students}
+          title="Class Tour Chart"
+          yLabel="# of Students"
+          labels={d => d.students}
+          padding={{ left: 75, right: 75, top: 50, bottom: 50 }}
+        />
+      </Card>
+    </LoadingContent>
   );
 };
 

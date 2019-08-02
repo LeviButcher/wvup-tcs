@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { CSVLink } from 'react-csv';
 import styled from 'styled-components';
+import { Router } from '@reach/router';
 import { ReportLayout, Table, Header, Card, PieChart } from '../../ui';
 import SemesterForm from '../../components/SemesterForm';
-import { callApi, ensureResponseCode, unwrapToJSON } from '../../utils';
+import LoadingContent from '../../components/LoadingContent';
+import useApiWithHeaders from '../../hooks/useApiWithHeaders';
 
 const inDepartment = department => record =>
   department.departmentName === record.departmentName;
@@ -49,53 +51,57 @@ const sumColumnsForPieChartsReducer = (acc, cur) => {
   return [completed, dropped, passed];
 };
 
-const getSuccessData = semesterId =>
-  callApi(`reports/success/${semesterId}`, 'GET', null);
-
-const SuccessReport = () => {
-  const [successRecords, setSuccessRecords] = useState();
-  const [pieChartData, setPieChartData] = useState();
-
+const SuccessReport = ({ navigate, '*': unMatchedUri }) => {
+  const [semesterUri] = unMatchedUri.split('/');
   return (
     <ReportLayout>
       <SemesterForm
         style={{ gridArea: 'form' }}
         name="Success Report"
         width="500px"
+        initialValues={{ semester: semesterUri }}
         onSubmit={({ semester }, { setSubmitting }) => {
-          getSuccessData(semester)
-            .then(ensureResponseCode(200))
-            .then(unwrapToJSON)
-            .then(data => {
-              setSuccessRecords(data);
-              setPieChartData({ records: data, name: 'Total of Everything' });
-            })
-            .finally(() => {
-              setSubmitting(false);
-            });
+          navigate(`${semester}/`);
+          setSubmitting(false);
         }}
       />
-      {successRecords && (
-        <Card width="1000px" style={{ gridArea: 'table' }}>
-          <SuccessTable
-            successRecords={successRecords}
-            setPieChartData={setPieChartData}
-          />
-        </Card>
-      )}
-      {pieChartData && (
-        <Card width="500px" style={{ gridArea: 'chart' }}>
-          <PieChart
-            title={pieChartData.name}
-            data={pieChartData.records
-              .reduce(sumColumnsForPieChartsReducer, [])
-              .filter(x => x.value > 0)}
-            x={x => x.name}
-            y={y => y.value}
-          />
-        </Card>
-      )}
+      <Router primary={false} component={({ children }) => <>{children}</>}>
+        <SuccessResult path=":semester" />
+      </Router>
     </ReportLayout>
+  );
+};
+
+const SuccessResult = ({ semester }) => {
+  const [loading, data, errors] = useApiWithHeaders(
+    `reports/success/${semester}`
+  );
+  const [pieChartData, setPieChartData] = useState();
+  return (
+    <LoadingContent loading={loading} data={data} errors={errors}>
+      <Card width="1000px" style={{ gridArea: 'table' }}>
+        <SuccessTable
+          successRecords={data.body}
+          setPieChartData={setPieChartData}
+        />
+      </Card>
+      <Card width="500px" style={{ gridArea: 'chart' }}>
+        <PieChart
+          title={pieChartData ? pieChartData.name : 'Total of Everything'}
+          data={
+            pieChartData
+              ? pieChartData.records
+                  .reduce(sumColumnsForPieChartsReducer, [])
+                  .filter(x => x.value > 0)
+              : data.body
+                  .reduce(sumColumnsForPieChartsReducer, [])
+                  .filter(x => x.value > 0)
+          }
+          x={x => x.name}
+          y={y => y.value}
+        />
+      </Card>
+    </LoadingContent>
   );
 };
 

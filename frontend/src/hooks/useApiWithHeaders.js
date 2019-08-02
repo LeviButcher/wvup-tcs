@@ -12,7 +12,7 @@ const getApiData = uri => callApi(uri, 'GET', null);
 const loadingReducer = (currState, action) => {
   switch (action.type) {
     case loadingStates.loading: {
-      return { loading: true };
+      return { ...currState, loading: true };
     }
     case loadingStates.done: {
       return { loading: false, data: action.data };
@@ -28,12 +28,15 @@ const loadingReducer = (currState, action) => {
 
 const useApiWithHeaders = uri => {
   const [{ loading, errors, data }, dispatch] = useReducer(loadingReducer, {
-    loading: true
+    loading: true,
+    data: {
+      headers: {},
+      body: []
+    }
   });
 
   useEffect(() => {
     if (uri === null || uri.length < 1) {
-      console.log('HIT');
       dispatch({ type: loadingStates.done });
       return;
     }

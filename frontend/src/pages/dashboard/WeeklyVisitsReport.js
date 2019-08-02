@@ -1,54 +1,54 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { CSVLink } from 'react-csv';
+import { Router } from '@reach/router';
 import { ReportLayout, Table, Header, Card, LineChart } from '../../ui';
 import StartToEndDateForm from '../../components/StartToEndDateForm';
-import { callApi, ensureResponseCode, unwrapToJSON } from '../../utils';
+import useApiWithHeaders from '../../hooks/useApiWithHeaders';
+import LoadingContent from '../../components/LoadingContent';
 
-const getVisitsSum = (startDate, endDate) =>
-  callApi(
-    `reports/weekly-visits?start=${startDate}&end=${endDate}`,
-    'GET',
-    null
-  );
-
-const WeeklyVisitsReport = () => {
-  const [visits, setVisits] = useState();
+const WeeklyVisitsReport = ({ navigate, '*': unMatchedUri }) => {
+  const [start, end] = unMatchedUri.split('/');
   return (
     <ReportLayout>
       <StartToEndDateForm
         style={{ gridArea: 'form' }}
-        onSubmit={(values, { setSubmitting }) => {
-          const { startDate, endDate } = values;
-          getVisitsSum(startDate, endDate)
-            .then(ensureResponseCode(200))
-            .then(unwrapToJSON)
-            .then(setVisits)
-            .catch(e => alert(e.message))
-            .finally(() => setSubmitting(false));
+        onSubmit={({ startDate, endDate }, { setSubmitting }) => {
+          navigate(`${startDate}/${endDate}`);
+          setSubmitting(false);
         }}
+        startDate={start}
+        endDate={end}
         name="Weekly Visits Report"
       />
-      {visits && visits.length > 0 && (
-        <Card>
-          <LineChart
-            style={{ gridArea: 'chart' }}
-            data={visits}
-            x={d => d.item}
-            y={d => d.count}
-            xLabel="Week"
-            yLabel="Total Visitors"
-            title="Weekly Visits"
-            labels={d => d.count}
-            domain={{ x: [1, 2], y: [1, 2] }}
-          />
-        </Card>
-      )}
-      {visits && (
-        <Card style={{ gridArea: 'table' }}>
-          <VisitsTable visits={visits} />
-        </Card>
-      )}
+      <Router primary={false} component={({ children }) => <>{children}</>}>
+        <VisitsResults path=":startDate/:endDate" />
+      </Router>
     </ReportLayout>
+  );
+};
+
+const VisitsResults = ({ startDate, endDate }) => {
+  const [loading, data, errors] = useApiWithHeaders(
+    `reports/weekly-visits?start=${startDate}&end=${endDate}`
+  );
+  return (
+    <LoadingContent loading={loading} data={data} errors={errors}>
+      <Card style={{ gridArea: 'chart' }}>
+        <LineChart
+          data={data.body}
+          x={d => d.item}
+          y={d => d.count}
+          xLabel="Week"
+          yLabel="Total Visitors"
+          title="Weekly Visits"
+          labels={d => d.count}
+          domain={{ x: [1, 2], y: [1, 2] }}
+        />
+      </Card>
+      <Card style={{ gridArea: 'table' }}>
+        <VisitsTable visits={data.body} />
+      </Card>
+    </LoadingContent>
   );
 };
 
