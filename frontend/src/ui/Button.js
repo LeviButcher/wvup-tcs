@@ -13,9 +13,9 @@ export default styled.button.attrs(props => ({
   border: none;
   cursor: pointer;
   text-decoration: none !important;
-
   background: ${props => props.background};
   color: white;
+
   &[disabled] {
     background: #bfbfff;
   }
