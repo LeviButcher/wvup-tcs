@@ -7,7 +7,7 @@ const ensureResponseCode = code => async fetchPromise => {
     } catch (e) {
       errors = await res.clone().text();
     }
-    throw Error(errors);
+    throw errors;
   }
   return fetchPromise;
 };
