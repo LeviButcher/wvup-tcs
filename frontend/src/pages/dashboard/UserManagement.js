@@ -1,32 +1,27 @@
 import React from 'react';
-import { pipe } from 'ramda';
 import { Link } from '@reach/router';
+import LoadingContent from '../../components/LoadingContent';
 import { Table, Header } from '../../ui';
-import { callApi, ensureResponseCode, unwrapToJSON } from '../../utils';
+import { callApi } from '../../utils';
 import { Gear, Trashcan } from '../../ui/icons';
-import useQuery from '../../hooks/useQuery';
+import useApiWithHeaders from '../../hooks/useApiWithHeaders';
 
-const getUsers = () => callApi(`users/`, 'GET', null);
 const deleteUser = id => callApi(`users/${id}`, 'DELETE', null);
 
-const queryUsers = pipe(
-  getUsers,
-  ensureResponseCode(200),
-  unwrapToJSON
-);
-
-const UserManagement = () => {
-  const [users, reload] = useQuery(queryUsers);
+const UserManagement = ({ navigate }) => {
+  const [loading, data, errors] = useApiWithHeaders('users/');
 
   return (
     <div>
       <a href="users/create">Add User</a>
-      {users && <UserTable users={users} afterDelete={reload} />}
+      <LoadingContent loading={loading} data={data} errors={errors}>
+        <UserTable users={data.body} navigate={navigate} />
+      </LoadingContent>
     </div>
   );
 };
 
-const UserTable = ({ users, afterDelete }) => (
+const UserTable = ({ users }) => (
   <Table>
     <caption>
       <Header>Users In System</Header>
@@ -55,7 +50,8 @@ const UserTable = ({ users, afterDelete }) => (
                   const goDelete = window.confirm(
                     `Are you sure you want to delete ${user.username}`
                   );
-                  if (goDelete) deleteUser(user.id).then(() => afterDelete());
+                  if (goDelete)
+                    deleteUser(user.id).then(() => window.location.reload());
                 }
               }}
             />
