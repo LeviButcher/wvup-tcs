@@ -1,25 +1,19 @@
 import React from 'react';
-import { pipe } from 'ramda';
 import { Link } from '@reach/router';
 import { Table, Header } from '../../ui';
-import useQuery from '../../hooks/useQuery';
+import useApiWithHeaders from '../../hooks/useApiWithHeaders';
 import { Gear } from '../../ui/icons';
-import { callApi, unwrapToJSON, ensureResponseCode } from '../../utils';
-
-const getReasons = () => callApi(`reasons/`, 'GET', null);
-
-const queryReasons = pipe(
-  getReasons,
-  ensureResponseCode(200),
-  unwrapToJSON
-);
+import LoadingContent from '../../components/LoadingContent';
 
 const ReasonManagement = () => {
-  const [reasons] = useQuery(queryReasons);
+  const [loading, data, errors] = useApiWithHeaders('reasons/');
+
   return (
     <div>
       <a href="reason/create">Add Reason</a>
-      {reasons && <ReasonTable reasons={reasons} />}
+      <LoadingContent loading={loading} data={data} errors={errors}>
+        <ReasonTable reasons={data.body} />
+      </LoadingContent>
     </div>
   );
 };
@@ -32,7 +26,7 @@ const ReasonTable = ({ reasons }) => (
     <thead align="left">
       <tr>
         <th>Name</th>
-        <th>Inactive</th>
+        <th>Deleted</th>
         <th>Actions</th>
       </tr>
     </thead>
