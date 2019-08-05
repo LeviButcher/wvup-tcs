@@ -9,7 +9,6 @@ using tcs_service_test.Helpers;
 using Moq;
 using Microsoft.Extensions.Options;
 using tcs_service.Helpers;
-using Microsoft.EntityFrameworkCore;
 using tcs_service.EF;
 
 namespace tcs_service_test.Repos

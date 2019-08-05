@@ -43,15 +43,12 @@ namespace tcs_service.Repos
         public async Task<List<WeeklyVisitsViewModel>> WeeklyVisits(DateTime startWeek, DateTime endWeek)
         {
             var result = new List<WeeklyVisitsViewModel>();
-            var count = 1;
             while (startWeek <= endWeek)
             {
-                result.Add(new WeeklyVisitsViewModel
+                result.Add(new WeeklyVisitsViewModel(startWeek, startWeek.Date.AddDays(6))
                 {
-                    Item = "" + startWeek.Date.ToShortDateString() + " - " + startWeek.Date.AddDays(6).ToShortDateString(),
-                    Count = await _db.SignIns.Where(x => x.InTime >= startWeek && x.InTime <= startWeek.AddDays(7)).CountAsync()
+                    Count = await _db.SignIns.Where(x => x.InTime >= startWeek && x.InTime <= startWeek.AddDays(6)).CountAsync()
                 }) ;
-                count++;
                 startWeek = startWeek.AddDays(7);
             }
             return result;
