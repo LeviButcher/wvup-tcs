@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Net;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using tcs_service.EF;
 using tcs_service.Models;
 using tcs_service.Models.ViewModels;
 using tcs_service.Repos.Interfaces;
@@ -148,6 +148,16 @@ namespace tcs_service.Controllers
 
             await _iRepo.Add(signIn);
             return Created("GetSignIn", new { id = signIn.ID });
+        }
+
+        // [Authorize]
+        [HttpPost("admin")]
+        public async Task<IActionResult> PostSignInAdmin([FromBody] SignInViewModel signInViewModel, bool teacher) {    
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            return BadRequest("Not yet man");
         }
 
         [HttpPut("{id}")]

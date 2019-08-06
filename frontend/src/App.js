@@ -1,7 +1,13 @@
 import React from 'react';
 import { Router, navigate } from '@reach/router';
 import { ThemeProvider } from 'styled-components';
-import { KioskLayout, Home, SignOut, SignInTeacher } from './pages/kiosk';
+import {
+  KioskLayout,
+  Home,
+  SignOut,
+  SignInTeacher,
+  SignInForm
+} from './pages/kiosk';
 import {
   DashboardLayout,
   ClassTourLookup,
@@ -17,7 +23,6 @@ import {
   ReasonManagement,
   ReasonForm,
   SignInLookup,
-  SignInForm,
   SignInFormUpdate,
   Welcome
 } from './pages/dashboard';
@@ -49,13 +54,7 @@ function App() {
             <DashboardLayout path="/">
               <Welcome path="/" />
               <SignInLookup path="/signins/*" />
-              <SignInForm
-                path="/signins/create"
-                afterSuccessfulSubmit={() => {
-                  alert('You created a signIn! ');
-                  navigate('/dashboard/signins');
-                }}
-              />
+              <SignInFormUpdate path="/signins/create" type="create" />
               <Fetch
                 path="/signins/:id"
                 url="signins/"
