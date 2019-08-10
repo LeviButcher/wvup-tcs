@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using tcs_service.Models;
+using tcs_service.Models.ViewModels;
 
 namespace tcs_service.Helpers
 {
@@ -13,6 +14,8 @@ namespace tcs_service.Helpers
         {
             CreateMap<User, UserDto>();
             CreateMap<UserDto, User>();
+            CreateMap<SignIn, SignInViewModel>();
+            CreateMap<SignInViewModel, SignIn>();
         }
     }
 }

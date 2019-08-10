@@ -34,6 +34,8 @@ namespace tcs_service_test.Repos
             fixture.Customize<SignIn>((ob) => ob.Without(x => x.ID).Without(x => x.Courses).Without(x => x.Reasons).Without(x => x.Person));
             fixture.Customize<SignInCourse>((ob) => ob.Without(x => x.SignInID).Without(x => x.SignIn));
             fixture.Customize<SignInReason>((ob) => ob.Without(x => x.SignInID).Without(x => x.SignIn));
+            fixture.Customize<Course>((ob) => ob.Without(x => x.Department).Without(x => x.SignInCourses));
+            fixture.Customize<Reason>((ob) => ob.Without(x => x.SignInReasons));
         }
 
         public void Dispose()
@@ -68,9 +70,8 @@ namespace tcs_service_test.Repos
         {
             var dept = fixture.Create<Department>();
 
-            var course = fixture.Build<Course>()
-                .With(x => x.Department, dept)
-                .Create();
+            var course = fixture.Create<Course>();
+            course.Department = dept;
 
             var res = await signInRepo.AddCourse(course);
 
@@ -85,14 +86,58 @@ namespace tcs_service_test.Repos
 
             var department = await signInRepo.AddDepartment(dept);
 
-            var course = fixture.Build<Course>()
-                .With(x => x.Department, department)
-                .Create();
+            var course = fixture.Create<Course>();
+            course.Department = dept;
 
             var res = await signInRepo.AddCourse(course);
 
             Assert.True(await signInRepo.DepartmentExist(department.Code));
             Assert.Equal(res.CRN, course.CRN);
+        }
+
+        [Fact]
+        public async void AddCourse_SignInWithNewPersonNewCoursesAndReasons_ShouldWork()
+        {
+            var signIn = fixture.Create<SignIn>();
+            var courses = fixture.CreateMany<Course>().Select(x => new SignInCourse() { Course = x });
+            var reasons = fixture.CreateMany<Reason>().Select(x => new SignInReason() { Reason = x });
+            var semester = fixture.Create<Semester>();
+
+            signIn.Courses.AddRange(courses);
+            signIn.Reasons.AddRange(reasons);
+            signIn.Semester = semester;
+
+            var res = await signInRepo.Add(signIn);
+
+            Assert.Equal(signIn.ID, res.ID);
+            Assert.Equal(db.Courses.Count(), signIn.Courses.Count());
+            Assert.Equal(db.Reasons.Count(), signIn.Reasons.Count());
+        }
+
+        // I was getting this to work with create new object or not all at once
+        [Fact]
+        public async void AddCourse_SignInWithExistingPersonAndNewAndExistingCoursesAndReasons_ShouldWork()
+        {
+            var person = fixture.Create<Person>();
+            db.People.Add(person);
+            var course = fixture.Create<Course>();
+            db.Courses.Add(course);
+            var reason = fixture.Create<Reason>();
+            db.Reasons.Add(reason);
+            await db.SaveChangesAsync();
+
+            var signIn = fixture.Create<SignIn>();
+            signIn.PersonId = person.ID;
+            var choosenCourses = fixture.CreateMany<Course>().Append(course).Select(x => new SignInCourse() { Course = x });
+            var choosenReasons = fixture.CreateMany<Reason>().Append(reason).Select(x => new SignInReason() { Reason = x });
+            signIn.Reasons.AddRange(choosenReasons);
+            signIn.Courses.AddRange(choosenCourses);
+
+            var res = await signInRepo.Add(signIn);
+
+            Assert.Equal(signIn.ID, res.ID);
+            Assert.Equal(db.Courses.Count(), signIn.Courses.Count());
+            Assert.Equal(db.Reasons.Count(), signIn.Reasons.Count());
         }
 
         [Fact]

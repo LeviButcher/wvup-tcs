@@ -96,7 +96,6 @@ namespace tcs_service_test.Controllers
                 .With(x => x.SemesterId, 202001)
                 .Create();
 
-            vm.Courses.Clear();
             vm.Courses.Add(course);
 
             var res = await sut.PostSignIn(vm, false);

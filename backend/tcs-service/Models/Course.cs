@@ -1,16 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace tcs_service.Models
 {
     public class Course
     {
         [Key]
-        [InverseProperty(nameof(SignInCourse.Course))]
         public int CRN { get; set; }
 
         [Required]
@@ -24,5 +20,8 @@ namespace tcs_service.Models
 
         [Required]
         public string ShortName { get; set; }
+
+        [InverseProperty(nameof(SignInCourse.Course))]
+        public List<SignInCourse> SignInCourses { get; set; }
     }
 }

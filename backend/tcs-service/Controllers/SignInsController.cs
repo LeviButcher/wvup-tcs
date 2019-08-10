@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Net;
 using System.Threading.Tasks;
+using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -15,9 +16,11 @@ namespace tcs_service.Controllers
     public class SignInsController : ControllerBase
     {
         private ISignInRepo _iRepo;
+        private IMapper _mapper;
 
-        public SignInsController(ISignInRepo iRepo)
+        public SignInsController(ISignInRepo iRepo, IMapper mapper)
         {
+            _mapper = mapper;
             _iRepo = iRepo;
         }
 
@@ -60,10 +63,7 @@ namespace tcs_service.Controllers
                 return BadRequest(ModelState);
             }
 
-            SignIn signIn = new SignIn();
-            signIn.PersonId = signInViewModel.PersonId;
-            signIn.SemesterId = signInViewModel.SemesterId;
-            signIn.Tutoring = signInViewModel.Tutoring;
+            var signIn = _mapper.Map<SignIn>(signInViewModel);
             signIn.InTime = DateTime.Now;
 
             if (!await _iRepo.PersonExist(signInViewModel.PersonId))
@@ -150,13 +150,10 @@ namespace tcs_service.Controllers
             return Created("GetSignIn", new { id = signIn.ID });
         }
 
-        // [Authorize]
+        [Authorize]
         [HttpPost("admin")]
-        public async Task<IActionResult> PostSignInAdmin([FromBody] SignInViewModel signInViewModel, bool teacher) {    
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
+        public async Task<IActionResult> PostSignInAdmin([FromBody] SignInViewModel signInViewModel, bool teacher)
+        {
             return BadRequest("Not yet man");
         }
 

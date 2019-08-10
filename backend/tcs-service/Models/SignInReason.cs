@@ -9,12 +9,16 @@ namespace tcs_service.Models
 {
     public class SignInReason
     {
+        [Key]
+        [Column(Order = 1)]
         [Required]
         public int ReasonID { get; set; }
 
         [ForeignKey(nameof(ReasonID))]
         public Reason Reason { get; set; }
 
+        [Key]
+        [Column(Order = 2)]
         [Required]
         public int SignInID { get; set; }
 

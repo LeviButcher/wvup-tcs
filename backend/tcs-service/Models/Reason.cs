@@ -10,7 +10,6 @@ namespace tcs_service.Models
     public class Reason
     {
         [Key]
-        [InverseProperty(nameof(SignInReason.Reason))]
         public int ID { get; set; }
 
         [Required]
@@ -18,5 +17,8 @@ namespace tcs_service.Models
 
         [Required]
         public bool Deleted { get; set; }
+
+        [InverseProperty(nameof(SignInReason.Reason))]
+        public List<SignInReason> SignInReasons { get; set; }
     }
 }

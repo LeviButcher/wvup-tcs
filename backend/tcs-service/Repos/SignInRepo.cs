@@ -21,10 +21,28 @@ namespace tcs_service.Repos
 
         public async Task<SignIn> Add(SignIn signIn)
         {
-            if (!await SemesterExists(signIn.SemesterId))
+            await _db.Semesters.FindAsync(signIn.Semester.ID);
+
+            signIn.Courses = signIn.Courses.Select(signInCourse =>
             {
-                await AddSemester(signIn.SemesterId);
-            }
+                var tracked = _db.Courses.Find(signInCourse.Course.CRN);
+                if (tracked != null)
+                {
+                    signInCourse.CourseID = tracked.CRN;
+                }
+                return signInCourse;
+            }).ToList();
+
+            signIn.Reasons = signIn.Reasons.Select(signInReason =>
+            {
+                var tracked = _db.Reasons.Find(signInReason.Reason.ID);
+                if (tracked != null)
+                {
+                    signInReason.ReasonID = tracked.ID;
+                }
+                return signInReason;
+            }).ToList();
+
 
             await _db.AddAsync(signIn);
             await _db.SaveChangesAsync();
@@ -78,40 +96,30 @@ namespace tcs_service.Repos
 
         public async Task<SignIn> Update(SignIn signIn)
         {
-            var signInInDB = await _db.SignIns.Where(x => x.ID == signIn.ID)
-                .Include(x => x.Courses).Include(x => x.Reasons).SingleOrDefaultAsync();
-
             // All the stuff to no remove
-            var trackedCourses = signIn.Courses.Aggregate(new List<SignInCourse>(), (acc, curr) =>
+            signIn.Courses = signIn.Courses.Select(signInCourse =>
             {
-                var found = _db.SignInCourses.Any(x => x.CourseID == curr.CourseID);
-                if (found) return acc.Append(curr).ToList();
-
-                return acc.Append(new SignInCourse()
+                var tracked = _db.Courses.Find(signInCourse.Course.CRN);
+                if (tracked != null)
                 {
-                    CourseID = curr.CourseID
-                }).ToList();
-            });
+                    signInCourse.CourseID = tracked.CRN;
+                }
+                return signInCourse;
+            }).ToList();
 
-            var trackedReasons = signIn.Reasons.Aggregate(new List<SignInReason>(), (acc, curr) =>
+            signIn.Reasons = signIn.Reasons.Select(signInReason =>
             {
-                var found = _db.SignInReasons.Any(x => x.ReasonID == curr.ReasonID);
-                if (found) return acc.Append(curr).ToList();
-
-                return acc.Append(new SignInReason()
+                var tracked = _db.Reasons.Find(signInReason.Reason.ID);
+                if (tracked != null)
                 {
-                    ReasonID = curr.ReasonID
-                }).ToList();
-            });
-            signInInDB.OutTime = signIn.OutTime;
-            signInInDB.InTime = signIn.InTime;
-            signInInDB.PersonId = signIn.PersonId;
-            signInInDB.Courses = trackedCourses;
-            signInInDB.Reasons = trackedReasons;
+                    signInReason.ReasonID = tracked.ID;
+                }
+                return signInReason;
+            }).ToList();
 
-            _db.SignIns.Update(signInInDB);
+            _db.SignIns.Update(signIn);
             await _db.SaveChangesAsync();
-            return signInInDB;
+            return signIn;
         }
 
         public async Task<Course> AddCourse(Course course)
