@@ -27,12 +27,15 @@ const SignInTeacher = () => {
       .catch(() => {
         throw new Error(`Can't find your information`);
       })
-      .then(teacher => ({
-        ...teacher,
-        id: teacher.teacherId,
-        email: teacher.teacherEmail
-      }))
-      .then(signIn => postSignInTeacher(signIn))
+      .then(teacher => {
+        console.log(teacher);
+        return {
+          ...teacher,
+          personId: teacher.teacherID,
+          email: teacher.teacherEmail
+        };
+      })
+      .then(postSignInTeacher)
       .then(ensureResponseCode(201))
       .then(() => {
         alert('You have signed in!');

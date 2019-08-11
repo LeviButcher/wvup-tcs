@@ -60,6 +60,7 @@ function App() {
                 url="signins/"
                 Component={SignInFormUpdate}
                 action="Update"
+                type="update"
               />
               <ClassTourLookup path="/tours" />
               <ClassTourForm path="/tours/create" />
