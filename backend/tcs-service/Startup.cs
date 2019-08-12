@@ -9,12 +9,16 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
+using Quartz;
+using Quartz.Impl;
+using Quartz.Spi;
 using tcs_service.EF;
 using tcs_service.Helpers;
 using tcs_service.Repos;
 using tcs_service.Repos.Interfaces;
 using tcs_service.Services;
 using tcs_service.Services.Interfaces;
+using tcs_service.Services.ScheduledTasks;
 
 namespace tcs_service
 {
@@ -69,6 +73,15 @@ namespace tcs_service
                     };
                 });
 
+            // Add Quartz services
+            services.AddSingleton<IJobFactory, SingletonJobFactory>();
+            services.AddSingleton<ISchedulerFactory, StdSchedulerFactory>();
+
+            // Add our job
+            services.AddSingleton<StudentSignOutJob>();
+            services.AddSingleton(new JobSchedule(
+                jobType: typeof(StudentSignOutJob),
+                cronExpression: "0/5 * * * * ?")); // runs one minute after midnight
 
 
             services.AddScoped<IBannerService, MockBannerService>();

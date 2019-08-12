@@ -43,5 +43,9 @@ namespace tcs_service.Repos.Interfaces
         Task<SignIn> GetMostRecentSignInByEmail(string email);
 
         Task<SignInViewModel> GetSignInViewModel(int id);
+
+        Task<IEnumerable<SignIn>> GetNullSignOuts();
+
+        void UpdateNullSignOuts(IEnumerable<SignIn> signIns);
     }
 }
