@@ -36,7 +36,17 @@ const dateOptions = {
 };
 
 const SignInRow = ({
-  signIn: { id, email, fullName, courses, reasons, inTime, outTime, tutoring }
+  signIn: {
+    id,
+    email,
+    fullName,
+    courses,
+    reasons,
+    inTime,
+    outTime,
+    tutoring,
+    type
+  }
 }) => (
   <tr>
     <td>{email}</td>
@@ -59,11 +69,18 @@ const SignInRow = ({
       {reasons
         .map(reason => reason.name)
         .concat([tutoring ? 'Tutoring' : null])
+        .concat([type === 1 ? 'Teacher Volunteering' : null])
         .filter(x => x !== null)
         .join(', ')}
     </td>
     <td style={{ display: 'flex', justifyContent: 'space-evenly' }}>
-      <Link to={`/dashboard/signins/${id}`}>
+      <Link
+        to={
+          type === 0
+            ? `/dashboard/signins/${id}`
+            : `/dashboard/signins/teacher/${id}`
+        }
+      >
         <Gear />
       </Link>
       <Trashcan onClick={() => alert('Not implemented yet')} />

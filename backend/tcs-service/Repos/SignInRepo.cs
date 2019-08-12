@@ -21,7 +21,11 @@ namespace tcs_service.Repos
 
         public async Task<SignIn> Add(SignIn signIn)
         {
-            await _db.Semesters.FindAsync(signIn.Semester.ID);
+            await _db.Semesters.FindAsync(signIn.SemesterId);
+            if (signIn.SemesterId == default)
+            {
+                signIn.SemesterId = (await _db.Semesters.LastAsync()).ID;
+            }
 
             signIn.Courses = signIn.Courses.Select(signInCourse =>
             {
@@ -96,28 +100,18 @@ namespace tcs_service.Repos
 
         public async Task<SignIn> Update(SignIn signIn)
         {
-            // All the stuff to no remove
-            signIn.Courses = signIn.Courses.Select(signInCourse =>
-            {
-                var tracked = _db.Courses.Find(signInCourse.Course.CRN);
-                if (tracked != null)
-                {
-                    signInCourse.CourseID = tracked.CRN;
-                }
-                return signInCourse;
-            }).ToList();
+            var existingSignIn = await _db.SignIns.Include(x => x.Courses).Include(x => x.Reasons).FirstOrDefaultAsync(x => x.ID == signIn.ID);
+            _db.Entry(existingSignIn).CurrentValues.SetValues(signIn);
 
-            signIn.Reasons = signIn.Reasons.Select(signInReason =>
-            {
-                var tracked = _db.Reasons.Find(signInReason.Reason.ID);
-                if (tracked != null)
-                {
-                    signInReason.ReasonID = tracked.ID;
-                }
-                return signInReason;
-            }).ToList();
+            existingSignIn.Courses = signIn.Courses.Select(signInCourse =>
+                new SignInCourse() { SignInID = signIn.ID, CourseID = signInCourse.Course.CRN }
+            ).ToList();
 
-            _db.SignIns.Update(signIn);
+            existingSignIn.Reasons = signIn.Reasons.Select(signInReason =>
+                new SignInReason() { SignInID = signIn.ID, ReasonID = signInReason.Reason.ID }
+            ).ToList();
+
+            _db.SignIns.Update(existingSignIn);
             await _db.SaveChangesAsync();
             return signIn;
         }
@@ -230,7 +224,7 @@ namespace tcs_service.Repos
         {
             if (await _db.SignIns.Where(x => x.PersonId == personId).AnyAsync())
             {
-                return await _db.SignIns.Include(x => x.Courses).Include(x => x.Reasons).Where(p => p.PersonId == personId).LastAsync();
+                return await _db.SignIns.Include(x => x.Courses).ThenInclude(x => x.Course).Include(x => x.Reasons).ThenInclude(x => x.Reason).Where(p => p.PersonId == personId).LastAsync();
             }
             return null;
         }

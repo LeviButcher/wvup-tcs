@@ -10,6 +10,7 @@ namespace tcs_service.Models
     public class Reason
     {
         [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int ID { get; set; }
 
         [Required]

@@ -13,6 +13,7 @@ import {
   ClassTourLookup,
   Login,
   ClassTourReport,
+  TeacherSignInFormUpdate,
   VolunteerReport,
   WeeklyVisitsReport,
   PeakHoursReport,
@@ -55,10 +56,21 @@ function App() {
               <Welcome path="/" />
               <SignInLookup path="/signins/*" />
               <SignInFormUpdate path="/signins/create" type="create" />
+              <TeacherSignInFormUpdate
+                path="/signins/teacher/create"
+                type="create"
+              />
               <Fetch
                 path="/signins/:id"
                 url="signins/"
                 Component={SignInFormUpdate}
+                action="Update"
+                type="update"
+              />
+              <Fetch
+                path="/signins/teacher/:id"
+                url="signins/"
+                Component={TeacherSignInFormUpdate}
                 action="Update"
                 type="update"
               />

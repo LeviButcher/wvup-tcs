@@ -48,9 +48,14 @@ const SignInLookup = ({ navigate }) => {
       <div>
         <Card>
           <h3>Additional Actions</h3>
-          <Link to="/dashboard/signins/create">
-            <Button align="left">Create Sign In</Button>
-          </Link>
+          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+            <Link to="/dashboard/signins/create">
+              <Button align="left">Create Student Sign In</Button>
+            </Link>
+            <Link to="/dashboard/signins/teacher/create">
+              <Button align="left">Create Teacher Sign In</Button>
+            </Link>
+          </div>
         </Card>
 
         <StartToEndDate
@@ -105,12 +110,12 @@ const LookupResults = ({ startDate, endDate, page, setFormValues }) => {
   useEffect(() => {
     setFormValues({ startDate, endDate, email, crn });
   }, [startDate, endDate, email, crn]);
-
+  console.log(data);
   return (
     <>
       <ScaleLoader sizeUnit="px" size={150} loading={loading} align="center" />
       {!loading && data.body.length < 1 && <h3>No records found for search</h3>}
-      {!loading && data && data.headers && data.body.length > 1 && (
+      {!loading && data && data.headers && data.body.length >= 1 && (
         <Card width="1400px">
           <Paging
             currentPage={data.headers['current-page']}

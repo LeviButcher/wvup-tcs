@@ -66,20 +66,6 @@ namespace tcs_service.Controllers
             var signIn = _mapper.Map<SignIn>(signInViewModel);
             signIn.InTime = DateTime.Now;
 
-            if (!await _iRepo.PersonExist(signInViewModel.PersonId))
-            {
-                var person = new Person
-                {
-                    ID = signInViewModel.PersonId,
-                    PersonType = signInViewModel.Type,
-                    FirstName = signInViewModel.FirstName,
-                    LastName = signInViewModel.LastName,
-                    Email = signInViewModel.Email
-                };
-
-                await _iRepo.AddPerson(person);
-            }
-
             var recent = await GetMostRecentById(signIn.PersonId);
 
             if (recent != null && recent.OutTime == null)
@@ -89,7 +75,7 @@ namespace tcs_service.Controllers
 
             if (!teacher)
             {
-                if (signInViewModel.Tutoring && signInViewModel.Courses == null)
+                if (signInViewModel.Courses == null || signInViewModel.Courses.Count < 1)
                 {
                     return BadRequest("Must select one or more courses");
                 }
@@ -97,52 +83,6 @@ namespace tcs_service.Controllers
                 if (!signInViewModel.Tutoring && signInViewModel.Reasons == null)
                 {
                     return BadRequest("Must select one or more reason for visit");
-                }
-
-                if (signInViewModel.Courses != null)
-                {
-
-                    foreach (Course course in signInViewModel.Courses)
-                    {
-                        course.DepartmentID = course.Department.Code;
-                        if (await _iRepo.DepartmentExist(course.Department.Code))
-                        {
-                            course.Department = null;
-                        }
-
-                        var signInCourse = new SignInCourse
-                        {
-                            SignInID = signIn.ID,
-                            CourseID = course.CRN
-                        };
-
-
-                        if (!await _iRepo.CourseExist(course.CRN))
-                        {
-                            await _iRepo.AddCourse(course);
-                        }
-
-                        signIn.Courses.Add(signInCourse);
-                    }
-                }
-
-                if (signInViewModel.Reasons != null)
-                {
-                    foreach (Reason reason in signInViewModel.Reasons)
-                    {
-                        if (!await _iRepo.ReasonExist(reason.ID))
-                        {
-                            await _iRepo.AddReason(reason);
-                        }
-
-                        var signInReason = new SignInReason
-                        {
-                            SignInID = signIn.ID,
-                            ReasonID = reason.ID
-                        };
-
-                        signIn.Reasons.Add(signInReason);
-                    }
                 }
             }
 
@@ -154,22 +94,29 @@ namespace tcs_service.Controllers
         [HttpPost("admin")]
         public async Task<IActionResult> PostSignInAdmin([FromBody] SignInViewModel signInViewModel, bool teacher)
         {
-            return BadRequest("Not yet man");
+            var signIn = _mapper.Map<SignIn>(signInViewModel);
+            await _iRepo.Add(signIn);
+
+            if (signIn.OutTime == null)
+            {
+                throw new Exception("Must Select a OutTime");
+            }
+            return Created("GetSignIn", new { id = signIn.ID });
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutSignIn([FromRoute] int id, [FromBody] SignIn signIn)
+        public async Task<IActionResult> PutSignIn([FromRoute] int id, [FromBody] SignInViewModel signInViewModel)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            if (id != signIn.ID)
+            if (id != signInViewModel.Id)
             {
                 return BadRequest();
             }
-
+            var signIn = _mapper.Map<SignIn>(signInViewModel);
             try
             {
                 var result = await _iRepo.Update(signIn);

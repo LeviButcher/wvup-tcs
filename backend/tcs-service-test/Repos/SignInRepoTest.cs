@@ -1,11 +1,8 @@
 ﻿using AutoFixture;
 using AutoFixture.AutoMoq;
-using Microsoft.Extensions.Options;
-using Moq;
 using System;
 using tcs_service.EF;
 using System.Linq;
-using tcs_service.Helpers;
 using tcs_service.Models;
 using tcs_service.Repos;
 using tcs_service_test.Helpers;
@@ -171,10 +168,14 @@ namespace tcs_service_test.Repos
         public async void Update_WithRemovedCoursesAndReasons_ShouldSucceed()
         {
             var signIn = fixture.Create<SignIn>();
-            var courses = fixture.CreateMany<SignInCourse>().ToList();
-            var reasons = fixture.CreateMany<SignInReason>().ToList();
-            signIn.Courses = courses;
-            signIn.Reasons = reasons;
+            var courses = fixture.CreateMany<Course>().ToList();
+            var reasons = fixture.CreateMany<Reason>().ToList();
+            db.Courses.AddRange(courses);
+            db.Reasons.AddRange(reasons);
+            await db.SaveChangesAsync();
+
+            signIn.Courses = courses.Select(c => new SignInCourse() { Course = c }).ToList();
+            signIn.Reasons = reasons.Select(r => new SignInReason() { Reason = r }).ToList();
             await signInRepo.Add(signIn);
 
             var newCourses = signIn.Courses.Take(signIn.Courses.Count - 1);
@@ -183,30 +184,38 @@ namespace tcs_service_test.Repos
             signIn.Reasons = newReasons.ToList();
             var result = await signInRepo.Update(signIn);
 
-            Assert.Equal(newCourses, result.Courses);
-            Assert.Equal(newReasons, result.Reasons);
+            Assert.Equal(newCourses.Select(x => x.CourseID), result.Courses.Select(x => x.CourseID));
+            Assert.Equal(newReasons.Select(x => x.ReasonID), result.Reasons.Select(x => x.ReasonID));
         }
 
         [Fact]
         public async void Update_RemoveCourseAndReasonAddCourseAndReason_ShouldSucceed()
         {
             var signIn = fixture.Create<SignIn>();
-            var courses = fixture.CreateMany<SignInCourse>().ToList();
-            var reasons = fixture.CreateMany<SignInReason>().ToList();
-            signIn.Courses = courses;
-            signIn.Reasons = reasons;
+            var courses = fixture.CreateMany<Course>().ToList();
+            var reasons = fixture.CreateMany<Reason>().ToList();
+            db.Courses.AddRange(courses);
+            db.Reasons.AddRange(reasons);
+            await db.SaveChangesAsync();
+
+            signIn.Courses = courses.Select(c => new SignInCourse() { Course = c }).ToList();
+            signIn.Reasons = reasons.Select(r => new SignInReason() { Reason = r }).ToList();
             await signInRepo.Add(signIn);
 
-            var newCourses = signIn.Courses.Take(signIn.Courses.Count - 1);
-            newCourses = newCourses.Append(fixture.Create<SignInCourse>());
-            signIn.Courses = newCourses.ToList();
-            var newReasons = signIn.Reasons.Take(signIn.Reasons.Count - 1);
-            newReasons = newReasons.Append(fixture.Create<SignInReason>());
-            signIn.Reasons = newReasons.ToList();
+            var newCourse = fixture.Create<Course>();
+            var newReason = fixture.Create<Reason>();
+            db.Courses.Add(newCourse);
+            db.Reasons.Add(newReason);
+            await db.SaveChangesAsync();
+
+            var choosenCourses = signIn.Courses.Take(signIn.Courses.Count - 1).Append(new SignInCourse() { Course = newCourse, CourseID = newCourse.CRN });
+            var choosenReasons = signIn.Reasons.Take(signIn.Reasons.Count - 1).Append(new SignInReason() { Reason = newReason, ReasonID = newReason.ID });
+            signIn.Reasons = choosenReasons.ToList();
+            signIn.Courses = choosenCourses.ToList();
             var result = await signInRepo.Update(signIn);
 
-            Assert.Equal(newCourses.Select(x => x.CourseID), result.Courses.Select(x => x.CourseID));
-            Assert.Equal(newReasons.Select(X => X.ReasonID), result.Reasons.Select(x => x.ReasonID));
+            Assert.Equal(choosenCourses.Select(x => x.CourseID), result.Courses.Select(x => x.CourseID));
+            Assert.Equal(choosenReasons.Select(X => X.ReasonID), result.Reasons.Select(x => x.ReasonID));
         }
     }
 }

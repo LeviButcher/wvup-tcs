@@ -14,8 +14,14 @@ namespace tcs_service.Helpers
         {
             CreateMap<User, UserDto>();
             CreateMap<UserDto, User>();
-            CreateMap<SignIn, SignInViewModel>();
-            CreateMap<SignInViewModel, SignIn>();
+            CreateMap<SignIn, SignInViewModel>()
+                .ForMember(dest => dest.Courses, opts =>
+                    opts.MapFrom(src => src.Courses.Select(x => x.Course)));
+            CreateMap<SignInViewModel, SignIn>()
+                .ForMember(dest => dest.Courses, opts =>
+                    opts.MapFrom(src => src.Courses.Select(x => new SignInCourse() { Course = x })))
+                .ForMember(dest => dest.Reasons, opts =>
+                    opts.MapFrom(src => src.Reasons.Select(x => new SignInReason() { Reason = x })));
         }
     }
 }

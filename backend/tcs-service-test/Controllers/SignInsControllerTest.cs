@@ -12,6 +12,8 @@ using tcs_service.Models;
 using tcs_service.Models.ViewModels;
 using tcs_service.Repos.Interfaces;
 using Xunit;
+using AutoMapper;
+using tcs_service.Helpers;
 
 namespace tcs_service_test.Controllers
 {
@@ -25,7 +27,9 @@ namespace tcs_service_test.Controllers
         public SignInsControllerTest()
         {
             signInRepo = new Mock<ISignInRepo>();
-            sut = new SignInsController(signInRepo.Object);
+            var config = new MapperConfiguration(opt => opt.AddProfile<AutoMapperProfile>());
+            var mapper = config.CreateMapper();
+            sut = new SignInsController(signInRepo.Object, mapper);
             fixture.Behaviors.OfType<ThrowingRecursionBehavior>().ToList().ForEach(b => fixture.Behaviors.Remove(b));
             fixture.Behaviors.Add(new OmitOnRecursionBehavior());
         }
@@ -38,7 +42,7 @@ namespace tcs_service_test.Controllers
 
         [Fact]
         public void GetAllSignIns_ShouldPass()
-        {            
+        {
             var signIns = fixture.CreateMany<SignIn>();
             signInRepo.Setup(x => x.GetAll()).Returns(signIns);
             var res = sut.GetSignIn();
@@ -59,7 +63,7 @@ namespace tcs_service_test.Controllers
         }
 
         [Fact]
-        public async void WhileTutoringIsTrue_NoClassesSelected_ShouldFail()
+        public async void WhileTeacherIsNotTrue_NoClassesSelected_ShouldFail()
         {
             var signIn = fixture.Build<SignInViewModel>()
                 .With(x => x.Tutoring, true)
@@ -101,6 +105,6 @@ namespace tcs_service_test.Controllers
             var res = await sut.PostSignIn(vm, false);
             var objectResult = Assert.IsType<CreatedResult>(res);
             Assert.Equal(201, objectResult.StatusCode);
-        }   
+        }
     }
 }
