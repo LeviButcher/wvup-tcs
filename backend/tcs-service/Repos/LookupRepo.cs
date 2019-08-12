@@ -107,7 +107,8 @@ namespace tcs_service.Repos
                     PersonId = x.PersonId,
                     Id = x.ID,
                     Courses = x.Courses.Select(signInCourse => signInCourse.Course).ToList(),
-                    Reasons = x.Reasons.Select(signInReason => signInReason.Reason).ToList()
+                    Reasons = x.Reasons.Select(signInReason => signInReason.Reason).ToList(),
+                    Type = x.Person.PersonType
                 });
         }
     }

@@ -21,8 +21,8 @@ namespace tcs_service.Controllers
     [Route("api/[controller]")]
     public class UsersController : ControllerBase
     {
-         private IMapper _mapper;
-         private IUserRepo _userRepo;
+        private IMapper _mapper;
+        private IUserRepo _userRepo;
         private readonly AppSettings _appSettings;
 
         public UsersController(
@@ -135,8 +135,9 @@ namespace tcs_service.Controllers
 
         [Authorize]
         [HttpGet("IsAuthenticate")]
-        public IActionResult IsAuthenticated() {
-            return Ok(new {authenticated=true});
+        public IActionResult IsAuthenticated()
+        {
+            return Ok(new { authenticated = true });
         }
     }
 }

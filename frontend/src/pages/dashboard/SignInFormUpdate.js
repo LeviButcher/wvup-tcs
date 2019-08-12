@@ -42,6 +42,7 @@ const StyledReasonCheckboxes = styled(ReasonCheckboxes)`
 `;
 
 const putSignIn = signIn => callApi(`signIns/${signIn.id}`, 'PUT', signIn);
+const postSignIn = signIn => callApi(`signIns/admin/`, 'POST', signIn);
 
 const getStudentInfoWithEmail = email =>
   callApi(`signins/${email}/email`, 'GET', null);
@@ -66,23 +67,43 @@ const loadClassList = email =>
   getStudentInfoWithEmail(email)
     .then(ensureResponseCode(200))
     .then(unwrapToJSON)
-    .then(res => res.classSchedule)
     .catch(e => alert(e.message));
 
+const defaultData = {
+  email: '',
+  inTime: '',
+  outTime: '',
+  reasons: [],
+  courses: [],
+  tutoring: false
+};
+
+const crudTypes = {
+  create: 'create',
+  update: 'update'
+};
+
 // test email = mtmqbude26@wvup.edu
-const SignIn = ({ afterSuccessfulSubmit, data }) => {
+const SignIn = ({ data = defaultData, type = crudTypes.create }) => {
   const [reasons] = useQuery(queryReasons);
-  const [student] = useState(data);
+  const [email, setEmail] = useState(data.email);
+  const [student, setStudent] = useState(data);
   const [classes, setClasses] = useState(student.courses);
 
   useEffect(() => {
-    loadClassList(student.email).then(currentCourses => {
+    if (email === '') return;
+    loadClassList(email).then(studentInfo => {
       // Class loaded could have a repeat class in it, reduce to only unique classes
+      setStudent({ ...student, ...studentInfo });
       setClasses(
-        [...classes, ...currentCourses].reduce(reduceToUniqueClasses, [])
+        [...classes, ...studentInfo.classSchedule].reduce(
+          reduceToUniqueClasses,
+          []
+        )
       );
     });
-  }, [student]);
+  }, [email]);
+
   console.log(student);
   return (
     <FullScreenContainer>
@@ -102,25 +123,39 @@ const SignIn = ({ afterSuccessfulSubmit, data }) => {
             const signIn = {
               ...values,
               id: student.id,
-              personId: student.personId,
+              personId: student.studentID,
               semesterId: student.semesterId,
-              courses: values.courses.map(courseCRN => ({
-                courseId: courseCRN
-              })),
-              reasons: values.reasons.map(id => ({
-                reasonId: id
-              }))
+              courses: values.courses.map(courseCRN =>
+                classes.find(ele => ele.crn === courseCRN)
+              ),
+              reasons: values.reasons.map(id =>
+                reasons.find(ele => ele.id === id)
+              )
             };
+
             console.log(signIn);
-            putSignIn(signIn)
-              .then(ensureResponseCode(200))
-              .then(afterSuccessfulSubmit)
-              .then(() => {
-                alert('Successfuly updated');
-                window.history.back();
-              })
-              .catch(e => alert(e.message))
-              .finally(() => setSubmitting(false));
+            switch (type) {
+              case crudTypes.create:
+                return postSignIn(signIn)
+                  .then(ensureResponseCode(201))
+                  .then(() => {
+                    alert('Successfuly created');
+                    window.history.back();
+                  })
+                  .catch(e => alert(e.message))
+                  .finally(() => setSubmitting(false));
+              case crudTypes.update:
+                return putSignIn(signIn)
+                  .then(ensureResponseCode(200))
+                  .then(() => {
+                    alert('Successfuly updated');
+                    window.history.back();
+                  })
+                  .catch(e => alert(e.message))
+                  .finally(() => setSubmitting(false));
+              default:
+                return () => 'Failed';
+            }
           }}
         >
           {({
@@ -133,7 +168,9 @@ const SignIn = ({ afterSuccessfulSubmit, data }) => {
           }) => (
             <Form>
               <Header>Student Sign In</Header>
-              <p>Enter in Email to load classlist</p>
+              {type === crudTypes.create && (
+                <p>Enter in Email to load classlist</p>
+              )}
               {status && status.msg && <div>{status.msg}</div>}
               <Field
                 id="email"
@@ -143,10 +180,10 @@ const SignIn = ({ afterSuccessfulSubmit, data }) => {
                 label="Email"
                 onChange={e => {
                   handleChange(e);
-                  if (isWVUPEmail(e.target.value))
-                    loadClassList(e.target.value);
+                  console.log(e.target.value);
+                  if (isWVUPEmail(e.target.value)) setEmail(e.target.value);
                 }}
-                disabled
+                disabled={type !== crudTypes.create}
               />
               <Field
                 id="inTime"

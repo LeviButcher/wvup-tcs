@@ -12,9 +12,9 @@ import UserForm from './UserForm';
 import SuccessReport from './SuccessReport';
 import ReasonForm from './ReasonForm';
 import SignInLookup from './SignInLookup';
-import SignInForm from './SignInForm';
 import SignInFormUpdate from './SignInFormUpdate';
 import Welcome from './Welcome';
+import TeacherSignInFormUpdate from './TeacherSignInFormUpdate';
 
 export {
   DashboardLayout,
@@ -31,7 +31,7 @@ export {
   ReasonManagement,
   ReasonForm,
   SignInLookup,
-  SignInForm,
   SignInFormUpdate,
-  Welcome
+  Welcome,
+  TeacherSignInFormUpdate
 };

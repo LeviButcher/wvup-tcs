@@ -21,10 +21,32 @@ namespace tcs_service.Repos
 
         public async Task<SignIn> Add(SignIn signIn)
         {
-            if (!await SemesterExists(signIn.SemesterId))
+            await _db.Semesters.FindAsync(signIn.SemesterId);
+            if (signIn.SemesterId == default)
             {
-                await AddSemester(signIn.SemesterId);
+                signIn.SemesterId = (await _db.Semesters.LastAsync()).ID;
             }
+
+            signIn.Courses = signIn.Courses.Select(signInCourse =>
+            {
+                var tracked = _db.Courses.Find(signInCourse.Course.CRN);
+                if (tracked != null)
+                {
+                    signInCourse.CourseID = tracked.CRN;
+                }
+                return signInCourse;
+            }).ToList();
+
+            signIn.Reasons = signIn.Reasons.Select(signInReason =>
+            {
+                var tracked = _db.Reasons.Find(signInReason.Reason.ID);
+                if (tracked != null)
+                {
+                    signInReason.ReasonID = tracked.ID;
+                }
+                return signInReason;
+            }).ToList();
+
 
             await _db.AddAsync(signIn);
             await _db.SaveChangesAsync();
@@ -78,40 +100,20 @@ namespace tcs_service.Repos
 
         public async Task<SignIn> Update(SignIn signIn)
         {
-            var signInInDB = await _db.SignIns.Where(x => x.ID == signIn.ID)
-                .Include(x => x.Courses).Include(x => x.Reasons).SingleOrDefaultAsync();
+            var existingSignIn = await _db.SignIns.Include(x => x.Courses).Include(x => x.Reasons).FirstOrDefaultAsync(x => x.ID == signIn.ID);
+            _db.Entry(existingSignIn).CurrentValues.SetValues(signIn);
 
-            // All the stuff to no remove
-            var trackedCourses = signIn.Courses.Aggregate(new List<SignInCourse>(), (acc, curr) =>
-            {
-                var found = _db.SignInCourses.Any(x => x.CourseID == curr.CourseID);
-                if (found) return acc.Append(curr).ToList();
+            existingSignIn.Courses = signIn.Courses.Select(signInCourse =>
+                new SignInCourse() { SignInID = signIn.ID, CourseID = signInCourse.Course.CRN }
+            ).ToList();
 
-                return acc.Append(new SignInCourse()
-                {
-                    CourseID = curr.CourseID
-                }).ToList();
-            });
+            existingSignIn.Reasons = signIn.Reasons.Select(signInReason =>
+                new SignInReason() { SignInID = signIn.ID, ReasonID = signInReason.Reason.ID }
+            ).ToList();
 
-            var trackedReasons = signIn.Reasons.Aggregate(new List<SignInReason>(), (acc, curr) =>
-            {
-                var found = _db.SignInReasons.Any(x => x.ReasonID == curr.ReasonID);
-                if (found) return acc.Append(curr).ToList();
-
-                return acc.Append(new SignInReason()
-                {
-                    ReasonID = curr.ReasonID
-                }).ToList();
-            });
-            signInInDB.OutTime = signIn.OutTime;
-            signInInDB.InTime = signIn.InTime;
-            signInInDB.PersonId = signIn.PersonId;
-            signInInDB.Courses = trackedCourses;
-            signInInDB.Reasons = trackedReasons;
-
-            _db.SignIns.Update(signInInDB);
+            _db.SignIns.Update(existingSignIn);
             await _db.SaveChangesAsync();
-            return signInInDB;
+            return signIn;
         }
 
         public async Task<Course> AddCourse(Course course)
@@ -222,7 +224,7 @@ namespace tcs_service.Repos
         {
             if (await _db.SignIns.Where(x => x.PersonId == personId).AnyAsync())
             {
-                return await _db.SignIns.Include(x => x.Courses).Include(x => x.Reasons).Where(p => p.PersonId == personId).LastAsync();
+                return await _db.SignIns.Include(x => x.Courses).ThenInclude(x => x.Course).Include(x => x.Reasons).ThenInclude(x => x.Reason).Where(p => p.PersonId == personId).LastAsync();
             }
             return null;
         }
