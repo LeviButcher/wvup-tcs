@@ -64,7 +64,7 @@ namespace tcs_service.Controllers
             }
 
             var signIn = _mapper.Map<SignIn>(signInViewModel);
-            signIn.InTime = DateTime.Now;
+            signIn.InTime = DateTimeOffset.UtcNow;
 
             var recent = await GetMostRecentById(signIn.PersonId);
 
@@ -155,7 +155,7 @@ namespace tcs_service.Controllers
                 return BadRequest("You are not signed in");
             }
 
-            signIn.OutTime = DateTime.Now;
+            signIn.OutTime = DateTimeOffset.UtcNow;
             await _iRepo.Update(signIn);
             return Ok(signIn);
         }
@@ -180,7 +180,7 @@ namespace tcs_service.Controllers
                 return BadRequest("You are not signed in");
             }
 
-            signIn.OutTime = DateTime.Now;
+            signIn.OutTime = DateTimeOffset.UtcNow;
             await _iRepo.Update(signIn);
             return Ok(signIn);
         }
