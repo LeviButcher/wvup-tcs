@@ -12,6 +12,7 @@ using Newtonsoft.Json;
 using Quartz;
 using Quartz.Impl;
 using Quartz.Spi;
+using tcs_service.Controllers;
 using tcs_service.EF;
 using tcs_service.Helpers;
 using tcs_service.Repos;
@@ -73,15 +74,7 @@ namespace tcs_service
                     };
                 });
 
-            // Add Quartz services
-            services.AddSingleton<IJobFactory, SingletonJobFactory>();
-            services.AddSingleton<ISchedulerFactory, StdSchedulerFactory>();
-
-            // Add our job
-            services.AddSingleton<StudentSignOutJob>();
-            services.AddSingleton(new JobSchedule(
-                jobType: typeof(StudentSignOutJob),
-                cronExpression: "0/5 * * * * ?")); // runs one minute after midnight
+          // runs one minute after midnight
 
 
             services.AddScoped<IBannerService, MockBannerService>();
@@ -91,6 +84,18 @@ namespace tcs_service
             services.AddScoped<IReportsRepo, ReportsRepo>();
             services.AddScoped<IReasonRepo, ReasonRepo>();
             services.AddScoped<ILookupRepo, LookupRepo>();
+           
+            // Add Quartz services
+            services.AddSingleton<IJobFactory, JobFactory>();
+            services.AddSingleton<ISchedulerFactory, StdSchedulerFactory>();
+            services.AddSingleton<JobRunner>();
+            services.AddHostedService<QuartzHostedService>();
+
+            // Add our job
+            services.AddScoped<StudentSignOutJob>();
+            services.AddSingleton(new JobSchedule(
+                jobType: typeof(StudentSignOutJob),
+                cronExpression: "0 57 23 * * ?"));    // runs at 11:57pm every night
 
             services.AddMvc().AddJsonOptions(options => {
                 options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;

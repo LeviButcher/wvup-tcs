@@ -203,20 +203,15 @@ namespace tcs_service.Repos
             return semester.Entity;
         }
 
-        public async Task<IEnumerable<SignIn>> GetNullSignOuts()
+        public void UpdateNullSignOuts()
         {
             var signIns = _db.SignIns.Where(x => x.OutTime == null && x.InTime != null);
-            return await signIns.ToListAsync();
-        }
-
-        public async void UpdateNullSignOuts(IEnumerable<SignIn> signIns)
-        {
-            foreach(SignIn signIn in signIns)
+            foreach (SignIn signIn in signIns)
             {
                 signIn.OutTime = signIn.InTime.Value.AddHours(2);
-                _db.SignIns.Update(signIn);
-                await _db.SaveChangesAsync();
+                 _db.SignIns.Update(signIn);
             }
+             _db.SaveChanges();
         }
 
         public async Task<SignIn> GetMostRecentSignInByID(int id)
