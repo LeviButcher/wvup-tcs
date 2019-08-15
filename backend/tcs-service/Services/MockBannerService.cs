@@ -25,25 +25,19 @@ namespace tcs_service.Services
         }
 
 
-        public CourseWithGradeViewModel GetStudentGrade(int studentId, Course course, Department department)
+        public async Task<CourseWithGradeViewModel> GetStudentGrade(int studentId, int crn, int termCode)
         {
             var grades = Enum.GetValues(typeof(Grade));
 
-            var courseWithGrade = new CourseWithGradeViewModel();
-            courseWithGrade.CRN = course.CRN;
-            courseWithGrade.CourseName = course.CourseName;
-            courseWithGrade.DepartmentName = department.Name;
-            courseWithGrade.Grade = (Grade)new Random().Next(grades.Length);
+            var course = await _db.Courses.Include(x => x.Department).FirstAsync(x => x.CRN == crn);
 
-            return courseWithGrade;
-
-            //return new CourseWithGradeViewModel()
-            //{
-            //    CRN = course.CRN,
-            //    CourseName = course.CourseName,
-            //    DepartmentName = course.Department.Name,
-            //    Grade = (Grade)new Random().Next(grades.Length)
-            //};
+            return new CourseWithGradeViewModel()
+            {
+                CRN = course.CRN,
+                CourseName = course.CourseName,
+                DepartmentName = course.Department.Name,
+                Grade = (Grade)new Random().Next(grades.Length),
+            };
         }
 
         public DbSet<Person> PersonTable;
@@ -51,17 +45,17 @@ namespace tcs_service.Services
         StudentInfoViewModel studentInfoViewModel = new StudentInfoViewModel();
         TeacherInfoViewModel teacherInfoViewModel = new TeacherInfoViewModel();
 
-        public StudentInfoViewModel GetStudentInfoWithEmail(string studentEmail)
+        public async Task<StudentInfoViewModel> GetStudentInfoWithEmail(string studentEmail)
         {
-            return GetStudentInfo(studentInfoViewModel, studentEmail, -1);
+            return await GetStudentInfo(studentInfoViewModel, studentEmail, -1);
         }
 
-        public StudentInfoViewModel GetStudentInfoWithID(int studentID)
+        public async Task<StudentInfoViewModel> GetStudentInfoWithID(int studentID)
         {
-            return GetStudentInfo(studentInfoViewModel, " ", studentID);
+            return await GetStudentInfo(studentInfoViewModel, " ", studentID);
         }
 
-        private StudentInfoViewModel GetStudentInfo(StudentInfoViewModel student, String email, int id)
+        private async Task<StudentInfoViewModel> GetStudentInfo(StudentInfoViewModel student, String email, int id)
         {
             PersonTable = _db.Set<Person>();
             Person newStudent = null;
@@ -82,19 +76,19 @@ namespace tcs_service.Services
             student.studentID = newStudent.ID;
             student.semesterId = 201903;
 
-            return GetCourseInfo(student);
+            return await GetCourseInfo(student);
 
         }
 
-        private StudentInfoViewModel GetCourseInfo(StudentInfoViewModel studentInfoViewModel)
+        private async Task<StudentInfoViewModel> GetCourseInfo(StudentInfoViewModel studentInfoViewModel)
         {
             CourseTable = _db.Set<Course>();
 
             List<Course> schedule = new List<Course>();
-            Course first = CourseTable.Where(x => x.CRN == 1).Include(x => x.Department).First();
-            Course second = CourseTable.Where(x => x.CRN == 2).Include(x => x.Department).First();
-            Course third = CourseTable.Where(x => x.CRN == 3).Include(x => x.Department).First();
-            Course fourth = CourseTable.Where(x => x.CRN == 4).Include(x => x.Department).First();
+            Course first = await CourseTable.Where(x => x.CRN == 1).Include(x => x.Department).FirstAsync();
+            Course second = await CourseTable.Where(x => x.CRN == 2).Include(x => x.Department).FirstAsync();
+            Course third = await CourseTable.Where(x => x.CRN == 3).Include(x => x.Department).FirstAsync();
+            Course fourth = await CourseTable.Where(x => x.CRN == 4).Include(x => x.Department).FirstAsync();
             schedule.Add(first);
             schedule.Add(second);
             schedule.Add(third);
@@ -105,28 +99,28 @@ namespace tcs_service.Services
             return studentInfoViewModel;
         }
 
-        public TeacherInfoViewModel GetTeacherInfoWithEmail(string teacherEmail)
+        public async Task<TeacherInfoViewModel> GetTeacherInfoWithEmail(string teacherEmail)
         {
-            return GetTeacherInfo(teacherInfoViewModel, teacherEmail, -1);
+            return await GetTeacherInfo(teacherInfoViewModel, teacherEmail, -1);
         }
 
-        public TeacherInfoViewModel GetTeacherInfoWithID(int teacherID)
+        public async Task<TeacherInfoViewModel> GetTeacherInfoWithID(int teacherID)
         {
-            return GetTeacherInfo(teacherInfoViewModel, "", teacherID);
+            return await GetTeacherInfo(teacherInfoViewModel, "", teacherID);
         }
 
-        private TeacherInfoViewModel GetTeacherInfo(TeacherInfoViewModel teacher, String email, int id)
+        private async Task<TeacherInfoViewModel> GetTeacherInfo(TeacherInfoViewModel teacher, String email, int id)
         {
             PersonTable = _db.Set<Person>();
             Person newTeacher = null;
 
             if (id == -1)
             {
-                newTeacher = PersonTable.Where(x => x.Email == email).First();
+                newTeacher = await PersonTable.Where(x => x.Email == email).FirstAsync();
             }
             else
             {
-                newTeacher = PersonTable.Where(x => x.ID == id).First();
+                newTeacher = await PersonTable.Where(x => x.ID == id).FirstAsync();
             }
 
             teacher.teacherEmail = newTeacher.Email;

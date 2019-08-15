@@ -48,7 +48,7 @@ namespace tcs_service.Repos
                 result.Add(new WeeklyVisitsViewModel(startWeek, startWeek.Date.AddDays(6))
                 {
                     Count = await _db.SignIns.Where(x => x.InTime >= startWeek && x.InTime <= startWeek.AddDays(6)).CountAsync()
-                }) ;
+                });
                 startWeek = startWeek.AddDays(7);
             }
             return result;
@@ -96,7 +96,7 @@ namespace tcs_service.Repos
                          {
                              fullName = grp.Key.fullName,
                              teacherEmail = grp.Key.teacherEmail,
-                             totalHours = Math.Round(grp.Sum(x => x.totalHours/600000000) / 60, 2)
+                             totalHours = Math.Round(grp.Sum(x => x.totalHours / 600000000) / 60, 2)
                          };
 
             return await result.ToListAsync();
@@ -176,32 +176,32 @@ namespace tcs_service.Repos
         public async Task<List<CourseWithSuccessCountViewModel>> SuccessReport(int semesterId)
         {
             var studentCourses = from item in _db.SignIns
-                          from course in item.Courses
-                          where item.SemesterId == semesterId
-                          select new
-                          {
-                              item.PersonId,
-                              course.Course,
-                              course.Course.Department,
-                          };
+                                 from course in item.Courses
+                                 where item.SemesterId == semesterId
+                                 select new
+                                 {
+                                     item.PersonId,
+                                     course.Course,
+                                     course.Course.Department,
+                                 };
 
             List<CourseWithGradeViewModel> coursesWithGrades = new List<CourseWithGradeViewModel>();
 
-            foreach(var item in studentCourses.Distinct())
+            foreach (var item in studentCourses.Distinct())
             {
-                coursesWithGrades.Add( _bannerService.GetStudentGrade(item.PersonId, item.Course, item.Course.Department));
+                coursesWithGrades.Add(await _bannerService.GetStudentGrade(item.PersonId, item.Course.CRN, semesterId));
             }
 
             List<CourseWithSuccessCountViewModel> coursesWithSuccessCount = new List<CourseWithSuccessCountViewModel>();
 
-            foreach(var course in coursesWithGrades)
+            foreach (var course in coursesWithGrades)
             {
                 CourseWithSuccessCountViewModel successCount = null;
 
                 if (coursesWithSuccessCount.Any(x => x.CRN == course.CRN))
                 {
                     successCount = coursesWithSuccessCount.Where(x => x.CRN == course.CRN).First();
-                }               
+                }
                 if (successCount != null)
                 {
                     DetermineSuccess(course.Grade, successCount);
