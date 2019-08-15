@@ -16,16 +16,17 @@ const CoursesCheckboxes = ({ courses, errors }) => {
         <div style={{ color: 'red' }}>{errors && errors.courses}</div>
       </Header>
       <FieldGroup>
-        {courses.map(course => (
-          <Checkbox
-            key={course.crn}
-            id={course.crn}
-            type="checkbox"
-            name="courses"
-            label={course.shortName}
-            value={course.crn}
-          />
-        ))}
+        {courses &&
+          courses.map(course => (
+            <Checkbox
+              key={course.crn}
+              id={course.crn}
+              type="checkbox"
+              name="courses"
+              label={course.shortName}
+              value={course.crn}
+            />
+          ))}
       </FieldGroup>
     </>
   );

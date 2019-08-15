@@ -186,29 +186,29 @@ namespace tcs_service.Controllers
         }
 
         [HttpGet("{studentID}/id")]
-        public StudentInfoViewModel GetStudentInfoWithID([FromRoute] int studentID)
+        public async Task<StudentInfoViewModel> GetStudentInfoWithID([FromRoute] int studentID)
         {
-            return _iRepo.GetStudentInfoWithID(studentID);
+            return await _iRepo.GetStudentInfoWithID(studentID);
         }
 
         // GET: api/SignIns/student@wvup.edu/email
         [HttpGet("{studentEmail}/email")]
-        public StudentInfoViewModel GetStudentInfoWithEmail([FromRoute] string studentEmail)
+        public async Task<StudentInfoViewModel> GetStudentInfoWithEmail([FromRoute] string studentEmail)
         {
-            return _iRepo.GetStudentInfoWithEmail(studentEmail);
+            return await _iRepo.GetStudentInfoWithEmail(studentEmail);
         }
 
         [HttpGet("{teacherID}/teacher/id")]
-        public TeacherInfoViewModel GetTeacherInfoWithID([FromRoute] int teacherID)
+        public async Task<TeacherInfoViewModel> GetTeacherInfoWithID([FromRoute] int teacherID)
         {
-            return _iRepo.GetTeacherInfoWithID(teacherID);
+            return await _iRepo.GetTeacherInfoWithID(teacherID);
         }
 
         // GET: api/SignIns/teacher@wvup.edu/teacher/email
         [HttpGet("{teacherEmail}/teacher/email")]
-        public TeacherInfoViewModel GetTeacherInfoWithEmail([FromRoute] string teacherEmail)
+        public async Task<TeacherInfoViewModel> GetTeacherInfoWithEmail([FromRoute] string teacherEmail)
         {
-            return _iRepo.GetTeacherInfoWithEmail(teacherEmail);
+            return await _iRepo.GetTeacherInfoWithEmail(teacherEmail);
         }
 
         private async Task<SignIn> GetMostRecentById(int id)
