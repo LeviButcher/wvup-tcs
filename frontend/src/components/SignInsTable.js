@@ -47,45 +47,48 @@ const SignInRow = ({
     tutoring,
     type
   }
-}) => (
-  <tr>
-    <td>{email}</td>
-    <td>{fullName}</td>
-    <td align="center">
-      {new Date(inTime).toLocaleDateString('default', dateOptions)}
-    </td>
-    <td align="center">
-      {outTime
-        ? new Date(outTime).toLocaleDateString('default', dateOptions)
-        : 'Not signed out'}
-    </td>
-    <td align="center">
-      {outTime
-        ? new Date(outTime).getHours() - new Date(inTime).getHours()
-        : ''}
-    </td>
-    <td>{courses.map(course => course.shortName).join(', ')}</td>
-    <td>
-      {reasons
-        .map(reason => reason.name)
-        .concat([tutoring ? 'Tutoring' : null])
-        .concat([type === 1 ? 'Teacher Volunteering' : null])
-        .filter(x => x !== null)
-        .join(', ')}
-    </td>
-    <td style={{ display: 'flex', justifyContent: 'space-evenly' }}>
-      <Link
-        to={
-          type === 0
-            ? `/dashboard/signins/${id}`
-            : `/dashboard/signins/teacher/${id}`
-        }
-      >
-        <Gear />
-      </Link>
-      <Trashcan onClick={() => alert('Not implemented yet')} />
-    </td>
-  </tr>
-);
+}) => {
+  console.log(inTime);
+  return (
+    <tr>
+      <td>{email}</td>
+      <td>{fullName}</td>
+      <td align="center">
+        {new Date(inTime).toLocaleDateString(undefined, dateOptions)}
+      </td>
+      <td align="center">
+        {outTime
+          ? new Date(outTime).toLocaleDateString(undefined, dateOptions)
+          : 'Not signed out'}
+      </td>
+      <td align="center">
+        {outTime
+          ? new Date(outTime).getHours() - new Date(inTime).getHours()
+          : ''}
+      </td>
+      <td>{courses.map(course => course.shortName).join(', ')}</td>
+      <td>
+        {reasons
+          .map(reason => reason.name)
+          .concat([tutoring ? 'Tutoring' : null])
+          .concat([type === 1 ? 'Teacher Volunteering' : null])
+          .filter(x => x !== null)
+          .join(', ')}
+      </td>
+      <td style={{ display: 'flex', justifyContent: 'space-evenly' }}>
+        <Link
+          to={
+            type === 0
+              ? `/dashboard/signins/${id}`
+              : `/dashboard/signins/teacher/${id}`
+          }
+        >
+          <Gear />
+        </Link>
+        <Trashcan onClick={() => alert('Not implemented yet')} />
+      </td>
+    </tr>
+  );
+};
 
 export default SignInsTable;

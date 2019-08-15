@@ -26,10 +26,10 @@ namespace tcs_service.Models.ViewModels
         public string SemesterName { get; set; }
 
         [DataType(DataType.DateTime)]
-        public DateTime? InTime { get; set; }
+        public DateTimeOffset? InTime { get; set; }
 
         [DataType(DataType.DateTime)]
-        public DateTime? OutTime { get; set; }
+        public DateTimeOffset? OutTime { get; set; }
 
         public bool Tutoring { get; set; }
 

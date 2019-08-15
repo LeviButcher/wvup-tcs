@@ -24,10 +24,10 @@ namespace tcs_service.Models
         [ForeignKey(nameof(SemesterId))]
         public Semester Semester { get; set; }
 
-        private DateTime? inTime;
+        private DateTimeOffset? inTime;
 
         [Required]
-        public DateTime? InTime
+        public DateTimeOffset? InTime
         {
             get
             {
@@ -37,8 +37,8 @@ namespace tcs_service.Models
             set => inTime = value;
         }
 
-        private DateTime? outTime;
-        public DateTime? OutTime
+        private DateTimeOffset? outTime;
+        public DateTimeOffset? OutTime
         {
             get
             {
