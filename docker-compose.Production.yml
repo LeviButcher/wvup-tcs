@@ -9,8 +9,7 @@ services:
       - "80:80"
 
   tcs-service:
-    build:
-      context: ./backend/tcs-service
+    image: lcbutch/tcs-service:master
     depends_on:
       - "tcs-db"
     ports:
