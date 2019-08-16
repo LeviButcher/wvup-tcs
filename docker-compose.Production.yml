@@ -2,7 +2,7 @@ version: "3.7"
 
 services:
   tcs-front:
-    image: lcbutch/tcs-front:master
+    image: lcbutch/tcs-front:prod
     depends_on:
       - "tcs-service"
     ports:
