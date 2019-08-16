@@ -209,9 +209,9 @@ namespace tcs_service.Repos
             foreach (SignIn signIn in signIns)
             {
                 signIn.OutTime = signIn.InTime.Value.AddHours(2);
-                 _db.SignIns.Update(signIn);
+                _db.SignIns.Update(signIn);
             }
-             _db.SaveChanges();
+            _db.SaveChanges();
         }
 
         public async Task<SignIn> GetMostRecentSignInByID(int id)
@@ -249,13 +249,28 @@ namespace tcs_service.Repos
                 FirstName = result.firstName,
                 ID = result.studentID
             };
-            _db.People.Update(student);
-            result.classSchedule.ForEach(course =>
+            await AddOrDoNothingIfExistsPerson(student);
+
+            result.classSchedule.ForEach(async course =>
             {
-                _db.Courses.Update(course);
+                await AddOrDoNothingIfExistsCourse(course);
             });
-            await _db.SaveChangesAsync();
+
             return result;
+        }
+
+        private async Task AddOrDoNothingIfExistsPerson(Person person)
+        {
+            if (await _db.People.AnyAsync(x => x.ID == person.ID)) return;
+            await _db.People.AddAsync(person);
+            await _db.SaveChangesAsync();
+        }
+
+        private async Task AddOrDoNothingIfExistsCourse(Course course)
+        {
+            if (await _db.Courses.AnyAsync(x => x.CRN == course.CRN)) return;
+            await _db.Courses.AddAsync(course);
+            await _db.SaveChangesAsync();
         }
 
         public async Task<StudentInfoViewModel> GetStudentInfoWithID(int studentID)
@@ -268,42 +283,42 @@ namespace tcs_service.Repos
                 FirstName = result.firstName,
                 ID = result.studentID
             };
-            _db.People.Update(student);
-            result.classSchedule.ForEach(course =>
+            await AddOrDoNothingIfExistsPerson(student);
+
+            result.classSchedule.ForEach(async course =>
             {
-                _db.Courses.Update(course);
+                await AddOrDoNothingIfExistsCourse(course);
             });
-            await _db.SaveChangesAsync();
             return result;
         }
 
         public async Task<TeacherInfoViewModel> GetTeacherInfoWithEmail(string teacherEmail)
         {
             var result = await _bannerService.GetTeacherInfoWithEmail(teacherEmail);
-            var student = new Person()
+            var teacher = new Person()
             {
                 Email = result.teacherEmail,
                 LastName = result.lastName,
                 FirstName = result.firstName,
-                ID = result.teacherID
+                ID = result.teacherID,
+                PersonType = PersonType.Teacher
             };
-            _db.People.Update(student);
-            await _db.SaveChangesAsync();
+            await AddOrDoNothingIfExistsPerson(teacher);
             return result;
         }
 
         public async Task<TeacherInfoViewModel> GetTeacherInfoWithID(int teacherID)
         {
             var result = await _bannerService.GetTeacherInfoWithID(teacherID);
-            var student = new Person()
+            var teacher = new Person()
             {
                 Email = result.teacherEmail,
                 LastName = result.lastName,
                 FirstName = result.firstName,
-                ID = result.teacherID
+                ID = result.teacherID,
+                PersonType = PersonType.Teacher
             };
-            _db.People.Update(student);
-            await _db.SaveChangesAsync();
+            await AddOrDoNothingIfExistsPerson(teacher);
             return result;
         }
     }
