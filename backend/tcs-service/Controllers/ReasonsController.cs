@@ -54,9 +54,9 @@ namespace tcs_service.Controllers
         }
 
         [HttpGet("active")]
-        public IEnumerable<Reason> GetActive()
+        public IActionResult GetActive()
         {
-            return  _iRepo.GetActive();
+            return Ok(_iRepo.GetActive());
         }
 
         [HttpPost]
