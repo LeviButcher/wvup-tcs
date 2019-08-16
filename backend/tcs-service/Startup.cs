@@ -11,12 +11,17 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
+using Quartz;
+using Quartz.Impl;
+using Quartz.Spi;
+using tcs_service.Controllers;
 using tcs_service.EF;
 using tcs_service.Helpers;
 using tcs_service.Repos;
 using tcs_service.Repos.Interfaces;
 using tcs_service.Services;
 using tcs_service.Services.Interfaces;
+using tcs_service.Services.ScheduledTasks;
 
 namespace tcs_service
 {
@@ -71,10 +76,12 @@ namespace tcs_service
                     };
                 });
 
+
             if (!Environment.IsDevelopment())
             {
                 var bannerAuth = Configuration["Banner:User"] + ":" + Configuration["Banner:Password"];
                 var encodedAuth = bannerAuth.ToBase64();
+
 
                 services.AddHttpClient("banner", c =>
                 {
@@ -94,6 +101,18 @@ namespace tcs_service
             services.AddScoped<IReportsRepo, ReportsRepo>();
             services.AddScoped<IReasonRepo, ReasonRepo>();
             services.AddScoped<ILookupRepo, LookupRepo>();
+           
+            // Add Quartz services
+            services.AddSingleton<IJobFactory, JobFactory>();
+            services.AddSingleton<ISchedulerFactory, StdSchedulerFactory>();
+            services.AddSingleton<JobRunner>();
+            services.AddHostedService<QuartzHostedService>();
+
+            // Add our job
+            services.AddScoped<StudentSignOutJob>();
+            services.AddSingleton(new JobSchedule(
+                jobType: typeof(StudentSignOutJob),
+                cronExpression: "0 57 23 * * ?"));    // runs at 11:57pm every night
 
             services.AddMvc().AddJsonOptions(options =>
             {
