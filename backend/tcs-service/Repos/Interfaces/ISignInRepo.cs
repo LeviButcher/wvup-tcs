@@ -14,13 +14,13 @@ namespace tcs_service.Repos.Interfaces
 
         Task<SignIn> Update(SignIn signIn);
 
-        StudentInfoViewModel GetStudentInfoWithID(int studentID);
+        Task<StudentInfoViewModel> GetStudentInfoWithID(int studentID);
 
-        StudentInfoViewModel GetStudentInfoWithEmail(string studentEmail);
+        Task<StudentInfoViewModel> GetStudentInfoWithEmail(string studentEmail);
 
-        TeacherInfoViewModel GetTeacherInfoWithID(int teacherID);
+        Task<TeacherInfoViewModel> GetTeacherInfoWithID(int teacherID);
 
-        TeacherInfoViewModel GetTeacherInfoWithEmail(string teacherEmail);
+        Task<TeacherInfoViewModel> GetTeacherInfoWithEmail(string teacherEmail);
 
         Task<Course> AddCourse(Course course);
 

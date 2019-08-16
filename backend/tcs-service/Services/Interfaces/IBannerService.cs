@@ -1,20 +1,19 @@
-﻿using tcs_service.Models;
+﻿using System.Threading.Tasks;
+using tcs_service.Models;
 using tcs_service.Models.ViewModels;
 
 namespace tcs_service.Services.Interfaces
 {
     public interface IBannerService
     {
-        CourseWithGradeViewModel GetStudentGrade(int studentId, Course course, Department department);
+        Task<CourseWithGradeViewModel> GetStudentGrade(int studentId, int crn, int termCode);
 
-        StudentInfoViewModel GetStudentInfoWithEmail(string studentEmail);
+        Task<StudentInfoViewModel> GetStudentInfoWithEmail(string studentEmail);
 
-        StudentInfoViewModel GetStudentInfoWithID(int studentID);
+        Task<StudentInfoViewModel> GetStudentInfoWithID(int studentID);
 
-        TeacherInfoViewModel GetTeacherInfoWithEmail(string teacherEmail);
+        Task<TeacherInfoViewModel> GetTeacherInfoWithEmail(string teacherEmail);
 
-        TeacherInfoViewModel GetTeacherInfoWithID(int teacherID);
-
-        
+        Task<TeacherInfoViewModel> GetTeacherInfoWithID(int teacherID);
     }
 }

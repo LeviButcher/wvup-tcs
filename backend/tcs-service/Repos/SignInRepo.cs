@@ -239,24 +239,72 @@ namespace tcs_service.Repos
             return null;
         }
 
-        public StudentInfoViewModel GetStudentInfoWithEmail(string studentEmail)
+        public async Task<StudentInfoViewModel> GetStudentInfoWithEmail(string studentEmail)
         {
-            return _bannerService.GetStudentInfoWithEmail(studentEmail);
+            var result = await _bannerService.GetStudentInfoWithEmail(studentEmail);
+            var student = new Person()
+            {
+                Email = result.studentEmail,
+                LastName = result.lastName,
+                FirstName = result.firstName,
+                ID = result.studentID
+            };
+            _db.People.Update(student);
+            result.classSchedule.ForEach(course =>
+            {
+                _db.Courses.Update(course);
+            });
+            await _db.SaveChangesAsync();
+            return result;
         }
 
-        public StudentInfoViewModel GetStudentInfoWithID(int studentID)
+        public async Task<StudentInfoViewModel> GetStudentInfoWithID(int studentID)
         {
-            return _bannerService.GetStudentInfoWithID(studentID);
+            var result = await _bannerService.GetStudentInfoWithID(studentID);
+            var student = new Person()
+            {
+                Email = result.studentEmail,
+                LastName = result.lastName,
+                FirstName = result.firstName,
+                ID = result.studentID
+            };
+            _db.People.Update(student);
+            result.classSchedule.ForEach(course =>
+            {
+                _db.Courses.Update(course);
+            });
+            await _db.SaveChangesAsync();
+            return result;
         }
 
-        public TeacherInfoViewModel GetTeacherInfoWithEmail(string teacherEmail)
+        public async Task<TeacherInfoViewModel> GetTeacherInfoWithEmail(string teacherEmail)
         {
-            return _bannerService.GetTeacherInfoWithEmail(teacherEmail);
+            var result = await _bannerService.GetTeacherInfoWithEmail(teacherEmail);
+            var student = new Person()
+            {
+                Email = result.teacherEmail,
+                LastName = result.lastName,
+                FirstName = result.firstName,
+                ID = result.teacherID
+            };
+            _db.People.Update(student);
+            await _db.SaveChangesAsync();
+            return result;
         }
 
-        public TeacherInfoViewModel GetTeacherInfoWithID(int teacherID)
+        public async Task<TeacherInfoViewModel> GetTeacherInfoWithID(int teacherID)
         {
-            return _bannerService.GetTeacherInfoWithID(teacherID);
+            var result = await _bannerService.GetTeacherInfoWithID(teacherID);
+            var student = new Person()
+            {
+                Email = result.teacherEmail,
+                LastName = result.lastName,
+                FirstName = result.firstName,
+                ID = result.teacherID
+            };
+            _db.People.Update(student);
+            await _db.SaveChangesAsync();
+            return result;
         }
     }
 }

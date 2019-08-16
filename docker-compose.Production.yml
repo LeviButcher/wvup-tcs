@@ -2,28 +2,25 @@ version: "3.7"
 
 services:
   tcs-front:
-    image: lcbutch/tcs-front:${TAG}
+    image: lcbutch/tcs-front:prod
     depends_on:
-      - tcs-service
+      - "tcs-service"
     ports:
       - "80:80"
 
   tcs-service:
-    image: lcbutch/tcs-service:${TAG}
+    image: lcbutch/tcs-service:master
     depends_on:
-      - tcs-db
+      - "tcs-db"
     ports:
       - "8080:80"
-    environment:
-      DB:connectionString: "Server=tcs-db;Database=tcs;User Id=SA;Password=Develop@90"
-      AppSettings:Secret: SuperSecretkeyThatNooneWillEverknow
-      ASPNETCORE_ENVIRONMENT: DEVELOPMENT
+    env_file:
+      - .env
 
   tcs-db:
     image: microsoft/mssql-server-linux
-    environment:
-      - ACCEPT_EULA=Y
-      - SA_PASSWORD=Develop@90
+    env_file:
+      - .env
     expose:
       - "1443"
     volumes:

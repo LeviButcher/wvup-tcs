@@ -1,4 +1,6 @@
-﻿using System.Text;
+﻿using System;
+using System.Net.Http.Headers;
+using System.Text;
 using AutoMapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
@@ -25,16 +27,16 @@ namespace tcs_service
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
+        readonly string AllowAnywhere = "_AllowAnywhere";
+        public IConfiguration Configuration { get; }
+        private readonly IHostingEnvironment Environment;
+
+        public Startup(IConfiguration configuration, IHostingEnvironment Environment)
         {
-            Configuration = configuration;
+            this.Environment = Environment;
+            this.Configuration = configuration;
         }
 
-        readonly string AllowAnywhere = "_AllowAnywhere";
-
-        public IConfiguration Configuration { get; }
-
-        // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddCors(options =>
@@ -74,12 +76,27 @@ namespace tcs_service
                     };
                 });
 
-          // runs one minute after midnight
+
+            if (!Environment.IsDevelopment())
+            {
+                var bannerAuth = Configuration["Banner:User"] + ":" + Configuration["Banner:Password"];
+                var encodedAuth = bannerAuth.ToBase64();
 
 
-            services.AddScoped<IBannerService, MockBannerService>();
-            services.AddScoped<IClassTourRepo, ClassTourRepo> ();
-            services.AddScoped<IUserRepo, UserRepo> ();
+                services.AddHttpClient("banner", c =>
+                {
+                    c.BaseAddress = new Uri(Configuration["Banner:api"]);
+                    c.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", encodedAuth);
+                });
+                services.AddScoped<IBannerService, LiveBannerService>();
+            }
+            else
+            {
+                services.AddScoped<IBannerService, MockBannerService>();
+            }
+
+            services.AddScoped<IClassTourRepo, ClassTourRepo>();
+            services.AddScoped<IUserRepo, UserRepo>();
             services.AddScoped<ISignInRepo, SignInRepo>();
             services.AddScoped<IReportsRepo, ReportsRepo>();
             services.AddScoped<IReasonRepo, ReasonRepo>();
@@ -97,22 +114,24 @@ namespace tcs_service
                 jobType: typeof(StudentSignOutJob),
                 cronExpression: "0 57 23 * * ?"));    // runs at 11:57pm every night
 
-            services.AddMvc().AddJsonOptions(options => {
+            services.AddMvc().AddJsonOptions(options =>
+            {
                 options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
             })
-            .SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
-            
+                .SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+
             services.AddDbContext<TCSContext>(options =>
                options.UseSqlServer(Configuration["DB:connectionString"]));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, TCSContext db)
+        public void Configure(IApplicationBuilder app, TCSContext db)
         {
 
-            if (env.IsDevelopment())
+            if (Environment.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+                DbInitializer.InitializeData(db);
             }
             else
             {
@@ -120,8 +139,6 @@ namespace tcs_service
                 app.UseHsts();
             }
             app.UseCors(AllowAnywhere);
-
-            DbInitializer.InitializeData(db);
 
             app.UseAuthentication();
 

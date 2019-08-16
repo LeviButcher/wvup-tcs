@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace tcs_service.Models.ViewModels
+﻿namespace tcs_service.Models.ViewModels
 {
     public class CourseWithGradeViewModel
     {
@@ -19,12 +14,12 @@ namespace tcs_service.Models.ViewModels
 
 public enum Grade
 {
-    A=0,
-    B=1,
-    C=2,
-    I=3,
-    D=4,
-    F=5,
-    W=6,
-    FIW=7
+    A = 0,
+    B = 1,
+    C = 2,
+    I = 3,
+    D = 4,
+    F = 5,
+    W = 6,
+    FIW = 7
 }
