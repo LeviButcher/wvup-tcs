@@ -1,12 +1,12 @@
 import React from 'react';
-import { Router, navigate } from '@reach/router';
+import { Router } from '@reach/router';
 import { ThemeProvider } from 'styled-components';
 import {
   KioskLayout,
   Home,
   SignOut,
   SignInTeacher,
-  SignInForm
+  SignInStudent
 } from './pages/kiosk';
 import {
   DashboardLayout,
@@ -41,13 +41,7 @@ function App() {
         <Router>
           <KioskLayout path="/">
             <Home path="/" />
-            <SignInForm
-              path="/signin"
-              afterSuccessfulSubmit={() => {
-                alert('You have signed in! ');
-                navigate('/');
-              }}
-            />
+            <SignInStudent path="/signin/*" />
             <SignOut path="/signout" />
             <SignInTeacher path="/signin/teacher" />
             <NotFound default />

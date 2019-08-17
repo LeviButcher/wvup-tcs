@@ -133,7 +133,6 @@ const SignIn = ({ data = defaultData, type = crudTypes.create }) => {
               )
             };
 
-            console.log(signIn);
             switch (type) {
               case crudTypes.create:
                 return postSignIn(signIn)
