@@ -13,7 +13,7 @@ const loadingReducer = (currState, action) => {
       return { loading: false, data: action.data };
     }
     case loadingStates.error: {
-      return { loading: false, data: action.errors };
+      return { loading: false, errors: action.errors };
     }
     default: {
       return currState;

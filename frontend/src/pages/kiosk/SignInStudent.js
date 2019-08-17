@@ -44,7 +44,6 @@ const StudentSignInForm = ({
   const [loading, { body: reasons, headers }, errors] = useApiWithHeaders(
     'reasons/active'
   );
-  console.log(studentInfo);
   return (
     <>
       <h4>Welcome, {`${studentInfo.firstName} ${studentInfo.lastName}`}</h4>
