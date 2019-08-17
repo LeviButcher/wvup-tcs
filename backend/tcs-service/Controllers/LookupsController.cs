@@ -93,5 +93,11 @@ namespace tcs_service.Controllers
 
             return Ok(page.data);
         }
+
+        [HttpGet("semester/{semesterId:int}")]
+        public async Task<ActionResult> Semester(int semesterId)
+        {
+            return Ok(await _iRepo.GetBySemester(semesterId));
+        }
     }
 }
