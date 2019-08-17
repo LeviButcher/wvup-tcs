@@ -48,12 +48,22 @@ const SignInLookup = ({ navigate }) => {
       <div>
         <Card>
           <h3>Additional Actions</h3>
-          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+          <div
+            style={{
+              display: 'grid',
+              justifyContent: 'space-between',
+              gridTemplateColumns: 'auto auto',
+              gridGap: '10px'
+            }}
+          >
             <Link to="/dashboard/signins/create">
               <Button align="left">Create Student Sign In</Button>
             </Link>
             <Link to="/dashboard/signins/teacher/create">
               <Button align="left">Create Teacher Sign In</Button>
+            </Link>
+            <Link to="/dashboard/signins/semester">
+              <Button align="left">Download Semesters Signins</Button>
             </Link>
           </div>
         </Card>

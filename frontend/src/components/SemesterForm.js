@@ -25,7 +25,7 @@ const SemesterForm = ({ onSubmit, name, initialValues, ...props }) => {
   return (
     <Card {...props}>
       <Header>{name}</Header>
-      <p>Choose Semester to create a report for</p>
+      <p>Choose Semester to query for</p>
       <Formik
         onSubmit={onSubmit}
         validationSchema={semesterSchema}

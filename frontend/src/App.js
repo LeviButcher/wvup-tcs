@@ -25,7 +25,8 @@ import {
   ReasonForm,
   SignInLookup,
   SignInFormUpdate,
-  Welcome
+  Welcome,
+  SemesterSignIns
 } from './pages/dashboard';
 import Theme from './theme.json';
 import NotFound from './pages/NotFound';
@@ -56,6 +57,7 @@ function App() {
               <Welcome path="/" />
               <SignInLookup path="/signins/*" />
               <SignInFormUpdate path="/signins/create" type="create" />
+              <SemesterSignIns path="/signins/semester/*" />
               <TeacherSignInFormUpdate
                 path="/signins/teacher/create"
                 type="create"
