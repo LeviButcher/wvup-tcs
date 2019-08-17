@@ -27,15 +27,7 @@ namespace tcs_service.Controllers
 
         [HttpGet]
         [Produces(typeof(DbSet<SignIn>))]
-        public IActionResult GetSignIn()
-        {
-            var results = new ObjectResult(_iRepo.GetAll())
-            {
-                StatusCode = (int)HttpStatusCode.OK
-            };
-
-            return results;
-        }
+        public IActionResult GetSignIn() => Ok(_iRepo.GetAll());
 
         [HttpGet("{id}")]
         [Produces(typeof(SignInViewModel))]
@@ -187,29 +179,29 @@ namespace tcs_service.Controllers
         }
 
         [HttpGet("{studentID}/id")]
-        public async Task<StudentInfoViewModel> GetStudentInfoWithID([FromRoute] int studentID)
+        public async Task<IActionResult> GetStudentInfoWithID([FromRoute] int studentID)
         {
-            return await _iRepo.GetStudentInfoWithID(studentID);
+            return Ok(await _iRepo.GetStudentInfoWithID(studentID));
         }
 
         // GET: api/SignIns/student@wvup.edu/email
         [HttpGet("{studentEmail}/email")]
-        public async Task<StudentInfoViewModel> GetStudentInfoWithEmail([FromRoute] string studentEmail)
+        public async Task<IActionResult> GetStudentInfoWithEmail([FromRoute] string studentEmail)
         {
-            return await _iRepo.GetStudentInfoWithEmail(studentEmail);
+            return Ok(await _iRepo.GetStudentInfoWithEmail(studentEmail));
         }
 
         [HttpGet("{teacherID}/teacher/id")]
-        public async Task<TeacherInfoViewModel> GetTeacherInfoWithID([FromRoute] int teacherID)
+        public async Task<IActionResult> GetTeacherInfoWithID([FromRoute] int teacherID)
         {
-            return await _iRepo.GetTeacherInfoWithID(teacherID);
+            return Ok(await _iRepo.GetTeacherInfoWithID(teacherID));
         }
 
         // GET: api/SignIns/teacher@wvup.edu/teacher/email
         [HttpGet("{teacherEmail}/teacher/email")]
-        public async Task<TeacherInfoViewModel> GetTeacherInfoWithEmail([FromRoute] string teacherEmail)
+        public async Task<IActionResult> GetTeacherInfoWithEmail([FromRoute] string teacherEmail)
         {
-            return await _iRepo.GetTeacherInfoWithEmail(teacherEmail);
+            return Ok(await _iRepo.GetTeacherInfoWithEmail(teacherEmail));
         }
 
         private async Task<SignIn> GetMostRecentById(int id)

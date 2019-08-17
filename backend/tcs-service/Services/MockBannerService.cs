@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using tcs_service.EF;
+using tcs_service.Helpers;
 using tcs_service.Models;
 using tcs_service.Models.ViewModels;
 using tcs_service.Services.Interfaces;
@@ -63,11 +64,15 @@ namespace tcs_service.Services
 
             if (id == -1)
             {
-                newStudent = PersonTable.Where(x => x.Email == email).First();
+                newStudent = await PersonTable.Where(x => x.Email == email).FirstOrDefaultAsync();
             }
             else
             {
-                newStudent = PersonTable.Where(x => x.ID == id).First();
+                newStudent = await PersonTable.Where(x => x.ID == id).FirstOrDefaultAsync();
+            }
+            if (newStudent == null)
+            {
+                throw new TCSException("Student information could not be found");
             }
 
             student.studentEmail = newStudent.Email;
@@ -116,11 +121,16 @@ namespace tcs_service.Services
 
             if (id == -1)
             {
-                newTeacher = await PersonTable.Where(x => x.Email == email).FirstAsync();
+                newTeacher = await PersonTable.Where(x => x.Email == email).FirstOrDefaultAsync();
             }
             else
             {
-                newTeacher = await PersonTable.Where(x => x.ID == id).FirstAsync();
+                newTeacher = await PersonTable.Where(x => x.ID == id).FirstOrDefaultAsync();
+            }
+
+            if (newTeacher == null)
+            {
+                throw new TCSException("Teacher could not be found");
             }
 
             teacher.teacherEmail = newTeacher.Email;

@@ -2,22 +2,17 @@ import React from 'react';
 import { Router, navigate } from '@reach/router';
 import styled from 'styled-components';
 import ScaleLoader from 'react-spinners/ScaleLoader';
-import { Formik, Form, Field } from 'formik';
-import { pipe } from 'ramda';
-import { Card, Input, Button } from '../../ui';
-import { callApi, unwrapToJSON, ensureResponseCode } from '../../utils';
+import { Formik, Form } from 'formik';
+import { Card, Button } from '../../ui';
+import { callApi, ensureResponseCode } from '../../utils';
 import CoursesCheckboxes from '../../components/CoursesCheckboxes';
 import ReasonCheckboxes from '../../components/ReasonCheckboxes';
 import LoadingContent from '../../components/LoadingContent';
 import useApiWithHeaders from '../../hooks/useApiWithHeaders';
 import SignInSchema from '../../schemas/SignInFormScema';
+import EmailOrCardSwipeForm from '../../components/EmailOrCardSwipeForm';
 
 const postSignIn = callApi(`signins/`, 'POST');
-
-const getStudentInfoWithEmail = email =>
-  callApi(`signins/${email}/email`, 'GET', null);
-
-const isWVUPEmail = email => email.match(/^[A-Z0-9._%+-]+@wvup.edu$/i);
 
 // test email = mtmqbude26@wvup.edu
 const SignInStudent = ({ navigate }) => {
@@ -36,50 +31,6 @@ const SignInStudent = ({ navigate }) => {
         </Router>
       </Card>
     </FullScreenContainer>
-  );
-};
-
-// email or listen for card swipe, check banner on submit, go to next
-// swipe email make auto submit
-// show errors
-// add validation schema
-const EmailOrCardSwipeForm = ({ afterValidSubmit }) => {
-  return (
-    <Formik
-      onSubmit={({ email, id }, { setSubmitting }) => {
-        getStudentInfoWithEmail(email)
-          .then(ensureResponseCode(200))
-          .then(unwrapToJSON)
-          .then(afterValidSubmit)
-          .finally(() => setSubmitting(false));
-      }}
-      initialValues={{ email: '', id: '' }}
-    >
-      {({ isSubmitting, isValid }) => (
-        <Form>
-          <h4>Please enter email or swipe card</h4>
-          <Field
-            id="email"
-            type="text"
-            name="email"
-            component={Input}
-            label="Email"
-          />
-          {isSubmitting && <h5>Getting Student information...</h5>}
-          <ScaleLoader
-            sizeUnit="px"
-            size={150}
-            loading={isSubmitting}
-            align="center"
-          />
-          {!isSubmitting && (
-            <Button type="Submit" disabled={!isValid} align="right">
-              Submit
-            </Button>
-          )}
-        </Form>
-      )}
-    </Formik>
   );
 };
 
