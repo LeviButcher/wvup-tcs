@@ -57,7 +57,7 @@ namespace tcs_service.Services
 
         private async Task<StudentInfoViewModel> GetStudentInfo(StudentInfoViewModel student, String email, int id)
         {
-            PersonTable = _db.Set<Person>();
+            PersonTable = _db.People;
             Person newStudent = null;
 
 

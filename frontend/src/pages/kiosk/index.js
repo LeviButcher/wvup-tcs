@@ -2,6 +2,6 @@ import KioskLayout from './Layout';
 import Home from './Home';
 import SignOut from './SignOut';
 import SignInTeacher from './SignInTeacher';
-import SignInForm from './SignInForm';
+import SignInStudent from './SignInStudent';
 
-export { KioskLayout, Home, SignOut, SignInTeacher, SignInForm };
+export { KioskLayout, Home, SignOut, SignInTeacher, SignInStudent };
