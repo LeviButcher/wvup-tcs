@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore.Query;
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using tcs_service.EF;
@@ -111,5 +112,20 @@ namespace tcs_service.Repos
                     Type = x.Person.PersonType
                 });
         }
+
+        public async Task<List<SignInSpreadSheetViewModel>> GetBySemester(int semesterId)
+            => await _db.SignIns.Include(x => x.Person).Include(x => x.Courses)
+                        .ThenInclude(x => x.Course).Include(x => x.Reasons).ThenInclude(x => x.Reason)
+                        .Where(x => x.SemesterId == semesterId)
+                        .Select(x => new SignInSpreadSheetViewModel(x.Person.PersonType, x.Courses.Select(c => c.Course), x.Reasons.Select(r => r.Reason), x.Tutoring)
+                        {
+                            Email = x.Person.Email,
+                            InTime = x.InTime,
+                            LastName = x.Person.LastName,
+                            FirstName = x.Person.FirstName,
+                            OutTime = x.OutTime,
+                            WVUPId = x.Person.ID,
+                        })
+                        .ToListAsync();
     }
 }
