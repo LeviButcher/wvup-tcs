@@ -15,6 +15,7 @@ import SignInLookup from './SignInLookup';
 import SignInFormUpdate from './SignInFormUpdate';
 import Welcome from './Welcome';
 import TeacherSignInFormUpdate from './TeacherSignInFormUpdate';
+import SemesterSignIns from './SemesterSignIns';
 
 export {
   DashboardLayout,
@@ -33,5 +34,6 @@ export {
   SignInLookup,
   SignInFormUpdate,
   Welcome,
-  TeacherSignInFormUpdate
+  TeacherSignInFormUpdate,
+  SemesterSignIns
 };
