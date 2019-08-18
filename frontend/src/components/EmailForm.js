@@ -12,7 +12,7 @@ const emailSchema = Yup.object().shape({
     .required('Email is required')
 });
 
-const EmailForm = ({ title, onSubmit }) => (
+const EmailForm = ({ title, onSubmit, errors }) => (
   <Card>
     <Link to="/">Go Back</Link>
     <Formik
@@ -23,9 +23,8 @@ const EmailForm = ({ title, onSubmit }) => (
       {({ isSubmitting, isValid, status }) => (
         <Form>
           <Header>{title}</Header>
-          {status && status.msg && (
-            <div style={{ color: 'red' }}>{status.msg}</div>
-          )}
+          {status && status.msg && <p style={{ color: 'red' }}>{status.msg}</p>}
+          {errors && <p style={{ color: 'red' }}>{errors.message}</p>}
           <Field
             id="email"
             type="email"
