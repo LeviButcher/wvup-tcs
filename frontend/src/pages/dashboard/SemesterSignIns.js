@@ -34,7 +34,10 @@ const SemesterResults = ({ semester }) => {
       <LoadingContent data={data} loading={loading} errors={errors}>
         <h1>There were {data.body.length} signins during this semester</h1>
         <h2>
-          <CSVLink data={data.body} filename={`semester-${semester}-signins`}>
+          <CSVLink
+            data={data.body}
+            filename={`semester-${semester}-signins.csv`}
+          >
             Download Now
           </CSVLink>
         </h2>
