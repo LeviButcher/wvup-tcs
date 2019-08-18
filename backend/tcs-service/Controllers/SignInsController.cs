@@ -14,6 +14,7 @@ using tcs_service.Repos.Interfaces;
 namespace tcs_service.Controllers
 {
     [Route("api/[controller]")]
+    [Authorize]
     [ApiController]
     public class SignInsController : ControllerBase
     {
@@ -49,6 +50,7 @@ namespace tcs_service.Controllers
             return Ok(signIn);
         }
 
+        [AllowAnonymous]
         [HttpPost]
         public async Task<IActionResult> PostSignIn([FromBody] SignInViewModel signInViewModel, bool teacher)
         {
@@ -84,7 +86,6 @@ namespace tcs_service.Controllers
             return Created("GetSignIn", new { id = signIn.ID });
         }
 
-        [Authorize]
         [HttpPost("admin")]
         public async Task<IActionResult> PostSignInAdmin([FromBody] SignInViewModel signInViewModel, bool teacher)
         {
@@ -93,7 +94,7 @@ namespace tcs_service.Controllers
 
             if (signIn.OutTime == null)
             {
-                throw new Exception("Must Select a OutTime");
+                throw new Exception("Must Select an OutTime");
             }
             return Created("GetSignIn", new { id = signIn.ID });
         }
@@ -129,7 +130,9 @@ namespace tcs_service.Controllers
             }
         }
 
-        [HttpPut("{id:int}/SignOut")]
+
+        [AllowAnonymous]
+        [HttpPut("{id}/signOut/id")]
         public async Task<IActionResult> SignOut([FromRoute] int id)
         {
             if (!ModelState.IsValid)
@@ -149,6 +152,7 @@ namespace tcs_service.Controllers
             return Ok(signIn);
         }
 
+        [AllowAnonymous]
         [HttpPut("{email}/SignOut")]
         public async Task<IActionResult> SignOut([FromRoute] string email)
         {
@@ -169,6 +173,7 @@ namespace tcs_service.Controllers
             return Ok(signIn);
         }
 
+        [AllowAnonymous]
         [HttpGet("{studentID}/id")]
         public async Task<IActionResult> GetStudentInfoWithID([FromRoute] int studentID)
         {
@@ -176,18 +181,21 @@ namespace tcs_service.Controllers
         }
 
         // GET: api/SignIns/student@wvup.edu/email
+        [AllowAnonymous]
         [HttpGet("{studentEmail}/email")]
         public async Task<IActionResult> GetStudentInfoWithEmail([FromRoute] string studentEmail)
         {
             return Ok(await _iRepo.GetStudentInfoWithEmail(studentEmail));
         }
 
+        [AllowAnonymous]
         [HttpGet("{teacherID}/teacher/id")]
         public async Task<IActionResult> GetTeacherInfoWithID([FromRoute] int teacherID)
         {
             return Ok(await _iRepo.GetTeacherInfoWithID(teacherID));
         }
 
+        [AllowAnonymous]
         // GET: api/SignIns/teacher@wvup.edu/teacher/email
         [HttpGet("{teacherEmail}/teacher/email")]
         public async Task<IActionResult> GetTeacherInfoWithEmail([FromRoute] string teacherEmail)

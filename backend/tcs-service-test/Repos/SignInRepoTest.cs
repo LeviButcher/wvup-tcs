@@ -28,7 +28,7 @@ namespace tcs_service_test.Repos
             signInRepo = new SignInRepo(DbInMemory.getDbInMemoryOptions(dbName), null);
             fixture = new Fixture()
               .Customize(new AutoMoqCustomization());
-            fixture.Customize<SignIn>((ob) => ob.Without(x => x.ID).Without(x => x.Courses).Without(x => x.Reasons).Without(x => x.Person));
+            fixture.Customize<SignIn>((ob) => ob.With(x => x.InTime).With(x => x.OutTime).Without(x => x.ID).Without(x => x.Courses).Without(x => x.Reasons).Without(x => x.Person));
             fixture.Customize<SignInCourse>((ob) => ob.Without(x => x.SignInID).Without(x => x.SignIn));
             fixture.Customize<SignInReason>((ob) => ob.Without(x => x.SignInID).Without(x => x.SignIn));
             fixture.Customize<Course>((ob) => ob.Without(x => x.Department).Without(x => x.SignInCourses));
@@ -96,6 +96,8 @@ namespace tcs_service_test.Repos
         public async void AddCourse_SignInWithNewPersonNewCoursesAndReasons_ShouldWork()
         {
             var signIn = fixture.Create<SignIn>();
+            signIn.InTime = DateTime.Now.AddHours(-1);
+            signIn.OutTime = DateTime.Now;
             var courses = fixture.CreateMany<Course>().Select(x => new SignInCourse() { Course = x });
             var reasons = fixture.CreateMany<Reason>().Select(x => new SignInReason() { Reason = x });
             var semester = fixture.Create<Semester>();
@@ -125,6 +127,8 @@ namespace tcs_service_test.Repos
 
             var signIn = fixture.Create<SignIn>();
             signIn.PersonId = person.ID;
+            signIn.InTime = DateTime.Now.AddHours(-1);
+            signIn.OutTime = DateTime.Now;
             var choosenCourses = fixture.CreateMany<Course>().Append(course).Select(x => new SignInCourse() { Course = x });
             var choosenReasons = fixture.CreateMany<Reason>().Append(reason).Select(x => new SignInReason() { Reason = x });
             signIn.Reasons.AddRange(choosenReasons);
@@ -141,9 +145,10 @@ namespace tcs_service_test.Repos
         public async void Update_HappyPath()
         {
             var signIn = fixture.Create<SignIn>();
+            signIn.InTime = DateTime.Now.AddHours(-1);
+            signIn.OutTime = DateTime.Now;
             // Technically add should enforce that a signIn have courses and reasons attached
-            await signInRepo.Add(signIn);
-            signIn.OutTime = new DateTime();
+            await signInRepo.Add(signIn);      
             var result = await signInRepo.Update(signIn);
             Assert.Equal(signIn.OutTime, result.OutTime);
             Assert.Equal(signIn.ID, result.ID);
@@ -153,6 +158,8 @@ namespace tcs_service_test.Repos
         public async void Update_WithAllNewCoursesAndReasons_ShouldSucceed()
         {
             var signIn = fixture.Create<SignIn>();
+            signIn.InTime = DateTime.Now.AddHours(-1);
+            signIn.OutTime = DateTime.Now;
             await signInRepo.Add(signIn);
             var courses = fixture.CreateMany<SignInCourse>().ToList();
             var reasons = fixture.CreateMany<SignInReason>().ToList();
@@ -168,6 +175,8 @@ namespace tcs_service_test.Repos
         public async void Update_WithRemovedCoursesAndReasons_ShouldSucceed()
         {
             var signIn = fixture.Create<SignIn>();
+            signIn.InTime = DateTime.Now.AddHours(-1);
+            signIn.OutTime = DateTime.Now;
             var courses = fixture.CreateMany<Course>().ToList();
             var reasons = fixture.CreateMany<Reason>().ToList();
             db.Courses.AddRange(courses);
@@ -192,6 +201,8 @@ namespace tcs_service_test.Repos
         public async void Update_RemoveCourseAndReasonAddCourseAndReason_ShouldSucceed()
         {
             var signIn = fixture.Create<SignIn>();
+            signIn.InTime = DateTime.Now.AddHours(-1);
+            signIn.OutTime = DateTime.Now;
             var courses = fixture.CreateMany<Course>().ToList();
             var reasons = fixture.CreateMany<Reason>().ToList();
             db.Courses.AddRange(courses);

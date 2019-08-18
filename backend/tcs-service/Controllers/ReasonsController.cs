@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -12,6 +13,7 @@ using tcs_service.Repos.Interfaces;
 namespace tcs_service.Controllers
 {
     [Route("api/[controller]")]
+    [Authorize]
     [ApiController]
     public class ReasonsController : ControllerBase
     {
@@ -53,6 +55,7 @@ namespace tcs_service.Controllers
             return Ok(reason);
         }
 
+        [AllowAnonymous]
         [HttpGet("active")]
         public IActionResult GetActive()
         {

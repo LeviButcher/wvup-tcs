@@ -18,11 +18,11 @@ namespace tcs_service.Services.ScheduledTasks
             _iRepo = iRepo;
         }
         
-        public Task Execute(IJobExecutionContext context)
+        public async Task Execute(IJobExecutionContext context)
         {
-            _iRepo.UpdateNullSignOuts();
-           
-            return Task.CompletedTask;
+            await _iRepo.UpdateNullSignOuts();
+          
+            return;
         }
     }
 }

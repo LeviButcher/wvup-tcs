@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 using tcs_service.Models;
@@ -21,6 +22,16 @@ namespace tcs_service.Repos
 
         public async Task<SignIn> Add(SignIn signIn)
         {
+            var results = new List<ValidationResult>();
+            var context = new ValidationContext(signIn, null, null);
+            if (!Validator.TryValidateObject(signIn, context, results, true))
+            {
+                if (results.Any())
+                {
+                    throw new Exception(results.ToString());
+                }
+            }
+
             await _db.Semesters.FindAsync(signIn.SemesterId);
             if (signIn.SemesterId == default)
             {
@@ -100,6 +111,16 @@ namespace tcs_service.Repos
 
         public async Task<SignIn> Update(SignIn signIn)
         {
+            var results = new List<ValidationResult>();
+            var context = new ValidationContext(signIn, null, null);
+            if (!Validator.TryValidateObject(signIn, context, results, true))
+            {
+               if(results.Any())
+                {
+                    throw new Exception(results.ToString());
+                }
+            }
+
             var existingSignIn = await _db.SignIns.Include(x => x.Courses).Include(x => x.Reasons).FirstOrDefaultAsync(x => x.ID == signIn.ID);
             _db.Entry(existingSignIn).CurrentValues.SetValues(signIn);
 
@@ -203,7 +224,7 @@ namespace tcs_service.Repos
             return semester.Entity;
         }
 
-        public void UpdateNullSignOuts()
+        public async Task UpdateNullSignOuts()
         {
             var signIns = _db.SignIns.Where(x => x.OutTime == null && x.InTime != null);
             foreach (SignIn signIn in signIns)
@@ -211,7 +232,9 @@ namespace tcs_service.Repos
                 signIn.OutTime = signIn.InTime.Value.AddHours(2);
                 _db.SignIns.Update(signIn);
             }
-            _db.SaveChanges();
+            await _db.SaveChangesAsync();
+
+            return;
         }
 
         public async Task<SignIn> GetMostRecentSignInByID(int id)

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
+using tcs_service.Models.Attributes;
 
 namespace tcs_service.Models.ViewModels
 {
@@ -13,6 +14,7 @@ namespace tcs_service.Models.ViewModels
         public int PersonId { get; set; }
 
         public PersonType Type { get; set; }
+
         public string FirstName { get; set; }
 
         public string LastName { get; set; }
@@ -29,6 +31,7 @@ namespace tcs_service.Models.ViewModels
         public DateTimeOffset? InTime { get; set; }
 
         [DataType(DataType.DateTime)]
+        [SignOutValidation("InTime")]
         public DateTimeOffset? OutTime { get; set; }
 
         public bool Tutoring { get; set; }
