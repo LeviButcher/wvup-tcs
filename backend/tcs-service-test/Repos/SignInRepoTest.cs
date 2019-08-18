@@ -145,10 +145,10 @@ namespace tcs_service_test.Repos
         public async void Update_HappyPath()
         {
             var signIn = fixture.Create<SignIn>();
-            // Technically add should enforce that a signIn have courses and reasons attached
-            await signInRepo.Add(signIn);
             signIn.InTime = DateTime.Now.AddHours(-1);
             signIn.OutTime = DateTime.Now;
+            // Technically add should enforce that a signIn have courses and reasons attached
+            await signInRepo.Add(signIn);      
             var result = await signInRepo.Update(signIn);
             Assert.Equal(signIn.OutTime, result.OutTime);
             Assert.Equal(signIn.ID, result.ID);
