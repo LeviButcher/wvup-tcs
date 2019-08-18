@@ -20,22 +20,34 @@ const getStudentInfoWithEmail = email =>
 
 const getStudentInfoWithId = id => callApi(`signins/${id}/id`, 'GET', null);
 
+const getTeacherInfoWithEmail = email =>
+  callApi(`signins/${email}/teacher/email`, 'GET', null);
+
+const getTeacherInfoWithId = id =>
+  callApi(`signins/${id}/teacher/id`, 'GET', null);
+
 // email or listen for card swipe, check banner on submit, go to next
 // swipe id make auto submit
-const EmailOrCardSwipeForm = ({ afterValidSubmit }) => {
+const EmailOrCardSwipeForm = ({ afterValidSubmit, teacher }) => {
   const [data] = useCardReader();
   const [{ loading, errors }, dispatch] = useReducer(loadingReducer, {});
+
+  const getInfoWithEmail = teacher
+    ? getTeacherInfoWithEmail
+    : getStudentInfoWithEmail;
+
+  const getInfoWithId = teacher ? getTeacherInfoWithId : getStudentInfoWithId;
 
   useEffect(() => {
     let isMounted = true;
     if (data && data.length > 2) {
-      const [, studentId] = data;
+      const [, wvupId] = data;
       dispatch({ type: loadingStates.loading });
-      getStudentInfoWithId(studentId)
+      getInfoWithId(wvupId)
         .then(ensureResponseCode(200))
         .then(unwrapToJSON)
-        .then(studentInfo => {
-          afterValidSubmit(studentInfo);
+        .then(personInfo => {
+          afterValidSubmit(personInfo);
           if (isMounted) dispatch({ type: loadingStates.done });
         })
         .catch(
@@ -45,12 +57,13 @@ const EmailOrCardSwipeForm = ({ afterValidSubmit }) => {
     return () => {
       isMounted = false;
     };
-  }, [data, afterValidSubmit]);
+  }, [data, afterValidSubmit, getInfoWithId]);
 
   return (
     <Formik
       onSubmit={({ email }, { setSubmitting, setStatus }) => {
-        getStudentInfoWithEmail(email)
+        console.log(email);
+        getInfoWithEmail(email)
           .then(ensureResponseCode(200))
           .then(unwrapToJSON)
           .then(afterValidSubmit)
@@ -78,34 +91,36 @@ const EmailOrCardSwipeForm = ({ afterValidSubmit }) => {
               />
             </div>
           )}
-          {!loading && (
-            <Form>
-              <h4>Please enter email or swipe card</h4>
-              {status && <h4 style={{ color: 'red' }}>{status}</h4>}
-              {errors && <h4 style={{ color: 'red' }}>{errors.message}</h4>}
-              <Field
-                id="email"
-                type="text"
-                name="email"
-                component={Input}
-                label="Email"
-                disabled={isSubmitting}
-                autoFocus
-              />
-              {isSubmitting && <h5>Getting information...</h5>}
-              <ScaleLoader
-                sizeUnit="px"
-                size={150}
-                loading={isSubmitting}
-                align="center"
-              />
-              {!isSubmitting && (
-                <Button type="Submit" disabled={!isValid} align="right">
-                  Submit
-                </Button>
-              )}
-            </Form>
-          )}
+          <Form>
+            <h4>Please enter email or swipe card</h4>
+            {status && <h4 style={{ color: 'red' }}>{status}</h4>}
+            {errors && <h4 style={{ color: 'red' }}>{errors.message}</h4>}
+            <Field
+              id="email"
+              type="text"
+              name="email"
+              component={Input}
+              label="Email"
+              disabled={isSubmitting}
+              autoFocus
+            />
+            {isSubmitting && <h5>Getting information...</h5>}
+            <ScaleLoader
+              sizeUnit="px"
+              size={150}
+              loading={isSubmitting}
+              align="center"
+            />
+            {!isSubmitting && (
+              <Button
+                type="Submit"
+                disabled={!isValid && isSubmitting}
+                align="right"
+              >
+                Submit
+              </Button>
+            )}
+          </Form>
         </>
       )}
     </Formik>

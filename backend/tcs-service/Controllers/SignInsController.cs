@@ -6,6 +6,7 @@ using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using tcs_service.Helpers;
 using tcs_service.Models;
 using tcs_service.Models.ViewModels;
 using tcs_service.Repos.Interfaces;
@@ -63,19 +64,19 @@ namespace tcs_service.Controllers
 
             if (recent != null && recent.OutTime == null)
             {
-                return BadRequest("You are already signed in");
+                throw new TCSException("You are already signed in");
             }
 
             if (!teacher)
             {
                 if (signInViewModel.Courses == null || signInViewModel.Courses.Count < 1)
                 {
-                    return BadRequest("Must select one or more courses");
+                    throw new TCSException("Must select one or more courses");
                 }
 
                 if (!signInViewModel.Tutoring && signInViewModel.Reasons == null)
                 {
-                    return BadRequest("Must select one or more reason for visit");
+                    throw new TCSException("Must select one or more reason for visit");
                 }
             }
 
@@ -128,7 +129,7 @@ namespace tcs_service.Controllers
             }
         }
 
-        [HttpPut("{id}/signOut/id")]
+        [HttpPut("{id:int}/SignOut")]
         public async Task<IActionResult> SignOut([FromRoute] int id)
         {
             if (!ModelState.IsValid)
@@ -138,14 +139,9 @@ namespace tcs_service.Controllers
 
             var signIn = await GetMostRecentById(id);
 
-            if (signIn == null)
+            if (signIn == null || signIn.OutTime != null)
             {
-                return NotFound();
-            }
-
-            if (signIn.OutTime != null)
-            {
-                return BadRequest("You are not signed in");
+                throw new TCSException("You are not signed in");
             }
 
             signIn.OutTime = DateTimeOffset.UtcNow;
@@ -163,14 +159,9 @@ namespace tcs_service.Controllers
 
             var signIn = await GetMostRecentByEmail(email);
 
-            if (signIn == null)
+            if (signIn == null || signIn.OutTime != null)
             {
-                return NotFound(new { message = "You are not signed in" });
-            }
-
-            if (signIn.OutTime != null)
-            {
-                return BadRequest("You are not signed in");
+                throw new TCSException("You are not signed in");
             }
 
             signIn.OutTime = DateTimeOffset.UtcNow;

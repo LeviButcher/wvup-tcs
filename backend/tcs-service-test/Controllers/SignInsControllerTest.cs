@@ -47,7 +47,7 @@ namespace tcs_service_test.Controllers
             signInRepo.Setup(x => x.GetAll()).Returns(signIns);
             var res = sut.GetSignIn();
 
-            var objectResult = Assert.IsType<ObjectResult>(res);
+            var objectResult = Assert.IsType<OkObjectResult>(res);
             Assert.Equal(objectResult.Value, signIns);
         }
 
@@ -70,9 +70,10 @@ namespace tcs_service_test.Controllers
                 .Without(x => x.Courses)
                 .Create();
 
-            var res = await sut.PostSignIn(signIn, false);
-            var objectResult = Assert.IsType<BadRequestObjectResult>(res);
-            Assert.Equal(400, objectResult.StatusCode);
+            await Assert.ThrowsAsync<TCSException>(async () =>
+            {
+                await sut.PostSignIn(signIn, false);
+            });
         }
 
         [Fact]
@@ -82,10 +83,10 @@ namespace tcs_service_test.Controllers
                 .With(x => x.Tutoring, false)
                 .Without(x => x.Reasons)
                 .Create();
-
-            var res = await sut.PostSignIn(signIn, false);
-            var objectResult = Assert.IsType<BadRequestObjectResult>(res);
-            Assert.Equal(400, objectResult.StatusCode);
+            await Assert.ThrowsAsync<TCSException>(async () =>
+            {
+                await sut.PostSignIn(signIn, false);
+            });
         }
 
         [Fact]
