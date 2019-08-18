@@ -14,7 +14,7 @@ const emailSchema = Yup.object().shape({
 
 const EmailForm = ({ title, onSubmit, errors }) => (
   <Card>
-    <Link to="/">Go Back</Link>
+    <Link to="/">Go to Home Screen</Link>
     <Formik
       initialValues={{ email: '' }}
       validationSchema={emailSchema}

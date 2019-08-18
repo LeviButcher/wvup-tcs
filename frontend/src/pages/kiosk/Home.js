@@ -2,8 +2,9 @@ import React from 'react';
 import styled from 'styled-components';
 import { Link, Header, Card } from '../../ui';
 
-const Home = () => (
+const Home = ({ location }) => (
   <FullScreenContainer>
+    {location.state.info && <InfoPopUp info={location.state.info} />}
     <BoxLink to="/signin" style={{ gridArea: 'boxLeft' }}>
       <Box>Sign In</Box>
     </BoxLink>
@@ -17,6 +18,14 @@ const Home = () => (
     </Footer>
   </FullScreenContainer>
 );
+
+const InfoPopUp = ({ info }) => {
+  return (
+    <div style={{ justifySelf: 'center', gridArea: 'info' }}>
+      <h4>{info}</h4>
+    </div>
+  );
+};
 
 const BoxLink = styled(Link)`
   align-self: center;
@@ -50,11 +59,13 @@ const FullScreenContainer = styled.div`
   width: 100%;
   display: grid;
   grid-template:
+    'info info' auto
     'boxLeft boxRight' 1fr
     'footer footer' auto / 50% 50%;
   align-items: flex-end;
   @media (max-width: 880px) {
     grid-template:
+      'info' 1fr
       'boxLeft' 500px
       'boxRight' 500px
       'footer' auto;

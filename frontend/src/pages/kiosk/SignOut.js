@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { navigate } from '@reach/router';
 import EmailForm from '../../components/EmailForm';
-import { callApi, isWVUPId } from "../../utils";
+import { callApi, isWVUPId } from '../../utils';
 import ensureResponseCode from '../../utils/ensureResponseCode';
 import useCardReader from '../../hooks/useCardReader';
 
@@ -22,8 +22,7 @@ const SignOutPage = () => {
       putSignOutId(wvupId)
         .then(ensureResponseCode(200))
         .then(() => {
-          alert('You have signed out!');
-          navigate('/');
+          navigate('/', { state: { info: 'You have signed out!' } });
         })
         .catch(setErrors);
     }
@@ -38,11 +37,9 @@ const SignOutPage = () => {
           putSignOutEmail(email)
             .then(ensureResponseCode(200))
             .then(() => {
-              alert('You have signed out!');
-              navigate('/');
+              navigate('/', { state: { info: 'You have signed out!' } });
             })
             .catch(e => {
-              console.log(e);
               setStatus({ msg: e.message });
             })
             .finally(() => setSubmitting(false));

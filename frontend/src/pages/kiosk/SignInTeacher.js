@@ -15,7 +15,7 @@ const SignInTeacher = ({ navigate }) => {
   return (
     <FullScreenContainer>
       <Card>
-        <Link to="/">Go Back</Link>
+        <Link to="/">Go to Home Screen</Link>
         <h1>Sign In Teacher</h1>
         {!loading && (
           <EmailOrCardSwipeForm
@@ -31,7 +31,7 @@ const SignInTeacher = ({ navigate }) => {
                 .then(ensureResponseCode(201))
                 .then(() => {
                   dispatch({ type: loadingStates.done });
-                  navigate('/');
+                  navigate('/', { state: { info: 'You have signed in!' } });
                 })
                 .catch(e => dispatch({ type: loadingStates.error, errors: e }));
             }}
