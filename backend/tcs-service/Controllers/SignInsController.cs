@@ -130,7 +130,7 @@ namespace tcs_service.Controllers
 
 
         [AllowAnonymous]
-        [HttpPut("{id}/signOut/id")]
+        [HttpPut("{id:int}/SignOut")]
         public async Task<IActionResult> SignOut([FromRoute] int id)
         {
             if (!ModelState.IsValid)

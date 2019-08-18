@@ -1,10 +1,12 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import styled from 'styled-components';
 import { Link, Header, Card } from '../../ui';
 
 const Home = ({ location }) => (
   <FullScreenContainer>
-    {location.state.info && <InfoPopUp info={location.state.info} />}
+    {location && location.state && location.state.info && (
+      <StyledInfoPopUp info={location.state.info} />
+    )}
     <BoxLink to="/signin" style={{ gridArea: 'boxLeft' }}>
       <Box>Sign In</Box>
     </BoxLink>
@@ -19,13 +21,32 @@ const Home = ({ location }) => (
   </FullScreenContainer>
 );
 
-const InfoPopUp = ({ info }) => {
+const InfoPopUp = ({ className, info }) => {
+  useEffect(() => {
+    setTimeout(() => {
+      const infoNode = document.querySelector('#info');
+      if (infoNode) {
+        infoNode.parentNode.removeChild(infoNode);
+      }
+    }, 5000);
+  }, [info]);
   return (
-    <div style={{ justifySelf: 'center', gridArea: 'info' }}>
+    <div
+      className={className}
+      style={{ justifySelf: 'center', gridArea: 'info' }}
+      id="info"
+    >
       <h4>{info}</h4>
     </div>
   );
 };
+
+const StyledInfoPopUp = styled(InfoPopUp)`
+  padding: 0.5rem 1rem;
+  background: #2f9cda66;
+  margin: 1rem;
+  border-left: 5px solid #444;
+`;
 
 const BoxLink = styled(Link)`
   align-self: center;
