@@ -1,57 +1,55 @@
-import React from 'react';
-import { navigate } from '@reach/router';
+import React, { useReducer } from 'react';
+import { Link } from '@reach/router';
 import styled from 'styled-components';
-import EmailForm from '../../components/EmailForm';
-import callApi from '../../utils/callApi';
-import ensureResponseCode from '../../utils/ensureResponseCode';
-import unWrapToJSON from '../../utils/unwrapToJSON';
+import ScaleLoader from 'react-spinners/ScaleLoader';
+import { callApi, ensureResponseCode } from '../../utils';
+import { Card } from '../../ui';
+import EmailOrCardSwipeForm from '../../components/EmailOrCardSwipeForm';
+import { loadingStates, loadingReducer } from '../../hooks/loadingReducer';
 
 const postSignInTeacher = callApi(`signins?teacher=true`, 'POST');
 
-const getTeacherInfoWithEmail = email =>
-  callApi(`signins/${email}/teacher/email`, 'GET', null);
-
-// get teacher information
-// transform that into signIn
-// send to post
-
 // test email : teacher@wvup.edu
-const SignInTeacher = () => {
-  const loadTeacherInfo = email =>
-    getTeacherInfoWithEmail(email)
-      .then(ensureResponseCode(200))
-      .then(unWrapToJSON);
-
-  const handleSubmit = async ({ email }, { setSubmitting, setStatus }) => {
-    loadTeacherInfo(email)
-      .catch(() => {
-        throw new Error(`Can't find your information`);
-      })
-      .then(teacher => {
-        console.log(teacher);
-        return {
-          ...teacher,
-          personId: teacher.teacherID,
-          email: teacher.teacherEmail
-        };
-      })
-      .then(postSignInTeacher)
-      .then(ensureResponseCode(201))
-      .then(() => {
-        alert('You have signed in!');
-        navigate('/');
-      })
-      .catch(e => {
-        setStatus({ msg: e.message });
-      })
-      .finally(() => {
-        setSubmitting(false);
-      });
-  };
-
+const SignInTeacher = ({ navigate }) => {
+  const [{ loading, errors }, dispatch] = useReducer(loadingReducer, {});
   return (
     <FullScreenContainer>
-      <EmailForm title="Teacher Sign In" onSubmit={handleSubmit} disabled />
+      <Card>
+        <Link to="/">Go Back</Link>
+        <h1>Sign In Teacher</h1>
+        {!loading && (
+          <EmailOrCardSwipeForm
+            teacher
+            afterValidSubmit={teacher => {
+              dispatch({ type: loadingStates.loading });
+              const signIn = {
+                ...teacher,
+                personId: teacher.teacherID,
+                email: teacher.teacherEmail
+              };
+              postSignInTeacher(signIn)
+                .then(ensureResponseCode(201))
+                .then(() => {
+                  dispatch({ type: loadingStates.done });
+                  navigate('/');
+                })
+                .catch(e => dispatch({ type: loadingStates.error, errors: e }));
+            }}
+          />
+        )}
+        {loading && (
+          <div>
+            <h5>Submitting your signin</h5>
+            <ScaleLoader
+              sizeUnit="px"
+              size={150}
+              loading={loading}
+              align="center"
+            />
+          </div>
+        )}
+        {errors && <div>{errors.message}</div>}
+      </Card>
     </FullScreenContainer>
   );
 };
