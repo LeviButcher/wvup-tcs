@@ -69,7 +69,6 @@ namespace tcs_service.Controllers
             });
         }
 
-        [AllowAnonymous]
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody]UserDto userDto)
         {
