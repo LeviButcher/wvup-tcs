@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { navigate } from '@reach/router';
 import EmailForm from '../../components/EmailForm';
-import callApi from '../../utils/callApi';
+import { callApi, isWVUPId } from "../../utils";
 import ensureResponseCode from '../../utils/ensureResponseCode';
 import useCardReader from '../../hooks/useCardReader';
 
@@ -18,7 +18,7 @@ const SignOutPage = () => {
 
   useEffect(() => {
     if (data && data.length > 2) {
-      const [, wvupId] = data;
+      const wvupId = data.find(isWVUPId);
       putSignOutId(wvupId)
         .then(ensureResponseCode(200))
         .then(() => {

@@ -19,7 +19,7 @@ const IsAuthenticated = ({ redirectRoute, children }) => {
       .catch(() => {
         navigate(redirectRoute);
       });
-  }, [redirectRoute]);
+  }, [redirectRoute, children]);
 
   return <div>{isAuth && children}</div>;
 };

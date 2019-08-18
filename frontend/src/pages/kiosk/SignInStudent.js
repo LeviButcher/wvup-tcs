@@ -1,5 +1,5 @@
 import React from 'react';
-import { Router, navigate } from '@reach/router';
+import { Router } from '@reach/router';
 import styled from 'styled-components';
 import ScaleLoader from 'react-spinners/ScaleLoader';
 import { Formik, Form } from 'formik';
@@ -7,7 +7,6 @@ import { Card, Button } from '../../ui';
 import { callApi, ensureResponseCode } from '../../utils';
 import CoursesCheckboxes from '../../components/CoursesCheckboxes';
 import ReasonCheckboxes from '../../components/ReasonCheckboxes';
-import LoadingContent from '../../components/LoadingContent';
 import useApiWithHeaders from '../../hooks/useApiWithHeaders';
 import SignInSchema from '../../schemas/SignInFormScema';
 import EmailOrCardSwipeForm from '../../components/EmailOrCardSwipeForm';
@@ -39,11 +38,10 @@ const SignInStudent = ({ navigate }) => {
 const StudentSignInForm = ({
   location: {
     state: { studentInfo }
-  }
+  },
+  navigate
 }) => {
-  const [loading, { body: reasons, headers }, errors] = useApiWithHeaders(
-    'reasons/active'
-  );
+  const [loading, { body: reasons }] = useApiWithHeaders('reasons/active');
   return (
     <>
       <h4>Welcome, {`${studentInfo.firstName} ${studentInfo.lastName}`}</h4>
@@ -76,23 +74,23 @@ const StudentSignInForm = ({
         validationSchema={SignInSchema}
       >
         {({ values, isSubmitting, isValid }) => (
-          <Form>
-            <LoadingContent
-              loading={loading}
-              data={{ headers, body: reasons }}
-              errors={errors}
-            >
-              <ReasonCheckboxes reasons={reasons} values={values} />
-            </LoadingContent>
-            <CoursesCheckboxes courses={studentInfo.classSchedule} />
+          <>
             {isSubmitting && <h5>Submitting SignIn...</h5>}
-            <ScaleLoader sizeUnit="px" size={150} loading={isSubmitting} />
-            {!isSubmitting && (
-              <Button type="Submit" align="right" disabled={!isValid}>
-                Submit
-              </Button>
+            <ScaleLoader
+              sizeUnit="px"
+              size={150}
+              loading={loading || isSubmitting}
+            />
+            {!isSubmitting && !loading && (
+              <Form>
+                <ReasonCheckboxes reasons={reasons} values={values} />
+                <CoursesCheckboxes courses={studentInfo.classSchedule} />
+                <Button type="Submit" align="right" disabled={!isValid}>
+                  Submit
+                </Button>
+              </Form>
             )}
-          </Form>
+          </>
         )}
       </Formik>
     </>
