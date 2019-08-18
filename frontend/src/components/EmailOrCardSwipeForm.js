@@ -3,7 +3,7 @@ import { Formik, Form, Field } from 'formik';
 import ScaleLoader from 'react-spinners/ScaleLoader';
 import * as Yup from 'yup';
 import { Input, Button } from '../ui';
-import { callApi, unwrapToJSON, ensureResponseCode } from '../utils';
+import { callApi, unwrapToJSON, ensureResponseCode, isWVUPId } from '../utils';
 import useCardReader from '../hooks/useCardReader';
 import { loadingStates, loadingReducer } from '../hooks/loadingReducer';
 
@@ -37,11 +37,10 @@ const EmailOrCardSwipeForm = ({ afterValidSubmit, teacher }) => {
     : getStudentInfoWithEmail;
 
   const getInfoWithId = teacher ? getTeacherInfoWithId : getStudentInfoWithId;
-
   useEffect(() => {
     let isMounted = true;
     if (data && data.length > 2) {
-      const [, wvupId] = data;
+      const wvupId = data.find(isWVUPId);
       dispatch({ type: loadingStates.loading });
       getInfoWithId(wvupId)
         .then(ensureResponseCode(200))
@@ -62,7 +61,6 @@ const EmailOrCardSwipeForm = ({ afterValidSubmit, teacher }) => {
   return (
     <Formik
       onSubmit={({ email }, { setSubmitting, setStatus }) => {
-        console.log(email);
         getInfoWithEmail(email)
           .then(ensureResponseCode(200))
           .then(unwrapToJSON)
@@ -79,39 +77,32 @@ const EmailOrCardSwipeForm = ({ afterValidSubmit, teacher }) => {
       enableReinitialize
     >
       {({ isSubmitting, isValid, status }) => (
-        <>
-          {loading && (
-            <div>
-              <h5>Getting information with Id...</h5>
+        <Form>
+          {(isSubmitting || loading) && (
+            <>
+              <h5>Getting information...</h5>
               <ScaleLoader
                 sizeUnit="px"
                 size={150}
-                loading={loading}
+                loading={isSubmitting || loading}
                 align="center"
               />
-            </div>
+            </>
           )}
-          <Form>
-            <h4>Please enter email or swipe card</h4>
-            {status && <h4 style={{ color: 'red' }}>{status}</h4>}
-            {errors && <h4 style={{ color: 'red' }}>{errors.message}</h4>}
-            <Field
-              id="email"
-              type="text"
-              name="email"
-              component={Input}
-              label="Email"
-              disabled={isSubmitting}
-              autoFocus
-            />
-            {isSubmitting && <h5>Getting information...</h5>}
-            <ScaleLoader
-              sizeUnit="px"
-              size={150}
-              loading={isSubmitting}
-              align="center"
-            />
-            {!isSubmitting && (
+          {errors && <h4 style={{ color: 'red' }}>{errors.message}</h4>}
+          {!isSubmitting && !loading && (
+            <>
+              <h4>Please enter email or swipe card</h4>
+              {status && <h4 style={{ color: 'red' }}>{status}</h4>}
+              <Field
+                id="email"
+                type="text"
+                name="email"
+                component={Input}
+                label="Email"
+                disabled={isSubmitting}
+              />
+
               <Button
                 type="Submit"
                 disabled={!isValid && isSubmitting}
@@ -119,9 +110,9 @@ const EmailOrCardSwipeForm = ({ afterValidSubmit, teacher }) => {
               >
                 Submit
               </Button>
-            )}
-          </Form>
-        </>
+            </>
+          )}
+        </Form>
       )}
     </Formik>
   );

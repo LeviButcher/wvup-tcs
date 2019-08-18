@@ -1,12 +1,9 @@
-﻿using System.Numerics;
-using AutoFixture;
+﻿using AutoFixture;
 using AutoFixture.AutoMoq;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using tcs_service.Controllers;
 using tcs_service.Models;
 using tcs_service.Models.ViewModels;
