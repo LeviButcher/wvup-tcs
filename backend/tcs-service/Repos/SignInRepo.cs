@@ -115,7 +115,7 @@ namespace tcs_service.Repos
             var context = new ValidationContext(signIn, null, null);
             if (!Validator.TryValidateObject(signIn, context, results, true))
             {
-               if(results.Any())
+                if (results.Any())
                 {
                     throw new Exception(results.ToString());
                 }
@@ -273,11 +273,7 @@ namespace tcs_service.Repos
                 ID = result.studentID
             };
             await AddOrDoNothingIfExistsPerson(student);
-
-            result.classSchedule.ForEach(async course =>
-            {
-                await AddOrDoNothingIfExistsCourse(course);
-            });
+            await AddRangeOrDoNothingIfExistsCourse(result.classSchedule);
 
             return result;
         }
@@ -287,13 +283,17 @@ namespace tcs_service.Repos
             if (await _db.People.AnyAsync(x => x.ID == person.ID)) return;
             await _db.People.AddAsync(person);
             await _db.SaveChangesAsync();
+            return;
         }
 
-        private async Task AddOrDoNothingIfExistsCourse(Course course)
+        private async Task<int> AddRangeOrDoNothingIfExistsCourse(List<Course> courses)
         {
-            if (await _db.Courses.AnyAsync(x => x.CRN == course.CRN)) return;
-            await _db.Courses.AddAsync(course);
-            await _db.SaveChangesAsync();
+            foreach (var course in courses)
+            {
+                var found = await _db.Courses.AnyAsync(x => x.CRN == course.CRN);
+                if (!found) _db.Courses.Add(course);
+            }
+            return await _db.SaveChangesAsync();
         }
 
         public async Task<StudentInfoViewModel> GetStudentInfoWithID(int studentID)
@@ -307,11 +307,7 @@ namespace tcs_service.Repos
                 ID = result.studentID
             };
             await AddOrDoNothingIfExistsPerson(student);
-
-            result.classSchedule.ForEach(async course =>
-            {
-                await AddOrDoNothingIfExistsCourse(course);
-            });
+            await AddRangeOrDoNothingIfExistsCourse(result.classSchedule);
             return result;
         }
 
