@@ -46,7 +46,6 @@ const StudentSignInForm = ({
   return (
     <>
       <h4>Welcome, {`${studentInfo.firstName} ${studentInfo.lastName}`}</h4>
-      <p>Please select a reason for vising the center and course</p>
       <Formik
         onSubmit={(studentSignIn, { setSubmitting }) => {
           const signIn = {
