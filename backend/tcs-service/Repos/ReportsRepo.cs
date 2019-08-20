@@ -189,7 +189,15 @@ namespace tcs_service.Repos
 
             foreach (var item in studentCourses.Distinct())
             {
-                coursesWithGrades.Add(await _bannerService.GetStudentGrade(item.PersonId, item.Course.CRN, semesterId));
+                try
+                {
+                    var grade = await _bannerService.GetStudentGrade(item.PersonId, item.Course.CRN, semesterId);
+                    coursesWithGrades.Add(grade);
+                }
+                catch
+                {
+
+                }
             }
 
             List<CourseWithSuccessCountViewModel> coursesWithSuccessCount = new List<CourseWithSuccessCountViewModel>();

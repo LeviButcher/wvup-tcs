@@ -200,6 +200,8 @@ namespace tcs_service.Repos
 
         private async Task<Semester> AddSemester(int id)
         {
+            var found = await _db.Semesters.FindAsync(id);
+            if (found != null) return found;
             String name = "";
             if (id % 100 == 01)
             {
@@ -220,6 +222,7 @@ namespace tcs_service.Repos
                 ID = id,
                 Name = name
             });
+            await _db.SaveChangesAsync();
 
             return semester.Entity;
         }
@@ -274,6 +277,7 @@ namespace tcs_service.Repos
             };
             await AddOrDoNothingIfExistsPerson(student);
             await AddRangeOrDoNothingIfExistsCourse(result.classSchedule);
+            await AddSemester(result.semesterId);
 
             return result;
         }
@@ -308,6 +312,7 @@ namespace tcs_service.Repos
             };
             await AddOrDoNothingIfExistsPerson(student);
             await AddRangeOrDoNothingIfExistsCourse(result.classSchedule);
+            await AddSemester(result.semesterId);
             return result;
         }
 
@@ -323,6 +328,7 @@ namespace tcs_service.Repos
                 PersonType = PersonType.Teacher
             };
             await AddOrDoNothingIfExistsPerson(teacher);
+            await AddSemester(result.semesterId);
             return result;
         }
 
@@ -338,6 +344,7 @@ namespace tcs_service.Repos
                 PersonType = PersonType.Teacher
             };
             await AddOrDoNothingIfExistsPerson(teacher);
+            await AddSemester(result.semesterId);
             return result;
         }
     }

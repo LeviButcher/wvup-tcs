@@ -22,9 +22,11 @@ namespace tcs_service.Helpers
             CreateMap<BannerInformation, StudentInfoViewModel>()
                 .ForMember(dest => dest.classSchedule, opts => opts.MapFrom(src => src.Courses))
                 .ForMember(dest => dest.studentID, opts => opts.MapFrom(src => src.WVUPID))
+                .ForMember(dest => dest.semesterId, opts => opts.MapFrom(src => src.TermCode))
                 .ForMember(dest => dest.studentEmail, opts => opts.MapFrom(src => src.EmailAddress));
             CreateMap<BannerInformation, TeacherInfoViewModel>()
                 .ForMember(dest => dest.teacherID, opts => opts.MapFrom(src => src.WVUPID))
+                .ForMember(dest => dest.semesterId, opts => opts.MapFrom(src => src.TermCode))
                 .ForMember(dest => dest.teacherEmail, opts => opts.MapFrom(src => src.EmailAddress));
         }
     }
