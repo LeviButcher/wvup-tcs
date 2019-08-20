@@ -290,6 +290,13 @@ namespace tcs_service.Repos
         {
             foreach (var course in courses)
             {
+                var departmentFound = await _db.Departments.FindAsync(course.Department.Code);
+                if (departmentFound != null)
+                {
+                    course.Department = null;
+                    course.DepartmentID = departmentFound.Code;
+                }
+
                 var found = await _db.Courses.AnyAsync(x => x.CRN == course.CRN);
                 if (!found) _db.Courses.Add(course);
             }
