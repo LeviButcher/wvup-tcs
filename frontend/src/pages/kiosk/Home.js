@@ -28,7 +28,7 @@ const InfoPopUp = ({ className, info }) => {
       if (infoNode) {
         infoNode.parentNode.removeChild(infoNode);
       }
-    }, 5000);
+    }, 10000);
   }, [info]);
   return (
     <div
