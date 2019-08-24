@@ -16,8 +16,9 @@ using tcs_service.Repos.Interfaces;
 
 namespace tcs_service.Controllers
 {
-    [Authorize]
+    
     [ApiController]
+    [Authorize]
     [Route("api/[controller]")]
     public class UsersController : ControllerBase
     {
@@ -69,7 +70,6 @@ namespace tcs_service.Controllers
             });
         }
 
-        [AllowAnonymous]
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody]UserDto userDto)
         {

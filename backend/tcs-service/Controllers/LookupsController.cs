@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using tcs_service.Helpers;
 using tcs_service.Models.ViewModels;
@@ -8,6 +9,7 @@ using tcs_service.Repos.Interfaces;
 namespace tcs_service.Controllers
 {
     [Route("api/[controller]")]
+    [Authorize]
     [ApiController]
     public class LookupsController : ControllerBase
     {

@@ -407,3 +407,7 @@ INSERT INTO [dbo].[People]
     ([ID], [Email], [PersonType], [FirstName], [LastName])
 VALUES
     (881881881, N'teach@wvup.edu', 1, N'Teacher', N'Name')
+INSERT INTO [dbo].[People]
+    ([ID], [Email], [PersonType], [FirstName], [LastName])
+VALUES
+    (991533860, N'lbutche3@wvup.edu', 0, N'Levi', N'Butcher')

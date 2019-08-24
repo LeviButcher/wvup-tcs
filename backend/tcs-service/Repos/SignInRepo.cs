@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 using tcs_service.Models;
@@ -21,6 +22,16 @@ namespace tcs_service.Repos
 
         public async Task<SignIn> Add(SignIn signIn)
         {
+            var results = new List<ValidationResult>();
+            var context = new ValidationContext(signIn, null, null);
+            if (!Validator.TryValidateObject(signIn, context, results, true))
+            {
+                if (results.Any())
+                {
+                    throw new Exception(results.ToString());
+                }
+            }
+
             await _db.Semesters.FindAsync(signIn.SemesterId);
             if (signIn.SemesterId == default)
             {
@@ -100,6 +111,16 @@ namespace tcs_service.Repos
 
         public async Task<SignIn> Update(SignIn signIn)
         {
+            var results = new List<ValidationResult>();
+            var context = new ValidationContext(signIn, null, null);
+            if (!Validator.TryValidateObject(signIn, context, results, true))
+            {
+                if (results.Any())
+                {
+                    throw new Exception(results.ToString());
+                }
+            }
+
             var existingSignIn = await _db.SignIns.Include(x => x.Courses).Include(x => x.Reasons).FirstOrDefaultAsync(x => x.ID == signIn.ID);
             _db.Entry(existingSignIn).CurrentValues.SetValues(signIn);
 
@@ -179,6 +200,8 @@ namespace tcs_service.Repos
 
         private async Task<Semester> AddSemester(int id)
         {
+            var found = await _db.Semesters.FindAsync(id);
+            if (found != null) return found;
             String name = "";
             if (id % 100 == 01)
             {
@@ -199,11 +222,12 @@ namespace tcs_service.Repos
                 ID = id,
                 Name = name
             });
+            await _db.SaveChangesAsync();
 
             return semester.Entity;
         }
 
-        public void UpdateNullSignOuts()
+        public async Task UpdateNullSignOuts()
         {
             var signIns = _db.SignIns.Where(x => x.OutTime == null && x.InTime != null);
             foreach (SignIn signIn in signIns)
@@ -211,7 +235,9 @@ namespace tcs_service.Repos
                 signIn.OutTime = signIn.InTime.Value.AddHours(2);
                 _db.SignIns.Update(signIn);
             }
-            _db.SaveChanges();
+            await _db.SaveChangesAsync();
+
+            return;
         }
 
         public async Task<SignIn> GetMostRecentSignInByID(int id)
@@ -250,11 +276,8 @@ namespace tcs_service.Repos
                 ID = result.studentID
             };
             await AddOrDoNothingIfExistsPerson(student);
-
-            result.classSchedule.ForEach(async course =>
-            {
-                await AddOrDoNothingIfExistsCourse(course);
-            });
+            await AddRangeOrDoNothingIfExistsCourse(result.classSchedule);
+            await AddSemester(result.semesterId);
 
             return result;
         }
@@ -264,13 +287,24 @@ namespace tcs_service.Repos
             if (await _db.People.AnyAsync(x => x.ID == person.ID)) return;
             await _db.People.AddAsync(person);
             await _db.SaveChangesAsync();
+            return;
         }
 
-        private async Task AddOrDoNothingIfExistsCourse(Course course)
+        private async Task<int> AddRangeOrDoNothingIfExistsCourse(List<Course> courses)
         {
-            if (await _db.Courses.AnyAsync(x => x.CRN == course.CRN)) return;
-            await _db.Courses.AddAsync(course);
-            await _db.SaveChangesAsync();
+            foreach (var course in courses)
+            {
+                var departmentFound = await _db.Departments.FindAsync(course.Department.Code);
+                if (departmentFound != null)
+                {
+                    course.Department = null;
+                    course.DepartmentID = departmentFound.Code;
+                }
+
+                var found = await _db.Courses.AnyAsync(x => x.CRN == course.CRN);
+                if (!found) _db.Courses.Add(course);
+            }
+            return await _db.SaveChangesAsync();
         }
 
         public async Task<StudentInfoViewModel> GetStudentInfoWithID(int studentID)
@@ -284,11 +318,8 @@ namespace tcs_service.Repos
                 ID = result.studentID
             };
             await AddOrDoNothingIfExistsPerson(student);
-
-            result.classSchedule.ForEach(async course =>
-            {
-                await AddOrDoNothingIfExistsCourse(course);
-            });
+            await AddRangeOrDoNothingIfExistsCourse(result.classSchedule);
+            await AddSemester(result.semesterId);
             return result;
         }
 
@@ -304,6 +335,7 @@ namespace tcs_service.Repos
                 PersonType = PersonType.Teacher
             };
             await AddOrDoNothingIfExistsPerson(teacher);
+            await AddSemester(result.semesterId);
             return result;
         }
 
@@ -319,6 +351,7 @@ namespace tcs_service.Repos
                 PersonType = PersonType.Teacher
             };
             await AddOrDoNothingIfExistsPerson(teacher);
+            await AddSemester(result.semesterId);
             return result;
         }
     }

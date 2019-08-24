@@ -10,7 +10,7 @@ const ReasonManagement = () => {
 
   return (
     <div>
-      <a href="reason/create">Add Reason</a>
+      <Link to="create">Add Reason</Link>
       <LoadingContent loading={loading} data={data} errors={errors}>
         <ReasonTable reasons={data.body} />
       </LoadingContent>

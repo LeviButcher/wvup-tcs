@@ -1,30 +1,30 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using tcs_service.Models;
+using tcs_service.Helpers;
 using tcs_service.Repos.Interfaces;
 
 namespace tcs_service.Controllers
 {
     [Produces("application/json")]
     [Route("api/ClassTours")]
+    [Authorize]
     [ApiController]
     public class ClassToursController : ControllerBase
     {
-        private readonly IClassTourRepo _classTourRepo;
+        private readonly IClassTourRepo _iRepo;
 
-        public ClassToursController(IClassTourRepo classTourRepo)
+        public ClassToursController(IClassTourRepo iRepo)
         {
-            _classTourRepo = classTourRepo;
+            _iRepo = iRepo;
         }
 
         private async Task<bool> ClassTourExists(int id)
         {
-            return await _classTourRepo.Exist(id);
+            return await _iRepo.Exist(id);
         }
                      
         [HttpGet("{id}")]
@@ -36,7 +36,7 @@ namespace tcs_service.Controllers
                 return BadRequest(ModelState);
             }
 
-            var classTour = await _classTourRepo.Find(id);
+            var classTour = await _iRepo.Find(id);
 
             if (classTour == null)
             {
@@ -47,9 +47,22 @@ namespace tcs_service.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<ClassTour>>> Get([FromQuery] DateTime start, [FromQuery] DateTime end)
+        public async Task<ActionResult<PagingModel<ClassTour>>> Get([FromQuery] DateTime start, [FromQuery] DateTime end, [FromQuery] int skip = 0, [FromQuery] int take = 20)
         {
-            return Ok(await _classTourRepo.GetBetweenDates(start, end));
+            var page = await _iRepo.GetBetweenDates(start, end, skip, take);
+            if (page.isNext)
+            {
+                Response.Headers.Add("Next", $"/api/classtours/?start={start}&end={end}&skip={page.Skip + page.Take}&take={page.Take}");
+            }
+            if (page.isPrev)
+            {
+                Response.Headers.Add("Prev", $"/api/classtours/?start={start}&end={end}&skip={page.Skip - page.Take}&take={page.Take}");
+            }
+            Response.Headers.Add("Total-Pages", $"{page.TotalPages}");
+            Response.Headers.Add("Total-Records", $"{page.TotalDataCount}");
+            Response.Headers.Add("Current-Page", $"{page.CurrentPage}");
+
+            return Ok(page.data);
         }
 
         [HttpPut("{id}")]
@@ -68,7 +81,7 @@ namespace tcs_service.Controllers
 
             try
             {
-                await _classTourRepo.Update(classTour);
+                await _iRepo.Update(classTour);
                 return Ok(classTour);
             }
             catch (DbUpdateConcurrencyException)
@@ -94,7 +107,7 @@ namespace tcs_service.Controllers
                 return BadRequest(ModelState);
             }
 
-            await _classTourRepo.Add(classTour);
+            await _iRepo.Add(classTour);
 
             return CreatedAtAction("GetClassTour", new { id = classTour.ID }, classTour);
         }
@@ -113,7 +126,7 @@ namespace tcs_service.Controllers
                 return NotFound();
             }
 
-            var tour = await _classTourRepo.Remove(id);
+            var tour = await _iRepo.Remove(id);
 
             return Ok(tour);
         }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using System.Xml.Serialization;
+using System;
 using System.Net.Http.Headers;
 using System.Text;
 using AutoMapper;
@@ -22,6 +23,7 @@ using tcs_service.Repos.Interfaces;
 using tcs_service.Services;
 using tcs_service.Services.Interfaces;
 using tcs_service.Services.ScheduledTasks;
+using Helpers;
 
 namespace tcs_service
 {
@@ -101,7 +103,7 @@ namespace tcs_service
             services.AddScoped<IReportsRepo, ReportsRepo>();
             services.AddScoped<IReasonRepo, ReasonRepo>();
             services.AddScoped<ILookupRepo, LookupRepo>();
-           
+
             // Add Quartz services
             services.AddSingleton<IJobFactory, JobFactory>();
             services.AddSingleton<ISchedulerFactory, StdSchedulerFactory>();
@@ -138,11 +140,14 @@ namespace tcs_service
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
+            app.UseErrorWrapping();
+
             app.UseCors(AllowAnywhere);
 
             app.UseAuthentication();
 
             app.UseMvc();
+
         }
     }
 }

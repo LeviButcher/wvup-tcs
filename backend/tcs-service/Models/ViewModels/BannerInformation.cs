@@ -9,5 +9,6 @@ namespace tcs_service.Models.ViewModels
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public List<Course> Courses { get; set; }
+        public int TermCode { get; set; }
     }
 }

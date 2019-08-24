@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
+using tcs_service.Models.Attributes;
 
 namespace tcs_service.Models
 {
@@ -38,6 +39,8 @@ namespace tcs_service.Models
         }
 
         private DateTimeOffset? outTime;
+
+        [SignOutValidation("InTime")]
         public DateTimeOffset? OutTime
         {
             get

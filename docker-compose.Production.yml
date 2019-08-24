@@ -7,6 +7,7 @@ services:
       - "tcs-service"
     ports:
       - "80:80"
+    restart: always
 
   tcs-service:
     image: lcbutch/tcs-service:master
@@ -16,6 +17,7 @@ services:
       - "8080:80"
     env_file:
       - .env
+    restart: always
 
   tcs-db:
     image: microsoft/mssql-server-linux
@@ -25,6 +27,7 @@ services:
       - "1443"
     volumes:
       - db-data:/var/opt/mssql
+    restart: always
 
   watchtower:
     image: containrrr/watchtower

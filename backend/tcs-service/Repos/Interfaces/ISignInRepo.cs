@@ -44,6 +44,6 @@ namespace tcs_service.Repos.Interfaces
 
         Task<SignInViewModel> GetSignInViewModel(int id);
 
-        void UpdateNullSignOuts();
+        Task UpdateNullSignOuts();
     }
 }
