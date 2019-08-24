@@ -47,7 +47,7 @@ const ClassTourRow = ({
       </td>
       <td align="center">{numberOfStudents}</td>
       <td style={{ display: 'flex', justifyContent: 'space-evenly' }}>
-        <Link to={`/dashboard/tours/${id}`}>
+        <Link to={`/dashboard/tours/update/${id}`}>
           <Gear />
         </Link>
         <Trashcan onClick={() => alert('Not implemented yet')} />
