@@ -46,7 +46,6 @@ namespace tcs_service.Controllers
             return Ok(classTour);
         }
 
-        [AllowAnonymous]
         [HttpGet]
         public async Task<ActionResult<PagingModel<ClassTour>>> Get([FromQuery] DateTime start, [FromQuery] DateTime end, [FromQuery] int skip = 0, [FromQuery] int take = 20)
         {

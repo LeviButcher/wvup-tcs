@@ -18,6 +18,7 @@ namespace tcs_service.Controllers
 {
     
     [ApiController]
+    [Authorize]
     [Route("api/[controller]")]
     public class UsersController : ControllerBase
     {
@@ -68,7 +69,7 @@ namespace tcs_service.Controllers
                 Token = tokenString
             });
         }
-        [AllowAnonymous]
+        
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody]UserDto userDto)
         {
