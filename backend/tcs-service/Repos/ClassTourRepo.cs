@@ -71,7 +71,8 @@ namespace tcs_service.Repos
             return tours
                 .Skip(skip).Take(take)
                 .Select(x => new ClassTourViewModel()
-                {
+                {  
+                    Id = x.ID,
                     Name = x.Name,
                     DayVisited = x.DayVisited,
                     NumberOfStudents = x.NumberOfStudents

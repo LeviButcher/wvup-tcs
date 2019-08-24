@@ -135,7 +135,7 @@ const LookupResults = ({ startDate, endDate, page, setFormValues }) => {
             queries={{ email, crn }}
             baseURL={`/dashboard/signins/${startDate}/${endDate}/`}
           />
-          <SignInsTable signIns={data.body} />
+          <SignInsTable signIns={data.body}  />
           <Paging
             currentPage={data.headers['current-page']}
             totalPages={data.headers['total-pages']}

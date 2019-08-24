@@ -9,6 +9,9 @@ namespace tcs_service.Models.ViewModels
     public class ClassTourViewModel
     {
         [Required]
+        public int Id { get; set; }
+
+        [Required]
         [MinLength(1)]
         public string Name { get; set; }
 
