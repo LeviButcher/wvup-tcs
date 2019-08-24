@@ -115,7 +115,7 @@ namespace tcs_service.Repos
             var context = new ValidationContext(signIn, null, null);
             if (!Validator.TryValidateObject(signIn, context, results, true))
             {
-               if(results.Any())
+                if (results.Any())
                 {
                     throw new Exception(results.ToString());
                 }
@@ -200,6 +200,8 @@ namespace tcs_service.Repos
 
         private async Task<Semester> AddSemester(int id)
         {
+            var found = await _db.Semesters.FindAsync(id);
+            if (found != null) return found;
             String name = "";
             if (id % 100 == 01)
             {
@@ -220,6 +222,7 @@ namespace tcs_service.Repos
                 ID = id,
                 Name = name
             });
+            await _db.SaveChangesAsync();
 
             return semester.Entity;
         }
@@ -273,11 +276,8 @@ namespace tcs_service.Repos
                 ID = result.studentID
             };
             await AddOrDoNothingIfExistsPerson(student);
-
-            result.classSchedule.ForEach(async course =>
-            {
-                await AddOrDoNothingIfExistsCourse(course);
-            });
+            await AddRangeOrDoNothingIfExistsCourse(result.classSchedule);
+            await AddSemester(result.semesterId);
 
             return result;
         }
@@ -287,13 +287,24 @@ namespace tcs_service.Repos
             if (await _db.People.AnyAsync(x => x.ID == person.ID)) return;
             await _db.People.AddAsync(person);
             await _db.SaveChangesAsync();
+            return;
         }
 
-        private async Task AddOrDoNothingIfExistsCourse(Course course)
+        private async Task<int> AddRangeOrDoNothingIfExistsCourse(List<Course> courses)
         {
-            if (await _db.Courses.AnyAsync(x => x.CRN == course.CRN)) return;
-            await _db.Courses.AddAsync(course);
-            await _db.SaveChangesAsync();
+            foreach (var course in courses)
+            {
+                var departmentFound = await _db.Departments.FindAsync(course.Department.Code);
+                if (departmentFound != null)
+                {
+                    course.Department = null;
+                    course.DepartmentID = departmentFound.Code;
+                }
+
+                var found = await _db.Courses.AnyAsync(x => x.CRN == course.CRN);
+                if (!found) _db.Courses.Add(course);
+            }
+            return await _db.SaveChangesAsync();
         }
 
         public async Task<StudentInfoViewModel> GetStudentInfoWithID(int studentID)
@@ -307,11 +318,8 @@ namespace tcs_service.Repos
                 ID = result.studentID
             };
             await AddOrDoNothingIfExistsPerson(student);
-
-            result.classSchedule.ForEach(async course =>
-            {
-                await AddOrDoNothingIfExistsCourse(course);
-            });
+            await AddRangeOrDoNothingIfExistsCourse(result.classSchedule);
+            await AddSemester(result.semesterId);
             return result;
         }
 
@@ -327,6 +335,7 @@ namespace tcs_service.Repos
                 PersonType = PersonType.Teacher
             };
             await AddOrDoNothingIfExistsPerson(teacher);
+            await AddSemester(result.semesterId);
             return result;
         }
 
@@ -342,6 +351,7 @@ namespace tcs_service.Repos
                 PersonType = PersonType.Teacher
             };
             await AddOrDoNothingIfExistsPerson(teacher);
+            await AddSemester(result.semesterId);
             return result;
         }
     }

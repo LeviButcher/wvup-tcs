@@ -5,16 +5,17 @@ const cardReaderStates = {
   setTime: 'setTime',
   reset: 'reset'
 };
-
+// readingCard: true
+// doneReadingCard: true
 const cardReaderReducer = (currState, { type, key }) => {
   switch (type) {
     case cardReaderStates.read:
       return {
         ...currState,
-        enteredValues: [...currState.enteredValues, key]
+        enteredValues: [...currState.enteredValues, key],
+        doneReadingCard: key === 'Enter'
       };
-    case cardReaderStates.setTime:
-      return { ...currState, lastRead: new Date() };
+
     case cardReaderStates.parse:
       return {
         ...currState,
@@ -29,22 +30,23 @@ const cardReaderReducer = (currState, { type, key }) => {
             return acc;
           },
           ['']
-        )
+        ),
+        enteredValues: [],
+        doneReadingCard: false
       };
-    case cardReaderStates.reset:
-      return { cardData: null, enteredValues: [], lastRead: null };
     default:
       return currState;
   }
 };
 
 const useCardReader = () => {
-  const [{ cardData, enteredValues, lastRead }, dispatch] = useReducer(
+  const [{ cardData, doneReadingCard }, dispatch] = useReducer(
     cardReaderReducer,
     {
       cardData: null,
       enteredValues: [],
-      lastRead: null
+      lastRead: null,
+      doneReadingCard: false
     }
   );
   const readKeys = ({ key }) => {
@@ -57,16 +59,10 @@ const useCardReader = () => {
   }, []);
 
   useEffect(() => {
-    const currTime = new Date();
-    if (currTime - lastRead < 100) {
-      dispatch({ type: cardReaderStates.parse });
-    } else {
-      dispatch({ type: cardReaderStates.reset });
-    }
-    dispatch({ type: cardReaderStates.setTime });
-  }, [enteredValues]);
+    if (doneReadingCard === true) dispatch({ type: cardReaderStates.parse });
+  }, [doneReadingCard]);
 
-  return [cardData];
+  return [cardData, doneReadingCard];
 };
 
 export default useCardReader;

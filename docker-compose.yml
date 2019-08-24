@@ -7,6 +7,7 @@ services:
       - tcs-service
     ports:
       - "80:80"
+    restart: always
 
   tcs-service:
     image: lcbutch/tcs-service:${TAG}
@@ -18,6 +19,7 @@ services:
       DB:connectionString: "Server=tcs-db;Database=tcs;User Id=SA;Password=Develop@90"
       AppSettings:Secret: SuperSecretkeyThatNooneWillEverknow
       ASPNETCORE_ENVIRONMENT: DEVELOPMENT
+    restart: always
 
   tcs-db:
     image: microsoft/mssql-server-linux
@@ -28,6 +30,7 @@ services:
       - "1443"
     volumes:
       - db-data:/var/opt/mssql
+    restart: always
 
   watchtower:
     image: containrrr/watchtower

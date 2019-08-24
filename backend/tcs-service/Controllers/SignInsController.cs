@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Net;
 using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
@@ -132,7 +130,7 @@ namespace tcs_service.Controllers
 
 
         [AllowAnonymous]
-        [HttpPut("{id}/signOut/id")]
+        [HttpPut("{id:int}/SignOut")]
         public async Task<IActionResult> SignOut([FromRoute] int id)
         {
             if (!ModelState.IsValid)

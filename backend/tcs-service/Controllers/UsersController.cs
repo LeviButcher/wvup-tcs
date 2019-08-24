@@ -69,7 +69,7 @@ namespace tcs_service.Controllers
                 Token = tokenString
             });
         }
-        
+
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody]UserDto userDto)
         {
