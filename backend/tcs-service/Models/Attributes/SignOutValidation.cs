@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 
 namespace tcs_service.Models.Attributes
 {
-
     [AttributeUsage(AttributeTargets.Property)]
     public class SignOutValidation : ValidationAttribute
     {
@@ -23,6 +22,7 @@ namespace tcs_service.Models.Attributes
             {
                 return ValidationResult.Success;
             }
+
             DateTimeOffset outTime = (DateTimeOffset)value;
 
             DateTimeOffset inTime = (DateTimeOffset)validationContext.ObjectType.GetProperty(DateToCompareToFieldName).GetValue(validationContext.ObjectInstance, null);

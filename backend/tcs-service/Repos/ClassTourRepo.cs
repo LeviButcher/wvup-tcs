@@ -5,8 +5,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using tcs_service.EF;
 using tcs_service.Models;
+using tcs_service.Helpers;
 using tcs_service.Repos.Base;
 using tcs_service.Repos.Interfaces;
+using tcs_service.Models.ViewModels;
 
 namespace tcs_service.Repos
 {
@@ -39,14 +41,14 @@ namespace tcs_service.Repos
         {
             return _db.ClassTours;
         }
-
-
-        public async Task<IEnumerable<ClassTour>> GetBetweenDates(DateTime start, DateTime end)
-        {
-            
+        
+        public async Task<PagingModel<ClassTourViewModel>> GetBetweenDates(DateTime start, DateTime end, int skip, int take)
+        {            
             var tours = _db.ClassTours.Where(a => a.DayVisited > start && a.DayVisited < end);
+            var totalDataCount = await tours.CountAsync();
+            var pageData = GetPageData(tours, skip, take);
 
-            return tours;
+            return new PagingModel<ClassTourViewModel>(skip, take, totalDataCount, pageData);
         }
 
         public async override Task<ClassTour> Remove(int id)
@@ -62,6 +64,19 @@ namespace tcs_service.Repos
             _db.ClassTours.Update(tour);
             await _db.SaveChangesAsync();
             return tour;
+        }
+
+        private IQueryable<ClassTourViewModel> GetPageData(IQueryable<ClassTour> tours, int skip, int take)
+        {
+            return tours
+                .Skip(skip).Take(take)
+                .Select(x => new ClassTourViewModel()
+                {  
+                    Id = x.ID,
+                    Name = x.Name,
+                    DayVisited = x.DayVisited,
+                    NumberOfStudents = x.NumberOfStudents
+                });
         }
     }
 }

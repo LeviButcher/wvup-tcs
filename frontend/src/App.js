@@ -70,7 +70,7 @@ function App() {
                 action="Update"
                 type="update"
               />
-              <ClassTourLookup path="/tours" />
+              <ClassTourLookup path="/tours/*" />
               <ClassTourForm path="/tours/create" />
               <Fetch
                 url="classtours/"
