@@ -54,9 +54,9 @@ namespace tcs_service.Repos
         {
             var dailySignIns = _db.SignIns
                 .OrderByDescending(x => x.InTime)
-                .Where(x => x.InTime.Value.Day == DateTime.Now.Day
-                && x.InTime.Value.Month == DateTime.Now.Month
-                && x.InTime.Value.Year == DateTime.Now.Year)
+                .Where(x => x.InTime.Value.Day == DateTime.UtcNow.Day
+                && x.InTime.Value.Month == DateTime.UtcNow.Month
+                && x.InTime.Value.Year == DateTime.UtcNow.Year)
                .Include(x => x.Courses).ThenInclude(x => x.Course)
                .Include(x => x.Reasons).ThenInclude(x => x.Reason);
 
