@@ -26,7 +26,7 @@ const ReasonTable = ({ reasons }) => (
     <thead align="left">
       <tr>
         <th>Name</th>
-        <th>Deleted</th>
+        <th>Inactive</th>
         <th>Actions</th>
       </tr>
     </thead>
