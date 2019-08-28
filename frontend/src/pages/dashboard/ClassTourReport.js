@@ -42,6 +42,7 @@ const ClassTourResult = ({ startDate, endDate }) => {
           x={d => d.name}
           y={d => d.students}
           title="Class Tour Chart"
+          horizontal
           yLabel="# of Students"
           labels={d => d.students}
           padding={{ left: 75, right: 75, top: 50, bottom: 50 }}
@@ -56,7 +57,7 @@ const ClassTourSumTable = ({ classTours }) => {
     <Table>
       <caption>
         <Header>
-          Total visitors per group -{' '}
+          Total tourists per Class Tour -{' '}
           <CSVLink data={classTours} filename="classTourReport">
             Download
           </CSVLink>

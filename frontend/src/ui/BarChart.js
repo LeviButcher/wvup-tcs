@@ -12,7 +12,6 @@ const BarChart = ({ data, x, y, xLabel, yLabel, title, labels, ...props }) => (
   <VictoryChart
     theme={VictoryTheme.material}
     domainPadding={20}
-    horizontal
     animate={{ duration: 1000 }}
     {...props}
   >
@@ -23,15 +22,16 @@ const BarChart = ({ data, x, y, xLabel, yLabel, title, labels, ...props }) => (
     />
     <VictoryAxis
       label={xLabel}
+      fixLabelOverlap
       tickLabelComponent={<VictoryLabel renderInPortal />}
     />
-    <VictoryLabel text={title} x={180} y={30} textAnchor="middle" />
+    <VictoryLabel text={title} x={175} y={30} textAnchor="middle" />
     <VictoryBar
       data={data}
       x={x}
       y={y}
       labels={labels}
-      labelComponent={<VictoryTooltip />}
+      labelComponent={<VictoryTooltip text={d => `${x(d)}: ${y(d)}`} />}
     />
   </VictoryChart>
 );

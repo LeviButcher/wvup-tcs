@@ -1,7 +1,14 @@
 import React from 'react';
 import { CSVLink } from 'react-csv';
 import { Router } from '@reach/router';
-import { ReportLayout, Table, Header, Card, LineChart } from '../../ui';
+import {
+  ReportLayout,
+  Table,
+  Header,
+  Card,
+  LineChart,
+  BarChart
+} from '../../ui';
 import StartToEndDateForm from '../../components/StartToEndDateForm';
 import useApiWithHeaders from '../../hooks/useApiWithHeaders';
 import LoadingContent from '../../components/LoadingContent';
@@ -35,15 +42,13 @@ const VolunteerResult = ({ startDate, endDate }) => {
   return (
     <LoadingContent loading={loading} data={data} errors={errors}>
       <Card width="600px" style={{ gridArea: 'chart' }}>
-        <LineChart
+        <BarChart
           data={data.body}
           x={d => d.fullName}
           y={d => d.totalHours}
-          xLabel="Email"
           yLabel="Total Hours"
           title="Volunteer Total Chart"
           labels={d => d.totalHours}
-          domain={{ y: [0, 10] }}
         />
       </Card>
       <Card width="900px" style={{ gridArea: 'table' }}>

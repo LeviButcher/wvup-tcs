@@ -180,8 +180,8 @@ const SuccessTable = ({ successRecords, setPieChartData }) => {
           <th>CRN</th>
           <th>Unique Students</th>
           <th>Dropped Course</th>
-          <th title="Didn't drop out of course">Completed Course</th>
-          <th title="Grade of C or higher">Passed Course</th>
+          <th title="Grade below C">Completed Unsuccessfully</th>
+          <th title="Grade of C or higher">Completed Successfully</th>
         </tr>
       </thead>
       <tbody>{allRows}</tbody>

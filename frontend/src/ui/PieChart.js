@@ -19,7 +19,13 @@ const PieChart = ({ data, x, y, title, ...props }) => (
       labelComponent={<LabelWithPercentage />}
       {...props}
     />
-    <VictoryLabel text={title} x={250} y={20} textAnchor="middle" />
+    <VictoryLabel
+      text={title}
+      x={250}
+      y={20}
+      textAnchor="middle"
+      style={{ fontSize: '20px' }}
+    />
     <text x={250} y={500} textAnchor="middle">
       Total Students:{data.map(d => y(d)).reduce(add, 0)}
     </text>

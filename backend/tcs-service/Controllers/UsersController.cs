@@ -16,7 +16,7 @@ using tcs_service.Repos.Interfaces;
 
 namespace tcs_service.Controllers
 {
-    
+
     [ApiController]
     [Authorize]
     [Route("api/[controller]")]
