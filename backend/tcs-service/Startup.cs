@@ -1,5 +1,4 @@
-﻿using System.Xml.Serialization;
-using System;
+﻿using System;
 using System.Net.Http.Headers;
 using System.Text;
 using AutoMapper;
@@ -15,7 +14,6 @@ using Newtonsoft.Json;
 using Quartz;
 using Quartz.Impl;
 using Quartz.Spi;
-using tcs_service.Controllers;
 using tcs_service.EF;
 using tcs_service.Helpers;
 using tcs_service.Repos;
@@ -24,6 +22,7 @@ using tcs_service.Services;
 using tcs_service.Services.Interfaces;
 using tcs_service.Services.ScheduledTasks;
 using Helpers;
+using System.Threading.Tasks;
 
 namespace tcs_service
 {
@@ -127,13 +126,12 @@ namespace tcs_service
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, TCSContext db)
+        public void Configure(IApplicationBuilder app, TCSContext db, IUserRepo repo)
         {
-
+            Task.Run(() => DbInitializer.InitializeData(db, repo, Environment)).Wait();
             if (Environment.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-                DbInitializer.InitializeData(db);
             }
             else
             {
