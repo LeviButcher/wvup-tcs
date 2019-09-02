@@ -47,7 +47,7 @@ namespace tcs_service
                     {
                         builder.WithOrigins("*")
                             .AllowAnyHeader()
-                            .WithExposedHeaders("*")
+                            .WithExposedHeaders("*", "Total-Pages", "Total-Records", "Current-Page", "Next", "Prev")
                             .AllowAnyMethod();
                     });
             });
