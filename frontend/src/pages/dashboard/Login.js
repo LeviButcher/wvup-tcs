@@ -1,7 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
 import { Form, Field, Formik } from 'formik';
-import { navigate } from '@reach/router';
 import Topography from '../../images/topography.svg';
 import { callApi, ensureResponseCode, unwrapToJSON } from '../../utils';
 import { Card, Header, Input, Button } from '../../ui';
@@ -30,7 +29,7 @@ const Login = () => {
                   user.token
                 );
                 localStorage.setItem('username', user.username);
-                navigate('/dashboard');
+                window.history.back();
               })
               .catch(setStatus)
               .finally(() => {
