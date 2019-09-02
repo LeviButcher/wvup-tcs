@@ -57,7 +57,6 @@ const SignInRow = ({
     type
   }
 }) => {
-  console.log(new Date(outTime) - new Date(inTime));
   return (
     <tr>
       <td>{email}</td>
