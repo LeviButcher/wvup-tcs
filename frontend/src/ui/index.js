@@ -12,6 +12,7 @@ import BarChart from './BarChart';
 import PieChart from './PieChart';
 import Paging from './Paging';
 import ZoomedLineChart from './ZoomedLineChart';
+import FormikDateTimePicker from './FormikDateTimePicker';
 
 export {
   Card,
@@ -27,5 +28,6 @@ export {
   BarChart,
   PieChart,
   Paging,
-  ZoomedLineChart
+  ZoomedLineChart,
+  FormikDateTimePicker
 };

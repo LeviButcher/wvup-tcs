@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { Formik, Form, Field } from 'formik';
 import * as Yup from 'yup';
-import { Card, Input, Header, Button } from '../../ui';
+import { Card, Input, Header, Button, FormikDateTimePicker } from '../../ui';
 import { callApi, ensureResponseCode, unwrapToJSON } from '../../utils';
 
 const SignInUpdateSchema = Yup.object()
@@ -76,14 +76,13 @@ const SignInTeacher = ({ data = defaultData, type = crudTypes.create }) => {
         <Formik
           initialValues={{
             email: signInTeacherRecord.email,
-            inTime: signInTeacherRecord.inTime,
-            outTime: signInTeacherRecord.outTime,
+            inTime: new Date(signInTeacherRecord.inTime),
+            outTime: new Date(signInTeacherRecord.outTime),
             teacher: true
           }}
           validationSchema={SignInUpdateSchema}
           onSubmit={async (values, { setSubmitting }) => {
             // massage data back into server format
-            console.log(signInTeacherRecord);
             const signIn = {
               ...values,
               id: signInTeacherRecord.id,
@@ -131,20 +130,20 @@ const SignInTeacher = ({ data = defaultData, type = crudTypes.create }) => {
                 label="Email"
                 disabled={type !== crudTypes.create}
               />
-              <Field
-                id="inTime"
-                type="datetime-local"
-                name="inTime"
-                component={Input}
-                label="In Time"
-              />
-              <Field
-                id="outTime"
-                type="datetime-local"
-                name="outTime"
-                component={Input}
-                label="Out Time"
-              />
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <Field
+                  id="inTime"
+                  name="inTime"
+                  component={FormikDateTimePicker}
+                  label="In Time"
+                />
+                <Field
+                  id="outTime"
+                  name="outTime"
+                  component={FormikDateTimePicker}
+                  label="Out Time"
+                />
+              </div>
               <br />
               <Button
                 type="submit"
