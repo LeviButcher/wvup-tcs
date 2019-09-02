@@ -2,6 +2,15 @@ import React from 'react';
 import { Table, Link } from '../ui';
 import { Gear, Trashcan } from '../ui/icons';
 
+function hourDifferenceInTime(date, date2) {
+  const { bigDate, smallDate } =
+    date > date2
+      ? { bigDate: date, smallDate: date2 }
+      : { bigDate: date2, smallDate: date };
+  const diff = (bigDate.getTime() - smallDate.getTime()) / 1000;
+  return (diff / 60 / 60).toFixed(2);
+}
+
 const SignInsTable = ({ signIns }) => {
   return (
     <Table>
@@ -48,7 +57,7 @@ const SignInRow = ({
     type
   }
 }) => {
-  console.log(inTime);
+  console.log(new Date(outTime) - new Date(inTime));
   return (
     <tr>
       <td>{email}</td>
@@ -63,7 +72,7 @@ const SignInRow = ({
       </td>
       <td align="center">
         {outTime
-          ? new Date(outTime).getHours() - new Date(inTime).getHours()
+          ? hourDifferenceInTime(new Date(inTime), new Date(outTime))
           : ''}
       </td>
       <td>{courses.map(course => course.shortName).join(', ')}</td>

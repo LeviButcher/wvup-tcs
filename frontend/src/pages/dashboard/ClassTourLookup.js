@@ -1,18 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import ScaleLoader from 'react-spinners/ScaleLoader';
+import { Router } from '@reach/router';
 import StartToEndDate from '../../components/StartToEndDateForm';
 import ClassToursTable from '../../components/ClassToursTable';
 import { Paging, Link, Button, Card } from '../../ui';
 import StartToEndDateSchema from '../../schemas/StartToEndDateSchema';
-import { Router } from '@reach/router';
 import useApiWithHeaders from '../../hooks/useApiWithHeaders';
 
 const take = 20;
-const getClassTourUrl = (start, end, page = 1 ) => {
+const getClassTourUrl = (start, end, page = 1) => {
   if (start == null || end == null) return '';
-  const endpoint = `classtours/?start=${start}&end=${end}&skip=${page * take - take}&take=${take}`;
+  const endpoint = `classtours/?start=${start}&end=${end}&skip=${page * take -
+    take}&take=${take}`;
   return endpoint;
-}
+};
 
 const ClassTourLookup = ({ navigate }) => {
   const [{ startDate, endDate }, setFormValues] = useState({});
@@ -22,7 +23,7 @@ const ClassTourLookup = ({ navigate }) => {
       <div>
         <Card>
           <h3>Additional Actions</h3>
-          <div 
+          <div
             style={{
               display: 'grid',
               justifyContent: 'space-between',
@@ -31,7 +32,7 @@ const ClassTourLookup = ({ navigate }) => {
             }}
           >
             <Link to="create">
-              <Button intent="secondary" align="left">
+              <Button intent="primary" align="left">
                 Add Class Tour
               </Button>
             </Link>
@@ -41,26 +42,24 @@ const ClassTourLookup = ({ navigate }) => {
         <StartToEndDate
           name="ClassTour Lookup"
           onSubmit={(values, { setSubmitting }) => {
-             navigate(
-               `${values.startDate}/${values.endDate}/1`
-               );
-               setSubmitting(false);
+            navigate(`${values.startDate}/${values.endDate}/1`);
+            setSubmitting(false);
           }}
-            submitText="Run Lookup"
-            initialValues={{
-              startDate: startDate || '',
-              endDate: endDate || ''
-            }}
-            isInitialValid={false}
-            validationSchema={StartToEndDateSchema}
-            enableReinitialize
-          ></StartToEndDate>
-          <Router primary={false}>
-            <LookupResults
-              path=":startDate/:endDate/:page"
-              setFormValues={setFormValues}
-            />
-          </Router>
+          submitText="Run Lookup"
+          initialValues={{
+            startDate: startDate || '',
+            endDate: endDate || ''
+          }}
+          isInitialValid={false}
+          validationSchema={StartToEndDateSchema}
+          enableReinitialize
+        ></StartToEndDate>
+        <Router primary={false}>
+          <LookupResults
+            path=":startDate/:endDate/:page"
+            setFormValues={setFormValues}
+          />
+        </Router>
       </div>
     </>
   );
@@ -72,7 +71,7 @@ const LookupResults = ({ startDate, endDate, page, setFormValues }) => {
   useEffect(() => {
     setFormValues({ startDate, endDate });
   }, [startDate, endDate]);
-  
+
   return (
     <>
       <ScaleLoader sizeUnit="px" size={150} loading={loading} align="center" />
@@ -84,10 +83,10 @@ const LookupResults = ({ startDate, endDate, page, setFormValues }) => {
             totalPages={data.headers['total-pages']}
             next={data.headers.next}
             prev={data.headers.prev}
-            queries={{ }}
+            queries={{}}
             baseURL={`/dashboard/tours/${startDate}/${endDate}/`}
           />
-          
+
           <ClassToursTable classTours={data.body} />
 
           <Paging
@@ -95,7 +94,7 @@ const LookupResults = ({ startDate, endDate, page, setFormValues }) => {
             totalPages={data.headers['total-pages']}
             next={data.headers.next}
             prev={data.headers.prev}
-            queries={{ }}
+            queries={{}}
             baseURL={`/dashboard/tours/${startDate}/${endDate}/`}
           />
         </Card>
