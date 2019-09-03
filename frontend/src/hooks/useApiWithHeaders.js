@@ -23,9 +23,11 @@ const useApiWithHeaders = uri => {
       .then(ensureResponseCode(200))
       .then(async response => {
         const buildData = { headers: {} };
+        console.log(response);
         response.headers.forEach((value, key) => {
           buildData.headers[key] = value;
         });
+        console.log(buildData.headers);
         buildData.body = await response.json();
         dispatch({ type: loadingStates.done, data: buildData });
       })
