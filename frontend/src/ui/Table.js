@@ -3,6 +3,7 @@ import styled from 'styled-components';
 export default styled.table`
   width: 100%;
   border-collapse: collapse;
+  overflow-wrap: break-word;
 
   & > thead {
     background: ${props => props.theme.color.main};

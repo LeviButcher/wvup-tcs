@@ -79,7 +79,7 @@ const SuccessResult = ({ semester }) => {
   const [pieChartData, setPieChartData] = useState();
   return (
     <LoadingContent loading={loading} data={data} errors={errors}>
-      <Card width="1000px" style={{ gridArea: 'table' }}>
+      <Card width="auto" style={{ gridArea: 'table' }}>
         <SuccessTable
           successRecords={data.body}
           setPieChartData={setPieChartData}

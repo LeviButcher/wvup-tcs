@@ -1,14 +1,7 @@
 import React from 'react';
 import { CSVLink } from 'react-csv';
 import { Router } from '@reach/router';
-import {
-  ReportLayout,
-  Table,
-  Header,
-  Card,
-  LineChart,
-  BarChart
-} from '../../ui';
+import { ReportLayout, Table, Header, Card, BarChart } from '../../ui';
 import StartToEndDateForm from '../../components/StartToEndDateForm';
 import useApiWithHeaders from '../../hooks/useApiWithHeaders';
 import LoadingContent from '../../components/LoadingContent';

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from '@reach/router';
-import { Table, Header } from '../../ui';
+import { Table, Header, Card } from '../../ui';
 import useApiWithHeaders from '../../hooks/useApiWithHeaders';
 import { Gear } from '../../ui/icons';
 import LoadingContent from '../../components/LoadingContent';
@@ -12,7 +12,9 @@ const ReasonManagement = () => {
     <div>
       <Link to="create">Add Reason</Link>
       <LoadingContent loading={loading} data={data} errors={errors}>
-        <ReasonTable reasons={data.body} />
+        <Card width="auto">
+          <ReasonTable reasons={data.body} />
+        </Card>
       </LoadingContent>
     </div>
   );
