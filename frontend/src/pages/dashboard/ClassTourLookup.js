@@ -77,7 +77,7 @@ const LookupResults = ({ startDate, endDate, page, setFormValues }) => {
       <ScaleLoader sizeUnit="px" size={150} loading={loading} align="center" />
       {!loading && data.body.length < 1 && <h3>No reconds found for search</h3>}
       {!loading && data && data.headers && data.body.length >= 1 && (
-        <Card width="1400px">
+        <Card width="auto">
           <Paging
             currentPage={data.headers['current-page']}
             totalPages={data.headers['total-pages']}
@@ -86,9 +86,7 @@ const LookupResults = ({ startDate, endDate, page, setFormValues }) => {
             queries={{}}
             baseURL={`/dashboard/tours/${startDate}/${endDate}/`}
           />
-
           <ClassToursTable classTours={data.body} />
-
           <Paging
             currentPage={data.headers['current-page']}
             totalPages={data.headers['total-pages']}

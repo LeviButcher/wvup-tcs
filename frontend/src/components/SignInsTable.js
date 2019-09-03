@@ -16,7 +16,7 @@ const SignInsTable = ({ signIns }) => {
     <Table>
       <thead align="left">
         <tr>
-          <th>Email</th>
+          <th>Email (@wvup.edu)</th>
           <th>Full Name</th>
           <th align="center">In</th>
           <th align="center">Out</th>
@@ -57,10 +57,9 @@ const SignInRow = ({
     type
   }
 }) => {
-  console.log(new Date(outTime) - new Date(inTime));
   return (
     <tr>
-      <td>{email}</td>
+      <td style={{ maxWidth: '150px' }}>{email.split('@')[0]}</td>
       <td>{fullName}</td>
       <td align="center">
         {new Date(inTime).toLocaleDateString(undefined, dateOptions)}

@@ -11,20 +11,19 @@ export default styled.div`
     'chart table' 1fr / auto 1fr;
 
   /* need to fix this media queries */
-  @media (max-width: 1350px) {
-    align-items: start;
-    justify-items: center;
+  @media (max-width: 1880px) {
     grid-template:
       'form chart' auto
-      'table table' auto / 1fr 2fr;
+      'table table' auto / 1fr auto;
   }
 
-  @media (max-width: 800px) {
+  /* 1660px */
+  @media (max-width: 1660px) {
     align-items: center;
     justify-items: center;
     grid-template:
       'form' auto
       'chart' auto
-      'table' auto / 1fr 2fr;
+      'table' auto / auto;
   }
 `;

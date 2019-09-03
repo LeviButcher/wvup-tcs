@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from '@reach/router';
 import LoadingContent from '../../components/LoadingContent';
-import { Table, Header } from '../../ui';
+import { Table, Header, Card } from '../../ui';
 import { callApi } from '../../utils';
 import { Gear, Trashcan } from '../../ui/icons';
 import useApiWithHeaders from '../../hooks/useApiWithHeaders';
@@ -15,7 +15,9 @@ const UserManagement = ({ navigate }) => {
     <div>
       <a href="users/create">Add User</a>
       <LoadingContent loading={loading} data={data} errors={errors}>
-        <UserTable users={data.body} navigate={navigate} />
+        <Card width="auto">
+          <UserTable users={data.body} navigate={navigate} />
+        </Card>
       </LoadingContent>
     </div>
   );
