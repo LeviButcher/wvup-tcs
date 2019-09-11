@@ -4,6 +4,8 @@
   "private": true,
   "dependencies": {
     "@reach/router": "^1.2.1",
+    "eslint-plugin-jest": "^22.17.0",
+    "flow-bin": "^0.107.0",
     "formik": "^1.5.7",
     "normalize.css": "^8.0.1",
     "ramda": "^0.26.1",
@@ -23,7 +25,8 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "flow": "flow"
   },
   "eslintConfig": {
     "extends": "react-app"

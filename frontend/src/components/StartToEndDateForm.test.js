@@ -1,23 +1,12 @@
-/* eslint-disable */
 import React from 'react';
 import '@testing-library/jest-dom/extend-expect';
-import {
-  render,
-  fireEvent,
-  cleanup,
-  waitForElement,
-  wait,
-  act
-} from 'CustomReactTestingLibrary'; // eslint-disable-line
+import { render, fireEvent, cleanup, wait } from 'CustomReactTestingLibrary';
 import StartToEndDateForm from './StartToEndDateForm';
 
-// put this in jest config
 afterEach(cleanup);
 
 test('EndDate has to be after StartDate to submit', async () => {
-  const { getByLabelText, getByText, debug, findByText } = render(
-    <StartToEndDateForm />
-  );
+  const { getByLabelText, getByText } = render(<StartToEndDateForm />);
   const startDate = getByLabelText(/start/i);
   const endDate = getByLabelText(/end/i);
   const submit = getByText(/run report/i);
@@ -34,4 +23,4 @@ test('EndDate has to be after StartDate to submit', async () => {
   await wait(() => {
     expect(submit).toBeDisabled();
   });
-}, 9999);
+});
