@@ -1,0 +1,49 @@
+version: "3.7"
+
+services:
+  tcs-front:
+    build:
+      context: ./frontend/
+    depends_on:
+      - "tcs-service"
+    ports:
+      - "3000:5000"
+    restart: always
+
+  tcs-service:
+    build:
+      context: ./backend/tcs-service
+    depends_on:
+      - "tcs-db"
+    env_file:
+      - .env
+    restart: always
+
+  tcs-db:
+    image: microsoft/mssql-server-linux
+    env_file:
+      - .env
+    expose:
+      - "1443"
+    volumes:
+      - db-data:/var/opt/mssql
+    restart: always
+
+  nginx:
+    image: nginx:1.15-alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./data/nginx:/etc/nginx/conf.d
+      - ./data/certbot/conf:/etc/letsencrypt
+      - ./data/certbot/www:/var/www/certbot
+
+  certbot:
+    image: certbot/certbot
+    volumes:
+      - ./data/certbot/conf:/etc/letsencrypt
+      - ./data/certbot/www:/var/www/certbot
+
+volumes:
+  db-data:
