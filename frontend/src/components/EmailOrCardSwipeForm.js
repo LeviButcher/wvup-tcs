@@ -1,3 +1,5 @@
+// @flow
+
 import React, { useEffect, useReducer } from 'react';
 import { Formik, Form, Field } from 'formik';
 import ScaleLoader from 'react-spinners/ScaleLoader';
@@ -26,9 +28,13 @@ const getTeacherInfoWithEmail = email =>
 const getTeacherInfoWithId = id =>
   callApi(`signins/${id}/teacher/id`, 'GET', null);
 
-// email or listen for card swipe, check banner on submit, go to next
-// swipe id make auto submit
-const EmailOrCardSwipeForm = ({ afterValidSubmit, teacher }) => {
+const EmailOrCardSwipeForm = ({
+  afterValidSubmit,
+  teacher
+}: {
+  afterValidSubmit: Function,
+  teacher: boolean
+}) => {
   const [data] = useCardReader();
   const [{ loading, errors }, dispatch] = useReducer(loadingReducer, {});
 
