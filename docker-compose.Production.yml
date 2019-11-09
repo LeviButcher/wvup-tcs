@@ -1,20 +1,22 @@
-version: "3.7"
+version: "3.0"
 
 services:
   tcs-front:
-    image: lcbutch/tcs-front:prod
+    image: lcbutch/tcs-front:master
     depends_on:
       - "tcs-service"
-    ports:
-      - "80:80"
+    expose:
+      - "5000"
+    env_file:
+      - .env
     restart: always
 
   tcs-service:
     image: lcbutch/tcs-service:master
     depends_on:
       - "tcs-db"
-    ports:
-      - "8080:80"
+    expose:
+      - "80"
     env_file:
       - .env
     restart: always
@@ -28,6 +30,19 @@ services:
     volumes:
       - db-data:/var/opt/mssql
     restart: always
+
+  letsencrypt:
+    image: linuxserver/letsencrypt
+    env_file:
+      - .env
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx:/config/nginx/site-confs
+    depends_on:
+      - "tcs-front"
+      - "tcs-service"
 
   watchtower:
     image: containrrr/watchtower
