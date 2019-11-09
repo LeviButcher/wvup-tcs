@@ -5,6 +5,5 @@ WORKDIR /app
 COPY package.json package-lock.json ./
 RUN npm install
 COPY . ./
-RUN npm run build
-RUN npm i -g serve
-ENTRYPOINT [ "serve", "-s", "/app/build"]
+RUN chmod 755 startScript
+ENTRYPOINT [ "/app/startScript" ]

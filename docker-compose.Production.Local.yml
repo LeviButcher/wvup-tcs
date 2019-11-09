@@ -1,19 +1,23 @@
+version: "3.0"
+
 services:
   tcs-front:
     build:
       context: ./frontend/
     depends_on:
       - "tcs-service"
-    ports:
-      - "5050:5000"
+    expose:
+      - "5000"
+    env_file:
+      - .env
     restart: always
 
   tcs-service:
     image: lcbutch/tcs-service:master
     depends_on:
       - "tcs-db"
-    ports:
-      - "8080:80"
+    expose:
+      - "80"
     env_file:
       - .env
     restart: always
@@ -28,13 +32,6 @@ services:
       - db-data:/var/opt/mssql
     restart: always
 
-  nginx:
-    image: nginx:1.15-alpine
-    volumes:
-      - ./data/nginx:/etc/nginx/conf.d
-      - ./data/certbot/conf:/etc/letsencrypt
-    command: '/bin/sh -c ''while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g "daemon off;"'''
-
   letsencrypt:
     image: linuxserver/letsencrypt
     environment:
@@ -44,12 +41,15 @@ services:
       STAGING: "True"
       ONLY_SUBDOMAINS: "TRUE"
       SUBDOMAINS: "devtcs"
+      EMAIL: "levibutcher355@gmail.com"
     ports:
       - "80:80"
       - "443:443"
     volumes:
-      - ./data/le-ssl/:/etc/letsencrypt
-      - ./data/nginx/:/config/nginx/site-confs/
+      - ./config:/config
+    depends_on:
+      - "tcs-front"
+      - "tcs-service"
 
 volumes:
   db-data:
