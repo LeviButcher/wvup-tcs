@@ -1,6 +1,11 @@
 {
-  "extends": ["airbnb", "prettier", "prettier/react"],
-  "plugins": ["prettier"],
+  "extends": [
+    "airbnb",
+    "prettier",
+    "prettier/react",
+    "plugin:jest/recommended"
+  ],
+  "plugins": ["jest", "prettier"],
   "rules": {
     "react/jsx-filename-extension": [
       1,
@@ -24,6 +29,7 @@
     "jsx-a11y/label-has-for": off
   },
   "globals": {
+    "jest/globals": true,
     "window": true,
     "document": true,
     "localStorage": true,
@@ -32,6 +38,9 @@
     "Blob": true,
     "navigator": true,
     "fetch": true
+  },
+  "settings": {
+    "import/core-modules": ["CustomReactTestingLibrary"]
   },
   "parser": "babel-eslint"
 }
