@@ -136,12 +136,6 @@ workflows:
       - deploy-back:
           requires:
             - test-back
-          filters:
-            branches:
-              only: master
       - deploy-front:
           requires:
             - test-front
-          filters:
-            branches:
-              only: master
