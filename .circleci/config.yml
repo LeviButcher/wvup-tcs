@@ -1,8 +1,30 @@
-# Javascript Node CircleCI 2.0 configuration file
-#
-# Check https://circleci.com/docs/2.0/language-javascript/ for more details
-#
 version: 2.1
+
+aliases:
+  - &restore_npm_cache
+    restore_cache:
+      name: Restore node_modules cache
+      keys:
+        - v1-front-{{ checksum "package.json" }}
+        - v1-front-
+  - &install_npm
+    run:
+      name: Install NPM Packages
+      command: npm install
+  - &restore_dotnet_cache
+    restore_cache:
+      name: Restore nuget cache
+      keys:
+        - v1-back-dependencies-{{ checksum "tcs-service/tcs-service.csproj" }}-{{ checksum "tcs-service-tests/tcs-service-tests.csproj" }}
+        - v1-back-dependencies-
+  - &install_nuget
+    run:
+      name: Install nuget packages
+      command: dotnet restore
+  - &login_docker
+    run:
+      name: Login with Docker Account
+      command: docker login -u $DOCKER_USER -p $DOCKER_PASS
 
 executors:
   front-exec:
@@ -13,163 +35,126 @@ executors:
     docker:
       - image: mcr.microsoft.com/dotnet/core/sdk:2.2
     working_directory: ~/repo
+  # Used for running docker commands
+  docker-exec:
+    docker:
+      - image: circleci/buildpack-deps:stretch
+    working_directory: ~/repo
 
 jobs:
-  checkout-code-front:
+  setup-front:
     executor: front-exec
+    working_directory: ~/repo/frontend
     steps:
-      - checkout
+      - checkout:
+          path: ~/repo
+      - *restore_npm_cache
+      - *install_npm
       - save_cache:
-          key: v1-frontend-{{ .Environment.CIRCLE_SHA1 }}
+          name: Cache node_modules
           paths:
-            - ~/repo/frontend
+            - node_modules
+          key: v1-front-{{ checksum "package.json" }}
 
-  build-front:
+  flow:
     executor: front-exec
+    working_directory: ~/repo/frontend
     steps:
-      # Download and cache dependencies
-      - restore_cache:
-          keys:
-            - v1-frontend-{{ .Environment.CIRCLE_SHA1 }}
-      - restore_cache:
-          keys:
-            - v1-front-dependencies-{{ checksum "frontend/package.json" }}
-            # fallback to using the latest cache if no exact match is found
-            - v1-front-dependencies-
-
-      - run: cd frontend && npm install
-
-      - save_cache:
-          paths:
-            - frontend/node_modules
-          key: v1-front-dependencies-{{ checksum "frontend/package.json" }}
+      - checkout:
+          path: ~/repo
+      - *restore_npm_cache
+      - *install_npm
+      - run: npm run flow
 
   test-front:
     executor: front-exec
+    working_directory: ~/repo/frontend
     steps:
-      - restore_cache:
-          keys:
-            - v1-frontend-{{ .Environment.CIRCLE_SHA1 }}
-      - restore_cache:
-          keys:
-            - v1-front-dependencies-{{ checksum "frontend/package.json" }}
-            # fallback to using the latest cache if no exact match is found
-            - v1-front-dependencies-
-      # run tests!
-      - run: cd frontend && npm test
+      - checkout:
+          path: ~/repo
+      - *restore_npm_cache
+      - *install_npm
+      - run: npm test
 
-  deploy-front:
-    executor: front-exec
-    steps:
-      - setup_remote_docker
-      - restore_cache:
-          keys:
-            - v1-frontend-{{ .Environment.CIRCLE_SHA1 }}
-      - restore_cache:
-          keys:
-            - v1-front-dependencies-{{ checksum "frontend/package.json" }}
-            # fallback to using the latest cache if no exact match is found
-            - v1-front-dependencies-
-
-      - run: docker login -u $DOCKER_USER -p $DOCKER_PASS
-      - run: docker build --build-arg REACT_APP_BACKEND=$REACT_APP_BACKEND --build-arg REACT_APP_TOKEN=$REACT_APP_TOKEN -t lcbutch/tcs-front:$CIRCLE_BRANCH frontend/
-      - run: docker build --build-arg REACT_APP_BACKEND=$REACT_APP_BACKEND_PROD --build-arg REACT_APP_TOKEN=$REACT_APP_TOKEN -t lcbutch/tcs-front:prod frontend/
-      - run: docker push lcbutch/tcs-front:$CIRCLE_BRANCH
-      - run: docker push lcbutch/tcs-front:prod
-
-  checkout-code-back:
+  setup-back:
     executor: back-exec
+    working_directory: ~/repo/backend
     steps:
-      - checkout
+      - checkout:
+          path: ~/repo
+      - *restore_dotnet_cache
+      - *install_nuget
       - save_cache:
-          key: v1-backend-{{ .Environment.CIRCLE_SHA1 }}
-          paths:
-            - ~/repo/backend
-
-  build-back:
-    executor: back-exec
-    steps:
-      - restore_cache:
-          keys:
-            - v1-backend-{{ .Environment.CIRCLE_SHA1 }}
-      - restore_cache:
-          keys:
-            - v1-back-dependencies-{{ checksum "backend/tcs-service/tcs-service.csproj" }}
-            - v1-back-dependencies-
-
-      - run: cd backend/ && dotnet restore tcs-service
-      - run: cd backend/ && dotnet restore tcs-service-test
-
-      - save_cache:
+          name: Save dotnet cache
           paths:
             - ~/.nuget/packages
-          key: v1-back-dependencies-{{ checksum "backend/tcs-service/tcs-service.csproj" }}
+          key: v1-back-dependencies-{{ checksum "sXb-service/sXb-service.csproj" }}-{{ checksum "sXb-service-tests/sXb-service-tests.csproj" }}
 
   test-back:
     executor: back-exec
+    working_directory: ~/repo/backend
     steps:
-      - restore_cache:
-          keys:
-            - v1-backend-{{ .Environment.CIRCLE_SHA1 }}
-      - restore_cache:
-          keys:
-            - v1-back-dependencies-{{ checksum "backend/tcs-service/tcs-service.csproj" }}
-            - v1-back-dependencies-
-      - run: cd backend/ && dotnet test tcs-service-test
+      - checkout:
+          path: ~/repo
+      - *restore_dotnet_cache
+      - *install_nuget
+      - run: dotnet test tcs-service-tests/
 
   deploy-back:
-    executor: back-exec
+    executor: docker-exec
+    working_directory: ~/repo/backend/
     steps:
       - setup_remote_docker
-      - restore_cache:
-          keys:
-            - v1-backend-{{ .Environment.CIRCLE_SHA1 }}
-      - restore_cache:
-          keys:
-            - v1-back-dependencies-{{ checksum "backend/tcs-service/tcs-service.csproj" }}
-            # fallback to using the latest cache if no exact match is found
-            - v1-back-dependencies-
+      - checkout:
+          path: ~/repo
+      - *login_docker
       - run:
-          name: Install Docker client
-          command: |
-            set -x
-            VER="17.03.0-ce"
-            curl -L -o /tmp/docker-$VER.tgz https://get.docker.com/builds/Linux/x86_64/docker-$VER.tgz
-            tar -xz -C /tmp -f /tmp/docker-$VER.tgz
-            mv /tmp/docker/* /usr/bin
+          name: Building Docker Image
+          command: docker build -t $DOCKER_USER/tcs-service:$CIRCLE_BRANCH tcs-service/
+      - run:
+          name: Pushing Image to Docker Hub
+          command: docker push $DOCKER_USER/tcs-service:$CIRCLE_BRANCH
 
-      - run: docker login -u $DOCKER_USER -p $DOCKER_PASS
-      - run: docker build -t lcbutch/tcs-service:$CIRCLE_BRANCH backend/tcs-service/
-      - run: docker push lcbutch/tcs-service:$CIRCLE_BRANCH
+  deploy-front:
+    executor: docker-exec
+    working_directory: ~/repo/frontend/
+    steps:
+      - setup_remote_docker
+      - checkout:
+          path: ~/repo
+      - *login_docker
+      - run:
+          name: Building Docker Image
+          command: docker build -t $DOCKER_USER/tcs-front:$CIRCLE_BRANCH .
+      - run:
+          name: Pushing Image to Docker Hub
+          command: docker push $DOCKER_USER/tcs-front:$CIRCLE_BRANCH
 
 workflows:
   version: 2
 
   build-test-deploy:
     jobs:
-      - checkout-code-front
-      - checkout-code-back
-      - build-front:
+      - setup-front
+      - setup-back
+      - flow:
           requires:
-            - checkout-code-front
+            - setup-front
       - test-front:
           requires:
-            - build-front
-      - deploy-front:
-          requires:
-            - test-front
-          filters:
-            branches:
-              only: master
-      - build-back:
-          requires:
-            - checkout-code-back
+            - setup-front
       - test-back:
           requires:
-            - build-back
+            - setup-back
       - deploy-back:
           requires:
             - test-back
+          filters:
+            branches:
+              only: master
+      - deploy-front:
+          requires:
+            - test-front
           filters:
             branches:
               only: master
