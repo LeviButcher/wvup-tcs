@@ -115,7 +115,7 @@ jobs:
       - *login_docker
       - run:
           name: Building Docker Image
-          command: docker build -t $DOCKER_USER/tcs-front:$CIRCLE_BRANCH .
+          command: docker build -t $DOCKER_USER/tcs-front:$CIRCLE_BRANCH
       - run:
           name: Pushing Image to Docker Hub
           command: docker push $DOCKER_USER/tcs-front:$CIRCLE_BRANCH
