@@ -15,7 +15,7 @@ aliases:
     restore_cache:
       name: Restore nuget cache
       keys:
-        - v1-back-dependencies-{{ checksum "tcs-service/tcs-service.csproj" }}-{{ checksum "tcs-service-tests/tcs-service-tests.csproj" }}
+        - v1-back-dependencies-{{ checksum "tcs-service/tcs-service.csproj" }}-{{ checksum "tcs-service-test/tcs-service-test.csproj" }}
         - v1-back-dependencies-
   - &install_nuget
     run:
@@ -56,16 +56,6 @@ jobs:
             - node_modules
           key: v1-front-{{ checksum "package.json" }}
 
-  flow:
-    executor: front-exec
-    working_directory: ~/repo/frontend
-    steps:
-      - checkout:
-          path: ~/repo
-      - *restore_npm_cache
-      - *install_npm
-      - run: npm run flow
-
   test-front:
     executor: front-exec
     working_directory: ~/repo/frontend
@@ -88,7 +78,7 @@ jobs:
           name: Save dotnet cache
           paths:
             - ~/.nuget/packages
-          key: v1-back-dependencies-{{ checksum "sXb-service/sXb-service.csproj" }}-{{ checksum "sXb-service-tests/sXb-service-tests.csproj" }}
+          key: v1-back-dependencies-{{ checksum "sXb-service/sXb-service.csproj" }}-{{ checksum "sXb-service-test/sXb-service-test.csproj" }}
 
   test-back:
     executor: back-exec
@@ -98,7 +88,7 @@ jobs:
           path: ~/repo
       - *restore_dotnet_cache
       - *install_nuget
-      - run: dotnet test tcs-service-tests/
+      - run: dotnet test tcs-service-test/
 
   deploy-back:
     executor: docker-exec
@@ -137,9 +127,6 @@ workflows:
     jobs:
       - setup-front
       - setup-back
-      - flow:
-          requires:
-            - setup-front
       - test-front:
           requires:
             - setup-front
