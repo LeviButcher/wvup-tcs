@@ -13,6 +13,7 @@ import PieChart from './PieChart';
 import Paging from './Paging';
 import ZoomedLineChart from './ZoomedLineChart';
 import FormikDateTimePicker from './FormikDateTimePicker';
+import Stack from './Stack';
 
 export {
   Card,
@@ -29,5 +30,6 @@ export {
   PieChart,
   Paging,
   ZoomedLineChart,
-  FormikDateTimePicker
+  FormikDateTimePicker,
+  Stack
 };

@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { Form, Field, Formik } from 'formik';
 import Topography from '../../images/topography.svg';
 import { callApi, ensureResponseCode, unwrapToJSON } from '../../utils';
-import { Card, Header, Input, Button } from '../../ui';
+import { Card, Header, Input, Button, Stack } from '../../ui';
 import useLoading from '../../hooks/useLoading';
 
 const postToAuthApi = callApi(`users/authenticate`, 'POST');
@@ -13,8 +13,7 @@ const Login = () => {
 
   return (
     <CenterComponent>
-      <Card data-loading={loading}>
-        <Header align="center">Tutoring Center Login</Header>
+      <Card data-loading={loading} style={{ paddingBottom: 0 }}>
         <Formik
           initialValues={{ username: '', password: '' }}
           onSubmit={async (values, { setSubmitting, setStatus }) => {
@@ -40,33 +39,35 @@ const Login = () => {
         >
           {({ status, values, isSubmitting, handleSubmit }) => (
             <Form onSubmit={handleSubmit}>
-              {status && status.message && (
-                <div style={{ color: 'red' }}>{status.message}</div>
-              )}
-              <Field
-                id="username"
-                name="username"
-                value={values.username}
-                component={Input}
-                label="Username"
-              />
-              <Field
-                id="password"
-                type="password"
-                name="password"
-                value={values.password}
-                component={Input}
-                label="Password"
-              />
-              <br />
-              <Button
-                type="submit"
-                display="block"
-                align="right"
-                disabled={isSubmitting}
-              >
-                Submit
-              </Button>
+              <Stack>
+                <Header align="center">Tutoring Center Login</Header>
+                {status && status.message && (
+                  <div style={{ color: 'red' }}>{status.message}</div>
+                )}
+                <Field
+                  id="username"
+                  name="username"
+                  value={values.username}
+                  component={Input}
+                  label="Username"
+                />
+                <Field
+                  id="password"
+                  type="password"
+                  name="password"
+                  value={values.password}
+                  component={Input}
+                  label="Password"
+                />
+                <Button
+                  type="submit"
+                  display="block"
+                  fullWidth
+                  disabled={isSubmitting}
+                >
+                  Submit
+                </Button>
+              </Stack>
             </Form>
           )}
         </Formik>

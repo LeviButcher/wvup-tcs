@@ -3,12 +3,12 @@ import { Router, Link } from '@reach/router';
 import styled from 'styled-components';
 import ScaleLoader from 'react-spinners/ScaleLoader';
 import { Formik, Form } from 'formik';
-import { Card, Button } from '../../ui';
+import { Card, Button, Stack } from '../../ui';
 import { callApi, ensureResponseCode } from '../../utils';
 import CoursesCheckboxes from '../../components/CoursesCheckboxes';
 import ReasonCheckboxes from '../../components/ReasonCheckboxes';
 import useApiWithHeaders from '../../hooks/useApiWithHeaders';
-import SignInSchema from '../../schemas/SignInFormScema';
+import SignInSchema from '../../schemas/SignInFormSchema';
 import EmailOrCardSwipeForm from '../../components/EmailOrCardSwipeForm';
 
 const postSignIn = callApi(`signins/`, 'POST');
@@ -17,7 +17,7 @@ const postSignIn = callApi(`signins/`, 'POST');
 const SignInStudent = ({ navigate }) => {
   return (
     <FullScreenContainer>
-      <Card>
+      <Card style={{ paddingBottom: 0 }}>
         <Link to="/">Go to Home Screen</Link>
         <h1>Student SignIn</h1>
         <Router primary={false}>
@@ -44,58 +44,58 @@ const StudentSignInForm = ({
 }) => {
   const [loading, { body: reasons }] = useApiWithHeaders('reasons/active');
   return (
-    <>
-      <h4>Welcome, {`${studentInfo.firstName} ${studentInfo.lastName}`}</h4>
-      <Formik
-        onSubmit={(studentSignIn, { setSubmitting }) => {
-          const signIn = {
-            ...studentSignIn,
-            courses: studentSignIn.courses.map(courseCRN =>
-              studentInfo.classSchedule.find(ele => ele.crn === courseCRN)
-            ),
-            reasons: studentSignIn.reasons.map(id =>
-              reasons.find(ele => ele.id === id)
-            )
-          };
-          postSignIn(signIn)
-            .then(ensureResponseCode(201))
-            .then(() =>
-              navigate('/', { state: { info: 'You have signed in!' } })
-            )
-            .catch(e => alert(e.message))
-            .finally(() => setSubmitting(false));
-        }}
-        initialValues={{
-          email: studentInfo.studentEmail,
-          reasons: [],
-          tutoring: false,
-          courses: [],
-          semesterId: studentInfo.semesterId,
-          personId: studentInfo.studentID
-        }}
-        validationSchema={SignInSchema}
-      >
-        {({ values, isSubmitting, isValid }) => (
-          <Form>
-            {!isSubmitting && !loading && (
-              <>
-                <ReasonCheckboxes reasons={reasons} values={values} />
-                <CoursesCheckboxes courses={studentInfo.classSchedule} />
-                <Button type="Submit" align="right" disabled={!isValid}>
-                  Submit
-                </Button>
-              </>
-            )}
+    <Formik
+      onSubmit={(studentSignIn, { setSubmitting }) => {
+        const signIn = {
+          ...studentSignIn,
+          courses: studentSignIn.courses.map(courseCRN =>
+            studentInfo.classSchedule.find(ele => ele.crn === courseCRN)
+          ),
+          reasons: studentSignIn.reasons.map(id =>
+            reasons.find(ele => ele.id === id)
+          )
+        };
+        postSignIn(signIn)
+          .then(ensureResponseCode(201))
+          .then(() => navigate('/', { state: { info: 'You have signed in!' } }))
+          .catch(e => alert(e.message))
+          .finally(() => setSubmitting(false));
+      }}
+      initialValues={{
+        email: studentInfo.studentEmail,
+        reasons: [],
+        tutoring: false,
+        courses: [],
+        semesterId: studentInfo.semesterId,
+        personId: studentInfo.studentID
+      }}
+      validationSchema={SignInSchema}
+    >
+      {({ values, isSubmitting, isValid }) => (
+        <Form>
+          <Stack>
+            <h4>
+              Welcome, {`${studentInfo.firstName} ${studentInfo.lastName}`}
+            </h4>
+            <ReasonCheckboxes reasons={reasons} values={values} />
+            <CoursesCheckboxes courses={studentInfo.classSchedule} />
+            <Button
+              type="submit"
+              disabled={!isValid}
+              fullWidth
+              intent="primary"
+            >
+              {isSubmitting ? 'Submitting SignIn...' : 'Submit'}
+            </Button>
             <ScaleLoader
               sizeUnit="px"
               size={150}
-              loading={isSubmitting || loading}
+              loading={isSubmitting && loading}
             />
-            {isSubmitting && <h5>Submitting SignIn...</h5>}
-          </Form>
-        )}
-      </Formik>
-    </>
+          </Stack>
+        </Form>
+      )}
+    </Formik>
   );
 };
 

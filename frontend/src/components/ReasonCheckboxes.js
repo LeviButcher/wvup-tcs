@@ -2,16 +2,23 @@ import React from 'react';
 import { Field } from 'formik';
 import styled from 'styled-components';
 import { Header, FieldGroup, Checkbox } from '../ui';
+import { StyledCheckbox } from '../ui/Checkbox';
+
+const Stack = styled.div`
+  & > * + * {
+    margin: 2rem 0;
+  }
+`;
 
 const ReasonsCheckboxes = ({ className, reasons, values, errors }) => (
-  <div className={className}>
+  <Stack className={className}>
     <Header type="h4">
       Reason for Visiting{' '}
       <SmallText>Select Tutoring or at least one other reason</SmallText>
       <div style={{ color: 'red' }}>{errors && errors.reasons}</div>
     </Header>
     <FieldGroup>
-      <SingleCheckBoxLabel name="tutoring">
+      <StyledCheckbox name="tutoring" data-checked={values.tutoring}>
         Tutoring
         <Field
           id="tutoring"
@@ -22,7 +29,7 @@ const ReasonsCheckboxes = ({ className, reasons, values, errors }) => (
           value="Tutoring"
           checked={values.tutoring}
         />
-      </SingleCheckBoxLabel>
+      </StyledCheckbox>
       {reasons.map(reason => (
         <Checkbox
           key={reason.id}
@@ -36,7 +43,7 @@ const ReasonsCheckboxes = ({ className, reasons, values, errors }) => (
         />
       ))}
     </FieldGroup>
-  </div>
+  </Stack>
 );
 
 const SmallText = styled.span`

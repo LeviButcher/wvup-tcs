@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from '@reach/router';
 import { Formik, Form, Field } from 'formik';
 import * as Yup from 'yup';
-import { Card, Input, Header, Button } from '../ui';
+import { Card, Input, Header, Button, Stack } from '../ui';
 
 const emailSchema = Yup.object().shape({
   email: Yup.string()
@@ -13,7 +13,7 @@ const emailSchema = Yup.object().shape({
 });
 
 const EmailForm = ({ title, onSubmit, errors }) => (
-  <Card>
+  <Card style={{ paddingBottom: 0 }}>
     <Link to="/">Go to Home Screen</Link>
     <Formik
       initialValues={{ email: '' }}
@@ -22,25 +22,29 @@ const EmailForm = ({ title, onSubmit, errors }) => (
     >
       {({ isSubmitting, isValid, status }) => (
         <Form>
-          <Header>{title}</Header>
-          <h4>Please enter email or swipe card</h4>
-          {status && status.msg && <p style={{ color: 'red' }}>{status.msg}</p>}
-          {errors && <p style={{ color: 'red' }}>{errors.message}</p>}
-          <Field
-            id="email"
-            type="email"
-            name="email"
-            component={Input}
-            label="Email"
-          />
-          <Button
-            type="submit"
-            align="right"
-            disabled={isSubmitting || !isValid}
-            intent="primary"
-          >
-            Submit
-          </Button>
+          <Stack>
+            <Header>{title}</Header>
+            <h4>Please enter email or swipe card</h4>
+            {status && status.msg && (
+              <p style={{ color: 'red' }}>{status.msg}</p>
+            )}
+            {errors && <p style={{ color: 'red' }}>{errors.message}</p>}
+            <Field
+              id="email"
+              type="email"
+              name="email"
+              component={Input}
+              label="Email"
+            />
+            <Button
+              type="submit"
+              fullWidth
+              disabled={isSubmitting || !isValid}
+              intent="primary"
+            >
+              Submit
+            </Button>
+          </Stack>
         </Form>
       )}
     </Formik>

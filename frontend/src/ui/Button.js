@@ -15,12 +15,16 @@ export default styled.button.attrs(props => ({
   text-decoration: none !important;
   background: ${props => props.background};
   color: white;
+  width: ${props => (props.fullWidth ? '100%' : 'auto')};
 
   &[disabled] {
-    background: #bfbfff;
+    background: ${props => props.background}77;
   }
   &:hover {
     box-shadow: 0 0 10px 1px ${props => props.background}bb;
+  }
+  &[disabled]:hover {
+    box-shadow: none;
   }
   & > a {
     color: white;

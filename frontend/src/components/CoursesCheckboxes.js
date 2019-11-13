@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Header, FieldGroup, Checkbox } from '../ui';
+import { Header, FieldGroup, Checkbox, Stack } from '../ui';
 
 const SmallText = styled.span`
   color: #aaa;
@@ -10,7 +10,7 @@ const SmallText = styled.span`
 
 const CoursesCheckboxes = ({ courses, errors }) => {
   return (
-    <>
+    <Stack>
       <Header type="h4">
         Classes Visiting for <SmallText>Select at least one course</SmallText>
         <div style={{ color: 'red' }}>{errors && errors.courses}</div>
@@ -28,7 +28,7 @@ const CoursesCheckboxes = ({ courses, errors }) => {
             />
           ))}
       </FieldGroup>
-    </>
+    </Stack>
   );
 };
 

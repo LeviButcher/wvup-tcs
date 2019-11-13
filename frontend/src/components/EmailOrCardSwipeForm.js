@@ -4,7 +4,7 @@ import React, { useEffect, useReducer } from 'react';
 import { Formik, Form, Field } from 'formik';
 import ScaleLoader from 'react-spinners/ScaleLoader';
 import * as Yup from 'yup';
-import { Input, Button } from '../ui';
+import { Input, Button, Stack } from '../ui';
 import { callApi, unwrapToJSON, ensureResponseCode, isWVUPId } from '../utils';
 import useCardReader from '../hooks/useCardReader';
 import { loadingStates, loadingReducer } from '../hooks/loadingReducer';
@@ -85,7 +85,7 @@ const EmailOrCardSwipeForm = ({
       {({ isSubmitting, isValid, status }) => (
         <Form>
           {(isSubmitting || loading) && (
-            <>
+            <Stack>
               <h5>Getting information...</h5>
               <ScaleLoader
                 sizeUnit="px"
@@ -93,11 +93,11 @@ const EmailOrCardSwipeForm = ({
                 loading={isSubmitting || loading}
                 align="center"
               />
-            </>
+            </Stack>
           )}
           {errors && <h4 style={{ color: 'red' }}>{errors.message}</h4>}
           {!isSubmitting && !loading && (
-            <>
+            <Stack>
               <h4>Please enter email or swipe card</h4>
               {status && <h4 style={{ color: 'red' }}>{status}</h4>}
               <Field
@@ -112,11 +112,12 @@ const EmailOrCardSwipeForm = ({
               <Button
                 type="Submit"
                 disabled={!isValid && isSubmitting}
-                align="right"
+                fullWidth
+                intent="primary"
               >
                 Submit
               </Button>
-            </>
+            </Stack>
           )}
         </Form>
       )}

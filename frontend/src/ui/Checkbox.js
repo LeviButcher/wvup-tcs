@@ -6,7 +6,12 @@ export default function Checkbox({ name, value, label, id, ...rest }) {
   return (
     <Field name={name}>
       {({ field, form }) => (
-        <StyledCheckbox name={name} htmlFor={id} {...rest}>
+        <StyledCheckbox
+          name={name}
+          htmlFor={id}
+          {...rest}
+          data-checked={field.value ? field.value.includes(value) : false}
+        >
           {label}
           <input
             type="checkbox"
@@ -34,7 +39,23 @@ export default function Checkbox({ name, value, label, id, ...rest }) {
 }
 
 const StyledCheckbox = styled.label`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+  & input {
+    display: none;
+  }
+
+  color: #444;
+  background: #eee;
+  border: 1px solid #ccc;
+  border-radius: 25px;
+  padding: 1rem;
+  text-align: center;
+  transition: background 0.25s, color 0.25s, border 0.25s;
+
+  &[data-checked='true'] {
+    background: ${props => props.theme.color.primary};
+    color: white;
+    border: 1px solid transparent;
+  }
 `;
+
+export { StyledCheckbox };

@@ -8,7 +8,7 @@ import useQuery from '../../hooks/useQuery';
 import { callApi, unwrapToJSON, ensureResponseCode } from '../../utils';
 import CoursesCheckboxes from '../../components/CoursesCheckboxes';
 import ReasonCheckboxes from '../../components/ReasonCheckboxes';
-import SignInSchema from '../../schemas/SignInFormScema';
+import SignInSchema from '../../schemas/SignInFormSchema';
 
 const SignInUpdateSchema = SignInSchema.shape({
   inTime: Yup.date()
