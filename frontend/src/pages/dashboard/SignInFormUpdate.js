@@ -146,6 +146,8 @@ const SignIn = ({ data = defaultData, type = crudTypes.create }) => {
             // massage data back into server format
             const signIn = {
               ...values,
+              inTime: new Date(values.inTime),
+              outTime: new Date(values.outTime),
               id: student.id,
               personId: student.studentID,
               semesterId: student.semesterId,
@@ -187,7 +189,8 @@ const SignIn = ({ data = defaultData, type = crudTypes.create }) => {
             status,
             isValid,
             handleChange,
-            errors
+            errors,
+            touched
           }) => (
             <Form>
               <Stack>
@@ -228,10 +231,15 @@ const SignIn = ({ data = defaultData, type = crudTypes.create }) => {
                     reasons={reasons}
                     values={values}
                     errors={errors}
+                    touched={touched}
                   />
                 )}
                 {student && (
-                  <CoursesCheckboxes courses={classes} errors={errors} />
+                  <CoursesCheckboxes
+                    courses={classes}
+                    errors={errors}
+                    touched={touched}
+                  />
                 )}
                 <Button
                   type="submit"

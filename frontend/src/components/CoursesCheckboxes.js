@@ -1,12 +1,14 @@
 import React from 'react';
 import { Header, FieldGroup, Checkbox, Stack, SmallText } from '../ui';
 
-const CoursesCheckboxes = ({ courses, errors }) => {
+const CoursesCheckboxes = ({ courses, errors, touched }) => {
   return (
     <Stack>
       <Header type="h4">
         Classes Visiting for <SmallText>Select at least one course</SmallText>
-        <div style={{ color: 'red' }}>{errors && errors.courses}</div>
+        {errors.courses && touched.courses && (
+          <div style={{ color: 'red' }}>{errors.courses}</div>
+        )}
       </Header>
       <FieldGroup>
         {courses &&

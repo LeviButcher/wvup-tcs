@@ -70,15 +70,25 @@ const StudentSignInForm = ({
         personId: studentInfo.studentID
       }}
       validationSchema={SignInSchema}
+      isInitialValid={false}
     >
-      {({ values, isSubmitting, isValid }) => (
+      {({ values, isSubmitting, isValid, errors, touched }) => (
         <Form>
           <Stack>
             <h4>
               Welcome, {`${studentInfo.firstName} ${studentInfo.lastName}`}
             </h4>
-            <ReasonCheckboxes reasons={reasons} values={values} />
-            <CoursesCheckboxes courses={studentInfo.classSchedule} />
+            <ReasonCheckboxes
+              reasons={reasons}
+              values={values}
+              errors={errors}
+              touched={touched}
+            />
+            <CoursesCheckboxes
+              courses={studentInfo.classSchedule}
+              errors={errors}
+              touched={touched}
+            />
             <Button
               type="submit"
               disabled={!isValid}

@@ -27,7 +27,7 @@ const LayoutGrid = styled.div`
 
   & > nav {
     height: 100%;
-    padding: 0 ${props => props.theme.padding};
+    padding: ${props => props.theme.padding};
     background-color: ${props => props.theme.color.main};
     color: #fff;
   }

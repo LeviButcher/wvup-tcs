@@ -3,12 +3,14 @@ import { Field } from 'formik';
 import { Header, FieldGroup, Checkbox, Stack, SmallText } from '../ui';
 import { StyledCheckbox } from '../ui/Checkbox';
 
-const ReasonsCheckboxes = ({ className, reasons, values, errors }) => (
+const ReasonsCheckboxes = ({ className, reasons, values, errors, touched }) => (
   <Stack className={className}>
     <Header type="h4">
       Reason for Visiting{' '}
       <SmallText>Select Tutoring or at least one other reason</SmallText>
-      <div style={{ color: 'red' }}>{errors && errors.reasons}</div>
+      {errors.reasons && touched.reasons && (
+        <div style={{ color: 'red' }}>{errors.reasons}</div>
+      )}
     </Header>
     <FieldGroup>
       <StyledCheckbox name="tutoring" data-checked={values.tutoring}>
@@ -17,11 +19,22 @@ const ReasonsCheckboxes = ({ className, reasons, values, errors }) => (
           id="tutoring"
           type="checkbox"
           name="tutoring"
-          component="input"
-          label="tutoring"
           value="Tutoring"
           checked={values.tutoring}
-        />
+        >
+          {({ form, ...rest }) => {
+            return (
+              <input
+                {...rest}
+                checked={values.tutoring}
+                type="checkbox"
+                onChange={() => {
+                  form.setFieldValue('tutoring', !values.tutoring);
+                }}
+              />
+            );
+          }}
+        </Field>
       </StyledCheckbox>
       {reasons.map(reason => (
         <Checkbox
