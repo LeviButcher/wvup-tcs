@@ -3,23 +3,25 @@ import styled from 'styled-components';
 
 const Input = ({
   field, // { name, value, onChange, onBlur }
-  form: { errors }, // also values, setXXXX, handleXXXX, dirty, isValid, status, etc.
+  form: { errors, touched }, // also values, setXXXX, handleXXXX, dirty, isValid, status, etc.
   className,
   label,
   type,
   id,
   ...props
-}) => (
-  <div className={className}>
-    <label htmlFor={id} style={{ textTransform: 'capitalize' }}>
-      {label || field.name}
-      {errors[field.name] && (
-        <div style={{ color: 'red' }}>{errors[field.name]}</div>
-      )}
-    </label>
-    <input id={id} type={type || 'text'} {...field} {...props} />
-  </div>
-);
+}) => {
+  return (
+    <div className={className}>
+      <label htmlFor={id} style={{ textTransform: 'capitalize' }}>
+        {label || field.name}
+        {errors[field.name] && touched[field.name] && (
+          <div style={{ color: 'red' }}>{errors[field.name]}</div>
+        )}
+      </label>
+      <input id={id} type={type || 'text'} {...field} {...props} />
+    </div>
+  );
+};
 
 export default styled(Input)`
   & input,

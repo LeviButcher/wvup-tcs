@@ -3,12 +3,24 @@ import styled from 'styled-components';
 import { Formik, Form, Field } from 'formik';
 import { pipe } from 'ramda';
 import * as Yup from 'yup';
-import { Card, Input, Header, Button, FormikDateTimePicker } from '../../ui';
+import {
+  Card,
+  Input,
+  Header,
+  Button,
+  FormikDateTimePicker,
+  Stack
+} from '../../ui';
 import useQuery from '../../hooks/useQuery';
 import { callApi, unwrapToJSON, ensureResponseCode } from '../../utils';
 import CoursesCheckboxes from '../../components/CoursesCheckboxes';
 import ReasonCheckboxes from '../../components/ReasonCheckboxes';
 import SignInSchema from '../../schemas/SignInFormSchema';
+
+function isBeforeInTime(outTime) {
+  const inTime = this.resolve(Yup.ref('inTime'));
+  return inTime < outTime;
+}
 
 const SignInUpdateSchema = SignInSchema.shape({
   inTime: Yup.date()
@@ -16,9 +28,7 @@ const SignInUpdateSchema = SignInSchema.shape({
     .required(),
   outTime: Yup.date()
     .typeError('Invalid Date format')
-    .test('date-test', 'Must be after In Time', function(outTime) {
-      return this.resolve(Yup.ref('inTime')) < outTime;
-    })
+    .test('date-test', 'Must be after In Time', isBeforeInTime)
     .required()
 })
   .from('inTime', 'startDate', true)
@@ -32,12 +42,31 @@ const FullScreenContainer = styled.div`
   justify-content: space-evenly;
 `;
 
+const DateInputGroup = styled.div`
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-gap: 1rem;
+  & div:last-child {
+    text-align: right;
+  }
+`;
+
 const StyledReasonCheckboxes = styled(ReasonCheckboxes)`
   & label[data-deleted='true'] {
     color: red;
+    border-color: red;
+  }
+  & label[data-deleted='true'][data-checked='true'] {
+    color: white;
+    background: red;
   }
   & label[data-deleted='false'] {
     color: green;
+    border-color: green;
+  }
+  & label[data-deleted='false'][data-checked='true'] {
+    color: white;
+    background: green;
   }
 `;
 
@@ -49,11 +78,7 @@ const getStudentInfoWithEmail = email =>
 
 const getReasons = () => callApi(`reasons`, 'GET', null);
 
-const queryReasons = pipe(
-  getReasons,
-  ensureResponseCode(200),
-  unwrapToJSON
-);
+const queryReasons = pipe(getReasons, ensureResponseCode(200), unwrapToJSON);
 
 const isWVUPEmail = email => email.match(/^[A-Z0-9._%+-]+@wvup.edu$/i);
 
@@ -103,20 +128,18 @@ const SignIn = ({ data = defaultData, type = crudTypes.create }) => {
       );
     });
   }, [email]);
-  if (student) {
-    console.log(student.inTime);
-  }
+
   return (
     <FullScreenContainer>
-      <Card>
+      <Card style={{ paddingBottom: 0 }}>
         <Formik
           initialValues={{
             email: student.email,
             reasons: student.reasons.map(reason => reason.id),
             tutoring: student.tutoring,
             courses: student.courses.map(course => course.crn),
-            inTime: new Date(student.inTime),
-            outTime: new Date(student.outTime)
+            inTime: student.inTime,
+            outTime: student.outTime
           }}
           validationSchema={SignInUpdateSchema}
           onSubmit={async (values, { setSubmitting }) => {
@@ -167,56 +190,58 @@ const SignIn = ({ data = defaultData, type = crudTypes.create }) => {
             errors
           }) => (
             <Form>
-              <Header>Student Sign In</Header>
-              {type === crudTypes.create && (
-                <p>Enter in Email to load classlist</p>
-              )}
-              {status && status.msg && <div>{status.msg}</div>}
-              <Field
-                id="email"
-                type="email"
-                name="email"
-                component={Input}
-                label="Email"
-                onChange={e => {
-                  handleChange(e);
-                  if (isWVUPEmail(e.target.value)) setEmail(e.target.value);
-                }}
-                disabled={type !== crudTypes.create}
-              />
-              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+              <Stack>
+                <Header>Student Sign In</Header>
+                <div>KEY: Green = Active, Red = Deleted</div>
+                {type === crudTypes.create && (
+                  <p>Enter in Email to load classlist</p>
+                )}
+                {status && status.msg && <div>{status.msg}</div>}
                 <Field
-                  id="inTime"
-                  name="inTime"
-                  component={FormikDateTimePicker}
-                  label="In Time"
+                  id="email"
+                  type="email"
+                  name="email"
+                  component={Input}
+                  label="Email"
+                  onChange={e => {
+                    handleChange(e);
+                    if (isWVUPEmail(e.target.value)) setEmail(e.target.value);
+                  }}
+                  disabled={type !== crudTypes.create}
                 />
-                <Field
-                  id="outTime"
-                  name="outTime"
-                  component={FormikDateTimePicker}
-                  label="Out Time"
-                />
-              </div>
-              {reasons && (
-                <StyledReasonCheckboxes
-                  reasons={reasons}
-                  values={values}
-                  errors={errors}
-                />
-              )}
-              {student && (
-                <CoursesCheckboxes courses={classes} errors={errors} />
-              )}
-              <br />
-              <Button
-                type="submit"
-                align="right"
-                disabled={isSubmitting || !isValid}
-                intent="primary"
-              >
-                Submit
-              </Button>
+                <DateInputGroup>
+                  <Field
+                    id="inTime"
+                    name="inTime"
+                    component={FormikDateTimePicker}
+                    label="In Time"
+                  />
+                  <Field
+                    id="outTime"
+                    name="outTime"
+                    component={FormikDateTimePicker}
+                    label="Out Time"
+                  />
+                </DateInputGroup>
+                {reasons && (
+                  <StyledReasonCheckboxes
+                    reasons={reasons}
+                    values={values}
+                    errors={errors}
+                  />
+                )}
+                {student && (
+                  <CoursesCheckboxes courses={classes} errors={errors} />
+                )}
+                <Button
+                  type="submit"
+                  disabled={isSubmitting || !isValid}
+                  intent="primary"
+                  fullWidth
+                >
+                  Submit
+                </Button>
+              </Stack>
             </Form>
           )}
         </Formik>

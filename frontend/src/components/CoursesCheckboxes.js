@@ -1,12 +1,5 @@
 import React from 'react';
-import styled from 'styled-components';
-import { Header, FieldGroup, Checkbox, Stack } from '../ui';
-
-const SmallText = styled.span`
-  color: #aaa;
-  font-size: 0.8em;
-  font-weight: normal;
-`;
+import { Header, FieldGroup, Checkbox, Stack, SmallText } from '../ui';
 
 const CoursesCheckboxes = ({ courses, errors }) => {
   return (

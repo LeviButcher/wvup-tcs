@@ -44,12 +44,16 @@ const StyledCheckbox = styled.label`
   }
 
   color: #444;
-  background: #eee;
-  border: 1px solid #ccc;
-  border-radius: 25px;
+  background: #fff;
+  border: 1px solid #444;
+  border-radius: 5px;
   padding: 1rem;
   text-align: center;
   transition: background 0.25s, color 0.25s, border 0.25s;
+
+  &:active {
+    transform: scale(0.98);
+  }
 
   &[data-checked='true'] {
     background: ${props => props.theme.color.primary};

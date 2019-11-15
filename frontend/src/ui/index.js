@@ -14,6 +14,7 @@ import Paging from './Paging';
 import ZoomedLineChart from './ZoomedLineChart';
 import FormikDateTimePicker from './FormikDateTimePicker';
 import Stack from './Stack';
+import SmallText from './SmallText';
 
 export {
   Card,
@@ -31,5 +32,6 @@ export {
   Paging,
   ZoomedLineChart,
   FormikDateTimePicker,
-  Stack
+  Stack,
+  SmallText
 };

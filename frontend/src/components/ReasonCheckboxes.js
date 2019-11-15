@@ -1,14 +1,7 @@
 import React from 'react';
 import { Field } from 'formik';
-import styled from 'styled-components';
-import { Header, FieldGroup, Checkbox } from '../ui';
+import { Header, FieldGroup, Checkbox, Stack, SmallText } from '../ui';
 import { StyledCheckbox } from '../ui/Checkbox';
-
-const Stack = styled.div`
-  & > * + * {
-    margin: 2rem 0;
-  }
-`;
 
 const ReasonsCheckboxes = ({ className, reasons, values, errors }) => (
   <Stack className={className}>
@@ -45,17 +38,5 @@ const ReasonsCheckboxes = ({ className, reasons, values, errors }) => (
     </FieldGroup>
   </Stack>
 );
-
-const SmallText = styled.span`
-  color: #aaa;
-  font-size: 0.8em;
-  font-weight: normal;
-`;
-
-const SingleCheckBoxLabel = styled.label`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-`;
 
 export default ReasonsCheckboxes;
