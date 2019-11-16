@@ -39,6 +39,7 @@ const cardReaderReducer = (currState, { type, key }) => {
   }
 };
 
+// Format of wvup id card: %{startofEmail}?;{wvupId}?
 const useCardReader = () => {
   const [{ cardData, doneReadingCard }, dispatch] = useReducer(
     cardReaderReducer,

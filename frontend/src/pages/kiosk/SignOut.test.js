@@ -10,6 +10,30 @@ import SignOut from './SignOut';
 
 const backendURL = process.env.REACT_APP_BACKEND || '';
 
+// Converts char to key code used for fire Events
+const toKeyCode = char => {
+  switch (char) {
+    case 'a':
+      return { key: 'a', code: '' };
+    case 'b':
+      return { key: 'b', code: 85 };
+    case 'l':
+      return { key: 'l', code: 66 };
+    case '9':
+      return { key: '9', code: 84 };
+    case '8':
+      return { key: '8', code: 84 };
+    case '?':
+      return { key: '?', code: 84 };
+    case ';':
+      return { key: ';', code: 67 };
+    case '\n':
+      return { key: 'Enter', code: 13 };
+    default:
+      return { key: ':(', code: 'char could not be found' };
+  }
+};
+
 afterEach(cleanup);
 
 test('Renders with required props', () => {
@@ -90,5 +114,28 @@ test('Submit with valid email sends fetch call to api with email', async () => {
         method: 'PUT'
       }
     );
+  });
+});
+
+test('Card swipe calls fetch with correct arguments', async () => {
+  const fakeFetch = jest.fn(() => Promise.resolve({}));
+  global.fetch = fakeFetch;
+
+  const { container } = render(<SignOut />);
+
+  // Format of wvup id card: %{startofEmail}?;{wvupId}?
+  const card = ['%', 'l', 'b', '?', ';', '9', '8', '?', '\n'];
+
+  card.forEach(char => fireEvent.keyPress(container, toKeyCode(char)));
+
+  await wait(() => {
+    expect(fakeFetch).toHaveBeenCalledTimes(1);
+    expect(fakeFetch).toHaveBeenCalledWith(`${backendURL}signins/98/signout`, {
+      headers: {
+        Authorization: 'Bearer null',
+        'Content-Type': 'application/json'
+      },
+      method: 'PUT'
+    });
   });
 });
