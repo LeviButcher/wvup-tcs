@@ -20,11 +20,7 @@ const StartToEndDateForm = ({
         onSubmit={onSubmit}
         validationSchema={StartToEndDateSchema}
         initialValues={{ startDate, endDate }}
-        isInitialValid={e => {
-          return StartToEndDateSchema.validate(e.initialValues)
-            .then(() => true)
-            .catch(() => false);
-        }}
+        validateOnMount
         {...props}
       >
         {({ isSubmitting, isValid }) => (

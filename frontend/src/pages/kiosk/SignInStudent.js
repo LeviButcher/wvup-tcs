@@ -70,7 +70,7 @@ const StudentSignInForm = ({
         personId: studentInfo.studentID
       }}
       validationSchema={SignInSchema}
-      isInitialValid={false}
+      validateOnMount
     >
       {({ values, isSubmitting, isValid, errors, touched }) => (
         <Form>

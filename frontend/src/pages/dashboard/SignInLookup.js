@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Field } from 'formik';
 import * as Yup from 'yup';
 import ScaleLoader from 'react-spinners/ScaleLoader';
@@ -83,7 +83,6 @@ const SignInLookup = ({ navigate }) => {
             email: email || '',
             crn: crn || ''
           }}
-          isInitialValid={false}
           validationSchema={SignInLookupSchema}
           enableReinitialize
         >
@@ -114,12 +113,17 @@ const SignInLookup = ({ navigate }) => {
 };
 
 const LookupResults = ({ startDate, endDate, page, setFormValues }) => {
+  const cachedSetFormValues = useCallback(args => setFormValues(args), [
+    setFormValues
+  ]);
   const { email, crn } = getQueryParams(window.location.search);
   const endPoint = getSignInUrl(startDate, endDate, crn, email, page);
   const [loading, data] = useApiWithHeaders(endPoint);
+
   useEffect(() => {
-    setFormValues({ startDate, endDate, email, crn });
-  }, [startDate, endDate, email, crn]);
+    cachedSetFormValues({ startDate, endDate, email, crn });
+  }, [startDate, endDate, email, crn, cachedSetFormValues]);
+
   return (
     <>
       <ScaleLoader sizeUnit="px" size={150} loading={loading} align="center" />

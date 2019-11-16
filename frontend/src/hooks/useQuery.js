@@ -1,16 +1,17 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 
 const useQuery = queryFunc => {
+  const queryFuncCallback = useCallback(() => queryFunc(), [queryFunc]);
   const [data, setData] = useState();
   const [rerun, setRerun] = useState(false);
 
   const triggerRerun = () => setRerun(!rerun);
 
   useEffect(() => {
-    queryFunc().then(res => {
+    queryFuncCallback().then(res => {
       setData(res);
     });
-  }, [rerun]);
+  }, [rerun, queryFuncCallback]);
 
   return [data, triggerRerun];
 };

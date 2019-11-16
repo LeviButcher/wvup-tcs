@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import ScaleLoader from 'react-spinners/ScaleLoader';
 import { Router } from '@reach/router';
 import StartToEndDate from '../../components/StartToEndDateForm';
@@ -50,7 +50,7 @@ const ClassTourLookup = ({ navigate }) => {
             startDate: startDate || '',
             endDate: endDate || ''
           }}
-          isInitialValid={false}
+          validateOnMount
           validationSchema={StartToEndDateSchema}
           enableReinitialize
         ></StartToEndDate>
@@ -66,11 +66,15 @@ const ClassTourLookup = ({ navigate }) => {
 };
 
 const LookupResults = ({ startDate, endDate, page, setFormValues }) => {
+  const setFormValuesCallback = useCallback(args => setFormValues(args), [
+    setFormValues
+  ]);
   const endpoint = getClassTourUrl(startDate, endDate, page);
   const [loading, data] = useApiWithHeaders(endpoint);
+
   useEffect(() => {
-    setFormValues({ startDate, endDate });
-  }, [startDate, endDate]);
+    setFormValuesCallback({ startDate, endDate });
+  }, [startDate, endDate, setFormValuesCallback]);
 
   return (
     <>

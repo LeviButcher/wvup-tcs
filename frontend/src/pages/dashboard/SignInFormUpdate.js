@@ -119,9 +119,9 @@ const SignIn = ({ data = defaultData, type = crudTypes.create }) => {
     if (email === '') return;
     loadClassList(email).then(studentInfo => {
       // Class loaded could have a repeat class in it, reduce to only unique classes
-      setStudent({ ...student, ...studentInfo });
-      setClasses(
-        [...classes, ...studentInfo.classSchedule].reduce(
+      setStudent(prevStudent => ({ ...prevStudent, ...studentInfo }));
+      setClasses(prevClasses =>
+        [...prevClasses, ...studentInfo.classSchedule].reduce(
           reduceToUniqueClasses,
           []
         )
