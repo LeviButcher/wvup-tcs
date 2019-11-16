@@ -8,8 +8,6 @@ import {
 } from '../test-utils/CustomReactTestingLibrary';
 import StartToEndDateForm from './StartToEndDateForm';
 
-afterEach(cleanup);
-
 test('EndDate has to be after StartDate to submit', async () => {
   const { getByLabelText, getByText } = render(<StartToEndDateForm />);
   const startDate = getByLabelText(/start/i);

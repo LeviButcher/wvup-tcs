@@ -9,9 +9,6 @@ import {
 } from '../test-utils/CustomReactTestingLibrary';
 import EmailOrCardSwipeForm from './EmailOrCardSwipeForm';
 
-// put this in jest config
-afterEach(cleanup);
-
 const mockSuccessResponse = {};
 const mockJsonPromise = Promise.resolve(mockSuccessResponse); // 2
 const mockFetchPromise = Promise.resolve({

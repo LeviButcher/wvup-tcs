@@ -34,8 +34,6 @@ const toKeyCode = char => {
   }
 };
 
-afterEach(cleanup);
-
 test('Renders with required props', () => {
   const { container } = render(<SignOut />);
   expect(container).toBeDefined();
