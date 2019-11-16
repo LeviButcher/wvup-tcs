@@ -7,18 +7,25 @@ import { Card, Input, Header, Button, Stack } from '../ui';
 const emailSchema = Yup.object().shape({
   email: Yup.string()
     .email('Invalid email')
-    .matches(/^[A-Z0-9._%+-]+@wvup.edu$/i, 'Must be a wvup email address')
+    .matches(/^[A-Z0-9._%+-]+@wvup.edu$/i, 'Must be a WVUP email address')
     .trim()
     .required('Email is required')
 });
 
-const EmailForm = ({ title, onSubmit, errors }) => (
+type Props = {
+  title: string,
+  onSubmit: () => any,
+  errors: () => { message: string }
+};
+
+const EmailForm = ({ title, onSubmit, errors }: Props) => (
   <Card style={{ paddingBottom: 0 }}>
     <Link to="/">Go to Home Screen</Link>
     <Formik
       initialValues={{ email: '' }}
       validationSchema={emailSchema}
       onSubmit={onSubmit}
+      isInitialValid={false}
     >
       {({ isSubmitting, isValid, status }) => (
         <Form>

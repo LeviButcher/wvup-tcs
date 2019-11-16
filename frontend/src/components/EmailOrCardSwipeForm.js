@@ -1,5 +1,3 @@
-// @flow
-
 import React, { useEffect, useReducer } from 'react';
 import { Formik, Form, Field } from 'formik';
 import ScaleLoader from 'react-spinners/ScaleLoader';

@@ -1,5 +1,3 @@
-/* eslint-disable */
-// test-utils.js
 import React from 'react';
 import { render } from '@testing-library/react';
 import Theme from '../theme.json';

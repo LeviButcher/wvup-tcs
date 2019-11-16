@@ -1,6 +1,11 @@
 import React from 'react';
 import '@testing-library/jest-dom/extend-expect';
-import { render, fireEvent, cleanup, wait } from 'CustomReactTestingLibrary';
+import {
+  render,
+  fireEvent,
+  cleanup,
+  wait
+} from '../test-utils/CustomReactTestingLibrary';
 import StartToEndDateForm from './StartToEndDateForm';
 
 afterEach(cleanup);

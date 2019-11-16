@@ -26,7 +26,7 @@
         "depth": 3
       }
     ],
-    "jsx-a11y/label-has-for": off
+    "jsx-a11y/label-has-for": "off"
   },
   "globals": {
     "jest/globals": true,
@@ -38,9 +38,6 @@
     "Blob": true,
     "navigator": true,
     "fetch": true
-  },
-  "settings": {
-    "import/core-modules": ["CustomReactTestingLibrary"]
   },
   "parser": "babel-eslint"
 }
