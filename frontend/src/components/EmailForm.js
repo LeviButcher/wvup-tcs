@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from '@reach/router';
 import { Formik, Form, Field } from 'formik';
+import type { FormikBag } from 'formik';
 import * as Yup from 'yup';
 import { Card, Input, Header, Button, Stack } from '../ui';
 
@@ -14,12 +15,12 @@ const emailSchema = Yup.object().shape({
 
 type Props = {
   title: string,
-  onSubmit: () => any,
-  errors: () => { message: string }
+  onSubmit: (Object, FormikBag<any, any>) => typeof undefined,
+  errors?: { message: string }
 };
 
 const EmailForm = ({ title, onSubmit, errors }: Props) => (
-  <Card style={{ paddingBottom: 0 }}>
+  <Card>
     <Link to="/">Go to Home Screen</Link>
     <Formik
       initialValues={{ email: '' }}
@@ -57,5 +58,9 @@ const EmailForm = ({ title, onSubmit, errors }: Props) => (
     </Formik>
   </Card>
 );
+
+EmailForm.defaultProps = {
+  errors: { message: '' }
+};
 
 export default EmailForm;

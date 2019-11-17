@@ -131,7 +131,7 @@ const SignIn = ({ data = defaultData, type = crudTypes.create }) => {
 
   return (
     <FullScreenContainer>
-      <Card style={{ paddingBottom: 0 }}>
+      <Card>
         <Formik
           initialValues={{
             email: student.email,

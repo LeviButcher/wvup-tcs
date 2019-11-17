@@ -9,7 +9,8 @@ import useCardReader from '../../hooks/useCardReader';
 const putSignOutEmail = email =>
   callApi(`signins/${email}/signout`, 'PUT', null);
 
-const putSignOutId = id => callApi(`signins/${id}/signout`, 'PUT', null);
+const putSignOutId = (id: number) =>
+  callApi(`signins/${id}/signout`, 'PUT', null);
 
 // test email: mtmqbude26@wvup.edu
 const SignOutPage = () => {

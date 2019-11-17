@@ -1,5 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
+import Stack from './Stack';
+import SmallText from './SmallText';
 
 const Input = ({
   field, // { name, value, onChange, onBlur }
@@ -11,28 +13,27 @@ const Input = ({
   ...props
 }) => {
   return (
-    <div className={className}>
+    <Stack size="small" className={className}>
       <label htmlFor={id} style={{ textTransform: 'capitalize' }}>
         {label || field.name}
         {errors[field.name] && touched[field.name] && (
-          <div style={{ color: 'red' }}>{errors[field.name]}</div>
+          <SmallText style={{ color: 'red' }}> {errors[field.name]}</SmallText>
         )}
       </label>
       <input id={id} type={type || 'text'} {...field} {...props} />
-    </div>
+    </Stack>
   );
 };
 
+// $FlowFixMe
 export default styled(Input)`
   & input,
   label {
     display: block;
     width: 100%;
-    margin-bottom: 10px;
     color: #444;
   }
   & input {
-    margin-bottom: 20px;
     border-radius: 5px;
     border: 2px solid #ccc;
     padding: 0.5rem;

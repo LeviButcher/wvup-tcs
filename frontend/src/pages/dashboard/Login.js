@@ -13,7 +13,7 @@ const Login = () => {
 
   return (
     <CenterComponent>
-      <Card data-loading={loading} style={{ paddingBottom: 0 }}>
+      <Card data-loading={loading}>
         <Formik
           initialValues={{ username: '', password: '' }}
           onSubmit={async (values, { setSubmitting, setStatus }) => {

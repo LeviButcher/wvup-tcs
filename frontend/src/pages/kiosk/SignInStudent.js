@@ -17,7 +17,7 @@ const postSignIn = callApi(`signins/`, 'POST');
 const SignInStudent = ({ navigate }) => {
   return (
     <FullScreenContainer>
-      <Card style={{ paddingBottom: 0 }}>
+      <Card>
         <Link to="/">Go to Home Screen</Link>
         <h1>Student SignIn</h1>
         <Router primary={false}>

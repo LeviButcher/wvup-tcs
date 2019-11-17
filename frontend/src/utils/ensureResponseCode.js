@@ -1,12 +1,7 @@
-const ensureResponseCode = code => async fetchPromise => {
+const ensureResponseCode = (code: number) => async (fetchPromise: any) => {
   const res = await fetchPromise;
   if (res.status !== code) {
-    let errors = '';
-    try {
-      errors = await res.clone().json();
-    } catch (e) {
-      errors = await res.clone().text();
-    }
+    const errors = await res.json();
     throw errors;
   }
   return fetchPromise;

@@ -1,11 +1,10 @@
-/* eslint-disable */
 import React from 'react';
 import '@testing-library/jest-dom/extend-expect';
 import {
   render,
   fireEvent,
   cleanup,
-  waitForElementToBeRemoved
+  wait
 } from '../test-utils/CustomReactTestingLibrary';
 import EmailOrCardSwipeForm from './EmailOrCardSwipeForm';
 
@@ -23,15 +22,17 @@ test('Form renders successfully', async () => {
 });
 
 test('Form can be submitted with wvup.edu address', async () => {
-  const mockSubmit = jest.fn(x => x);
-  const { findByLabelText, findByText, debug, queryByText } = render(
+  const mockSubmit = jest.fn();
+  const { getByText, getByLabelText } = render(
     <EmailOrCardSwipeForm afterValidSubmit={mockSubmit} teacher={false} />
   );
-  const emailInput = await findByLabelText(/Email/);
-  fireEvent.change(emailInput, {
+
+  fireEvent.change(getByLabelText(/email/i), {
     target: { value: 'lbutche3@wvup.edu' }
   });
-  fireEvent.click(await findByText(/Submit/));
-  await waitForElementToBeRemoved(() => queryByText(/Getting information/));
-  expect(mockSubmit.mock.calls.length).toBe(1);
+  fireEvent.submit(getByText(/submit/i));
+
+  await wait(() => {
+    expect(mockSubmit).toHaveBeenCalledTimes(1);
+  });
 });
