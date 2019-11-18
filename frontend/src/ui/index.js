@@ -15,6 +15,7 @@ import ZoomedLineChart from './ZoomedLineChart';
 import FormikDateTimePicker from './FormikDateTimePicker';
 import Stack from './Stack';
 import SmallText from './SmallText';
+import KioskFullScreenContainer from './KioskFullScreenContainer';
 
 export {
   Card,
@@ -33,5 +34,6 @@ export {
   ZoomedLineChart,
   FormikDateTimePicker,
   Stack,
-  SmallText
+  SmallText,
+  KioskFullScreenContainer
 };

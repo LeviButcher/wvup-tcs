@@ -21,7 +21,6 @@ type Props = {
 
 const EmailForm = ({ title, onSubmit, errors }: Props) => (
   <Card>
-    <Link to="/">Go to Home Screen</Link>
     <Formik
       initialValues={{ email: '' }}
       validationSchema={emailSchema}
@@ -31,6 +30,7 @@ const EmailForm = ({ title, onSubmit, errors }: Props) => (
       {({ isSubmitting, isValid, status }) => (
         <Form>
           <Stack>
+            <Link to="/">Go to Home Screen</Link>
             <Header>{title}</Header>
             <h4>Please enter email or swipe card</h4>
             {status && status.msg && (
