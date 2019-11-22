@@ -11,7 +11,6 @@ const stackSize = (size: 'small' | 'large') => {
   }
 };
 
-// $FlowFixMe
 const Stack = styled.div`
   & > * + * {
     margin-top: ${props => stackSize(props.size)} !important;

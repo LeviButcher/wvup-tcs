@@ -42,6 +42,9 @@ const Footer = styled.footer`
   background-color: #afafaf;
   grid-area: footer;
   padding: 0 ${props => props.theme.padding};
+  & header {
+    margin: 1rem;
+  }
 `;
 
 const Box = styled(Card)`
@@ -56,7 +59,6 @@ const Box = styled(Card)`
   justify-self: center;
 `;
 
-// $FlowFixMe
 const LandingPageKioskFullScreen = styled(KioskFullScreenContainer)`
   padding: 0;
   display: grid;
@@ -95,7 +97,7 @@ const Home = ({ location }: Props) => (
     <BoxLink to="/signout" style={{ gridArea: 'boxRight' }}>
       <Box>Sign Out</Box>
     </BoxLink>
-    <Footer>
+    <Footer style={{ alignSelf: 'center' }}>
       <Header type="h3" align="center">
         <Link to="/signin/teacher">Sign in for teachers</Link>
       </Header>

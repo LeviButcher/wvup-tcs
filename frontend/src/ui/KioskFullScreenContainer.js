@@ -1,6 +1,5 @@
 import styled from 'styled-components';
 
-// $FlowFixMe
 const KioskFullScreenContainer = styled.div`
   padding: ${props => props.theme.padding};
   height: calc(100vh - ${props => props.theme.kioskHeaderSize});

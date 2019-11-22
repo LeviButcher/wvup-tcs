@@ -1,8 +1,13 @@
 import React from 'react';
+import type { Node } from 'react';
 import styled from 'styled-components';
 import Header from '../../ui/Header';
 
-const Layout = ({ children }) => (
+type Props = {
+  children: Node
+};
+
+const Layout = ({ children }: Props) => (
   <div>
     <StyledHeader>Welcome to the Tutoring Center</StyledHeader>
     <div>{children}</div>

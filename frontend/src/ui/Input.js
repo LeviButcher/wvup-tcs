@@ -25,7 +25,6 @@ const Input = ({
   );
 };
 
-// $FlowFixMe
 export default styled(Input)`
   & input,
   label {
