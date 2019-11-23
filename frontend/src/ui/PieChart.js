@@ -4,8 +4,8 @@ import { add, sum } from 'ramda';
 
 type LabelWithPercentageProps = {
   text: string,
-  data: {},
-  datum: string
+  data: [{ _y: number }],
+  datum: { _y: number }
 };
 
 const LabelWithPercentage = ({
@@ -31,8 +31,8 @@ const LabelWithPercentage = ({
 
 type Props = {
   data: Array<Object>,
-  x: ({}) => string,
-  y: ({}) => string,
+  x: ({}) => number,
+  y: ({}) => number,
   title: string
 };
 
@@ -61,6 +61,7 @@ const PieChart = ({ data, x, y, title, ...props }: Props) => (
       style={{ fontSize: '20px' }}
     />
     <text x={250} y={500} textAnchor="middle">
+      {/* // $FlowFixMe */}
       Total Students:{data.map(d => y(d)).reduce(add, 0)}
     </text>
   </svg>

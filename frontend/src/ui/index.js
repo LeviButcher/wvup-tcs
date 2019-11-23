@@ -11,7 +11,6 @@ import LineChart from './LineChart';
 import BarChart from './BarChart';
 import PieChart from './PieChart';
 import Paging from './Paging';
-import ZoomedLineChart from './ZoomedLineChart';
 import FormikDateTimePicker from './FormikDateTimePicker';
 import Stack from './Stack';
 import SmallText from './SmallText';
@@ -31,7 +30,6 @@ export {
   BarChart,
   PieChart,
   Paging,
-  ZoomedLineChart,
   FormikDateTimePicker,
   Stack,
   SmallText,
