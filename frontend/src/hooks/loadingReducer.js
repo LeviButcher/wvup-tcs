@@ -4,7 +4,19 @@ const loadingStates = {
   error: 'Error'
 };
 
-const loadingReducer = (currState, action) => {
+type LoadingState = {
+  loading: boolean,
+  data: {},
+  errors: {}
+};
+
+type Action = {
+  type: typeof loadingStates,
+  data: {},
+  errors: {}
+};
+
+const loadingReducer = (currState: LoadingState, action: Action) => {
   switch (action.type) {
     case loadingStates.loading: {
       return { ...currState, loading: true };

@@ -1,9 +1,14 @@
 import React from 'react';
+import type { Node } from 'react';
 import styled from 'styled-components';
 import { Header, Link } from '../../ui';
 import Logout from '../../components/Logout';
 
-const Layout = ({ children }) => (
+type Props = {
+  children: Node
+};
+
+const Layout = ({ children }: Props) => (
   <LayoutGrid>
     <SideNav />
     <main>{children}</main>

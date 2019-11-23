@@ -7,7 +7,4 @@ export default styled.article`
   padding: ${props => props.padding || '2rem'};
   box-shadow: 0 0 20px 5px rgba(0, 0, 0, 0.3);
   background: #fff;
-
-  &[data-loading='true'] {
-  }
 `;

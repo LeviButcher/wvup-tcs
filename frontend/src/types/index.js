@@ -32,3 +32,8 @@ export type ClassTour = {
   dayVisited: string,
   numberOfStudents: number
 };
+
+export type User = {
+  token: string,
+  username: string
+};

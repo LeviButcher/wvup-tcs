@@ -4,41 +4,44 @@ import { Form, Field, Formik } from 'formik';
 import Topography from '../../images/topography.svg';
 import { callApi, ensureResponseCode, unwrapToJSON } from '../../utils';
 import { Card, Header, Input, Button, Stack } from '../../ui';
-import useLoading from '../../hooks/useLoading';
+import type { User } from '../../types';
+
+const CenterComponent = styled.div`
+  height: 100vh;
+  display: grid;
+  align-items: center;
+  justify-content: center;
+  background-color: #dfdbe5;
+  background-image: url('${Topography}');
+`;
 
 const postToAuthApi = callApi(`users/authenticate`, 'POST');
 
 const Login = () => {
-  const [loading, startLoading, doneLoading] = useLoading();
-
   return (
     <CenterComponent>
-      <Card data-loading={loading}>
+      <Card>
         <Formik
           initialValues={{ username: '', password: '' }}
-          onSubmit={async (values, { setSubmitting, setStatus }) => {
-            startLoading();
-            postToAuthApi(values)
+          isInitialValid={false}
+          onSubmit={(values, { setStatus }) => {
+            return postToAuthApi(values)
               .then(ensureResponseCode(200))
               .then(unwrapToJSON)
-              .then(user => {
+              .then((user: User) => {
                 // put user in local storage
                 localStorage.setItem(
-                  `${process.env.REACT_APP_TOKEN}`,
+                  `${process.env.REACT_APP_TOKEN || ''}`,
                   user.token
                 );
                 localStorage.setItem('username', user.username);
                 window.history.back();
               })
-              .catch(setStatus)
-              .finally(() => {
-                setSubmitting(false);
-                doneLoading();
-              });
+              .catch(setStatus);
           }}
         >
-          {({ status, values, isSubmitting, handleSubmit }) => (
-            <Form onSubmit={handleSubmit}>
+          {({ status, isSubmitting, isValid }) => (
+            <Form>
               <Stack>
                 <Header align="center">Tutoring Center Login</Header>
                 {status && status.message && (
@@ -47,7 +50,6 @@ const Login = () => {
                 <Field
                   id="username"
                   name="username"
-                  value={values.username}
                   component={Input}
                   label="Username"
                 />
@@ -55,7 +57,6 @@ const Login = () => {
                   id="password"
                   type="password"
                   name="password"
-                  value={values.password}
                   component={Input}
                   label="Password"
                 />
@@ -63,7 +64,7 @@ const Login = () => {
                   type="submit"
                   display="block"
                   fullWidth
-                  disabled={isSubmitting}
+                  disabled={isSubmitting || !isValid}
                 >
                   Submit
                 </Button>
@@ -75,14 +76,5 @@ const Login = () => {
     </CenterComponent>
   );
 };
-
-const CenterComponent = styled.div`
-  height: 100vh;
-  display: grid;
-  align-items: center;
-  justify-content: center;
-  background-color: #dfdbe5;
-  background-image: url('${Topography}');
-`;
 
 export default Login;
