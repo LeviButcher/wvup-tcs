@@ -1,4 +1,6 @@
-function marginConvertor(align) {
+type alignEnum = 'left' | 'right';
+
+function marginConvertor(align: alignEnum) {
   let margin = 'auto';
   switch (align) {
     case 'left':

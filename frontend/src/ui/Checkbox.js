@@ -2,7 +2,14 @@ import React from 'react';
 import { Field } from 'formik';
 import styled from 'styled-components';
 
-export default function Checkbox({ name, value, label, id, ...rest }) {
+type Props = {
+  name: string,
+  value: string,
+  label: string,
+  id: string
+};
+
+export default function Checkbox({ name, value, label, id, ...rest }: Props) {
   return (
     <Field name={name}>
       {({ field, form }) => (

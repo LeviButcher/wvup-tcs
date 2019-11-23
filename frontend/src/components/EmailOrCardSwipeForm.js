@@ -5,6 +5,7 @@ import * as Yup from 'yup';
 import { Input, Button, Stack } from '../ui';
 import { callApi, unwrapToJSON, ensureResponseCode, isWVUPId } from '../utils';
 import useCardReader from '../hooks/useCardReader';
+import type { Teacher, Student } from '../types';
 
 const EmailSchema = Yup.object().shape({
   email: Yup.string()
@@ -26,13 +27,8 @@ const getTeacherInfoWithEmail = email =>
 const getTeacherInfoWithId = (id: number) =>
   callApi(`signins/${id}/teacher/id`, 'GET', null);
 
-type Teacher = {
-  teacherID: number,
-  teacherEmail: string
-};
-
 type Props = {
-  afterValidSubmit: Teacher => Promise<any>,
+  afterValidSubmit: (Teacher & Student) => Promise<any>,
   teacher?: boolean,
   children?: Node
 };

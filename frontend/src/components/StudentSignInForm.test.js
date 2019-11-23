@@ -80,7 +80,6 @@ test('Happy Path: Student Sign ins with tutoring, another reason, and 1 class, s
         personId: '1'
       }),
       headers: {
-        Authorization: 'Bearer null',
         'Content-Type': 'application/json'
       },
       method: 'POST'

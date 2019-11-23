@@ -1,16 +1,21 @@
 import React from 'react';
 import { Table, Link } from '../ui';
 import { Gear, Trashcan } from '../ui/icons';
+import type { ClassTour } from '../types';
 
-const ClassToursTable = ({ classTours }) => {
-  return(
+type Props = {
+  classTours: Array<ClassTour>
+};
+
+const ClassToursTable = ({ classTours }: Props) => {
+  return (
     <Table>
       <thead align="left">
         <tr>
           <th align="center">Name</th>
           <th align="center">Day Visited</th>
           <th align="center">Number of Students</th>
-          <th align="center" >Actions</th>
+          <th align="center">Actions</th>
         </tr>
       </thead>
       <tbody>
@@ -31,14 +36,13 @@ const dateOptions = {
   minute: '2-digit'
 };
 
+type ClassTourRowProps = {
+  classTour: ClassTour
+};
+
 const ClassTourRow = ({
-  classTour: {
-    id,
-    name,
-    dayVisited,
-    numberOfStudents
-  }
-}) => {
+  classTour: { id, name, dayVisited, numberOfStudents }
+}: ClassTourRowProps) => {
   return (
     <tr>
       <td>{name}</td>
@@ -50,7 +54,13 @@ const ClassTourRow = ({
         <Link to={`/dashboard/tours/update/${id}`}>
           <Gear />
         </Link>
-        <Trashcan onClick={() => alert('Not implemented yet')} />
+        <Trashcan
+          onClick={() => {
+            // eslint-disable-next-line no-alert
+            // eslint-disable-next-line no-undef
+            alert('Not implemented yet');
+          }}
+        />
       </td>
     </tr>
   );

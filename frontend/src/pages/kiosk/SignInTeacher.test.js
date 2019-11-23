@@ -96,7 +96,6 @@ test('Submit with valid wvup.edu email, calls fetch with correct backend endpoin
       `${backendURL}signins/test@wvup.edu/teacher/email`,
       {
         headers: {
-          Authorization: 'Bearer null',
           'Content-Type': 'application/json'
         },
         method: 'GET'
@@ -106,7 +105,6 @@ test('Submit with valid wvup.edu email, calls fetch with correct backend endpoin
   // Shouldn't this pass in body for the teacher, email maybe?
   expect(fakeFetch).toHaveBeenCalledWith(`${backendURL}signins?teacher=true`, {
     headers: {
-      Authorization: 'Bearer null',
       'Content-Type': 'application/json'
     },
     body: JSON.stringify({ personId: -1, email: 'test@wvup.edu' }),
@@ -130,7 +128,6 @@ test('Card swipe calls fetch with correct backend endpoint', async () => {
       `${backendURL}signins/98/teacher/id`,
       {
         headers: {
-          Authorization: 'Bearer null',
           'Content-Type': 'application/json'
         },
         method: 'GET'

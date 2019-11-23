@@ -3,6 +3,7 @@ import { Link } from '@reach/router';
 import { Card, KioskFullScreenContainer, Stack } from '../../ui';
 import EmailOrCardSwipeForm from '../../components/EmailOrCardSwipeForm';
 import StudentSignInForm from '../../components/StudentSignInForm';
+import type { Student } from '../../types';
 
 // test email = mtmqbude26@wvup.edu
 const SignInStudent = () => {
@@ -17,7 +18,7 @@ const SignInStudent = () => {
           {!student ? (
             <EmailOrCardSwipeForm
               default
-              afterValidSubmit={studentInfo => {
+              afterValidSubmit={(studentInfo: Student) => {
                 return Promise.resolve(setStudent(studentInfo));
               }}
             />

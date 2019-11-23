@@ -40,6 +40,7 @@ function App() {
       <ThemeProvider theme={Theme}>
         <Router>
           <KioskLayout path="/">
+            {/* $FlowFixMe */}
             <Home path="/" />
             <SignInStudent path="/signin/*" />
             <SignOut path="/signout" />

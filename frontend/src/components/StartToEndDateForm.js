@@ -1,7 +1,17 @@
 import React from 'react';
+import type { Node } from 'react';
 import { Formik, Form, Field } from 'formik';
 import { Card, Header, Button, Input } from '../ui';
 import StartToEndDateSchema from '../schemas/StartToEndDateSchema';
+
+type Props = {
+  onSubmit: () => any,
+  name: string,
+  submitText: string,
+  startDate: string,
+  endDate: string,
+  children: Node
+};
 
 const StartToEndDateForm = ({
   onSubmit,
@@ -11,7 +21,7 @@ const StartToEndDateForm = ({
   endDate = '',
   children,
   ...props
-}) => {
+}: Props) => {
   return (
     <Card>
       <Header>{name}</Header>
@@ -20,7 +30,6 @@ const StartToEndDateForm = ({
         onSubmit={onSubmit}
         validationSchema={StartToEndDateSchema}
         initialValues={{ startDate, endDate }}
-        validateOnMount
         {...props}
       >
         {({ isSubmitting, isValid }) => (

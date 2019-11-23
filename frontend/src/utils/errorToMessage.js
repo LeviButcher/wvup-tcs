@@ -1,3 +1,3 @@
-const errorToMessage = e => ({ msg: e.message });
+const errorToMessage = (e: Error) => ({ msg: e.message });
 
 export default errorToMessage;

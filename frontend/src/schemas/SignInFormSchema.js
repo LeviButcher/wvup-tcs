@@ -1,5 +1,6 @@
 import * as Yup from 'yup';
 
+// $FlowFixMe
 const SignInSchema = Yup.object().shape({
   email: Yup.string()
     .email('Invalid email')

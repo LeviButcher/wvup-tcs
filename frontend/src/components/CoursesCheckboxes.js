@@ -1,7 +1,14 @@
 import React from 'react';
 import { Header, FieldGroup, Checkbox, Stack, SmallText } from '../ui';
+import type { Course } from '../types';
 
-const CoursesCheckboxes = ({ courses, errors, touched }) => {
+type Props = {
+  courses: Array<Course>,
+  errors: { courses: string },
+  touched: { courses: string }
+};
+
+const CoursesCheckboxes = ({ courses, errors, touched }: Props) => {
   return (
     <Stack>
       <Header type="h4">

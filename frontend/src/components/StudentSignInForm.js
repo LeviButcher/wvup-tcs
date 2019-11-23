@@ -7,22 +7,17 @@ import CoursesCheckboxes from './CoursesCheckboxes';
 import ReasonCheckboxes from './ReasonCheckboxes';
 import useApiWithHeaders from '../hooks/useApiWithHeaders';
 import SignInSchema from '../schemas/SignInFormSchema';
+import type { Student } from '../types';
 
 const postSignIn = callApi(`signins/`, 'POST');
 
 type Props = {
-  student: {
-    classSchedule: [{ crn: string }],
-    studentEmail: string,
-    studentID: string,
-    semesterId: string,
-    firstName: string,
-    lastName: string
-  }
+  student: Student
 };
 
 const StudentSignInForm = ({ student }: Props) => {
   const [, { body: reasons }] = useApiWithHeaders('reasons/active');
+
   return (
     <Formik
       onSubmit={studentSignIn => {

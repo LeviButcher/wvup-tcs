@@ -18,8 +18,7 @@ test('Renders with required props', () => {
 
 test('Expect submit to be disabled on render', () => {
   const { getByText } = render(<SignOut />);
-  const submit = getByText(/Submit/);
-  expect(submit).toBeDisabled();
+  expect(getByText(/Submit/)).toBeDisabled();
 });
 
 test("Can't submit with non wvup.edu email", async () => {
@@ -83,7 +82,6 @@ test('Submit with valid email sends fetch call to api with email', async () => {
       `${backendURL}signins/fake@wvup.edu/signout`,
       {
         headers: {
-          Authorization: 'Bearer null',
           'Content-Type': 'application/json'
         },
         method: 'PUT'
@@ -107,7 +105,6 @@ test('Card swipe calls fetch with correct arguments', async () => {
     expect(fakeFetch).toHaveBeenCalledTimes(1);
     expect(fakeFetch).toHaveBeenCalledWith(`${backendURL}signins/98/signout`, {
       headers: {
-        Authorization: 'Bearer null',
         'Content-Type': 'application/json'
       },
       method: 'PUT'

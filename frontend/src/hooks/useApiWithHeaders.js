@@ -30,10 +30,14 @@ const useApiWithHeaders = (uri: string) => {
           buildData.headers[key] = value;
         });
         buildData.body = await response.json();
-        if (isMounted) dispatch({ type: loadingStates.done, data: buildData });
+        if (isMounted) {
+          dispatch({ type: loadingStates.done, data: buildData });
+        }
       })
       .catch(e => {
-        if (isMounted) dispatch({ type: loadingStates.error, errors: e });
+        if (isMounted) {
+          dispatch({ type: loadingStates.error, errors: e });
+        }
       });
 
     return () => {

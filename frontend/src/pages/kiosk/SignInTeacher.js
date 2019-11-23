@@ -3,6 +3,7 @@ import { Link, navigate } from '@reach/router';
 import { callApi, ensureResponseCode } from '../../utils';
 import { Card, KioskFullScreenContainer } from '../../ui';
 import EmailOrCardSwipeForm from '../../components/EmailOrCardSwipeForm';
+import type { Teacher } from '../../types';
 
 const postSignInTeacher = callApi(`signins?teacher=true`, 'POST');
 
@@ -13,7 +14,7 @@ const SignInTeacher = () => {
       <Card>
         <EmailOrCardSwipeForm
           teacher
-          afterValidSubmit={teacher => {
+          afterValidSubmit={(teacher: Teacher) => {
             const signIn = {
               personId: teacher.teacherID,
               email: teacher.teacherEmail

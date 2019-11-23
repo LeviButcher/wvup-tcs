@@ -10,7 +10,26 @@ import {
   VictoryScatter
 } from 'victory';
 
-const LineChart = ({ data, x, y, xLabel, yLabel, title, labels, ...props }) => (
+type Props = {
+  data: {},
+  x: ({}) => string,
+  y: ({}) => string,
+  xLabel: string,
+  yLabel: string,
+  title: string,
+  labels: string
+};
+
+const LineChart = ({
+  data,
+  x,
+  y,
+  xLabel,
+  yLabel,
+  title,
+  labels,
+  ...props
+}: Props) => (
   <VictoryChart
     theme={VictoryTheme.material}
     containerComponent={<VictoryVoronoiContainer />}
