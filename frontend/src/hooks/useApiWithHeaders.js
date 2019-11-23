@@ -4,7 +4,7 @@ import { loadingReducer, loadingStates } from './loadingReducer';
 
 const getApiData = uri => callApi(uri, 'GET', null);
 
-const useApiWithHeaders = uri => {
+const useApiWithHeaders = (uri: string) => {
   const [{ loading, errors, data }, dispatch] = useReducer(loadingReducer, {
     loading: true,
     data: {
@@ -14,11 +14,14 @@ const useApiWithHeaders = uri => {
   });
 
   useEffect(() => {
+    let isMounted = true;
     if (uri === null || uri.length < 1) {
-      dispatch({ type: loadingStates.done });
-      return;
+      if (isMounted) dispatch({ type: loadingStates.done });
+      return () => {
+        isMounted = false;
+      };
     }
-    dispatch({ type: loadingStates.loading });
+    if (isMounted) dispatch({ type: loadingStates.loading });
     getApiData(uri)
       .then(ensureResponseCode(200))
       .then(async response => {
@@ -27,11 +30,15 @@ const useApiWithHeaders = uri => {
           buildData.headers[key] = value;
         });
         buildData.body = await response.json();
-        dispatch({ type: loadingStates.done, data: buildData });
+        if (isMounted) dispatch({ type: loadingStates.done, data: buildData });
       })
       .catch(e => {
-        dispatch({ type: loadingStates.error, errors: e });
+        if (isMounted) dispatch({ type: loadingStates.error, errors: e });
       });
+
+    return () => {
+      isMounted = false;
+    };
   }, [uri]);
 
   return [loading, data, errors];

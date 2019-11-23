@@ -33,7 +33,7 @@ type Teacher = {
 
 type Props = {
   afterValidSubmit: Teacher => Promise<any>,
-  teacher: boolean,
+  teacher?: boolean,
   children?: Node
 };
 
@@ -51,20 +51,24 @@ const EmailOrCardSwipeForm = ({
   const getInfoWithId = teacher ? getTeacherInfoWithId : getStudentInfoWithId;
 
   useEffect(() => {
+    let isMounted = true;
     if (data && data.length > 2) {
       const wvupId = data.find(isWVUPId) || -1;
       getInfoWithId(wvupId)
         .then(ensureResponseCode(200))
         .then(unwrapToJSON)
         .then(personInfo => {
-          afterValidSubmit(personInfo);
+          if (isMounted) afterValidSubmit(personInfo);
         });
     }
+    return () => {
+      isMounted = false;
+    };
   }, [data, afterValidSubmit, getInfoWithId]);
 
   return (
     <Formik
-      onSubmit={({ email }, { setSubmitting, setStatus }) => {
+      onSubmit={({ email }, { setStatus }) => {
         return getInfoWithEmail(email)
           .then(ensureResponseCode(200))
           .then(unwrapToJSON)
@@ -73,8 +77,7 @@ const EmailOrCardSwipeForm = ({
             if (e.message) {
               setStatus(e.message);
             }
-          })
-          .finally(() => setSubmitting(false));
+          });
       }}
       initialValues={{ email: '' }}
       validationSchema={EmailSchema}
@@ -101,7 +104,7 @@ const EmailOrCardSwipeForm = ({
                 fullWidth
                 intent="primary"
               >
-                {isSubmitting ? 'Submitting SignIn...' : 'Submit'}
+                {isSubmitting ? 'Submitting...' : 'Submit'}
               </Button>
             </Stack>
           </Form>
@@ -112,7 +115,8 @@ const EmailOrCardSwipeForm = ({
 };
 
 EmailOrCardSwipeForm.defaultProps = {
-  children: null
+  children: null,
+  teacher: false
 };
 
 export default EmailOrCardSwipeForm;
