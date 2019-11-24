@@ -1,5 +1,5 @@
 import React from 'react';
-import { navigate } from '@reach/router';
+import { navigate, Router } from '@reach/router';
 import {
   render,
   fireEvent,
@@ -29,7 +29,13 @@ describe('Class Tour Lookup', () => {
     global.fetch = fakeFetch;
 
     const { getByLabelText, getByText } = render(
-      <ClassTourLookup navigate={navigate} />
+      <Router>
+        <ClassTourLookup navigate={navigate} default />
+        <ClassTourLookup
+          navigate={navigate}
+          path="/dashboard/tours/:startDate/:endDate/"
+        />
+      </Router>
     );
 
     fireEvent.change(getByLabelText(/start/i), {

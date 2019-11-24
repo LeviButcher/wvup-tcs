@@ -4,6 +4,7 @@ import StartToEndDateForm from '../../components/StartToEndDateForm';
 import ClassToursTable from '../../components/ClassToursTable';
 import { Link, Button, Card } from '../../ui';
 import Paging from '../../components/Paging';
+import { getProperty } from '../../utils';
 import useApiWithHeaders from '../../hooks/useApiWithHeaders';
 
 const take = 20;
@@ -13,8 +14,6 @@ const getClassTourUrl = (start, end, page = 1) => {
     take}&take=${take}`;
   return endpoint;
 };
-
-const getProperty = (obj, property: string) => obj[property] || '';
 
 type Props = {
   navigate: string => any,
@@ -31,6 +30,7 @@ const ClassTourLookup = ({
 }: Props) => {
   const endpoint = getClassTourUrl(startDate, endDate, page);
   const [loading, data, errors] = useApiWithHeaders(endpoint);
+  const isDefaultForm = () => startDate === '' && endDate === '';
 
   return (
     <div>
@@ -63,8 +63,8 @@ const ClassTourLookup = ({
           endDate
         }}
       />
-      <ScaleLoader loading={loading} />
-      {!loading && (
+      <ScaleLoader loading={loading && !isDefaultForm()} />
+      {!loading && !isDefaultForm() && (
         <>
           {data.body.length <= 0 ? (
             <div>No records found</div>

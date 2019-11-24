@@ -35,7 +35,7 @@ const StartToEndDateForm = ({ onSubmit, title, children, ...props }: Props) => {
                 type="date"
                 name="startDate"
                 component={Input}
-                label="start Date"
+                label="Start Date"
                 required
               />
               <Field
@@ -43,7 +43,7 @@ const StartToEndDateForm = ({ onSubmit, title, children, ...props }: Props) => {
                 type="date"
                 name="endDate"
                 component={Input}
-                label="end Date"
+                label="End Date"
                 required
               />
               {children}

@@ -11,6 +11,7 @@ const ClassTourUpdate = ({ id }: Props) => {
   const [loading, { body }] = useApi(`classtours/${id}`);
   return (
     <div style={{ margin: 'auto' }}>
+      {/* $FlowFixMe */}
       {loading ? <ScaleLoader /> : <ClassTourForm classTour={body} />}
     </div>
   );
