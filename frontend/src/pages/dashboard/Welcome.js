@@ -22,15 +22,15 @@ const Welcome = () => {
             <BigText>{totalVisits}</BigText>{' '}
             {totalVisits !== 1 ? 'Students' : 'Student'} Helped Today
           </Header>
-          {data.body.length >= 1 && (
+          {data.body && data.body.length >= 1 && (
             <div>
               <h4>Most Recent Visitors</h4>
               <SignInsTable signIns={data.body} />
             </div>
           )}
+          {errors && errors.message && <div>{errors.message}</div>}
         </>
       )}
-      {errors && <div>{errors}</div>}
     </div>
   );
 };

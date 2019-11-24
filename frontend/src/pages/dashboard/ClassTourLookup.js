@@ -1,10 +1,8 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React from 'react';
 import ScaleLoader from 'react-spinners/ScaleLoader';
-import { Router } from '@reach/router';
-import StartToEndDate from '../../components/StartToEndDateForm';
+import StartToEndDateForm from '../../components/StartToEndDateForm';
 import ClassToursTable from '../../components/ClassToursTable';
 import { Paging, Link, Button, Card } from '../../ui';
-import StartToEndDateSchema from '../../schemas/StartToEndDateSchema';
 import useApiWithHeaders from '../../hooks/useApiWithHeaders';
 
 const take = 20;
@@ -15,94 +13,90 @@ const getClassTourUrl = (start, end, page = 1) => {
   return endpoint;
 };
 
-const ClassTourLookup = ({ navigate }) => {
-  const [{ startDate, endDate }, setFormValues] = useState({});
+type Props = {
+  navigate: string => any,
+  startDate?: string,
+  endDate?: string,
+  page?: number
+};
+
+const ClassTourLookup = ({
+  navigate,
+  startDate = '',
+  endDate = '',
+  page = 1
+}: Props) => {
+  const endpoint = getClassTourUrl(startDate, endDate, page);
+  const [loading, data, errors] = useApiWithHeaders(endpoint);
 
   return (
-    <>
-      <div>
-        <Card>
-          <h3>Additional Actions</h3>
-          <div
-            style={{
-              display: 'grid',
-              justifyContent: 'space-between',
-              gridTemplateColumns: 'auto auto',
-              gridGap: '10px'
-            }}
-          >
-            <Link to="create">
-              <Button intent="primary" align="left">
-                Add Class Tour
-              </Button>
-            </Link>
-          </div>
-        </Card>
-
-        <StartToEndDate
-          name="ClassTour Lookup"
-          onSubmit={(values, { setSubmitting }) => {
-            navigate(`${values.startDate}/${values.endDate}/1`);
-            setSubmitting(false);
+    <div>
+      <Card>
+        <h3>Additional Actions</h3>
+        <div
+          style={{
+            display: 'grid',
+            justifyContent: 'space-between',
+            gridTemplateColumns: 'auto auto',
+            gridGap: '1rem'
           }}
-          submitText="Run Lookup"
-          initialValues={{
-            startDate: startDate || '',
-            endDate: endDate || ''
-          }}
-          validateOnMount
-          validationSchema={StartToEndDateSchema}
-          enableReinitialize
-        ></StartToEndDate>
-        <Router primary={false}>
-          <LookupResults
-            path=":startDate/:endDate/:page"
-            setFormValues={setFormValues}
-          />
-        </Router>
-      </div>
-    </>
+        >
+          <Link to="create">
+            <Button intent="primary" align="left">
+              Add Class Tour
+            </Button>
+          </Link>
+        </div>
+      </Card>
+      <StartToEndDateForm
+        title="ClassTour Lookup"
+        onSubmit={values => {
+          return Promise.resolve(
+            navigate(`/dashboard/tours/${values.startDate}/${values.endDate}`)
+          );
+        }}
+        initialValues={{
+          startDate,
+          endDate
+        }}
+      />
+      <ScaleLoader loading={loading} />
+      {!loading && (
+        <>
+          {data.body.length <= 0 ? (
+            <div>No records found</div>
+          ) : (
+            <Card width="auto">
+              <Paging
+                currentPage={data.headers['current-page']}
+                totalPages={data.headers['total-pages']}
+                next={data.headers.next}
+                prev={data.headers.prev}
+                queries={{}}
+                baseURL={`/dashboard/tours/${startDate}/${endDate}/`}
+              />
+              <ClassToursTable classTours={data.body} />
+              <Paging
+                currentPage={data.headers['current-page']}
+                totalPages={data.headers['total-pages']}
+                next={data.headers.next}
+                prev={data.headers.prev}
+                queries={{}}
+                baseURL={`/dashboard/tours/${startDate}/${endDate}/`}
+              />
+            </Card>
+          )}
+        </>
+      )}
+      {errors && errors.message && <div>{errors.message}</div>}
+    </div>
   );
 };
 
-const LookupResults = ({ startDate, endDate, page, setFormValues }) => {
-  const setFormValuesCallback = useCallback(args => setFormValues(args), [
-    setFormValues
-  ]);
-  const endpoint = getClassTourUrl(startDate, endDate, page);
-  const [loading, data] = useApiWithHeaders(endpoint);
-
-  useEffect(() => {
-    setFormValuesCallback({ startDate, endDate });
-  }, [startDate, endDate, setFormValuesCallback]);
-
-  return (
-    <>
-      <ScaleLoader sizeUnit="px" size={150} loading={loading} align="center" />
-      {!loading && data.body.length < 1 && <h3>No reconds found for search</h3>}
-      {!loading && data && data.headers && data.body.length >= 1 && (
-        <Card width="auto">
-          <Paging
-            currentPage={data.headers['current-page']}
-            totalPages={data.headers['total-pages']}
-            next={data.headers.next}
-            prev={data.headers.prev}
-            queries={{}}
-            baseURL={`/dashboard/tours/${startDate}/${endDate}/`}
-          />
-          <ClassToursTable classTours={data.body} />
-          <Paging
-            currentPage={data.headers['current-page']}
-            totalPages={data.headers['total-pages']}
-            next={data.headers.next}
-            prev={data.headers.prev}
-            queries={{}}
-            baseURL={`/dashboard/tours/${startDate}/${endDate}/`}
-          />
-        </Card>
-      )}
-    </>
-  );
+ClassTourLookup.defaultProps = {
+  page: 1,
+  startDate: '',
+  endDate: ''
 };
 
 export default ClassTourLookup;

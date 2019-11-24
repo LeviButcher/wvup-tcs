@@ -6,14 +6,14 @@ const loadingStates = {
 
 type LoadingState = {
   loading: boolean,
-  data: {},
-  errors: {}
+  data: any,
+  errors: any
 };
 
 type Action = {
   type: 'Loading' | 'Done' | 'Error',
-  data: {},
-  errors: {}
+  data: any,
+  errors: any
 };
 
 const loadingReducer = (currState: LoadingState, action: Action) => {

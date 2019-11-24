@@ -1,69 +1,74 @@
 import React from 'react';
 import type { Node } from 'react';
 import { Formik, Form, Field } from 'formik';
-import { Card, Header, Button, Input } from '../ui';
+import { Card, Header, Button, Input, Stack } from '../ui';
 import StartToEndDateSchema from '../schemas/StartToEndDateSchema';
 
 type Props = {
-  onSubmit: () => any,
-  name: string,
-  submitText: string,
-  startDate: string,
-  endDate: string,
-  children: Node
+  // Second argument is formikBag
+  onSubmit: (any, any) => Promise<any> & any,
+  title: string,
+  initialValues?: {
+    startDate: string,
+    endDate: string
+  },
+  children?: Node
 };
 
-const StartToEndDateForm = ({
-  onSubmit,
-  name,
-  submitText,
-  startDate = '',
-  endDate = '',
-  children,
-  ...props
-}: Props) => {
+const StartToEndDateForm = ({ onSubmit, title, children, ...props }: Props) => {
   return (
     <Card>
-      <Header>{name}</Header>
+      <Header>{title}</Header>
       <p>Enter begin and end date to query by</p>
       <Formik
         onSubmit={onSubmit}
         validationSchema={StartToEndDateSchema}
-        initialValues={{ startDate, endDate }}
+        enableReinitialize
+        isInitialValid={false}
         {...props}
       >
         {({ isSubmitting, isValid }) => (
           <Form>
-            <Field
-              id="startDate"
-              type="date"
-              name="startDate"
-              component={Input}
-              label="start Date"
-              required
-            />
-            <Field
-              id="endDate"
-              type="date"
-              name="endDate"
-              component={Input}
-              label="end Date"
-              required
-            />
-            {children}
-            <Button
-              type="submit"
-              align="right"
-              intent="primary"
-              disabled={isSubmitting || !isValid}
-            >
-              {submitText || 'Run Report'}
-            </Button>
+            <Stack>
+              <Field
+                id="startDate"
+                type="date"
+                name="startDate"
+                component={Input}
+                label="start Date"
+                required
+              />
+              <Field
+                id="endDate"
+                type="date"
+                name="endDate"
+                component={Input}
+                label="end Date"
+                required
+              />
+              {children}
+              <Button
+                type="submit"
+                fullWidth
+                intent="primary"
+                disabled={isSubmitting || !isValid}
+              >
+                {isSubmitting ? 'Submitting' : 'Submit'}
+              </Button>
+            </Stack>
           </Form>
         )}
       </Formik>
     </Card>
   );
+};
+
+StartToEndDateForm.defaultProps = {
+  initialValues: {
+    startDate: '',
+    endDate: ''
+  },
+  children: null
 };
 
 export default StartToEndDateForm;

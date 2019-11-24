@@ -72,7 +72,12 @@ function App() {
                 action="Update"
                 type="update"
               />
-              <ClassTourLookup path="/tours/*" />
+              {/* // $FlowFixMe */}
+              <ClassTourLookup path="/tours/" />
+              {/* // $FlowFixMe */}
+              <ClassTourLookup path="/tours/:startDate/:endDate" />
+              {/* // $FlowFixMe */}
+              <ClassTourLookup path="/tours/:startDate/:endDate/:page" />
               <ClassTourCreate path="/tours/create" />
               {/* // $FlowFixMe */}
               <ClassTourUpdate path="/tours/update/:id" />

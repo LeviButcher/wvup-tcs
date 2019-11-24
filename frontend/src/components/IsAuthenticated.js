@@ -8,6 +8,7 @@ const checkAuth = () => callApi(`users/IsAuthenticate`, 'GET', null);
 // Need to add loading state
 const IsAuthenticated = ({ redirectRoute, children }) => {
   const [isAuth, setAuth] = useState(false);
+
   useEffect(() => {
     checkAuth()
       .then(async res => {
