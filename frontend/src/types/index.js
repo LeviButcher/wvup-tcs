@@ -37,3 +37,15 @@ export type User = {
   token: string,
   username: string
 };
+
+export type SignIn = {
+  id: string,
+  email: string,
+  fullName: string,
+  courses: [Course],
+  reasons: [Reason],
+  inTime: string,
+  outTime: string,
+  tutoring: string,
+  type: string
+};

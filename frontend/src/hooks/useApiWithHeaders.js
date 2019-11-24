@@ -10,33 +10,54 @@ const useApiWithHeaders = (uri: string) => {
     data: {
       headers: {},
       body: []
-    }
+    },
+    errors: {}
   });
 
   useEffect(() => {
     let isMounted = true;
     if (uri === null || uri.length < 1) {
-      if (isMounted) dispatch({ type: loadingStates.done });
+      if (isMounted)
+        dispatch({
+          type: loadingStates.done,
+          data: { headers: {}, body: [] },
+          errors: {}
+        });
       return () => {
         isMounted = false;
       };
     }
-    if (isMounted) dispatch({ type: loadingStates.loading });
+    if (isMounted)
+      dispatch({
+        type: loadingStates.loading,
+        data: {
+          headers: {},
+          body: { headers: {}, body: [] }
+        },
+        errors: {}
+      });
     getApiData(uri)
       .then(ensureResponseCode(200))
       .then(async response => {
-        const buildData = { headers: {} };
+        const buildData = { headers: {}, body: {} };
         response.headers.forEach((value, key) => {
           buildData.headers[key] = value;
         });
         buildData.body = await response.json();
         if (isMounted) {
-          dispatch({ type: loadingStates.done, data: buildData });
+          dispatch({ type: loadingStates.done, data: buildData, errors: {} });
         }
       })
       .catch(e => {
         if (isMounted) {
-          dispatch({ type: loadingStates.error, errors: e });
+          dispatch({
+            type: loadingStates.error,
+            errors: e,
+            data: {
+              headers: {},
+              body: []
+            }
+          });
         }
       });
 
