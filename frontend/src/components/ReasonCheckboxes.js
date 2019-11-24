@@ -2,8 +2,23 @@ import React from 'react';
 import { Field } from 'formik';
 import { Header, FieldGroup, Checkbox, Stack, SmallText } from '../ui';
 import { StyledCheckbox } from '../ui/Checkbox';
+import type { Reason } from '../types';
 
-const ReasonsCheckboxes = ({ className, reasons, values, errors, touched }) => (
+type Props = {
+  className?: string,
+  reasons: Array<Reason>,
+  values: any,
+  errors: any,
+  touched: any
+};
+
+const ReasonsCheckboxes = ({
+  className,
+  reasons,
+  values,
+  errors,
+  touched
+}: Props) => (
   <Stack className={className}>
     <Header type="h4">
       Reason for Visiting{' '}
@@ -51,5 +66,9 @@ const ReasonsCheckboxes = ({ className, reasons, values, errors, touched }) => (
     </FieldGroup>
   </Stack>
 );
+
+ReasonsCheckboxes.defaultProps = {
+  className: ''
+};
 
 export default ReasonsCheckboxes;

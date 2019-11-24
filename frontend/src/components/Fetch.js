@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import callApi from '../utils/callApi';
 
+// $FlowFixMe
 const Fetch = ({ url, id, Component, ...props }) => {
   const [object, setObject] = useState();
 

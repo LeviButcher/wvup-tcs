@@ -1,7 +1,6 @@
 import React from 'react';
 import { Link } from '@reach/router';
 import { Formik, Form, Field } from 'formik';
-import type { FormikBag } from 'formik';
 import * as Yup from 'yup';
 import { Card, Input, Header, Button, Stack } from '../ui';
 
@@ -15,7 +14,7 @@ const emailSchema = Yup.object().shape({
 
 type Props = {
   title: string,
-  onSubmit: (Object, FormikBag<any, any>) => typeof undefined,
+  onSubmit: (any, any) => Promise<any> & any,
   errors?: { message: string }
 };
 

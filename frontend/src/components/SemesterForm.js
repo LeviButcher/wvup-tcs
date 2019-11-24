@@ -16,21 +16,31 @@ const getSemesters = () => callApi(`reports/semesters`, 'GET', null);
 
 const querySemesters = pipe(
   getSemesters,
+  // $FlowFixMe
   ensureResponseCode(200),
   unwrapToJSON
 );
 
-const SemesterForm = ({ onSubmit, name, initialValues, ...props }) => {
+type Props = {
+  onSubmit: (any, any) => Promise<any> & any,
+  title: string,
+  initialValues?: {
+    semester: string
+  }
+};
+
+const SemesterForm = ({ onSubmit, title, initialValues, ...props }: Props) => {
   const [semesters] = useQuery(querySemesters);
   return (
     <Card {...props}>
-      <Header>{name}</Header>
+      <Header>{title}</Header>
       <p>Choose Semester to query for</p>
       <Formik
         onSubmit={onSubmit}
         validationSchema={semesterSchema}
         initialValues={initialValues}
         enableReinitialize
+        isInitialValid={false}
       >
         {({ isSubmitting, isValid }) => (
           <Form>
@@ -39,6 +49,7 @@ const SemesterForm = ({ onSubmit, name, initialValues, ...props }) => {
               name="semester"
               component="select"
               label="Semester"
+              data-testid="semester-select"
             >
               <option style={{ display: 'none' }}>Select a Value</option>
               {semesters &&
@@ -52,17 +63,23 @@ const SemesterForm = ({ onSubmit, name, initialValues, ...props }) => {
             </Field>
             <Button
               type="submit"
-              align="right"
+              fullWidth
               intent="primary"
               disabled={isSubmitting || !isValid}
             >
-              Run Report
+              Submit
             </Button>
           </Form>
         )}
       </Formik>
     </Card>
   );
+};
+
+SemesterForm.defaultProps = {
+  initialValues: {
+    semester: ''
+  }
 };
 
 export default SemesterForm;

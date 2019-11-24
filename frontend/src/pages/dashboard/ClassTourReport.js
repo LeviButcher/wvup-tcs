@@ -12,13 +12,15 @@ const ClassTourReport = ({ navigate, '*': unMatchedUri }) => {
     <ReportLayout>
       <StartToEndDateForm
         style={{ gridArea: 'form' }}
+        title="Class Tour Report"
         onSubmit={({ startDate, endDate }, { setSubmitting }) => {
           navigate(`${startDate}/${endDate}`);
           setSubmitting(false);
         }}
-        startDate={start}
-        endDate={end}
-        name="Class Tour Report"
+        initialValues={{
+          startDate: start,
+          endDate: end
+        }}
       />
       <Router primary={false} component={({ children }) => <>{children}</>}>
         <ClassTourResult path=":startDate/:endDate" />
