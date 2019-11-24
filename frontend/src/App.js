@@ -26,11 +26,12 @@ import {
   SignInLookup,
   SignInFormUpdate,
   Welcome,
-  SemesterSignIns
+  SemesterSignIns,
+  ClassTourCreate,
+  ClassTourUpdate
 } from './pages/dashboard';
 import Theme from './theme.json';
 import NotFound from './pages/NotFound';
-import ClassTourForm from './pages/dashboard/ClassTourForm';
 import Fetch from './components/Fetch';
 import IsAuthenticated from './components/IsAuthenticated';
 
@@ -72,13 +73,8 @@ function App() {
                 type="update"
               />
               <ClassTourLookup path="/tours/*" />
-              <ClassTourForm path="/tours/create" />
-              <Fetch
-                url="classtours/"
-                path="/tours/update/:id"
-                Component={ClassTourForm}
-                action="Update"
-              />
+              <ClassTourCreate path="/tours/create" />
+              <ClassTourUpdate path="/tours/update/:id" />
               <ClassTourReport path="/report/tours/*" />
               <VolunteerReport path="/report/volunteer/*" />
               <WeeklyVisitsReport path="/report/weekly-visits/*" />

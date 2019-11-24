@@ -16,6 +16,8 @@ import SignInFormUpdate from './SignInFormUpdate';
 import Welcome from './Welcome';
 import TeacherSignInFormUpdate from './TeacherSignInFormUpdate';
 import SemesterSignIns from './SemesterSignIns';
+import ClassTourCreate from './ClassTourCreate';
+import ClassTourUpdate from './ClassTourUpdate';
 
 export {
   DashboardLayout,
@@ -35,5 +37,7 @@ export {
   SignInFormUpdate,
   Welcome,
   TeacherSignInFormUpdate,
-  SemesterSignIns
+  SemesterSignIns,
+  ClassTourCreate,
+  ClassTourUpdate
 };

@@ -27,7 +27,7 @@ export type Teacher = {
 };
 
 export type ClassTour = {
-  id: string,
+  id?: string,
   name: string,
   dayVisited: string,
   numberOfStudents: number
