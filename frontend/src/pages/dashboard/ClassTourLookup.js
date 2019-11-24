@@ -2,7 +2,8 @@ import React from 'react';
 import ScaleLoader from 'react-spinners/ScaleLoader';
 import StartToEndDateForm from '../../components/StartToEndDateForm';
 import ClassToursTable from '../../components/ClassToursTable';
-import { Paging, Link, Button, Card } from '../../ui';
+import { Link, Button, Card } from '../../ui';
+import Paging from '../../components/Paging';
 import useApiWithHeaders from '../../hooks/useApiWithHeaders';
 
 const take = 20;
@@ -12,6 +13,8 @@ const getClassTourUrl = (start, end, page = 1) => {
     take}&take=${take}`;
   return endpoint;
 };
+
+const getProperty = (obj, property: string) => obj[property] || '';
 
 type Props = {
   navigate: string => any,
@@ -68,21 +71,15 @@ const ClassTourLookup = ({
           ) : (
             <Card width="auto">
               <Paging
-                currentPage={data.headers['current-page']}
-                totalPages={data.headers['total-pages']}
-                next={data.headers.next}
-                prev={data.headers.prev}
-                queries={{}}
-                baseURL={`/dashboard/tours/${startDate}/${endDate}/`}
+                currentPage={getProperty(data.headers, 'current-page')}
+                totalPages={getProperty(data.headers, 'total-pages')}
+                basePath={`/dashboard/tours/${startDate}/${endDate}/`}
               />
               <ClassToursTable classTours={data.body} />
               <Paging
-                currentPage={data.headers['current-page']}
-                totalPages={data.headers['total-pages']}
-                next={data.headers.next}
-                prev={data.headers.prev}
-                queries={{}}
-                baseURL={`/dashboard/tours/${startDate}/${endDate}/`}
+                currentPage={getProperty(data.headers, 'current-page')}
+                totalPages={getProperty(data.headers, 'total-pages')}
+                basePath={`/dashboard/tours/${startDate}/${endDate}/`}
               />
             </Card>
           )}

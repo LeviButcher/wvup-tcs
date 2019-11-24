@@ -5,7 +5,8 @@ import ScaleLoader from 'react-spinners/ScaleLoader';
 import { Router } from '@reach/router';
 import StartToEndDateSchema from '../../schemas/StartToEndDateSchema';
 import StartToEndDate from '../../components/StartToEndDateForm';
-import { Paging, Link, Card, Button, Input } from '../../ui';
+import { Link, Card, Button, Input } from '../../ui';
+import Paging from '../../components/Paging';
 import SignInsTable from '../../components/SignInsTable';
 import useApiWithHeaders from '../../hooks/useApiWithHeaders';
 
