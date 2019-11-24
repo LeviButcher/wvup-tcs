@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link } from '@reach/router';
+import { Link, navigate } from '@reach/router';
 import LoadingContent from '../../components/LoadingContent';
 import { Table, Header, Card } from '../../ui';
 import { callApi } from '../../utils';
@@ -8,7 +8,7 @@ import useApiWithHeaders from '../../hooks/useApiWithHeaders';
 
 const deleteUser = id => callApi(`users/${id}`, 'DELETE', null);
 
-const UserManagement = ({ navigate }) => {
+const UserManagement = () => {
   const [loading, data, errors] = useApiWithHeaders('users/');
 
   return (

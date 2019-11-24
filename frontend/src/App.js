@@ -74,6 +74,7 @@ function App() {
               />
               <ClassTourLookup path="/tours/*" />
               <ClassTourCreate path="/tours/create" />
+              {/* // $FlowFixMe */}
               <ClassTourUpdate path="/tours/update/:id" />
               <ClassTourReport path="/report/tours/*" />
               <VolunteerReport path="/report/volunteer/*" />

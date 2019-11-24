@@ -11,7 +11,7 @@ type LoadingState = {
 };
 
 type Action = {
-  type: typeof loadingStates,
+  type: 'Loading' | 'Done' | 'Error',
   data: {},
   errors: {}
 };
@@ -22,10 +22,10 @@ const loadingReducer = (currState: LoadingState, action: Action) => {
       return { ...currState, loading: true };
     }
     case loadingStates.done: {
-      return { loading: false, data: action.data };
+      return { ...currState, loading: false, data: action.data };
     }
     case loadingStates.error: {
-      return { loading: false, errors: action.errors };
+      return { ...currState, loading: false, errors: action.errors };
     }
     default: {
       return currState;
