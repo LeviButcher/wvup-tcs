@@ -8,7 +8,6 @@ import PeakHoursReport from './PeakHoursReport';
 import ReasonForVisitingReport from './ReasonForVisitingReport';
 import UserManagement from './UserManagement';
 import ReasonManagement from './ReasonManagement';
-import UserForm from './UserForm';
 import SuccessReport from './SuccessReport';
 import ReasonForm from './ReasonForm';
 import SignInLookup from './SignInLookup';
@@ -18,6 +17,8 @@ import TeacherSignInFormUpdate from './TeacherSignInFormUpdate';
 import SemesterSignIns from './SemesterSignIns';
 import ClassTourCreate from './ClassTourCreate';
 import ClassTourUpdate from './ClassTourUpdate';
+import CreateUser from './CreateUser';
+import UpdateUser from './UpdateUser';
 
 export {
   DashboardLayout,
@@ -29,7 +30,6 @@ export {
   PeakHoursReport,
   ReasonForVisitingReport,
   UserManagement,
-  UserForm,
   SuccessReport,
   ReasonManagement,
   ReasonForm,
@@ -39,5 +39,7 @@ export {
   TeacherSignInFormUpdate,
   SemesterSignIns,
   ClassTourCreate,
-  ClassTourUpdate
+  ClassTourUpdate,
+  CreateUser,
+  UpdateUser
 };

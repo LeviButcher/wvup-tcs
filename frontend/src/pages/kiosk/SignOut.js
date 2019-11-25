@@ -34,16 +34,15 @@ const SignOutPage = () => {
       <EmailForm
         title="Sign Out"
         errors={errors}
-        onSubmit={({ email }, { setSubmitting, setStatus }) => {
-          putSignOutEmail(email)
+        onSubmit={({ email }, { setStatus }) => {
+          return putSignOutEmail(email)
             .then(ensureResponseCode(200))
             .then(() => {
               navigate('/', { state: { info: 'You have signed out!' } });
             })
             .catch(e => {
               setStatus({ msg: e.message });
-            })
-            .finally(() => setSubmitting(false));
+            });
         }}
       />
     </KioskFullScreenContainer>

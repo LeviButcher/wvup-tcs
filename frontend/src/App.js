@@ -19,7 +19,6 @@ import {
   PeakHoursReport,
   ReasonForVisitingReport,
   UserManagement,
-  UserForm,
   SuccessReport,
   ReasonManagement,
   ReasonForm,
@@ -28,7 +27,9 @@ import {
   Welcome,
   SemesterSignIns,
   ClassTourCreate,
-  ClassTourUpdate
+  ClassTourUpdate,
+  CreateUser,
+  UpdateUser
 } from './pages/dashboard';
 import Theme from './theme.json';
 import NotFound from './pages/NotFound';
@@ -87,13 +88,9 @@ function App() {
               <PeakHoursReport path="/report/peak-hours/*" />
               <ReasonForVisitingReport path="/report/reason-for-visiting/*" />
               <UserManagement path="/admin/users" />
-              <UserForm path="/admin/users/create" />
-              <Fetch
-                url="users/"
-                path="/admin/users/update/:id"
-                Component={UserForm}
-                action="Update"
-              />
+              <CreateUser path="/admin/users/create" />
+              {/* $FlowFixMe */}
+              <UpdateUser path="/admin/users/update/:id" />
               <SuccessReport path="/report/success/*" />
               <ReasonManagement path="/admin/reason" />
               <ReasonForm path="/admin/reason/create" />

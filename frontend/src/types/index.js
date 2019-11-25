@@ -34,8 +34,12 @@ export type ClassTour = {
 };
 
 export type User = {
-  token: string,
-  username: string
+  token?: string,
+  username: string,
+  firstName?: string,
+  lastName?: string,
+  password?: string,
+  id?: string
 };
 
 export type SignIn = {
