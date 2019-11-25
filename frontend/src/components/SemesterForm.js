@@ -2,7 +2,7 @@ import React from 'react';
 import { Formik, Form, Field } from 'formik';
 import { pipe } from 'ramda';
 import * as Yup from 'yup';
-import { Card, Header, Button } from '../ui';
+import { Card, Header, Button, Stack } from '../ui';
 import useQuery from '../hooks/useQuery';
 import callApi from '../utils/callApi';
 import ensureResponseCode from '../utils/ensureResponseCode';
@@ -44,31 +44,33 @@ const SemesterForm = ({ onSubmit, title, initialValues, ...props }: Props) => {
       >
         {({ isSubmitting, isValid }) => (
           <Form>
-            <Field
-              id="semester"
-              name="semester"
-              component="select"
-              label="Semester"
-              data-testid="semester-select"
-            >
-              <option style={{ display: 'none' }}>Select a Value</option>
-              {semesters &&
-                semesters
-                  .sort((a, b) => b.id - a.id)
-                  .map(({ id, name: semesterName }) => (
-                    <option value={id} key={id}>
-                      {semesterName}
-                    </option>
-                  ))}
-            </Field>
-            <Button
-              type="submit"
-              fullWidth
-              intent="primary"
-              disabled={isSubmitting || !isValid}
-            >
-              Submit
-            </Button>
+            <Stack>
+              <Field
+                id="semester"
+                name="semester"
+                component="select"
+                label="Semester"
+                data-testid="semester-select"
+              >
+                <option style={{ display: 'none' }}>Select a Value</option>
+                {semesters &&
+                  semesters
+                    .sort((a, b) => b.id - a.id)
+                    .map(({ id, name: semesterName }) => (
+                      <option value={id} key={id}>
+                        {semesterName}
+                      </option>
+                    ))}
+              </Field>
+              <Button
+                type="submit"
+                fullWidth
+                intent="primary"
+                disabled={isSubmitting || !isValid}
+              >
+                Submit
+              </Button>
+            </Stack>
           </Form>
         )}
       </Formik>

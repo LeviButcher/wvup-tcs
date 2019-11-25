@@ -56,13 +56,12 @@ const SuccessReport = ({ navigate, '*': unMatchedUri }) => {
   return (
     <ReportLayout>
       <SemesterForm
+        title="Success Report"
         style={{ gridArea: 'form' }}
-        name="Success Report"
         width="500px"
         initialValues={{ semester: semesterUri }}
-        onSubmit={({ semester }, { setSubmitting }) => {
-          navigate(`${semester}/`);
-          setSubmitting(false);
+        onSubmit={({ semester }) => {
+          return Promise.resolve(navigate(`${semester}/`));
         }}
       />
       <Router primary={false} component={({ children }) => <>{children}</>}>
