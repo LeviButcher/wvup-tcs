@@ -10,7 +10,7 @@ const SemesterSignIns = ({ navigate, '*': unMatchedUri }) => {
   return (
     <>
       <SemesterForm
-        name="Semester Lookup"
+        title="Semester Lookup"
         initialValues={{ semester: semesterUri }}
         onSubmit={({ semester }, { setSubmitting }) => {
           navigate(semester);

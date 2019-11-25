@@ -58,7 +58,7 @@ const ReasonsCheckboxes = ({
           type="checkbox"
           name="reasons"
           label={`${reason.name}`}
-          value={reason.id}
+          value={reason.id || ''}
           data-deleted={reason.deleted}
           title={`This reason is ${reason.deleted ? 'deleted' : 'active'}`}
         />

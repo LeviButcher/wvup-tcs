@@ -21,7 +21,6 @@ import {
   UserManagement,
   SuccessReport,
   ReasonManagement,
-  ReasonForm,
   SignInLookup,
   SignInFormUpdate,
   Welcome,
@@ -29,7 +28,9 @@ import {
   ClassTourCreate,
   ClassTourUpdate,
   CreateUser,
-  UpdateUser
+  UpdateUser,
+  CreateReason,
+  UpdateReason
 } from './pages/dashboard';
 import Theme from './theme.json';
 import NotFound from './pages/NotFound';
@@ -93,13 +94,9 @@ function App() {
               <UpdateUser path="/admin/users/update/:id" />
               <SuccessReport path="/report/success/*" />
               <ReasonManagement path="/admin/reason" />
-              <ReasonForm path="/admin/reason/create" />
-              <Fetch
-                url="reasons/"
-                path="/admin/reason/update/:id"
-                Component={ReasonForm}
-                action="Update"
-              />
+              <CreateReason path="/admin/reason/create" />
+              {/* $FlowFixMe */}
+              <UpdateReason path="/admin/reason/update/:id" />
               <NotFound default />
             </DashboardLayout>
           </IsAuthenticated>

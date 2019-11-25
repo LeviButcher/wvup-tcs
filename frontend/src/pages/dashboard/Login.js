@@ -32,7 +32,7 @@ const Login = () => {
                 // put user in local storage
                 localStorage.setItem(
                   `${process.env.REACT_APP_TOKEN || ''}`,
-                  user.token
+                  user.token || ''
                 );
                 localStorage.setItem('username', user.username);
                 window.history.back();

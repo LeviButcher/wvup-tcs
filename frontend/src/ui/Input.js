@@ -10,10 +10,11 @@ const Input = ({
   label,
   type,
   id,
+  hidden,
   ...props
 }) => {
   return (
-    <Stack size="small" className={className}>
+    <Stack size="small" className={className} hidden={hidden} data-type={type}>
       <label htmlFor={id} style={{ textTransform: 'capitalize' }}>
         {label || field.name}
         {errors[field.name] && touched[field.name] && (
@@ -40,5 +41,20 @@ export default styled(Input)`
   & input:focus {
     outline: 0;
     border: 2px solid ${props => props.theme.color.primary};
+  }
+  &[data-type='checkbox'] {
+    display: flex;
+    align-items: center;
+    & input,
+    label {
+      width: auto;
+      margin-top: auto;
+    }
+    & input {
+      margin-left: 1rem;
+    }
+  }
+  &[hidden] {
+    display: none;
   }
 `;

@@ -16,7 +16,7 @@ export type Student = {
 };
 
 export type Reason = {
-  id: string,
+  id?: string,
   name: string,
   deleted: boolean
 };

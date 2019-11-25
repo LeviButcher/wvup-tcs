@@ -9,7 +9,6 @@ import ReasonForVisitingReport from './ReasonForVisitingReport';
 import UserManagement from './UserManagement';
 import ReasonManagement from './ReasonManagement';
 import SuccessReport from './SuccessReport';
-import ReasonForm from './ReasonForm';
 import SignInLookup from './SignInLookup';
 import SignInFormUpdate from './SignInFormUpdate';
 import Welcome from './Welcome';
@@ -19,6 +18,8 @@ import ClassTourCreate from './ClassTourCreate';
 import ClassTourUpdate from './ClassTourUpdate';
 import CreateUser from './CreateUser';
 import UpdateUser from './UpdateUser';
+import CreateReason from './CreateReason';
+import UpdateReason from './UpdateReason';
 
 export {
   DashboardLayout,
@@ -32,7 +33,6 @@ export {
   UserManagement,
   SuccessReport,
   ReasonManagement,
-  ReasonForm,
   SignInLookup,
   SignInFormUpdate,
   Welcome,
@@ -41,5 +41,7 @@ export {
   ClassTourCreate,
   ClassTourUpdate,
   CreateUser,
-  UpdateUser
+  UpdateUser,
+  CreateReason,
+  UpdateReason
 };
