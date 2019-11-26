@@ -1,8 +1,8 @@
+/* eslint-disable import/named */
 import React from 'react';
 import {
   render,
   fireEvent,
-  cleanup,
   wait
 } from '../test-utils/CustomReactTestingLibrary';
 import StudentSignInForm from './StudentSignInForm';

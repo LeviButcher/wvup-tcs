@@ -33,7 +33,12 @@ const StudentSignInForm = ({ student }: Props) => {
         return postSignIn(signIn)
           .then(ensureResponseCode(201))
           .then(() => navigate('/', { state: { info: 'You have signed in!' } }))
-          .catch(e => console.log(e.message));
+          .catch(e =>
+            console.error(
+              e.message,
+              'LEVI -> Write a test to make sure fetch errors are displayed to user'
+            )
+          );
       }}
       initialValues={{
         email: student.studentEmail,
