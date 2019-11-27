@@ -20,6 +20,7 @@ import CreateUser from './CreateUser';
 import UpdateUser from './UpdateUser';
 import CreateReason from './CreateReason';
 import UpdateReason from './UpdateReason';
+import CreateSignIn from './CreateSignIn';
 
 export {
   DashboardLayout,
@@ -43,5 +44,6 @@ export {
   CreateUser,
   UpdateUser,
   CreateReason,
-  UpdateReason
+  UpdateReason,
+  CreateSignIn
 };

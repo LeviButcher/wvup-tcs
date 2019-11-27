@@ -30,7 +30,8 @@ import {
   CreateUser,
   UpdateUser,
   CreateReason,
-  UpdateReason
+  UpdateReason,
+  CreateSignIn
 } from './pages/dashboard';
 import Theme from './theme.json';
 import NotFound from './pages/NotFound';
@@ -54,7 +55,7 @@ function App() {
             <DashboardLayout path="/">
               <Welcome path="/" />
               <SignInLookup path="/signins/*" />
-              <SignInFormUpdate path="/signins/create" type="create" />
+              <CreateSignIn path="/signins/create" />
               <SemesterSignIns path="/signins/semester/*" />
               <TeacherSignInFormUpdate
                 path="/signins/teacher/create"

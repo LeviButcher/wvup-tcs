@@ -2,14 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { Formik, Form, Field } from 'formik';
 import * as Yup from 'yup';
-import {
-  Card,
-  Input,
-  Header,
-  Button,
-  FormikDateTimePicker,
-  Stack
-} from '../ui';
+import { Card, Input, Header, Button, Stack } from '../ui';
 import { callApi, ensureResponseCode } from '../utils';
 import CoursesCheckboxes from './CoursesCheckboxes';
 import ReasonCheckboxes from './ReasonCheckboxes';
@@ -21,14 +14,25 @@ function isBeforeInTime(outTime) {
   return inTime < outTime;
 }
 
-const SignInUpdateSchema = SignInSchema.shape({
-  inTime: Yup.date()
+const TeacherSignInSchema = Yup.object().shape({
+  inTime: Yup.string().required(),
+  outTime: Yup.string()
+    .required()
+    .test('date-test', 'Must be after In Time', isBeforeInTime),
+  inDate: Yup.date().required(),
+  outDate: Yup.date().required()
+});
+
+const StudentSignInSchema = SignInSchema.shape({
+  inTime: Yup.string()
     .typeError('Invalid Date format')
     .required(),
-  outTime: Yup.date()
+  outTime: Yup.string()
     .typeError('Invalid Date format')
     .test('date-test', 'Must be after In Time', isBeforeInTime)
-    .required()
+    .required(),
+  inDate: Yup.date().required(),
+  outDate: Yup.date().required()
 })
   .from('inTime', 'startDate', true)
   .from('outTime', 'endDate', true);
@@ -39,15 +43,6 @@ const FullScreenContainer = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-evenly;
-`;
-
-const DateInputGroup = styled.div`
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  grid-gap: 1rem;
-  & div:last-child {
-    text-align: right;
-  }
 `;
 
 const StyledReasonCheckboxes = styled(ReasonCheckboxes)`
@@ -69,28 +64,28 @@ const StyledReasonCheckboxes = styled(ReasonCheckboxes)`
   }
 `;
 
-const putSignIn = signIn => callApi(`signIns/${signIn.id}`, 'PUT', signIn);
-const postSignIn = signIn => callApi(`signIns/admin/`, 'POST', signIn);
+// Student API Calls
+const putSignInStudent = signIn =>
+  callApi(`signIns/${signIn.id || ''}`, 'PUT', signIn).then(
+    ensureResponseCode(200)
+  );
+const postSignInStudent = signIn =>
+  callApi(`signIns/admin/`, 'POST', signIn).then(ensureResponseCode(201));
 
-const reduceToUniqueClasses = (acc, curr) => {
-  const found = acc.find(ele => ele.crn === curr.crn);
-  if (!found) acc.push(curr);
-  return acc;
-};
-
-const defaultData = {
-  email: '',
-  inTime: '',
-  outTime: '',
-  reasons: [],
-  courses: [],
-  tutoring: false
-};
+// Teacher API Calls
+const putSignInTeacher = signIn =>
+  callApi(`signIns/${signIn.id || ''}?teacher=true`, 'PUT', signIn).then(
+    ensureResponseCode(200)
+  );
+const postSignInTeacher = signIn =>
+  callApi(`signIns/admin/?teacher=true`, 'POST', signIn).then(
+    ensureResponseCode(201)
+  );
 
 type Props = {
   signInRecord: {
     email: string,
-    classSchedule: Array<Course>,
+    classSchedule?: Array<Course>,
     selectedClasses: Array<string>,
     inTime: string,
     outTime: string,
@@ -101,11 +96,24 @@ type Props = {
     personId: string,
     semesterId: string
   },
-  reasons: Array<Reason>
+  reasons?: Array<Reason>
 };
 
 // test email = mtmqbude26@wvup.edu
-const SignInForm = ({ signInRecord = defaultData, reasons }: Props) => {
+const SignInForm = ({ signInRecord, reasons }: Props) => {
+  const isStudent = signInRecord.personType === 'Student';
+
+  const callCorrectAPIEndpoint = signIn => {
+    // signInRecord id is NOT a truthy value then we should create a new signin record
+    // ELSE we should update the signin record with the associated ID
+    const shouldPostSignIn = !signInRecord.id;
+    if (isStudent && shouldPostSignIn) return postSignInStudent(signIn);
+    if (isStudent && !shouldPostSignIn) return putSignInStudent(signIn);
+    if (!isStudent && shouldPostSignIn) return postSignInTeacher(signIn);
+    if (!isStudent && !shouldPostSignIn) return putSignInTeacher(signIn);
+    return Promise.reject(Error("Didn't hit a api case"));
+  };
+
   return (
     <FullScreenContainer>
       <Card>
@@ -115,61 +123,34 @@ const SignInForm = ({ signInRecord = defaultData, reasons }: Props) => {
             reasons: signInRecord.selectedReasons,
             tutoring: signInRecord.tutoring,
             courses: signInRecord.selectedClasses,
-            inTime: signInRecord.inTime,
-            outTime: signInRecord.outTime
+            inTime: new Date(signInRecord.inTime).toTimeString(),
+            outTime: new Date(signInRecord.outTime).toTimeString(),
+            inDate: new Date(signInRecord.outTime).toDateString(),
+            outDate: new Date(signInRecord.outTime).toDateString()
           }}
           isInitialValid={false}
-          validationSchema={SignInUpdateSchema}
-          onSubmit={values => {
+          validationSchema={
+            isStudent ? StudentSignInSchema : TeacherSignInSchema
+          }
+          onSubmit={(values, { setStatus }) => {
             // massage data back into server format
             const signIn = {
-              ...values,
-              inTime: new Date(values.inTime),
-              outTime: new Date(values.outTime),
               id: signInRecord.id,
               personId: signInRecord.personId,
               semesterId: signInRecord.semesterId,
-              courses: values.courses.map(courseCRN =>
-                signInRecord.selectedClasses.find(crn => crn === courseCRN)
-              ),
-              reasons: values.reasons.map(id =>
-                reasons.find(ele => ele.id === id)
-              )
+              inTime: new Date(`${values.inDate} ${values.inTime}`),
+              outTime: new Date(`${values.outDate} ${values.outTime}`),
+              courses: values.courses,
+              reasons: values.reasons,
+              tutoring: values.tutoring
             };
-
-            if (signInRecord.personType === 'Student') {
-              if (signInRecord.selectedClasses.length === 0) {
-                return postSignIn(signIn)
-                  .then(ensureResponseCode(201))
-                  .then(() => {
-                    alert('Successfuly created');
-                    window.history.back();
-                  })
-                  .catch(e => alert(e.message));
-              }
-            }
-
-            // switch (type) {
-            //   case crudTypes.create:
-            //     return postSignIn(signIn)
-            //       .then(ensureResponseCode(201))
-            //       .then(() => {
-            //         alert('Successfuly created');
-            //         window.history.back();
-            //       })
-            //       .catch(e => alert(e.message))
-            //       .finally(() => setSubmitting(false));
-            //   case crudTypes.update:
-            //     return putSignIn(signIn)
-            //       .then(ensureResponseCode(200))
-            //       .then(() => {
-            //         alert('Successfuly updated');
-            //         window.history.back();
-            //       })
-            //       .catch(e => alert(e.message))
-            //       .finally(() => setSubmitting(false));
-            //   default:
-            //     return () => 'Failed';
+            // $FlowFixMe
+            return callCorrectAPIEndpoint(signIn)
+              .then(() => {
+                alert('Success!');
+                window.history.back();
+              })
+              .catch(e => setStatus(e.message));
           }}
         >
           {({ values, isSubmitting, status, isValid, errors, touched }) => (
@@ -177,7 +158,7 @@ const SignInForm = ({ signInRecord = defaultData, reasons }: Props) => {
               <Stack>
                 <Header>Student Sign In</Header>
                 <div>KEY: Green = Active, Red = Deleted</div>
-                {status && status.msg && <div>{status.msg}</div>}
+                {status && <div>{status}</div>}
                 <Field
                   id="email"
                   type="email"
@@ -185,31 +166,49 @@ const SignInForm = ({ signInRecord = defaultData, reasons }: Props) => {
                   component={Input}
                   label="Email"
                 />
-                <DateInputGroup>
-                  {/* <Field
-                    id="inTime"
-                    name="inTime"
-                    component={FormikDateTimePicker}
-                    label="In Time"
-                  />
-                  <Field
-                    id="outTime"
-                    name="outTime"
-                    component={FormikDateTimePicker}
-                    label="Out Time"
-                  /> */}
-                </DateInputGroup>
-                <StyledReasonCheckboxes
-                  reasons={reasons}
-                  values={values}
-                  errors={errors}
-                  touched={touched}
+                <Field
+                  id="inDate"
+                  type="date"
+                  name="inDate"
+                  component={Input}
+                  label="In Date"
                 />
-                <CoursesCheckboxes
-                  courses={signInRecord.classSchedule}
-                  errors={errors}
-                  touched={touched}
+                <Field
+                  id="inTime"
+                  type="time"
+                  name="inTime"
+                  component={Input}
+                  label="In Time"
                 />
+                <Field
+                  id="outDate"
+                  type="date"
+                  name="outDate"
+                  component={Input}
+                  label="Out Date"
+                />
+                <Field
+                  id="outTime"
+                  type="time"
+                  name="outTime"
+                  component={Input}
+                  label="Out Time"
+                />
+                {isStudent && (
+                  <>
+                    <StyledReasonCheckboxes
+                      reasons={reasons}
+                      values={values}
+                      errors={errors}
+                      touched={touched}
+                    />
+                    <CoursesCheckboxes
+                      courses={signInRecord.classSchedule || []}
+                      errors={errors}
+                      touched={touched}
+                    />
+                  </>
+                )}
                 <Button
                   type="submit"
                   disabled={isSubmitting || !isValid}
@@ -225,6 +224,10 @@ const SignInForm = ({ signInRecord = defaultData, reasons }: Props) => {
       </Card>
     </FullScreenContainer>
   );
+};
+
+SignInForm.defaultProps = {
+  reasons: []
 };
 
 export default SignInForm;

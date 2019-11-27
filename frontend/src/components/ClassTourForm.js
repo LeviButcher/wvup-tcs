@@ -51,7 +51,7 @@ const ClassTourForm = ({ classTour }: Props) => {
       <Formik
         initialValues={classTour}
         onSubmit={(submittedTour, { setStatus }) => {
-          callCorrectApi(submittedTour)
+          return callCorrectApi(submittedTour)
             .then(() => {
               alert(`Updated tour for ${submittedTour.name}`);
               navigate('/dashboard/tours');
