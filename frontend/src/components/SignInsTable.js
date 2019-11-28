@@ -89,13 +89,7 @@ const SignInRow = ({
           .join(', ')}
       </td>
       <td style={{ display: 'flex', justifyContent: 'space-evenly' }}>
-        <Link
-          to={
-            type === 0
-              ? `/dashboard/signins/${id}`
-              : `/dashboard/signins/teacher/${id}`
-          }
-        >
+        <Link to={`/dashboard/signins/${id}`}>
           <Gear />
         </Link>
         <Trashcan onClick={() => alert('Not implemented yet')} />

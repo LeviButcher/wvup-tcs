@@ -7,7 +7,7 @@ type Props = {
   id: string
 };
 
-const ClassTourUpdate = ({ id }: Props) => {
+const UpdateClassTour = ({ id }: Props) => {
   const [loading, { body }] = useApi(`classtours/${id}`);
   return (
     <div style={{ margin: 'auto' }}>
@@ -17,4 +17,4 @@ const ClassTourUpdate = ({ id }: Props) => {
   );
 };
 
-export default ClassTourUpdate;
+export default UpdateClassTour;

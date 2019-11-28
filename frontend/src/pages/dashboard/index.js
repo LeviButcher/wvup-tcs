@@ -10,17 +10,16 @@ import UserManagement from './UserManagement';
 import ReasonManagement from './ReasonManagement';
 import SuccessReport from './SuccessReport';
 import SignInLookup from './SignInLookup';
-import SignInFormUpdate from './SignInFormUpdate';
 import Welcome from './Welcome';
-import TeacherSignInFormUpdate from './TeacherSignInFormUpdate';
 import SemesterSignIns from './SemesterSignIns';
-import ClassTourCreate from './ClassTourCreate';
-import ClassTourUpdate from './ClassTourUpdate';
+import CreateClassTour from './CreateClassTour';
+import UpdateClassTour from './UpdateClassTour';
 import CreateUser from './CreateUser';
 import UpdateUser from './UpdateUser';
 import CreateReason from './CreateReason';
 import UpdateReason from './UpdateReason';
 import CreateSignIn from './CreateSignIn';
+import UpdateSignIn from './UpdateSignIn';
 
 export {
   DashboardLayout,
@@ -35,15 +34,14 @@ export {
   SuccessReport,
   ReasonManagement,
   SignInLookup,
-  SignInFormUpdate,
   Welcome,
-  TeacherSignInFormUpdate,
   SemesterSignIns,
-  ClassTourCreate,
-  ClassTourUpdate,
+  CreateClassTour,
+  UpdateClassTour,
   CreateUser,
   UpdateUser,
   CreateReason,
   UpdateReason,
-  CreateSignIn
+  CreateSignIn,
+  UpdateSignIn
 };

@@ -1,7 +1,7 @@
 import React from 'react';
 import ClassTourForm from '../../components/ClassTourForm';
 
-const ClassTourCreate = () => {
+const CreateClassTour = () => {
   return (
     <div style={{ margin: 'auto' }}>
       <ClassTourForm />
@@ -9,4 +9,4 @@ const ClassTourCreate = () => {
   );
 };
 
-export default ClassTourCreate;
+export default CreateClassTour;

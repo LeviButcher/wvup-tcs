@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { Formik, Form, Field } from 'formik';
 import * as Yup from 'yup';
-import { Card, Input, Header, Button, Stack } from '../ui';
+import { Input, Header, Button, Stack } from '../ui';
 import { callApi, ensureResponseCode } from '../utils';
 import CoursesCheckboxes from './CoursesCheckboxes';
 import ReasonCheckboxes from './ReasonCheckboxes';
@@ -36,14 +36,6 @@ const StudentSignInSchema = SignInSchema.shape({
 })
   .from('inTime', 'startDate', true)
   .from('outTime', 'endDate', true);
-
-const FullScreenContainer = styled.div`
-  padding: ${props => props.theme.padding};
-  height: calc(100vh - 75px);
-  display: flex;
-  align-items: center;
-  justify-content: space-evenly;
-`;
 
 const StyledReasonCheckboxes = styled(ReasonCheckboxes)`
   & label[data-deleted='true'] {
@@ -102,11 +94,12 @@ type Props = {
 // test email = mtmqbude26@wvup.edu
 const SignInForm = ({ signInRecord, reasons }: Props) => {
   const isStudent = signInRecord.personType === 'Student';
+  const shouldPostSignIn = !signInRecord.id;
 
   const callCorrectAPIEndpoint = signIn => {
     // signInRecord id is NOT a truthy value then we should create a new signin record
     // ELSE we should update the signin record with the associated ID
-    const shouldPostSignIn = !signInRecord.id;
+
     if (isStudent && shouldPostSignIn) return postSignInStudent(signIn);
     if (isStudent && !shouldPostSignIn) return putSignInStudent(signIn);
     if (!isStudent && shouldPostSignIn) return postSignInTeacher(signIn);
@@ -115,114 +108,102 @@ const SignInForm = ({ signInRecord, reasons }: Props) => {
   };
 
   return (
-    <FullScreenContainer>
-      <Card>
-        <Formik
-          initialValues={{
-            email: signInRecord.email,
-            reasons: signInRecord.selectedReasons,
-            tutoring: signInRecord.tutoring,
-            courses: signInRecord.selectedClasses,
-            inTime: new Date(signInRecord.inTime).toTimeString(),
-            outTime: new Date(signInRecord.outTime).toTimeString(),
-            inDate: new Date(signInRecord.outTime).toDateString(),
-            outDate: new Date(signInRecord.outTime).toDateString()
-          }}
-          isInitialValid={false}
-          validationSchema={
-            isStudent ? StudentSignInSchema : TeacherSignInSchema
-          }
-          onSubmit={(values, { setStatus }) => {
-            // massage data back into server format
-            const signIn = {
-              id: signInRecord.id,
-              personId: signInRecord.personId,
-              semesterId: signInRecord.semesterId,
-              inTime: new Date(`${values.inDate} ${values.inTime}`),
-              outTime: new Date(`${values.outDate} ${values.outTime}`),
-              courses: values.courses,
-              reasons: values.reasons,
-              tutoring: values.tutoring
-            };
-            // $FlowFixMe
-            return callCorrectAPIEndpoint(signIn)
-              .then(() => {
-                alert('Success!');
-                window.history.back();
-              })
-              .catch(e => setStatus(e.message));
-          }}
-        >
-          {({ values, isSubmitting, status, isValid, errors, touched }) => (
-            <Form>
-              <Stack>
-                <Header>Student Sign In</Header>
-                <div>KEY: Green = Active, Red = Deleted</div>
-                {status && <div>{status}</div>}
-                <Field
-                  id="email"
-                  type="email"
-                  name="email"
-                  component={Input}
-                  label="Email"
+    <Formik
+      initialValues={{
+        email: signInRecord.email,
+        reasons: signInRecord.selectedReasons,
+        tutoring: signInRecord.tutoring,
+        courses: signInRecord.selectedClasses,
+        inTime: new Date(signInRecord.inTime).toTimeString(),
+        outTime: new Date(signInRecord.outTime).toTimeString(),
+        inDate: new Date(signInRecord.outTime).toDateString(),
+        outDate: new Date(signInRecord.outTime).toDateString()
+      }}
+      isInitialValid={false}
+      validationSchema={isStudent ? StudentSignInSchema : TeacherSignInSchema}
+      onSubmit={(values, { setStatus }) => {
+        // massage data back into server format
+        const signIn = {
+          id: signInRecord.id,
+          personId: signInRecord.personId,
+          semesterId: signInRecord.semesterId,
+          inTime: new Date(`${values.inDate} ${values.inTime}`),
+          outTime: new Date(`${values.outDate} ${values.outTime}`),
+          courses: values.courses,
+          reasons: values.reasons,
+          tutoring: values.tutoring
+        };
+        // $FlowFixMe
+        return callCorrectAPIEndpoint(signIn)
+          .then(() => {
+            alert('Success!');
+            window.history.back();
+          })
+          .catch(e => setStatus(e.message));
+      }}
+    >
+      {({ values, isSubmitting, status, isValid, errors, touched }) => (
+        <Form>
+          <Stack>
+            <Header>{shouldPostSignIn ? 'Create' : 'Update'} Sign In</Header>
+            <div>KEY: Green = Active, Red = Deleted</div>
+            {status && <div>{status}</div>}
+            <h2>{signInRecord.email}</h2>
+            <Field
+              id="inDate"
+              type="date"
+              name="inDate"
+              component={Input}
+              label="In Date"
+            />
+            <Field
+              id="inTime"
+              type="time"
+              name="inTime"
+              component={Input}
+              label="In Time"
+            />
+            <Field
+              id="outDate"
+              type="date"
+              name="outDate"
+              component={Input}
+              label="Out Date"
+            />
+            <Field
+              id="outTime"
+              type="time"
+              name="outTime"
+              component={Input}
+              label="Out Time"
+            />
+            {isStudent && (
+              <>
+                <StyledReasonCheckboxes
+                  reasons={reasons}
+                  values={values}
+                  errors={errors}
+                  touched={touched}
                 />
-                <Field
-                  id="inDate"
-                  type="date"
-                  name="inDate"
-                  component={Input}
-                  label="In Date"
+                <CoursesCheckboxes
+                  courses={signInRecord.classSchedule || []}
+                  errors={errors}
+                  touched={touched}
                 />
-                <Field
-                  id="inTime"
-                  type="time"
-                  name="inTime"
-                  component={Input}
-                  label="In Time"
-                />
-                <Field
-                  id="outDate"
-                  type="date"
-                  name="outDate"
-                  component={Input}
-                  label="Out Date"
-                />
-                <Field
-                  id="outTime"
-                  type="time"
-                  name="outTime"
-                  component={Input}
-                  label="Out Time"
-                />
-                {isStudent && (
-                  <>
-                    <StyledReasonCheckboxes
-                      reasons={reasons}
-                      values={values}
-                      errors={errors}
-                      touched={touched}
-                    />
-                    <CoursesCheckboxes
-                      courses={signInRecord.classSchedule || []}
-                      errors={errors}
-                      touched={touched}
-                    />
-                  </>
-                )}
-                <Button
-                  type="submit"
-                  disabled={isSubmitting || !isValid}
-                  intent="primary"
-                  fullWidth
-                >
-                  {isSubmitting ? 'Submitting...' : 'Submit'}
-                </Button>
-              </Stack>
-            </Form>
-          )}
-        </Formik>
-      </Card>
-    </FullScreenContainer>
+              </>
+            )}
+            <Button
+              type="submit"
+              disabled={isSubmitting || !isValid}
+              intent="primary"
+              fullWidth
+            >
+              {isSubmitting ? 'Submitting...' : 'Submit'}
+            </Button>
+          </Stack>
+        </Form>
+      )}
+    </Formik>
   );
 };
 

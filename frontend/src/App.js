@@ -13,7 +13,6 @@ import {
   ClassTourLookup,
   Login,
   ClassTourReport,
-  TeacherSignInFormUpdate,
   VolunteerReport,
   WeeklyVisitsReport,
   PeakHoursReport,
@@ -22,20 +21,19 @@ import {
   SuccessReport,
   ReasonManagement,
   SignInLookup,
-  SignInFormUpdate,
   Welcome,
   SemesterSignIns,
-  ClassTourCreate,
-  ClassTourUpdate,
+  CreateClassTour,
+  UpdateClassTour,
   CreateUser,
   UpdateUser,
   CreateReason,
   UpdateReason,
-  CreateSignIn
+  CreateSignIn,
+  UpdateSignIn
 } from './pages/dashboard';
 import Theme from './theme.json';
 import NotFound from './pages/NotFound';
-import Fetch from './components/Fetch';
 import IsAuthenticated from './components/IsAuthenticated';
 
 function App() {
@@ -56,34 +54,18 @@ function App() {
               <Welcome path="/" />
               <SignInLookup path="/signins/*" />
               <CreateSignIn path="/signins/create" />
+              {/* // $FlowFixMe */}
+              <UpdateSignIn path="/signins/:id" />
               <SemesterSignIns path="/signins/semester/*" />
-              <TeacherSignInFormUpdate
-                path="/signins/teacher/create"
-                type="create"
-              />
-              <Fetch
-                path="/signins/:id"
-                url="signins/"
-                Component={SignInFormUpdate}
-                action="Update"
-                type="update"
-              />
-              <Fetch
-                path="/signins/teacher/:id"
-                url="signins/"
-                Component={TeacherSignInFormUpdate}
-                action="Update"
-                type="update"
-              />
               {/* // $FlowFixMe */}
               <ClassTourLookup path="/tours/" />
               {/* // $FlowFixMe */}
               <ClassTourLookup path="/tours/:startDate/:endDate" />
               {/* // $FlowFixMe */}
               <ClassTourLookup path="/tours/:startDate/:endDate/:page" />
-              <ClassTourCreate path="/tours/create" />
+              <CreateClassTour path="/tours/create" />
               {/* // $FlowFixMe */}
-              <ClassTourUpdate path="/tours/update/:id" />
+              <UpdateClassTour path="/tours/update/:id" />
               <ClassTourReport path="/report/tours/*" />
               <VolunteerReport path="/report/volunteer/*" />
               <WeeklyVisitsReport path="/report/weekly-visits/*" />
