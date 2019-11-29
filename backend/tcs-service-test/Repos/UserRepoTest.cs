@@ -38,7 +38,7 @@ namespace tcs_service_test.Repos
               .Customize(new AutoMoqCustomization());
 
             // Sets all users created by autofixture to not have properties set
-            fixture.Customize<User>((ob) => ob.Without(x => x.ID).Without(x => x.PasswordHash).Without(x => x.PasswordSalt));
+            fixture.Customize<User>((ob) => ob.Without(x => x.Id).Without(x => x.PasswordHash).Without(x => x.PasswordSalt));
         }
 
         public void Dispose()
@@ -179,7 +179,7 @@ namespace tcs_service_test.Repos
         }
 
         // Gave real names to make more readable
-        // Have to create a copy to give a new reference so to not automatically updating 
+        // Have to create a copy to give a new reference so to not automatically updating
         // the tom stored in memory db's Username
         [Fact]
         public async void UpdateUser_UsernameAlreadyTaken_ThrowsException()
@@ -205,8 +205,8 @@ namespace tcs_service_test.Repos
             var bob = fixture.Build<User>().Create();
             bob = await userRepo.Create(bob, password);
 
-            await userRepo.Remove(bob.ID);
-            var found = await userRepo.Find(bob.ID);
+            await userRepo.Remove(x => x.Id == bob.Id);
+            var found = await userRepo.Find(x => x.Id == bob.Id);
 
             Assert.Null(found);
         }

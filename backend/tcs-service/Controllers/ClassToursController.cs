@@ -24,9 +24,9 @@ namespace tcs_service.Controllers
 
         private async Task<bool> ClassTourExists(int id)
         {
-            return await _iRepo.Exist(id);
+            return await _iRepo.Exist(x => x.Id == id);
         }
-                     
+
         [HttpGet("{id}")]
         [Produces(typeof(ClassTour))]
         public async Task<IActionResult> GetClassTour([FromRoute] int id)
@@ -36,7 +36,7 @@ namespace tcs_service.Controllers
                 return BadRequest(ModelState);
             }
 
-            var classTour = await _iRepo.Find(id);
+            var classTour = await _iRepo.Find(x => x.Id == id);
 
             if (classTour == null)
             {
@@ -74,7 +74,7 @@ namespace tcs_service.Controllers
                 return BadRequest(ModelState);
             }
 
-            if (id != classTour.ID)
+            if (id != classTour.Id)
             {
                 return BadRequest("ID's do not match");
             }
@@ -107,9 +107,9 @@ namespace tcs_service.Controllers
                 return BadRequest(ModelState);
             }
 
-            await _iRepo.Add(classTour);
+            await _iRepo.Create(classTour);
 
-            return CreatedAtAction("GetClassTour", new { id = classTour.ID }, classTour);
+            return CreatedAtAction("GetClassTour", new { id = classTour.Id }, classTour);
         }
 
         [HttpDelete("{id}")]
@@ -126,7 +126,7 @@ namespace tcs_service.Controllers
                 return NotFound();
             }
 
-            var tour = await _iRepo.Remove(id);
+            var tour = await _iRepo.Remove(x => x.Id == id);
 
             return Ok(tour);
         }

@@ -117,7 +117,7 @@ namespace tcs_service.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!await _iRepo.Exist(id))
+                if (!await _iRepo.Exist(x => x.ID == id))
                 {
                     return NotFound();
                 }

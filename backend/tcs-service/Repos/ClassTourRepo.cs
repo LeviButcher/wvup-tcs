@@ -1,9 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using tcs_service.EF;
 using tcs_service.Models;
 using tcs_service.Helpers;
 using tcs_service.Repos.Base;
@@ -19,7 +17,7 @@ namespace tcs_service.Repos
         {
 
         }
-        
+
         public async Task<ClassTour> Add(ClassTour tour)
         {
             await _db.AddAsync(tour);
@@ -27,23 +25,9 @@ namespace tcs_service.Repos
             return tour;
         }
 
-        public async override Task<bool> Exist(int id)
-        {
-            return await _db.ClassTours.AnyAsync(e => e.ID == id);
-        }
 
-        public async override Task<ClassTour> Find(int id)
-        {
-            return await _db.ClassTours.SingleOrDefaultAsync(a => a.ID == id);
-        }
-
-        public override IEnumerable<ClassTour> GetAll()
-        {
-            return _db.ClassTours;
-        }
-        
         public async Task<PagingModel<ClassTourViewModel>> GetBetweenDates(DateTime start, DateTime end, int skip, int take)
-        {            
+        {
             var tours = _db.ClassTours.Where(a => a.DayVisited > start && a.DayVisited < end);
             var totalDataCount = await tours.CountAsync();
             var pageData = GetPageData(tours, skip, take);
@@ -51,28 +35,15 @@ namespace tcs_service.Repos
             return new PagingModel<ClassTourViewModel>(skip, take, totalDataCount, pageData);
         }
 
-        public async override Task<ClassTour> Remove(int id)
-        {
-            var tour = await _db.ClassTours.SingleAsync(a => a.ID == id);
-            _db.ClassTours.Remove(tour);
-            await _db.SaveChangesAsync();
-            return tour;
-        }
-
-        public async Task<ClassTour> Update(ClassTour tour)
-        {
-            _db.ClassTours.Update(tour);
-            await _db.SaveChangesAsync();
-            return tour;
-        }
+        protected override IQueryable<ClassTour> Include(DbSet<ClassTour> set) => set;
 
         private IQueryable<ClassTourViewModel> GetPageData(IQueryable<ClassTour> tours, int skip, int take)
         {
             return tours
                 .Skip(skip).Take(take)
                 .Select(x => new ClassTourViewModel()
-                {  
-                    Id = x.ID,
+                {
+                    Id = x.Id,
                     Name = x.Name,
                     DayVisited = x.DayVisited,
                     NumberOfStudents = x.NumberOfStudents

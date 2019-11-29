@@ -22,7 +22,6 @@ using tcs_service.Services;
 using tcs_service.Services.Interfaces;
 using tcs_service.Services.ScheduledTasks;
 using Helpers;
-using System.Threading.Tasks;
 
 namespace tcs_service
 {
@@ -96,13 +95,6 @@ namespace tcs_service
                 services.AddScoped<IBannerService, MockBannerService>();
             }
 
-            services.AddScoped<IClassTourRepo, ClassTourRepo>();
-            services.AddScoped<IUserRepo, UserRepo>();
-            services.AddScoped<ISignInRepo, SignInRepo>();
-            services.AddScoped<IReportsRepo, ReportsRepo>();
-            services.AddScoped<IReasonRepo, ReasonRepo>();
-            services.AddScoped<ILookupRepo, LookupRepo>();
-
             // Add Quartz services
             services.AddSingleton<IJobFactory, JobFactory>();
             services.AddSingleton<ISchedulerFactory, StdSchedulerFactory>();
@@ -123,12 +115,19 @@ namespace tcs_service
 
             services.AddDbContext<TCSContext>(options =>
                options.UseSqlServer(Configuration["DB:connectionString"]));
+
+            services.AddScoped<IClassTourRepo, ClassTourRepo>();
+            services.AddScoped<IUserRepo, UserRepo>();
+            services.AddScoped<ISignInRepo, SignInRepo>();
+            services.AddScoped<IReportsRepo, ReportsRepo>();
+            services.AddScoped<IReasonRepo, ReasonRepo>();
+            services.AddScoped<ILookupRepo, LookupRepo>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, TCSContext db, IUserRepo repo)
         {
-            Task.Run(() => DbInitializer.InitializeData(db, repo, Environment)).Wait();
+            DbInitializer.InitializeData(db, repo, Environment);
             if (Environment.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();

@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using tcs_service.EF;
 using tcs_service.Models;
 using tcs_service.Models.ViewModels;
 using tcs_service.Repos.Base;
@@ -12,33 +13,16 @@ using tcs_service.Services.Interfaces;
 
 namespace tcs_service.Repos
 {
-    public class ReportsRepo : BaseRepo<SignIn>, IReportsRepo
+    public class ReportsRepo : IReportsRepo
     {
+        private readonly TCSContext _db;
         IBannerService _bannerService;
-        public ReportsRepo(DbContextOptions options, IBannerService bannerService) : base(options)
+        public ReportsRepo(TCSContext tcs, IBannerService bannerService)
         {
+            _db = tcs;
             _bannerService = bannerService;
         }
 
-        public override Task<bool> Exist(int id)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override Task<SignIn> Find(int id)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override IEnumerable<SignIn> GetAll()
-        {
-            throw new NotImplementedException();
-        }
-
-        public override Task<SignIn> Remove(int id)
-        {
-            throw new NotImplementedException();
-        }
 
         public async Task<List<WeeklyVisitsViewModel>> WeeklyVisits(DateTime startWeek, DateTime endWeek)
         {

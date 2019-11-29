@@ -50,10 +50,10 @@ namespace tcs_service.Repos
 
             signIn.Reasons = signIn.Reasons.Select(signInReason =>
             {
-                var tracked = _db.Reasons.Find(signInReason.Reason.ID);
+                var tracked = _db.Reasons.Find(signInReason.Reason.Id);
                 if (tracked != null)
                 {
-                    signInReason.ReasonID = tracked.ID;
+                    signInReason.ReasonID = tracked.Id;
                 }
                 return signInReason;
             }).ToList();
@@ -64,15 +64,6 @@ namespace tcs_service.Repos
             return signIn;
         }
 
-        public async override Task<bool> Exist(int id)
-        {
-            return await _db.SignIns.AnyAsync(e => e.ID == id);
-        }
-
-        public async override Task<SignIn> Find(int id)
-        {
-            return await _db.SignIns.Include(x => x.Courses).Include(x => x.Reasons).SingleOrDefaultAsync(a => a.ID == id);
-        }
 
         public async Task<SignInViewModel> GetSignInViewModel(int id) =>
             await _db.SignIns.Include(x => x.Courses).ThenInclude(x => x.Course)
@@ -96,19 +87,6 @@ namespace tcs_service.Repos
 
 
 
-        public override IEnumerable<SignIn> GetAll()
-        {
-            return _db.SignIns;
-        }
-
-        public async override Task<SignIn> Remove(int id)
-        {
-            var signIn = await _db.SignIns.SingleAsync(a => a.ID == id);
-            _db.SignIns.Remove(signIn);
-            await _db.SaveChangesAsync();
-            return signIn;
-        }
-
         public async Task<SignIn> Update(SignIn signIn)
         {
             var results = new List<ValidationResult>();
@@ -129,7 +107,7 @@ namespace tcs_service.Repos
             ).ToList();
 
             existingSignIn.Reasons = signIn.Reasons.Select(signInReason =>
-                new SignInReason() { SignInID = signIn.ID, ReasonID = signInReason.Reason.ID }
+                new SignInReason() { SignInID = signIn.ID, ReasonID = signInReason.Reason.Id }
             ).ToList();
 
             _db.SignIns.Update(existingSignIn);
@@ -159,7 +137,7 @@ namespace tcs_service.Repos
 
         public async Task<bool> ReasonExist(int id)
         {
-            return await _db.Reasons.AnyAsync(e => e.ID == id);
+            return await _db.Reasons.AnyAsync(e => e.Id == id);
         }
 
         public async Task<Department> AddDepartment(Department dept)
@@ -354,5 +332,7 @@ namespace tcs_service.Repos
             await AddSemester(result.semesterId);
             return result;
         }
+
+        protected override IQueryable<SignIn> Include(DbSet<SignIn> set) => set.Include(x => x.Courses).Include(x => x.Reasons);
     }
 }

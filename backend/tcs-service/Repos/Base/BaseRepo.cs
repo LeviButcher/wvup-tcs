@@ -1,77 +1,99 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
+using tcs_service.EF;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using tcs_service.EF;
+using System.Linq.Expressions;
 
 namespace tcs_service.Repos.Base
 {
-    public abstract class BaseRepo<T> : IRepo<T>,IDisposable where T : new()
+    public abstract class BaseRepo<T> : IRepo<T> where T : class
     {
         protected TCSContext _db;
-        private bool _disposed = false;
+        protected DbSet<T> table;
 
         protected BaseRepo()
         {
             _db = new TCSContext();
+            table = _db.Set<T>();
         }
 
         protected BaseRepo(TCSContext context)
         {
             _db = context;
+            table = _db.Set<T>();
         }
 
         protected BaseRepo(DbContextOptions options)
         {
             _db = new TCSContext(options);
+            table = _db.Set<T>();
         }
 
-        public void Dispose()
+        public async Task<T> Create(T t)
         {
-            Dispose(true);
-            GC.SuppressFinalize(this);
+            var added = await table.AddAsync(t);
+            await SaveChangesAsync();
+            return added.Entity;
         }
 
-        protected virtual void Dispose(bool disposing)
+        public async Task<T> Update(T t)
         {
-            if (_disposed) return;
-            if (disposing)
-            {
-                //Free any other managed objects here
-            }
-            _db.Dispose();
-            _disposed = true;
+            var updated = table.Update(t);
+            await SaveChangesAsync();
+            return updated.Entity;
         }
 
-        public int SaveChanges()
+        protected abstract IQueryable<T> Include(DbSet<T> set);
+
+        public async Task<bool> Exist(Expression<Func<T, Boolean>> function) => await table.AnyAsync(function);
+
+        public async Task<T> Find(Expression<Func<T, Boolean>> function)
+            => await Include(table).FirstOrDefaultAsync(function);
+
+        public IEnumerable<T> GetAll(Expression<Func<T, Boolean>> function) => Include(table).Where(function);
+
+        public IEnumerable<T> GetAll() => Include(table);
+
+        public async Task<T> Remove(Expression<Func<T, Boolean>> function)
+        {
+            var found = await this.Find(function);
+            var deleted = table.Remove(found);
+            await SaveChangesAsync();
+            return deleted.Entity;
+        }
+
+        public async Task<IEnumerable<T>> RemoveAll(Expression<Func<T, Boolean>> function)
+        {
+            var found = this.GetAll(function);
+            table.RemoveRange(found);
+            await SaveChangesAsync();
+            return found;
+        }
+
+        public async Task<int> SaveChangesAsync()
         {
             try
             {
-                return _db.SaveChanges();
+                return await _db.SaveChangesAsync();
             }
             catch (DbUpdateConcurrencyException ex)
             {
-                //A concurrency error occurred
+                Console.WriteLine(ex);
                 throw;
             }
             catch (RetryLimitExceededException ex)
             {
-                //_dbResiliency retry limit exceeded
-                //logger.Error("Maximum retry limit reached.", ex);
+                Console.WriteLine(ex);
                 throw;
             }
             catch (Exception ex)
             {
-                //logger.Error("Error occurred.", ex);
+                Console.WriteLine(ex);
                 throw;
             }
         }
-
-        public abstract Task<bool> Exist(int id);
-        public abstract Task<T> Find(int id);
-        public abstract IEnumerable<T> GetAll();
-        public abstract Task<T> Remove(int id);
     }
 }

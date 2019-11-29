@@ -51,7 +51,7 @@ namespace tcs_service.Controllers
             {
                 Subject = new ClaimsIdentity(new Claim[]
                 {
-                    new Claim(ClaimTypes.Name, user.ID.ToString())
+                    new Claim(ClaimTypes.Name, user.Id.ToString())
                 }),
                 Expires = DateTime.UtcNow.AddDays(7),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature),
@@ -62,7 +62,7 @@ namespace tcs_service.Controllers
             // return basic user info (without password) and token to store client side
             return Ok(new
             {
-                Id = user.ID,
+                Id = user.Id,
                 Username = user.Username,
                 FirstName = user.FirstName,
                 LastName = user.LastName,
@@ -80,7 +80,7 @@ namespace tcs_service.Controllers
             {
                 // save
                 var res = await _userRepo.Create(user, userDto.Password);
-                return Created($"api/Users/${res.ID}", res);
+                return Created($"api/Users/${res.Id}", res);
             }
             catch (AppException ex)
             {
@@ -100,7 +100,7 @@ namespace tcs_service.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
-            var user = await _userRepo.Find(id);
+            var user = await _userRepo.Find(x => x.Id == id);
             var userDto = _mapper.Map<UserDto>(user);
             return Ok(userDto);
         }
@@ -110,7 +110,7 @@ namespace tcs_service.Controllers
         {
             // map dto to entity and set id
             var user = _mapper.Map<User>(userDto);
-            user.ID = id;
+            user.Id = id;
 
             try
             {
@@ -128,7 +128,7 @@ namespace tcs_service.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
-            await _userRepo.Remove(id);
+            await _userRepo.Remove(x => x.Id == id);
             return Ok();
         }
 

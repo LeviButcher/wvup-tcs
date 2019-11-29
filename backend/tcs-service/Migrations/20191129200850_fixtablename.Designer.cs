@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using tcs_service.EF;
 
 namespace tcs_service.Migrations
 {
     [DbContext(typeof(TCSContext))]
-    partial class TCSContextModelSnapshot : ModelSnapshot
+    [Migration("20191129200850_fixtablename")]
+    partial class fixtablename
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,7 +23,7 @@ namespace tcs_service.Migrations
 
             modelBuilder.Entity("tcs_service.Models.ClassTour", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("ID")
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
@@ -32,7 +34,7 @@ namespace tcs_service.Migrations
 
                     b.Property<int>("NumberOfStudents");
 
-                    b.HasKey("Id");
+                    b.HasKey("ID");
 
                     b.ToTable("ClassTours");
                 });
@@ -170,7 +172,7 @@ namespace tcs_service.Migrations
 
             modelBuilder.Entity("tcs_service.Models.User", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("ID")
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
@@ -186,7 +188,7 @@ namespace tcs_service.Migrations
                         .IsRequired()
                         .HasMaxLength(25);
 
-                    b.HasKey("Id");
+                    b.HasKey("ID");
 
                     b.ToTable("Users");
                 });
