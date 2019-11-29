@@ -80,6 +80,7 @@ namespace tcs_service.Services
             student.lastName = newStudent.LastName;
             student.studentID = newStudent.ID;
             student.semesterId = 201903;
+            student.personType = "Student";
 
             return await GetCourseInfo(student);
 
@@ -138,6 +139,7 @@ namespace tcs_service.Services
             teacher.lastName = newTeacher.LastName;
             teacher.teacherID = newTeacher.ID;
             teacher.semesterId = 201903;
+            teacher.personType = "Teacher";
 
             return teacher;
         }
