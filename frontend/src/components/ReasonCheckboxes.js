@@ -1,28 +1,56 @@
 import React from 'react';
 import { Field } from 'formik';
-import styled from 'styled-components';
-import { Header, FieldGroup, Checkbox } from '../ui';
+import { Header, FieldGroup, Checkbox, Stack, SmallText } from '../ui';
+import { StyledCheckbox } from '../ui/Checkbox';
+import type { Reason } from '../types';
 
-const ReasonsCheckboxes = ({ className, reasons, values, errors }) => (
-  <div className={className}>
+type Props = {
+  className?: string,
+  reasons: Array<Reason>,
+  values: any,
+  errors: any,
+  touched: any
+};
+
+const ReasonsCheckboxes = ({
+  className,
+  reasons,
+  values,
+  errors,
+  touched
+}: Props) => (
+  <Stack className={className}>
     <Header type="h4">
       Reason for Visiting{' '}
       <SmallText>Select Tutoring or at least one other reason</SmallText>
-      <div style={{ color: 'red' }}>{errors && errors.reasons}</div>
+      {errors.reasons && touched.reasons && (
+        <div style={{ color: 'red' }}>{errors.reasons}</div>
+      )}
     </Header>
     <FieldGroup>
-      <SingleCheckBoxLabel name="tutoring">
+      <StyledCheckbox name="tutoring" data-checked={values.tutoring}>
         Tutoring
         <Field
           id="tutoring"
           type="checkbox"
           name="tutoring"
-          component="input"
-          label="tutoring"
           value="Tutoring"
           checked={values.tutoring}
-        />
-      </SingleCheckBoxLabel>
+        >
+          {({ form, ...rest }) => {
+            return (
+              <input
+                {...rest}
+                checked={values.tutoring}
+                type="checkbox"
+                onChange={() => {
+                  form.setFieldValue('tutoring', !values.tutoring);
+                }}
+              />
+            );
+          }}
+        </Field>
+      </StyledCheckbox>
       {reasons.map(reason => (
         <Checkbox
           key={reason.id}
@@ -30,25 +58,17 @@ const ReasonsCheckboxes = ({ className, reasons, values, errors }) => (
           type="checkbox"
           name="reasons"
           label={`${reason.name}`}
-          value={reason.id}
+          value={reason.id || ''}
           data-deleted={reason.deleted}
           title={`This reason is ${reason.deleted ? 'deleted' : 'active'}`}
         />
       ))}
     </FieldGroup>
-  </div>
+  </Stack>
 );
 
-const SmallText = styled.span`
-  color: #aaa;
-  font-size: 0.8em;
-  font-weight: normal;
-`;
-
-const SingleCheckBoxLabel = styled.label`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-`;
+ReasonsCheckboxes.defaultProps = {
+  className: ''
+};
 
 export default ReasonsCheckboxes;

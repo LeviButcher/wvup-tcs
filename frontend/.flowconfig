@@ -1,11 +1,21 @@
 [ignore]
+.*/node_modules/.*
+.*/build/.*
+.*/flow-typed/.*
 
 [include]
 
 [libs]
+flow-typed
 
 [lints]
 
+# Stops flow from failing in ci pipeline
+# https://github.com/flowtype/flow-bin/issues/138
 [options]
+server.max_workers=4
+all=true
+module.system.node.resolve_dirname=node_modules
+
 
 [strict]

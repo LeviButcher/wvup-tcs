@@ -1,9 +1,14 @@
 import React from 'react';
+import type { Node } from 'react';
 import styled from 'styled-components';
 import { Header, Link } from '../../ui';
 import Logout from '../../components/Logout';
 
-const Layout = ({ children }) => (
+type Props = {
+  children: Node
+};
+
+const Layout = ({ children }: Props) => (
   <LayoutGrid>
     <SideNav />
     <main>{children}</main>
@@ -27,7 +32,7 @@ const LayoutGrid = styled.div`
 
   & > nav {
     height: 100%;
-    padding: 0 ${props => props.theme.padding};
+    padding: ${props => props.theme.padding};
     background-color: ${props => props.theme.color.main};
     color: #fff;
   }

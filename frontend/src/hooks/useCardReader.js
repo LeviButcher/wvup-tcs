@@ -2,12 +2,17 @@ import { useEffect, useReducer } from 'react';
 
 const cardReaderStates = {
   read: 'read',
-  setTime: 'setTime',
-  reset: 'reset'
+  parse: 'parse'
 };
+
+type DispatchType = {
+  type: 'read' | 'parse',
+  key?: string
+};
+
 // readingCard: true
 // doneReadingCard: true
-const cardReaderReducer = (currState, { type, key }) => {
+const cardReaderReducer = (currState, { type, key }: DispatchType) => {
   switch (type) {
     case cardReaderStates.read:
       return {
@@ -26,6 +31,7 @@ const cardReaderReducer = (currState, { type, key }) => {
               return acc;
             }
             if (curr === ';' || curr === 'Enter') return acc;
+            // $FlowFixMe
             acc[acc.length - 1] += curr;
             return acc;
           },
@@ -39,6 +45,7 @@ const cardReaderReducer = (currState, { type, key }) => {
   }
 };
 
+// Format of wvup id card: %{startofEmail}?;{wvupId}?
 const useCardReader = () => {
   const [{ cardData, doneReadingCard }, dispatch] = useReducer(
     cardReaderReducer,

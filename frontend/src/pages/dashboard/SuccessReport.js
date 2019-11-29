@@ -51,28 +51,37 @@ const sumColumnsForPieChartsReducer = (acc, cur) => {
   return [completed, dropped, passed];
 };
 
-const SuccessReport = ({ navigate, '*': unMatchedUri }) => {
+type Props = {
+  navigate: any,
+  '*': string
+};
+
+const SuccessReport = ({ navigate, '*': unMatchedUri }: Props) => {
   const [semesterUri] = unMatchedUri.split('/');
   return (
     <ReportLayout>
       <SemesterForm
+        title="Success Report"
         style={{ gridArea: 'form' }}
-        name="Success Report"
         width="500px"
         initialValues={{ semester: semesterUri }}
-        onSubmit={({ semester }, { setSubmitting }) => {
-          navigate(`${semester}/`);
-          setSubmitting(false);
+        onSubmit={({ semester }) => {
+          return Promise.resolve(navigate(`${semester}/`));
         }}
       />
       <Router primary={false} component={({ children }) => <>{children}</>}>
+        {/* $FlowFixMe */}
         <SuccessResult path=":semester" />
       </Router>
     </ReportLayout>
   );
 };
 
-const SuccessResult = ({ semester }) => {
+type SuccessReportProps = {
+  semester: string
+};
+
+const SuccessResult = ({ semester }: SuccessReportProps) => {
   const [loading, data, errors] = useApiWithHeaders(
     `reports/success/${semester}`
   );

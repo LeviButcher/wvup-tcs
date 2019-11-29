@@ -1,8 +1,15 @@
 import React from 'react';
+import type { Node } from 'react';
 
 import ScaleLoader from 'react-spinners/ScaleLoader';
 
-const LoadingContent = ({ loading, children, data }) => (
+type Props = {
+  loading: boolean,
+  children: Node,
+  data: any
+};
+
+const LoadingContent = ({ loading, children, data }: Props) => (
   <>
     <ScaleLoader sizeUnit="px" size={150} loading={loading} align="center" />
     {!loading && (

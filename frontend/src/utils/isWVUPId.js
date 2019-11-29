@@ -1,1 +1,1 @@
-export default possibleId => Number.parseInt(possibleId, 10);
+export default (possibleId: string) => Number.parseInt(possibleId, 10);

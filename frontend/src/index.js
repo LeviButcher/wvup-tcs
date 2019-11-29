@@ -4,4 +4,11 @@ import 'normalize.css';
 import './index.css';
 import App from './App';
 
-ReactDOM.render(<App />, document.getElementById('root'));
+const root = document.getElementById('root');
+
+if (root) {
+  ReactDOM.render(<App />, root);
+} else {
+  // eslint-disable-next-line no-console
+  console.error("Can't find root element");
+}

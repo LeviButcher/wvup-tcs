@@ -57,7 +57,7 @@ namespace tcs_service_test.Repos
 
             var obj = await signInRepo.AddReason(reason);
 
-            var res = await signInRepo.ReasonExist(obj.ID);
+            var res = await signInRepo.ReasonExist(obj.Id);
 
             Assert.True(res);
         }
@@ -148,7 +148,7 @@ namespace tcs_service_test.Repos
             signIn.InTime = DateTime.Now.AddHours(-1);
             signIn.OutTime = DateTime.Now;
             // Technically add should enforce that a signIn have courses and reasons attached
-            await signInRepo.Add(signIn);      
+            await signInRepo.Add(signIn);
             var result = await signInRepo.Update(signIn);
             Assert.Equal(signIn.OutTime, result.OutTime);
             Assert.Equal(signIn.ID, result.ID);
@@ -220,7 +220,7 @@ namespace tcs_service_test.Repos
             await db.SaveChangesAsync();
 
             var choosenCourses = signIn.Courses.Take(signIn.Courses.Count - 1).Append(new SignInCourse() { Course = newCourse, CourseID = newCourse.CRN });
-            var choosenReasons = signIn.Reasons.Take(signIn.Reasons.Count - 1).Append(new SignInReason() { Reason = newReason, ReasonID = newReason.ID });
+            var choosenReasons = signIn.Reasons.Take(signIn.Reasons.Count - 1).Append(new SignInReason() { Reason = newReason, ReasonID = newReason.Id });
             signIn.Reasons = choosenReasons.ToList();
             signIn.Courses = choosenCourses.ToList();
             var result = await signInRepo.Update(signIn);

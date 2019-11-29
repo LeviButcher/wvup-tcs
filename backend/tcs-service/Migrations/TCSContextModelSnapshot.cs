@@ -15,13 +15,13 @@ namespace tcs_service.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "2.2.4-servicing-10062")
+                .HasAnnotation("ProductVersion", "2.2.6-servicing-10079")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
             modelBuilder.Entity("tcs_service.Models.ClassTour", b =>
                 {
-                    b.Property<int>("ID")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
@@ -32,7 +32,7 @@ namespace tcs_service.Migrations
 
                     b.Property<int>("NumberOfStudents");
 
-                    b.HasKey("ID");
+                    b.HasKey("Id");
 
                     b.ToTable("ClassTours");
                 });
@@ -90,7 +90,7 @@ namespace tcs_service.Migrations
 
             modelBuilder.Entity("tcs_service.Models.Reason", b =>
                 {
-                    b.Property<int>("ID")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
@@ -99,7 +99,7 @@ namespace tcs_service.Migrations
                     b.Property<string>("Name")
                         .IsRequired();
 
-                    b.HasKey("ID");
+                    b.HasKey("Id");
 
                     b.ToTable("Reasons");
                 });
@@ -170,7 +170,7 @@ namespace tcs_service.Migrations
 
             modelBuilder.Entity("tcs_service.Models.User", b =>
                 {
-                    b.Property<int>("ID")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
@@ -186,7 +186,7 @@ namespace tcs_service.Migrations
                         .IsRequired()
                         .HasMaxLength(25);
 
-                    b.HasKey("ID");
+                    b.HasKey("Id");
 
                     b.ToTable("Users");
                 });

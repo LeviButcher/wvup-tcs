@@ -8,14 +8,18 @@ import PeakHoursReport from './PeakHoursReport';
 import ReasonForVisitingReport from './ReasonForVisitingReport';
 import UserManagement from './UserManagement';
 import ReasonManagement from './ReasonManagement';
-import UserForm from './UserForm';
 import SuccessReport from './SuccessReport';
-import ReasonForm from './ReasonForm';
 import SignInLookup from './SignInLookup';
-import SignInFormUpdate from './SignInFormUpdate';
 import Welcome from './Welcome';
-import TeacherSignInFormUpdate from './TeacherSignInFormUpdate';
 import SemesterSignIns from './SemesterSignIns';
+import CreateClassTour from './CreateClassTour';
+import UpdateClassTour from './UpdateClassTour';
+import CreateUser from './CreateUser';
+import UpdateUser from './UpdateUser';
+import CreateReason from './CreateReason';
+import UpdateReason from './UpdateReason';
+import CreateSignIn from './CreateSignIn';
+import UpdateSignIn from './UpdateSignIn';
 
 export {
   DashboardLayout,
@@ -27,13 +31,17 @@ export {
   PeakHoursReport,
   ReasonForVisitingReport,
   UserManagement,
-  UserForm,
   SuccessReport,
   ReasonManagement,
-  ReasonForm,
   SignInLookup,
-  SignInFormUpdate,
   Welcome,
-  TeacherSignInFormUpdate,
-  SemesterSignIns
+  SemesterSignIns,
+  CreateClassTour,
+  UpdateClassTour,
+  CreateUser,
+  UpdateUser,
+  CreateReason,
+  UpdateReason,
+  CreateSignIn,
+  UpdateSignIn
 };

@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using tcs_service.Models;
@@ -13,7 +8,6 @@ using tcs_service.Repos.Interfaces;
 namespace tcs_service.Controllers
 {
     [Route("api/[controller]")]
-    [Authorize]
     [ApiController]
     public class ReasonsController : ControllerBase
     {
@@ -25,27 +19,13 @@ namespace tcs_service.Controllers
         }
 
         [HttpGet]
-        [Produces(typeof(DbSet<Reason>))]
-        public IActionResult GetReason()
-        {
-            var results = new ObjectResult(_iRepo.GetAll())
-            {
-                StatusCode = (int)HttpStatusCode.OK
-            };
-
-            return results;
-        }
+        public IActionResult GetReasons() => Ok(_iRepo.GetAll());
 
         [HttpGet("{id}")]
         [Produces(typeof(Reason))]
         public async Task<IActionResult> GetReason([FromRoute] int id)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
-            var reason = await _iRepo.Find(id);
+            var reason = await _iRepo.Find(x => x.Id == id);
 
             if (reason == null)
             {
@@ -57,32 +37,19 @@ namespace tcs_service.Controllers
 
         [AllowAnonymous]
         [HttpGet("active")]
-        public IActionResult GetActive()
-        {
-            return Ok(_iRepo.GetActive());
-        }
+        public IActionResult GetActive() => Ok(_iRepo.GetAll(x => x.Deleted == false));
 
         [HttpPost]
         public async Task<IActionResult> PostReason([FromBody] Reason reason)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
-            await _iRepo.Add(reason);
-            return Created("GetReason", new { id = reason.ID });
+            await _iRepo.Create(reason);
+            return Created($"reasons/{reason.Id}", reason);
         }
 
         [HttpPut("{id}")]
         public async Task<IActionResult> PutReason([FromRoute] int id, [FromBody]Reason reason)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
-            if (id != reason.ID)
+            if (id != reason.Id)
             {
                 return BadRequest();
             }
@@ -94,14 +61,7 @@ namespace tcs_service.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!await _iRepo.Exist(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
+                return NotFound(new { message = "Something went terribly wrong" });
             }
         }
     }

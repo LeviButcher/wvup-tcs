@@ -1,19 +1,21 @@
 import React from 'react';
-import styled from 'styled-components';
-import { Header, FieldGroup, Checkbox } from '../ui';
+import { Header, FieldGroup, Checkbox, Stack, SmallText } from '../ui';
+import type { Course } from '../types';
 
-const SmallText = styled.span`
-  color: #aaa;
-  font-size: 0.8em;
-  font-weight: normal;
-`;
+type Props = {
+  courses: Array<Course>,
+  errors: { courses: string },
+  touched: { courses: string }
+};
 
-const CoursesCheckboxes = ({ courses, errors }) => {
+const CoursesCheckboxes = ({ courses, errors, touched }: Props) => {
   return (
-    <>
+    <Stack>
       <Header type="h4">
         Classes Visiting for <SmallText>Select at least one course</SmallText>
-        <div style={{ color: 'red' }}>{errors && errors.courses}</div>
+        {errors.courses && touched.courses && (
+          <div style={{ color: 'red' }}>{errors.courses}</div>
+        )}
       </Header>
       <FieldGroup>
         {courses &&
@@ -28,7 +30,7 @@ const CoursesCheckboxes = ({ courses, errors }) => {
             />
           ))}
       </FieldGroup>
-    </>
+    </Stack>
   );
 };
 

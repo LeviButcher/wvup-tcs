@@ -1,6 +1,8 @@
 import theme from '../theme.json';
 
-export default type => {
+type intent = 'primary' | 'secondary' | 'danger' | 'warning';
+
+export default (type: intent) => {
   switch (type) {
     case 'primary':
       return theme.color.primary;

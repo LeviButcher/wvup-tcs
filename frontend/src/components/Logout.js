@@ -3,8 +3,10 @@ import { navigate } from '@reach/router';
 import styled from 'styled-components';
 import { Header } from '../ui';
 
+const token = process.env.REACT_APP_TOKEN || '';
+
 const clearSession = () => {
-  localStorage.removeItem(process.env.REACT_APP_TOKEN);
+  localStorage.removeItem(token);
   navigate('/login');
 };
 

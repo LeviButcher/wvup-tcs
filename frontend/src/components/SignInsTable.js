@@ -1,6 +1,7 @@
 import React from 'react';
 import { Table, Link } from '../ui';
 import { Gear, Trashcan } from '../ui/icons';
+import type { SignIn } from '../types';
 
 function hourDifferenceInTime(date, date2) {
   const { bigDate, smallDate } =
@@ -11,7 +12,11 @@ function hourDifferenceInTime(date, date2) {
   return (diff / 60 / 60).toFixed(2);
 }
 
-const SignInsTable = ({ signIns }) => {
+type Props = {
+  signIns: Array<SignIn>
+};
+
+const SignInsTable = ({ signIns }: Props) => {
   return (
     <Table>
       <thead align="left">
@@ -84,13 +89,7 @@ const SignInRow = ({
           .join(', ')}
       </td>
       <td style={{ display: 'flex', justifyContent: 'space-evenly' }}>
-        <Link
-          to={
-            type === 0
-              ? `/dashboard/signins/${id}`
-              : `/dashboard/signins/teacher/${id}`
-          }
-        >
+        <Link to={`/dashboard/signins/${id}`}>
           <Gear />
         </Link>
         <Trashcan onClick={() => alert('Not implemented yet')} />

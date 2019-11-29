@@ -29,28 +29,40 @@ const reasonTotalStudentReducer = (acc, reason) => {
   return acc;
 };
 
-const ReasonsReport = ({ navigate, '*': unMatchedUri }) => {
+type Props = {
+  navigate: any,
+  '*': string
+};
+
+const ReasonsReport = ({ navigate, '*': unMatchedUri }: Props) => {
   const [start, end] = unMatchedUri.split('/');
   return (
     <ReportLayout>
       <StartToEndDateForm
+        title="Reason For Visiting Report"
         style={{ gridArea: 'form' }}
-        startDate={start}
-        endDate={end}
-        onSubmit={({ startDate, endDate }, { setSubmitting }) => {
-          navigate(`${startDate}/${endDate}`);
-          setSubmitting(false);
+        initialValues={{
+          startDate: start,
+          endDate: end
         }}
-        name="Reason For Visiting Report"
+        onSubmit={({ startDate, endDate }) => {
+          return Promise.resolve(navigate(`${startDate}/${endDate}`));
+        }}
       />
       <Router primary={false} component={({ children }) => <>{children}</>}>
+        {/* $FlowFixMe */}
         <ReasonsResult path=":startDate/:endDate" />
       </Router>
     </ReportLayout>
   );
 };
 
-const ReasonsResult = ({ startDate, endDate }) => {
+type ReasonsResultProps = {
+  startDate: string,
+  endDate: string
+};
+
+const ReasonsResult = ({ startDate, endDate }: ReasonsResultProps) => {
   const [loading, data, errors] = useApiWithHeaders(
     `reports/reasons?start=${startDate}&end=${endDate}`
   );
@@ -58,10 +70,10 @@ const ReasonsResult = ({ startDate, endDate }) => {
     <LoadingContent loading={loading} data={data} errors={errors}>
       <Card width="600px" style={{ gridArea: 'chart' }}>
         <PieChart
+          title="Reason For Visiting Percentages"
           data={data.body.reduce(reasonTotalStudentReducer, [])}
           x={d => d.reasonName}
           y={d => d.visits}
-          title="Reason For Visiting Percentages"
         />
       </Card>
       <Card width="900px" style={{ gridArea: 'table' }}>

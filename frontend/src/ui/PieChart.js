@@ -2,7 +2,42 @@ import React from 'react';
 import { VictoryPie, VictoryTheme, VictoryLabel } from 'victory';
 import { add, sum } from 'ramda';
 
-const PieChart = ({ data, x, y, title, ...props }) => (
+type LabelWithPercentageProps = {
+  text: string,
+  data: [{ _y: number }],
+  datum: { _y: number }
+};
+
+// Victory Passes in a lot more props then just these
+const LabelWithPercentage = ({
+  text,
+  data,
+  datum,
+  ...props
+}: LabelWithPercentageProps) => {
+  return (
+    <g>
+      <VictoryLabel
+        {...props}
+        text={() => {
+          return `${text}\n${(
+            (datum._y / sum(data.map(da => da._y))) *
+            100
+          ).toFixed(1)}%`;
+        }}
+      />
+    </g>
+  );
+};
+
+type Props = {
+  data: any,
+  x: any => number,
+  y: any => number,
+  title: string
+};
+
+const PieChart = ({ data, x, y, title, ...props }: Props) => (
   <svg viewBox="0 0 500 500">
     <VictoryPie
       padding={100}
@@ -16,6 +51,9 @@ const PieChart = ({ data, x, y, title, ...props }) => (
       y={y}
       theme={VictoryTheme.material}
       style={{ labels: { fill: 'black' } }}
+      // Victory doesn't have labelComponent as a render prop, but still automatically
+      // Passes in props to the provide react component
+      // $FlowFixMe
       labelComponent={<LabelWithPercentage />}
       {...props}
     />
@@ -31,21 +69,5 @@ const PieChart = ({ data, x, y, title, ...props }) => (
     </text>
   </svg>
 );
-
-const LabelWithPercentage = ({ text, data, datum, ...props }) => {
-  return (
-    <g>
-      <VictoryLabel
-        {...props}
-        text={() => {
-          return `${text}\n${(
-            (datum._y / sum(data.map(da => da._y))) *
-            100
-          ).toFixed(1)}%`;
-        }}
-      />
-    </g>
-  );
-};
 
 export default PieChart;

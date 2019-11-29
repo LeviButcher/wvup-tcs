@@ -1,5 +1,6 @@
 import * as Yup from 'yup';
 
+// $FlowFixMe
 const StartToEndDateSchema = Yup.object().shape({
   startDate: Yup.date().required(),
   endDate: Yup.date()

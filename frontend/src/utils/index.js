@@ -4,6 +4,7 @@ import callApi from './callApi';
 import isWVUPEmail from './isWVUPEmail';
 import errorToMessage from './errorToMessage';
 import isWVUPId from './isWVUPId';
+import getProperty from './getProperty';
 
 export {
   ensureResponseCode,
@@ -11,5 +12,6 @@ export {
   callApi,
   isWVUPEmail,
   errorToMessage,
-  isWVUPId
+  isWVUPId,
+  getProperty
 };

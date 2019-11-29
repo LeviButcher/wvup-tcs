@@ -5,4 +5,5 @@ const dataPointsConvertor = (xProperty, yProperty, object) => ({
   y: object[yProperty]
 });
 
+// $FlowFixMe
 export default curry(dataPointsConvertor);

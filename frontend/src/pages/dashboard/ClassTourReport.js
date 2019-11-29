@@ -6,31 +6,45 @@ import StartToEndDateForm from '../../components/StartToEndDateForm';
 import LoadingContent from '../../components/LoadingContent';
 import useApiWithHeaders from '../../hooks/useApiWithHeaders';
 
-const ClassTourReport = ({ navigate, '*': unMatchedUri }) => {
+type Props = {
+  navigate: any,
+  '*': string
+};
+
+const ClassTourReport = ({ navigate, '*': unMatchedUri }: Props) => {
   const [start, end] = unMatchedUri.split('/');
   return (
     <ReportLayout>
       <StartToEndDateForm
         style={{ gridArea: 'form' }}
-        onSubmit={({ startDate, endDate }, { setSubmitting }) => {
-          navigate(`${startDate}/${endDate}`);
-          setSubmitting(false);
+        title="Class Tour Report"
+        onSubmit={({ startDate, endDate }) => {
+          return Promise.resolve(navigate(`${startDate}/${endDate}`));
         }}
-        startDate={start}
-        endDate={end}
-        name="Class Tour Report"
+        initialValues={{
+          startDate: start,
+          endDate: end
+        }}
       />
       <Router primary={false} component={({ children }) => <>{children}</>}>
+        {/* $FlowFixMe */}
         <ClassTourResult path=":startDate/:endDate" />
       </Router>
     </ReportLayout>
   );
 };
 
-const ClassTourResult = ({ startDate, endDate }) => {
-  const [loading, data, errors] = useApiWithHeaders(
-    `reports/classtours?start=${startDate}&end=${endDate}`
-  );
+type ClassTourResultProps = {
+  startDate: string,
+  endDate: string
+};
+
+const ClassTourResult = ({ startDate, endDate }: ClassTourResultProps) => {
+  const [loading, data, errors]: [
+    boolean,
+    { body: any },
+    any
+  ] = useApiWithHeaders(`reports/classtours?start=${startDate}&end=${endDate}`);
   return (
     <LoadingContent loading={loading} data={data} errors={errors}>
       <Card width="900px" style={{ gridArea: 'table' }}>

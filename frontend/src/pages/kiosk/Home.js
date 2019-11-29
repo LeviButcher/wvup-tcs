@@ -1,32 +1,13 @@
 import React, { useEffect } from 'react';
 import styled from 'styled-components';
-import { Link, Header, Card } from '../../ui';
-
-const Home = ({ location }) => (
-  <FullScreenContainer>
-    {location && location.state && location.state.info && (
-      <StyledInfoPopUp info={location.state.info} />
-    )}
-    <BoxLink to="/signin" style={{ gridArea: 'boxLeft' }}>
-      <Box>Sign In</Box>
-    </BoxLink>
-    <BoxLink to="/signout" style={{ gridArea: 'boxRight' }}>
-      <Box>Sign Out</Box>
-    </BoxLink>
-    <Footer>
-      <Header type="h3" align="center">
-        <Link to="/signin/teacher">Sign in for teachers</Link>
-      </Header>
-    </Footer>
-  </FullScreenContainer>
-);
+import { Link, Header, Card, KioskFullScreenContainer } from '../../ui';
 
 const InfoPopUp = ({ className, info }) => {
   useEffect(() => {
     setTimeout(() => {
       const infoNode = document.querySelector('#info');
       if (infoNode) {
-        infoNode.parentNode.removeChild(infoNode);
+        if (infoNode.parentNode) infoNode.parentNode.removeChild(infoNode);
       }
     }, 10000);
   }, [info]);
@@ -61,6 +42,9 @@ const Footer = styled.footer`
   background-color: #afafaf;
   grid-area: footer;
   padding: 0 ${props => props.theme.padding};
+  & header {
+    margin: 1rem;
+  }
 `;
 
 const Box = styled(Card)`
@@ -75,15 +59,15 @@ const Box = styled(Card)`
   justify-self: center;
 `;
 
-const FullScreenContainer = styled.div`
-  height: calc(100vh - ${props => props.theme.kioskHeaderSize});
-  width: 100%;
+const LandingPageKioskFullScreen = styled(KioskFullScreenContainer)`
+  padding: 0;
   display: grid;
   grid-template:
     'info info' auto
     'boxLeft boxRight' 1fr
     'footer footer' auto / 50% 50%;
   align-items: flex-end;
+  justify-content: flex-start;
   @media (max-width: 880px) {
     grid-template:
       'info' 1fr
@@ -93,5 +77,32 @@ const FullScreenContainer = styled.div`
     grid-gap: 30px;
   }
 `;
+
+type Props = {
+  location: {
+    state: {
+      info: string
+    }
+  }
+};
+
+const Home = ({ location }: Props) => (
+  <LandingPageKioskFullScreen>
+    {location && location.state && location.state.info && (
+      <StyledInfoPopUp info={location.state.info} />
+    )}
+    <BoxLink to="/signin" style={{ gridArea: 'boxLeft' }}>
+      <Box>Sign In</Box>
+    </BoxLink>
+    <BoxLink to="/signout" style={{ gridArea: 'boxRight' }}>
+      <Box>Sign Out</Box>
+    </BoxLink>
+    <Footer style={{ alignSelf: 'center' }}>
+      <Header type="h3" align="center">
+        <Link to="/signin/teacher">Sign in for teachers</Link>
+      </Header>
+    </Footer>
+  </LandingPageKioskFullScreen>
+);
 
 export default Home;

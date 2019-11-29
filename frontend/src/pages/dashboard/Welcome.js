@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import { Header } from '../../ui';
 import useApiWithHeaders from '../../hooks/useApiWithHeaders';
 import SignInsTable from '../../components/SignInsTable';
+import { getProperty } from '../../utils';
 
 const BigText = styled.span`
   font-size: 5em;
@@ -11,7 +12,8 @@ const BigText = styled.span`
 
 const Welcome = () => {
   const [loading, data, errors] = useApiWithHeaders('lookups/daily');
-  const totalVisits = (data && Number(data.headers['total-records'])) || 0;
+  const totalVisits =
+    (data && Number(getProperty(data.headers, 'total-records'))) || 0;
   return (
     <div>
       <CustomHeader align="center">Tutoring Center System</CustomHeader>
@@ -22,15 +24,16 @@ const Welcome = () => {
             <BigText>{totalVisits}</BigText>{' '}
             {totalVisits !== 1 ? 'Students' : 'Student'} Helped Today
           </Header>
-          {data.body.length >= 1 && (
+          {data.body && data.body.length >= 1 && (
             <div>
               <h4>Most Recent Visitors</h4>
+              {/* // $FlowFixMe */}
               <SignInsTable signIns={data.body} />
             </div>
           )}
+          {errors && errors.message && <div>{errors.message}</div>}
         </>
       )}
-      {errors && <div>{errors}</div>}
     </div>
   );
 };

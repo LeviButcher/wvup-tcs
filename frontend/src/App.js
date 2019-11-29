@@ -13,25 +13,27 @@ import {
   ClassTourLookup,
   Login,
   ClassTourReport,
-  TeacherSignInFormUpdate,
   VolunteerReport,
   WeeklyVisitsReport,
   PeakHoursReport,
   ReasonForVisitingReport,
   UserManagement,
-  UserForm,
   SuccessReport,
   ReasonManagement,
-  ReasonForm,
   SignInLookup,
-  SignInFormUpdate,
   Welcome,
-  SemesterSignIns
+  SemesterSignIns,
+  CreateClassTour,
+  UpdateClassTour,
+  CreateUser,
+  UpdateUser,
+  CreateReason,
+  UpdateReason,
+  CreateSignIn,
+  UpdateSignIn
 } from './pages/dashboard';
 import Theme from './theme.json';
 import NotFound from './pages/NotFound';
-import ClassTourForm from './pages/dashboard/ClassTourForm';
-import Fetch from './components/Fetch';
 import IsAuthenticated from './components/IsAuthenticated';
 
 function App() {
@@ -40,6 +42,7 @@ function App() {
       <ThemeProvider theme={Theme}>
         <Router>
           <KioskLayout path="/">
+            {/* $FlowFixMe */}
             <Home path="/" />
             <SignInStudent path="/signin/*" />
             <SignOut path="/signout" />
@@ -49,57 +52,42 @@ function App() {
           <IsAuthenticated redirectRoute="/login" path="/dashboard">
             <DashboardLayout path="/">
               <Welcome path="/" />
+              {/* // $FlowFixMe */}
               <SignInLookup path="/signins/*" />
-              <SignInFormUpdate path="/signins/create" type="create" />
+              <CreateSignIn path="/signins/create" />
+              {/* // $FlowFixMe */}
+              <UpdateSignIn path="/signins/:id" />
+              {/* // $FlowFixMe */}
               <SemesterSignIns path="/signins/semester/*" />
-              <TeacherSignInFormUpdate
-                path="/signins/teacher/create"
-                type="create"
-              />
-              <Fetch
-                path="/signins/:id"
-                url="signins/"
-                Component={SignInFormUpdate}
-                action="Update"
-                type="update"
-              />
-              <Fetch
-                path="/signins/teacher/:id"
-                url="signins/"
-                Component={TeacherSignInFormUpdate}
-                action="Update"
-                type="update"
-              />
-              <ClassTourLookup path="/tours/*" />
-              <ClassTourForm path="/tours/create" />
-              <Fetch
-                url="classtours/"
-                path="/tours/update/:id"
-                Component={ClassTourForm}
-                action="Update"
-              />
+              {/* // $FlowFixMe */}
+              <ClassTourLookup path="/tours/" />
+              {/* // $FlowFixMe */}
+              <ClassTourLookup path="/tours/:startDate/:endDate" />
+              {/* // $FlowFixMe */}
+              <ClassTourLookup path="/tours/:startDate/:endDate/:page" />
+              <CreateClassTour path="/tours/create" />
+              {/* // $FlowFixMe */}
+              <UpdateClassTour path="/tours/update/:id" />
+              {/* // $FlowFixMe */}
               <ClassTourReport path="/report/tours/*" />
+              {/* // $FlowFixMe */}
               <VolunteerReport path="/report/volunteer/*" />
+              {/* // $FlowFixMe */}
               <WeeklyVisitsReport path="/report/weekly-visits/*" />
+              {/* // $FlowFixMe */}
               <PeakHoursReport path="/report/peak-hours/*" />
+              {/* // $FlowFixMe */}
               <ReasonForVisitingReport path="/report/reason-for-visiting/*" />
               <UserManagement path="/admin/users" />
-              <UserForm path="/admin/users/create" />
-              <Fetch
-                url="users/"
-                path="/admin/users/update/:id"
-                Component={UserForm}
-                action="Update"
-              />
+              <CreateUser path="/admin/users/create" />
+              {/* $FlowFixMe */}
+              <UpdateUser path="/admin/users/update/:id" />
+              {/* // $FlowFixMe */}
               <SuccessReport path="/report/success/*" />
               <ReasonManagement path="/admin/reason" />
-              <ReasonForm path="/admin/reason/create" />
-              <Fetch
-                url="reasons/"
-                path="/admin/reason/update/:id"
-                Component={ReasonForm}
-                action="Update"
-              />
+              <CreateReason path="/admin/reason/create" />
+              {/* $FlowFixMe */}
+              <UpdateReason path="/admin/reason/update/:id" />
               <NotFound default />
             </DashboardLayout>
           </IsAuthenticated>

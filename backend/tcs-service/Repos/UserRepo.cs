@@ -1,14 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.Tokens;
 using System;
-using System.Collections.Generic;
-using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
-using System.Security.Claims;
-using System.Text;
 using System.Threading.Tasks;
-using tcs_service.EF;
 using tcs_service.Exceptions;
 using tcs_service.Helpers;
 using tcs_service.Models;
@@ -75,7 +69,7 @@ namespace tcs_service.Repos
 
         public async Task<User> Update(User userParam, string password = null)
         {
-            var user = await _db.Users.FindAsync(userParam.ID);
+            var user = await _db.Users.FindAsync(userParam.Id);
 
             if (user == null)
                 throw new AppException("User not found");
@@ -110,23 +104,6 @@ namespace tcs_service.Repos
             return user;
         }
 
-        public override async Task<User> Find(int id)
-        {
-            return await _db.Users.FindAsync(id);
-        }
-
-
-        public override IEnumerable<User> GetAll()
-        {
-            // return users without passwords
-            return _db.Users;
-        }
-
-
-
-
-
-
         // private helper methods
 
         private static void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
@@ -160,17 +137,6 @@ namespace tcs_service.Repos
             return true;
         }
 
-        public override async Task<bool> Exist(int id)
-        {
-            return await _db.Users.AnyAsync(e => e.ID == id);
-        }
-
-        public override async Task<User> Remove(int id)
-        {
-            var user = await _db.Users.SingleAsync(a => a.ID == id);
-            _db.Users.Remove(user);
-            await _db.SaveChangesAsync();
-            return user;
-        }
+        protected override IQueryable<User> Include(DbSet<User> set) => set;
     }
 }

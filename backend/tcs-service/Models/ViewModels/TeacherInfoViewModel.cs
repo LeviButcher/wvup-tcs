@@ -16,5 +16,7 @@ namespace tcs_service.Models.ViewModels
         public string lastName { get; set; }
 
         public int semesterId { get; set; }
+
+        public string personType { get; set; }
     }
 }

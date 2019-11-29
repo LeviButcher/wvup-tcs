@@ -4,34 +4,66 @@ import { loadingReducer, loadingStates } from './loadingReducer';
 
 const getApiData = uri => callApi(uri, 'GET', null);
 
-const useApiWithHeaders = uri => {
+const useApiWithHeaders = (uri: string) => {
   const [{ loading, errors, data }, dispatch] = useReducer(loadingReducer, {
     loading: true,
     data: {
       headers: {},
       body: []
-    }
+    },
+    errors: {}
   });
 
   useEffect(() => {
+    let isMounted = true;
     if (uri === null || uri.length < 1) {
-      dispatch({ type: loadingStates.done });
-      return;
+      if (isMounted)
+        dispatch({
+          type: loadingStates.done,
+          data: { headers: {}, body: [] },
+          errors: {}
+        });
+      return () => {
+        isMounted = false;
+      };
     }
-    dispatch({ type: loadingStates.loading });
+    if (isMounted)
+      dispatch({
+        type: loadingStates.loading,
+        data: {
+          headers: {},
+          body: { headers: {}, body: [] }
+        },
+        errors: {}
+      });
     getApiData(uri)
       .then(ensureResponseCode(200))
       .then(async response => {
-        const buildData = { headers: {} };
+        const buildData = { headers: {}, body: {} };
         response.headers.forEach((value, key) => {
           buildData.headers[key] = value;
         });
         buildData.body = await response.json();
-        dispatch({ type: loadingStates.done, data: buildData });
+        if (isMounted) {
+          dispatch({ type: loadingStates.done, data: buildData, errors: {} });
+        }
       })
       .catch(e => {
-        dispatch({ type: loadingStates.error, errors: e });
+        if (isMounted) {
+          dispatch({
+            type: loadingStates.error,
+            errors: e,
+            data: {
+              headers: {},
+              body: []
+            }
+          });
+        }
       });
+
+    return () => {
+      isMounted = false;
+    };
   }, [uri]);
 
   return [loading, data, errors];

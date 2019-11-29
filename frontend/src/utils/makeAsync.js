@@ -9,4 +9,5 @@ const makeAsync = (time, data) => {
     });
 };
 
+// $FlowFixMe
 export default curry(makeAsync);

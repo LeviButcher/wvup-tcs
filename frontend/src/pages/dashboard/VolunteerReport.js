@@ -6,28 +6,37 @@ import StartToEndDateForm from '../../components/StartToEndDateForm';
 import useApiWithHeaders from '../../hooks/useApiWithHeaders';
 import LoadingContent from '../../components/LoadingContent';
 
-const VolunteerReport = ({ navigate, '*': unMatchedUri }) => {
+type Props = {
+  navigate: any,
+  '*': any
+};
+
+const VolunteerReport = ({ navigate, '*': unMatchedUri }: Props) => {
   const [start, end] = unMatchedUri.split('/');
   return (
     <ReportLayout>
       <StartToEndDateForm
+        title="Volunteer Report"
         style={{ gridArea: 'form' }}
-        onSubmit={({ startDate, endDate }, { setSubmitting }) => {
-          navigate(`${startDate}/${endDate}`);
-          setSubmitting(false);
+        onSubmit={({ startDate, endDate }) => {
+          return Promise.resolve(navigate(`${startDate}/${endDate}`));
         }}
-        startDate={start}
-        endDate={end}
-        name="Volunteer Report"
+        initialValues={{ startDate: start, endDate: end }}
       />
       <Router primary={false} component={({ children }) => <>{children}</>}>
+        {/* $FlowFixMe */}
         <VolunteerResult path=":startDate/:endDate" />
       </Router>
     </ReportLayout>
   );
 };
 
-const VolunteerResult = ({ startDate, endDate }) => {
+type VolunteerResultProps = {
+  startDate: string,
+  endDate: string
+};
+
+const VolunteerResult = ({ startDate, endDate }: VolunteerResultProps) => {
   const [loading, data, errors] = useApiWithHeaders(
     `reports/volunteers?start=${startDate}&end=${endDate}`
   );

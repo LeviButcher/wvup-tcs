@@ -1,65 +1,37 @@
-import React, { useReducer } from 'react';
-import { Link } from '@reach/router';
-import styled from 'styled-components';
-import ScaleLoader from 'react-spinners/ScaleLoader';
+import React from 'react';
+import { Link, navigate } from '@reach/router';
 import { callApi, ensureResponseCode } from '../../utils';
-import { Card } from '../../ui';
+import { Card, KioskFullScreenContainer } from '../../ui';
 import EmailOrCardSwipeForm from '../../components/EmailOrCardSwipeForm';
-import { loadingStates, loadingReducer } from '../../hooks/loadingReducer';
+import type { Teacher } from '../../types';
 
 const postSignInTeacher = callApi(`signins?teacher=true`, 'POST');
 
 // test email : teacher@wvup.edu
-const SignInTeacher = ({ navigate }) => {
-  const [{ loading, errors }, dispatch] = useReducer(loadingReducer, {});
+const SignInTeacher = () => {
   return (
-    <FullScreenContainer>
+    <KioskFullScreenContainer>
       <Card>
-        <Link to="/">Go to Home Screen</Link>
-        <h1>Sign In Teacher</h1>
-        {!loading && (
-          <EmailOrCardSwipeForm
-            teacher
-            afterValidSubmit={teacher => {
-              dispatch({ type: loadingStates.loading });
-              const signIn = {
-                ...teacher,
-                personId: teacher.teacherID,
-                email: teacher.teacherEmail
-              };
-              postSignInTeacher(signIn)
-                .then(ensureResponseCode(201))
-                .then(() => {
-                  dispatch({ type: loadingStates.done });
-                  navigate('/', { state: { info: 'You have signed in!' } });
-                })
-                .catch(e => dispatch({ type: loadingStates.error, errors: e }));
-            }}
-          />
-        )}
-        {loading && (
-          <div>
-            <h5>Submitting your signin</h5>
-            <ScaleLoader
-              sizeUnit="px"
-              size={150}
-              loading={loading}
-              align="center"
-            />
-          </div>
-        )}
-        {errors && <div>{errors.message}</div>}
+        <EmailOrCardSwipeForm
+          teacher
+          afterValidSubmit={(teacher: Teacher) => {
+            const signIn = {
+              personId: teacher.teacherID,
+              email: teacher.teacherEmail
+            };
+            return postSignInTeacher(signIn)
+              .then(ensureResponseCode(201))
+              .then(() => {
+                navigate('/', { state: { info: 'You have signed in!' } });
+              });
+          }}
+        >
+          <Link to="/">Go to Home Screen</Link>
+          <h1>Sign In Teacher</h1>
+        </EmailOrCardSwipeForm>
       </Card>
-    </FullScreenContainer>
+    </KioskFullScreenContainer>
   );
 };
-
-const FullScreenContainer = styled.div`
-  padding: ${props => props.theme.padding};
-  height: calc(100vh - 75px);
-  display: flex;
-  align-items: center;
-  justify-content: space-evenly;
-`;
 
 export default SignInTeacher;

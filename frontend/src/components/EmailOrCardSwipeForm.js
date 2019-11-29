@@ -1,13 +1,11 @@
-// @flow
-
-import React, { useEffect, useReducer } from 'react';
+import React, { useEffect } from 'react';
+import type { Node } from 'react';
 import { Formik, Form, Field } from 'formik';
-import ScaleLoader from 'react-spinners/ScaleLoader';
 import * as Yup from 'yup';
-import { Input, Button } from '../ui';
+import { Input, Button, Stack } from '../ui';
 import { callApi, unwrapToJSON, ensureResponseCode, isWVUPId } from '../utils';
 import useCardReader from '../hooks/useCardReader';
-import { loadingStates, loadingReducer } from '../hooks/loadingReducer';
+import type { Teacher, Student } from '../types';
 
 const EmailSchema = Yup.object().shape({
   email: Yup.string()
@@ -20,44 +18,44 @@ const EmailSchema = Yup.object().shape({
 const getStudentInfoWithEmail = email =>
   callApi(`signins/${email}/email`, 'GET', null);
 
-const getStudentInfoWithId = id => callApi(`signins/${id}/id`, 'GET', null);
+const getStudentInfoWithId = (id: number) =>
+  callApi(`signins/${id}/id`, 'GET', null);
 
 const getTeacherInfoWithEmail = email =>
   callApi(`signins/${email}/teacher/email`, 'GET', null);
 
-const getTeacherInfoWithId = id =>
+const getTeacherInfoWithId = (id: number) =>
   callApi(`signins/${id}/teacher/id`, 'GET', null);
+
+type Props = {
+  afterValidSubmit: (Teacher & Student) => Promise<any>,
+  teacher?: boolean,
+  children?: Node
+};
 
 const EmailOrCardSwipeForm = ({
   afterValidSubmit,
-  teacher
-}: {
-  afterValidSubmit: Function,
-  teacher: boolean
-}) => {
+  teacher,
+  children
+}: Props) => {
   const [data] = useCardReader();
-  const [{ loading, errors }, dispatch] = useReducer(loadingReducer, {});
 
   const getInfoWithEmail = teacher
     ? getTeacherInfoWithEmail
     : getStudentInfoWithEmail;
 
   const getInfoWithId = teacher ? getTeacherInfoWithId : getStudentInfoWithId;
+
   useEffect(() => {
     let isMounted = true;
     if (data && data.length > 2) {
-      const wvupId = data.find(isWVUPId);
-      dispatch({ type: loadingStates.loading });
+      const wvupId = data.find(isWVUPId) || -1;
       getInfoWithId(wvupId)
         .then(ensureResponseCode(200))
         .then(unwrapToJSON)
         .then(personInfo => {
-          afterValidSubmit(personInfo);
-          if (isMounted) dispatch({ type: loadingStates.done });
-        })
-        .catch(
-          e => isMounted && dispatch({ type: loadingStates.error, errors: e })
-        );
+          if (isMounted) afterValidSubmit(personInfo);
+        });
     }
     return () => {
       isMounted = false;
@@ -66,8 +64,8 @@ const EmailOrCardSwipeForm = ({
 
   return (
     <Formik
-      onSubmit={({ email }, { setSubmitting, setStatus }) => {
-        getInfoWithEmail(email)
+      onSubmit={({ email }, { setStatus }) => {
+        return getInfoWithEmail(email)
           .then(ensureResponseCode(200))
           .then(unwrapToJSON)
           .then(afterValidSubmit)
@@ -75,29 +73,17 @@ const EmailOrCardSwipeForm = ({
             if (e.message) {
               setStatus(e.message);
             }
-          })
-          .finally(() => setSubmitting(false));
+          });
       }}
       initialValues={{ email: '' }}
       validationSchema={EmailSchema}
-      enableReinitialize
+      isInitialValid={false}
     >
-      {({ isSubmitting, isValid, status }) => (
-        <Form>
-          {(isSubmitting || loading) && (
-            <>
-              <h5>Getting information...</h5>
-              <ScaleLoader
-                sizeUnit="px"
-                size={150}
-                loading={isSubmitting || loading}
-                align="center"
-              />
-            </>
-          )}
-          {errors && <h4 style={{ color: 'red' }}>{errors.message}</h4>}
-          {!isSubmitting && !loading && (
-            <>
+      {({ isSubmitting, isValid, status }) => {
+        return (
+          <Form>
+            <Stack>
+              {children}
               <h4>Please enter email or swipe card</h4>
               {status && <h4 style={{ color: 'red' }}>{status}</h4>}
               <Field
@@ -108,20 +94,25 @@ const EmailOrCardSwipeForm = ({
                 label="Email"
                 disabled={isSubmitting}
               />
-
               <Button
-                type="Submit"
-                disabled={!isValid && isSubmitting}
-                align="right"
+                type="submit"
+                disabled={!isValid || isSubmitting}
+                fullWidth
+                intent="primary"
               >
-                Submit
+                {isSubmitting ? 'Submitting...' : 'Submit'}
               </Button>
-            </>
-          )}
-        </Form>
-      )}
+            </Stack>
+          </Form>
+        );
+      }}
     </Formik>
   );
+};
+
+EmailOrCardSwipeForm.defaultProps = {
+  children: null,
+  teacher: false
 };
 
 export default EmailOrCardSwipeForm;

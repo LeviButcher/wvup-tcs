@@ -8,7 +8,26 @@ import {
   VictoryTooltip
 } from 'victory';
 
-const BarChart = ({ data, x, y, xLabel, yLabel, title, labels, ...props }) => (
+type Props = {
+  data: any,
+  x: any => string,
+  y: any => string,
+  xLabel?: string,
+  yLabel: string,
+  title: string,
+  labels: any => string
+};
+
+const BarChart = ({
+  data,
+  x,
+  y,
+  xLabel,
+  yLabel,
+  title,
+  labels,
+  ...props
+}: Props) => (
   <VictoryChart
     theme={VictoryTheme.material}
     domainPadding={20}
@@ -35,5 +54,9 @@ const BarChart = ({ data, x, y, xLabel, yLabel, title, labels, ...props }) => (
     />
   </VictoryChart>
 );
+
+BarChart.defaultProps = {
+  xLabel: ''
+};
 
 export default BarChart;
