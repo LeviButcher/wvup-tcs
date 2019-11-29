@@ -73,13 +73,13 @@ const ClassTourLookup = ({
               <Paging
                 currentPage={getProperty(data.headers, 'current-page')}
                 totalPages={getProperty(data.headers, 'total-pages')}
-                basePath={`/dashboard/tours/${startDate}/${endDate}/`}
+                basePath={`/dashboard/tours/${startDate}/${endDate}`}
               />
               <ClassToursTable classTours={data.body} />
               <Paging
                 currentPage={getProperty(data.headers, 'current-page')}
                 totalPages={getProperty(data.headers, 'total-pages')}
-                basePath={`/dashboard/tours/${startDate}/${endDate}/`}
+                basePath={`/dashboard/tours/${startDate}/${endDate}`}
               />
             </Card>
           )}

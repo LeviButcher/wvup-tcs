@@ -11,13 +11,13 @@ import {
 } from 'victory';
 
 type Props = {
-  data: {},
-  x: ({}) => string,
-  y: ({}) => string,
+  data: any,
+  x: any => string,
+  y: any => string,
   xLabel: string,
   yLabel: string,
   title: string,
-  labels: string
+  labels: any => string
 };
 
 const LineChart = ({

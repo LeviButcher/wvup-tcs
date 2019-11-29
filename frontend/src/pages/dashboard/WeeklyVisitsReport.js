@@ -6,28 +6,37 @@ import StartToEndDateForm from '../../components/StartToEndDateForm';
 import useApiWithHeaders from '../../hooks/useApiWithHeaders';
 import LoadingContent from '../../components/LoadingContent';
 
-const WeeklyVisitsReport = ({ navigate, '*': unMatchedUri }) => {
+type Props = {
+  navigate: any,
+  '*': string
+};
+
+const WeeklyVisitsReport = ({ navigate, '*': unMatchedUri }: Props) => {
   const [start, end] = unMatchedUri.split('/');
   return (
     <ReportLayout>
       <StartToEndDateForm
+        title="Weekly Visits Report"
         style={{ gridArea: 'form' }}
-        onSubmit={({ startDate, endDate }, { setSubmitting }) => {
-          navigate(`${startDate}/${endDate}`);
-          setSubmitting(false);
+        onSubmit={({ startDate, endDate }) => {
+          return Promise.resolve(navigate(`${startDate}/${endDate}`));
         }}
-        startDate={start}
-        endDate={end}
-        name="Weekly Visits Report"
+        initialValues={{ startDate: start, endDate: end }}
       />
       <Router primary={false} component={({ children }) => <>{children}</>}>
+        {/* $FlowFixMe */}
         <VisitsResults path=":startDate/:endDate" />
       </Router>
     </ReportLayout>
   );
 };
 
-const VisitsResults = ({ startDate, endDate }) => {
+type VisitsResultsProps = {
+  startDate: string,
+  endDate: string
+};
+
+const VisitsResults = ({ startDate, endDate }: VisitsResultsProps) => {
   const [loading, data, errors] = useApiWithHeaders(
     `reports/weekly-visits?start=${startDate}&end=${endDate}`
   );

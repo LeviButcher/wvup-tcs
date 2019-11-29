@@ -51,7 +51,12 @@ const sumColumnsForPieChartsReducer = (acc, cur) => {
   return [completed, dropped, passed];
 };
 
-const SuccessReport = ({ navigate, '*': unMatchedUri }) => {
+type Props = {
+  navigate: any,
+  '*': string
+};
+
+const SuccessReport = ({ navigate, '*': unMatchedUri }: Props) => {
   const [semesterUri] = unMatchedUri.split('/');
   return (
     <ReportLayout>
@@ -65,13 +70,18 @@ const SuccessReport = ({ navigate, '*': unMatchedUri }) => {
         }}
       />
       <Router primary={false} component={({ children }) => <>{children}</>}>
+        {/* $FlowFixMe */}
         <SuccessResult path=":semester" />
       </Router>
     </ReportLayout>
   );
 };
 
-const SuccessResult = ({ semester }) => {
+type SuccessReportProps = {
+  semester: string
+};
+
+const SuccessResult = ({ semester }: SuccessReportProps) => {
   const [loading, data, errors] = useApiWithHeaders(
     `reports/success/${semester}`
   );

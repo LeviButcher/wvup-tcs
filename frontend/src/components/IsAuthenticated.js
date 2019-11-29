@@ -1,12 +1,18 @@
 import React, { useEffect, useState } from 'react';
+import type { Node } from 'react';
 import { navigate } from '@reach/router';
 import callApi from '../utils/callApi';
 
 const checkAuth = () => callApi(`users/IsAuthenticate`, 'GET', null);
 
+type Props = {
+  redirectRoute: string,
+  children: Node
+};
+
 // Redirect to route is not signed in, else render component
 // Need to add loading state
-const IsAuthenticated = ({ redirectRoute, children }) => {
+const IsAuthenticated = ({ redirectRoute, children }: Props) => {
   const [isAuth, setAuth] = useState(false);
 
   useEffect(() => {

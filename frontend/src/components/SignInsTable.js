@@ -13,7 +13,7 @@ function hourDifferenceInTime(date, date2) {
 }
 
 type Props = {
-  signIns: [SignIn]
+  signIns: Array<SignIn>
 };
 
 const SignInsTable = ({ signIns }: Props) => {

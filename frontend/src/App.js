@@ -52,10 +52,12 @@ function App() {
           <IsAuthenticated redirectRoute="/login" path="/dashboard">
             <DashboardLayout path="/">
               <Welcome path="/" />
+              {/* // $FlowFixMe */}
               <SignInLookup path="/signins/*" />
               <CreateSignIn path="/signins/create" />
               {/* // $FlowFixMe */}
               <UpdateSignIn path="/signins/:id" />
+              {/* // $FlowFixMe */}
               <SemesterSignIns path="/signins/semester/*" />
               {/* // $FlowFixMe */}
               <ClassTourLookup path="/tours/" />
@@ -66,15 +68,21 @@ function App() {
               <CreateClassTour path="/tours/create" />
               {/* // $FlowFixMe */}
               <UpdateClassTour path="/tours/update/:id" />
+              {/* // $FlowFixMe */}
               <ClassTourReport path="/report/tours/*" />
+              {/* // $FlowFixMe */}
               <VolunteerReport path="/report/volunteer/*" />
+              {/* // $FlowFixMe */}
               <WeeklyVisitsReport path="/report/weekly-visits/*" />
+              {/* // $FlowFixMe */}
               <PeakHoursReport path="/report/peak-hours/*" />
+              {/* // $FlowFixMe */}
               <ReasonForVisitingReport path="/report/reason-for-visiting/*" />
               <UserManagement path="/admin/users" />
               <CreateUser path="/admin/users/create" />
               {/* $FlowFixMe */}
               <UpdateUser path="/admin/users/update/:id" />
+              {/* // $FlowFixMe */}
               <SuccessReport path="/report/success/*" />
               <ReasonManagement path="/admin/reason" />
               <CreateReason path="/admin/reason/create" />

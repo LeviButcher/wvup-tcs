@@ -8,6 +8,7 @@ type LabelWithPercentageProps = {
   datum: { _y: number }
 };
 
+// Victory Passes in a lot more props then just these
 const LabelWithPercentage = ({
   text,
   data,
@@ -30,9 +31,9 @@ const LabelWithPercentage = ({
 };
 
 type Props = {
-  data: Array<Object>,
-  x: ({}) => number,
-  y: ({}) => number,
+  data: any,
+  x: any => number,
+  y: any => number,
   title: string
 };
 
@@ -50,7 +51,10 @@ const PieChart = ({ data, x, y, title, ...props }: Props) => (
       y={y}
       theme={VictoryTheme.material}
       style={{ labels: { fill: 'black' } }}
-      labelComponent={LabelWithPercentage}
+      // Victory doesn't have labelComponent as a render prop, but still automatically
+      // Passes in props to the provide react component
+      // $FlowFixMe
+      labelComponent={<LabelWithPercentage />}
       {...props}
     />
     <VictoryLabel
@@ -61,7 +65,6 @@ const PieChart = ({ data, x, y, title, ...props }: Props) => (
       style={{ fontSize: '20px' }}
     />
     <text x={250} y={500} textAnchor="middle">
-      {/* // $FlowFixMe */}
       Total Students:{data.map(d => y(d)).reduce(add, 0)}
     </text>
   </svg>

@@ -9,6 +9,7 @@ import { Link, Card, Button, Input } from '../../ui';
 import Paging from '../../components/Paging';
 import SignInsTable from '../../components/SignInsTable';
 import useApiWithHeaders from '../../hooks/useApiWithHeaders';
+import { getProperty } from '../../utils';
 
 const SignInLookupSchema = StartToEndDateSchema.shape({
   email: Yup.string()
@@ -41,7 +42,11 @@ const getQueryParams = url => {
   return params;
 };
 
-const SignInLookup = ({ navigate }) => {
+type Props = {
+  navigate: any
+};
+
+const SignInLookup = ({ navigate }: Props) => {
   const [{ startDate, endDate, email, crn }, setFormValues] = useState({});
 
   return (
@@ -58,10 +63,7 @@ const SignInLookup = ({ navigate }) => {
             }}
           >
             <Link to="/dashboard/signins/create">
-              <Button align="left">Create Student Sign In</Button>
-            </Link>
-            <Link to="/dashboard/signins/teacher/create">
-              <Button align="left">Create Teacher Sign In</Button>
+              <Button align="left">Create Sign In</Button>
             </Link>
             <Link to="/dashboard/signins/semester">
               <Button align="left">Download Semesters Signins</Button>
@@ -70,14 +72,14 @@ const SignInLookup = ({ navigate }) => {
         </Card>
 
         <StartToEndDate
-          name="Sign In Lookup"
-          onSubmit={(values, { setSubmitting }) => {
-            navigate(
-              `${values.startDate}/${values.endDate}/1/?email=${values.email}&crn=${values.crn}`
+          title="Sign In Lookup"
+          onSubmit={values => {
+            return Promise.resolve(
+              navigate(
+                `${values.startDate}/${values.endDate}/1/?email=${values.email}&crn=${values.crn}`
+              )
             );
-            setSubmitting(false);
           }}
-          submitText="Run Lookup"
           initialValues={{
             startDate: startDate || '',
             endDate: endDate || '',
@@ -85,7 +87,6 @@ const SignInLookup = ({ navigate }) => {
             crn: crn || ''
           }}
           validationSchema={SignInLookupSchema}
-          enableReinitialize
         >
           <Field
             id="email"
@@ -103,6 +104,7 @@ const SignInLookup = ({ navigate }) => {
           />
         </StartToEndDate>
         <Router primary={false}>
+          {/* $FlowFixMe */}
           <LookupResults
             path=":startDate/:endDate/:page"
             setFormValues={setFormValues}
@@ -113,7 +115,19 @@ const SignInLookup = ({ navigate }) => {
   );
 };
 
-const LookupResults = ({ startDate, endDate, page, setFormValues }) => {
+type LookupResultsProps = {
+  startDate: string,
+  endDate: string,
+  page: number,
+  setFormValues: ({}) => any
+};
+
+const LookupResults = ({
+  startDate,
+  endDate,
+  page,
+  setFormValues
+}: LookupResultsProps) => {
   const cachedSetFormValues = useCallback(args => setFormValues(args), [
     setFormValues
   ]);
@@ -132,21 +146,15 @@ const LookupResults = ({ startDate, endDate, page, setFormValues }) => {
       {!loading && data && data.headers && data.body.length >= 1 && (
         <Card width="auto">
           <Paging
-            currentPage={data.headers['current-page']}
-            totalPages={data.headers['total-pages']}
-            next={data.headers.next}
-            prev={data.headers.prev}
-            queries={{ email, crn }}
-            baseURL={`/dashboard/signins/${startDate}/${endDate}/`}
+            currentPage={getProperty(data.headers, 'current-page')}
+            totalPages={getProperty(data.headers, 'total-pages')}
+            basePath={`/dashboard/signins/${startDate}/${endDate}`}
           />
           <SignInsTable signIns={data.body} />
           <Paging
-            currentPage={data.headers['current-page']}
-            totalPages={data.headers['total-pages']}
-            next={data.headers.next}
-            prev={data.headers.prev}
-            queries={{ email, crn }}
-            baseURL={`/dashboard/signins/${startDate}/${endDate}/`}
+            currentPage={getProperty(data.headers, 'current-page')}
+            totalPages={getProperty(data.headers, 'total-pages')}
+            basePath={`/dashboard/signins/${startDate}/${endDate}`}
           />
         </Card>
       )}

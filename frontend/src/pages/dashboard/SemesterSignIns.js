@@ -5,26 +5,35 @@ import LoadingContent from '../../components/LoadingContent';
 import SemesterForm from '../../components/SemesterForm';
 import useApiWithHeaders from '../../hooks/useApiWithHeaders';
 
-const SemesterSignIns = ({ navigate, '*': unMatchedUri }) => {
+type Props = {
+  navigate: any,
+  '*': string
+};
+
+const SemesterSignIns = ({ navigate, '*': unMatchedUri }: Props) => {
   const [semesterUri] = unMatchedUri.split('/');
   return (
     <>
       <SemesterForm
         title="Semester Lookup"
         initialValues={{ semester: semesterUri }}
-        onSubmit={({ semester }, { setSubmitting }) => {
-          navigate(semester);
-          setSubmitting(false);
+        onSubmit={({ semester }) => {
+          return Promise.resolve(navigate(semester));
         }}
       />
       <Router primary={false} component={({ children }) => <>{children}</>}>
+        {/* $FlowFixMe */}
         <SemesterResults path=":semester" />
       </Router>
     </>
   );
 };
 
-const SemesterResults = ({ semester }) => {
+type SemesterResultsProps = {
+  semester: string
+};
+
+const SemesterResults = ({ semester }: SemesterResultsProps) => {
   const [loading, data, errors] = useApiWithHeaders(
     `lookups/semester/${semester}`
   );

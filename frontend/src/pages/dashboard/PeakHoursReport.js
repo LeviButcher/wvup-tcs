@@ -6,28 +6,37 @@ import StartToEndDateForm from '../../components/StartToEndDateForm';
 import LoadingContent from '../../components/LoadingContent';
 import useApiWithHeaders from '../../hooks/useApiWithHeaders';
 
-const PeakHoursReport = ({ navigate, '*': unMatchedUri }) => {
+type Props = {
+  navigate: any,
+  '*': string
+};
+
+const PeakHoursReport = ({ navigate, '*': unMatchedUri }: Props) => {
   const [start, end] = unMatchedUri.split('/');
   return (
     <ReportLayout>
       <StartToEndDateForm
+        title="Peak Hours Report"
         style={{ gridArea: 'form' }}
-        onSubmit={({ startDate, endDate }, { setSubmitting }) => {
-          navigate(`${startDate}/${endDate}`);
-          setSubmitting(false);
+        onSubmit={({ startDate, endDate }) => {
+          return Promise.resolve(navigate(`${startDate}/${endDate}`));
         }}
-        startDate={start}
-        endDate={end}
-        name="Peak Hours Report"
+        initialValues={{ startDate: start, endDate: end }}
       />
       <Router primary={false} component={({ children }) => <>{children}</>}>
+        {/* $FlowFixMe */}
         <PeakHoursResult path=":startDate/:endDate" />
       </Router>
     </ReportLayout>
   );
 };
 
-const PeakHoursResult = ({ startDate, endDate }) => {
+type PeakHoursResultProps = {
+  startDate: string,
+  endDate: string
+};
+
+const PeakHoursResult = ({ startDate, endDate }: PeakHoursResultProps) => {
   const [loading, data, errors] = useApiWithHeaders(
     `reports/peakhours?start=${startDate}&end=${endDate}`
   );
