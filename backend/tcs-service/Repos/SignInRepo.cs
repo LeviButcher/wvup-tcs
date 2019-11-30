@@ -163,7 +163,7 @@ namespace tcs_service.Repos
 
         public async Task<bool> PersonExist(int id)
         {
-            return await _db.People.AnyAsync(e => e.ID == id);
+            return await _db.People.AnyAsync(e => e.Id == id);
         }
 
         public async Task<bool> PersonExist(string email)
@@ -220,8 +220,8 @@ namespace tcs_service.Repos
 
         public async Task<SignIn> GetMostRecentSignInByID(int id)
         {
-            var person = await _db.People.Where(x => x.ID == id).FirstOrDefaultAsync();
-            var signIn = await GetMostRecentSignIn(person.ID);
+            var person = await _db.People.Where(x => x.Id == id).FirstOrDefaultAsync();
+            var signIn = await GetMostRecentSignIn(person.Id);
 
             return signIn;
         }
@@ -229,7 +229,7 @@ namespace tcs_service.Repos
         public async Task<SignIn> GetMostRecentSignInByEmail(string email)
         {
             var person = await _db.People.Where(x => x.Email == email).FirstAsync();
-            var signIn = await GetMostRecentSignIn(person.ID);
+            var signIn = await GetMostRecentSignIn(person.Id);
 
             return signIn;
         }
@@ -251,7 +251,7 @@ namespace tcs_service.Repos
                 Email = result.studentEmail,
                 LastName = result.lastName,
                 FirstName = result.firstName,
-                ID = result.studentID
+                Id = result.studentID
             };
             await AddOrDoNothingIfExistsPerson(student);
             await AddRangeOrDoNothingIfExistsCourse(result.classSchedule);
@@ -262,7 +262,7 @@ namespace tcs_service.Repos
 
         private async Task AddOrDoNothingIfExistsPerson(Person person)
         {
-            if (await _db.People.AnyAsync(x => x.ID == person.ID)) return;
+            if (await _db.People.AnyAsync(x => x.Id == person.Id)) return;
             await _db.People.AddAsync(person);
             await _db.SaveChangesAsync();
             return;
@@ -293,7 +293,7 @@ namespace tcs_service.Repos
                 Email = result.studentEmail,
                 LastName = result.lastName,
                 FirstName = result.firstName,
-                ID = result.studentID
+                Id = result.studentID
             };
             await AddOrDoNothingIfExistsPerson(student);
             await AddRangeOrDoNothingIfExistsCourse(result.classSchedule);
@@ -309,7 +309,7 @@ namespace tcs_service.Repos
                 Email = result.teacherEmail,
                 LastName = result.lastName,
                 FirstName = result.firstName,
-                ID = result.teacherID,
+                Id = result.teacherID,
                 PersonType = PersonType.Teacher
             };
             await AddOrDoNothingIfExistsPerson(teacher);
@@ -325,7 +325,7 @@ namespace tcs_service.Repos
                 Email = result.teacherEmail,
                 LastName = result.lastName,
                 FirstName = result.firstName,
-                ID = result.teacherID,
+                Id = result.teacherID,
                 PersonType = PersonType.Teacher
             };
             await AddOrDoNothingIfExistsPerson(teacher);

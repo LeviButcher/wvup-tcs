@@ -9,7 +9,7 @@ namespace tcs_service.Models
     public class Person
     {
         [Key]
-        public int ID { get; set; }
+        public int Id { get; set; }
 
         [Required]
         public string Email { get; set; }
@@ -22,6 +22,8 @@ namespace tcs_service.Models
 
         [Required]
         public string LastName { get; set; }
+
+        public IEnumerable<Course> Schedule;
     }
 
     public enum PersonType

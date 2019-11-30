@@ -52,7 +52,7 @@ namespace tcs_service_test.Repos
             signIns = signIns.Select(x =>
             {
                 x.SemesterId = semester.ID;
-                x.PersonId = person.ID;
+                x.PersonId = person.Id;
                 return x;
             });
             db.SignIns.AddRange(signIns);

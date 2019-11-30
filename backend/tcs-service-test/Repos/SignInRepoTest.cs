@@ -126,7 +126,7 @@ namespace tcs_service_test.Repos
             await db.SaveChangesAsync();
 
             var signIn = fixture.Create<SignIn>();
-            signIn.PersonId = person.ID;
+            signIn.PersonId = person.Id;
             signIn.InTime = DateTime.Now.AddHours(-1);
             signIn.OutTime = DateTime.Now;
             var choosenCourses = fixture.CreateMany<Course>().Append(course).Select(x => new SignInCourse() { Course = x });

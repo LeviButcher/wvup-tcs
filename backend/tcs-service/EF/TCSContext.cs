@@ -16,6 +16,8 @@ namespace tcs_service.EF
 
         public DbSet<Reason> Reasons { get; set; }
 
+        public DbSet<Schedule> Schedules { get; set; }
+
         public DbSet<SignIn> SignIns { get; set; }
 
         public DbSet<Semester> Semesters { get; set; }
@@ -63,7 +65,7 @@ namespace tcs_service.EF
             .ValueGeneratedNever();
 
             modelBuilder.Entity<Person>()
-             .Property(p => p.ID)
+             .Property(p => p.Id)
              .ValueGeneratedNever();
 
             modelBuilder.Entity<Department>()
