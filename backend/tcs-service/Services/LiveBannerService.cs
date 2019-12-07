@@ -18,6 +18,11 @@ namespace tcs_service.Services
             this.mapper = mapper;
         }
 
+        public Task<BannerPersonInfo> GetBannerInfo(string identifier)
+        {
+            return null;
+        }
+
         public async Task<CourseWithGradeViewModel> GetStudentGrade(int studentId, int crn, int termCode)
         {
             var response = await bannerApi.GetAsync($"student/{studentId}/{termCode}/{crn}");

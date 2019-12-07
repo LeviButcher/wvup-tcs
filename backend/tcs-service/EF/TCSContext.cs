@@ -61,7 +61,7 @@ namespace tcs_service.EF
             .ValueGeneratedNever();
 
             modelBuilder.Entity<Semester>()
-            .Property(p => p.ID)
+            .Property(p => p.Code)
             .ValueGeneratedNever();
 
             modelBuilder.Entity<Person>()

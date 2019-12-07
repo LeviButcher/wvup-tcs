@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -9,9 +8,18 @@ namespace tcs_service.Models
         [Key]
         public int PersonId { get; set; }
 
-        public int ClassId { get; set; }
+        [ForeignKey(nameof(PersonId))]
+        public Person Person { get; set; }
 
-        public int SemesterId { get; set; }
+        public int CourseCRN { get; set; }
+
+        [ForeignKey(nameof(CourseCRN))]
+        public Course Course { get; set; }
+
+        public int SemesterCode { get; set; }
+
+        [ForeignKey(nameof(SemesterCode))]
+        public Semester Semester { get; set; }
 
     }
 }

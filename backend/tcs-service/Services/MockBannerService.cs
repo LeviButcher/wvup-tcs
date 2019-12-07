@@ -25,6 +25,11 @@ namespace tcs_service.Services
             _db = new TCSContext(options);
         }
 
+        public Task<BannerPersonInfo> GetBannerInfo(string identifier)
+        {
+            return null;
+        }
+
 
         public async Task<CourseWithGradeViewModel> GetStudentGrade(int studentId, int crn, int termCode)
         {
@@ -35,7 +40,7 @@ namespace tcs_service.Services
             return new CourseWithGradeViewModel()
             {
                 CRN = course.CRN,
-                CourseName = course.CourseName,
+                CourseName = course.Name,
                 DepartmentName = course.Department.Name,
                 Grade = (Grade)new Random().Next(grades.Length),
             };

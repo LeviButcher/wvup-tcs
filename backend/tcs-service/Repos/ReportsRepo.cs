@@ -99,7 +99,7 @@ namespace tcs_service.Repos
                          {
                              ReasonName = reason.Reason.Name,
                              ReasonId = reason.ReasonID,
-                             CourseName = course.Course.CourseName,
+                             CourseName = course.Course.Name,
                              CourseId = course.CourseID
                          };
 
@@ -112,7 +112,7 @@ namespace tcs_service.Repos
                                  select new
                                  {
 
-                                     CourseName = course.Course.CourseName,
+                                     CourseName = course.Course.Name,
                                      CourseId = course.CourseID
                                  };
 

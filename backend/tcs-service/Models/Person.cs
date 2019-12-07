@@ -22,8 +22,6 @@ namespace tcs_service.Models
 
         [Required]
         public string LastName { get; set; }
-
-        public IEnumerable<Course> Schedule;
     }
 
     public enum PersonType
