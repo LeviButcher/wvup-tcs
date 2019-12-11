@@ -26,6 +26,14 @@ namespace tcs_service.EF
 
         public DbSet<Department> Departments { get; set; }
 
+        public DbSet<Session> Sessions { get; set; }
+
+        public DbSet<Class> Classes { get; set; }
+
+        public DbSet<SessionReason> SessionReasons { get; set; } 
+
+        public DbSet<SessionClass> SessionClasses { get; set; } 
+
         public TCSContext()
         {
 
@@ -54,9 +62,17 @@ namespace tcs_service.EF
 
             modelBuilder.Entity<SignInReason>().HasKey(key => new { key.SignInID, key.ReasonID });
 
+            modelBuilder.Entity<SessionReason>().HasKey(key => new { key.SessionID, key.ReasonID });
+
+            modelBuilder.Entity<SessionClass>().HasKey(key => new { key.SessionID, key.ClassID});
+
             modelBuilder.Entity<Course>()
             .Property(p => p.CRN)
             .ValueGeneratedNever();
+
+            modelBuilder.Entity<Class>()
+             .Property(p => p.CRN)
+             .ValueGeneratedNever();
 
             modelBuilder.Entity<Semester>()
             .Property(p => p.ID)

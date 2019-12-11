@@ -11,7 +11,7 @@
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="8.1.1" />
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="6.1.1" />
-    <PackageReference Include="Microsoft.AspNetCore.App" Version="2.2.0"/>
+    <PackageReference Include="Microsoft.AspNetCore.App" Version="2.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.Razor.Design" Version="2.2.0" PrivateAssets="All" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="2.2.4" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="2.2.4" />
@@ -25,6 +25,15 @@
     <Content Include="SampleData/**/*.*">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="Migrations\20191201004817_updateClass.cs" />
+    <Compile Remove="Migrations\20191201004817_updateClass.Designer.cs" />
+    <Compile Remove="Migrations\20191201010102_AddSessions.cs" />
+    <Compile Remove="Migrations\20191201010102_AddSessions.Designer.cs" />
+    <Compile Remove="Migrations\20191201010404_UpdateClass.cs" />
+    <Compile Remove="Migrations\20191201010404_UpdateClass.Designer.cs" />
   </ItemGroup>
 
 </Project>

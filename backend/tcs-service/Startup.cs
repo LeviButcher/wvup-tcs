@@ -122,6 +122,7 @@ namespace tcs_service
             services.AddScoped<IReportsRepo, ReportsRepo>();
             services.AddScoped<IReasonRepo, ReasonRepo>();
             services.AddScoped<ILookupRepo, LookupRepo>();
+            services.AddScoped<ISessionRepo, SessionRepo>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
