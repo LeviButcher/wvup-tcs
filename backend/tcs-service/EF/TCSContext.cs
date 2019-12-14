@@ -71,6 +71,9 @@ namespace tcs_service.EF
             modelBuilder.Entity<Department>()
             .Property(p => p.Code)
             .ValueGeneratedNever();
+
+            modelBuilder.Entity<Schedule>()
+            .HasKey(key => new { key.CourseCRN, key.PersonId, key.SemesterCode });
         }
     }
 }

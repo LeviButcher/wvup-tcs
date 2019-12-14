@@ -10,6 +10,7 @@ using Moq;
 using tcs_service.Controllers;
 using tcs_service.Helpers;
 using tcs_service.Models;
+using tcs_service.Models.DTOs;
 using tcs_service.Repos.Interfaces;
 using Xunit;
 using System.Collections.Generic;

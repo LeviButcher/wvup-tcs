@@ -4,7 +4,7 @@ using tcs_service.Models.DTOs;
 
 namespace tcs_service.UnitOfWorks
 {
-    interface IUnitOfWorkPerson
+    public interface IUnitOfWorkPerson
     {
         Task<PersonInfoDTO> GetPersonInfo(string identifier, DateTime currentDate);
     }

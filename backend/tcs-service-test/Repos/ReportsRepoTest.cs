@@ -16,17 +16,17 @@ namespace tcs_service_test.Repos
 {
     public class ReportsRepoTest : IDisposable
     {
-        ReportsRepo reportsRepo;
-        string dbName = "ReportRepoTest";
-        IFixture fixture;
-        TCSContext db;
+        readonly ReportsRepo reportsRepo;
+        readonly string dbName = "ReportRepoTest";
+        readonly IFixture fixture;
+        readonly TCSContext db;
 
 
         public ReportsRepoTest()
         {
             var dbOptions = DbInMemory.getDbInMemoryOptions(dbName);
             db = new TCSContext(dbOptions);
-            IBannerService bs = new MockBannerService(dbOptions);
+            IBannerService bs = new MockBannerService(new PersonRepo(dbOptions), new SemesterRepo(dbOptions), new CourseRepo(dbOptions));
             reportsRepo = new ReportsRepo(db, bs);
             fixture = new Fixture()
               .Customize(new AutoMoqCustomization());

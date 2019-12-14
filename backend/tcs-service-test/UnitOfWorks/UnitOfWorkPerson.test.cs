@@ -28,10 +28,11 @@ namespace tcs_service_test.Controllers
             var courseRepo = new CourseRepo(dbInMemory);
             var scheduleRepo = new ScheduleRepo(dbInMemory);
             var semesterRepo = new SemesterRepo(dbInMemory);
+            var departmentRepo = new DepartmentRepo(dbInMemory);
             db = new TCSContext(dbInMemory);
             mockBannerService = new Mock<IBannerService>();
 
-            unitPerson = new UnitOfWorkPerson(personRepo, scheduleRepo, courseRepo, semesterRepo, mockBannerService.Object);
+            unitPerson = new UnitOfWorkPerson(personRepo, scheduleRepo, courseRepo, semesterRepo, departmentRepo, mockBannerService.Object);
         }
 
         public void Dispose()
@@ -75,6 +76,15 @@ namespace tcs_service_test.Controllers
                     CRN=13548,
                     ShortName="CS 101",
                     Department= new BannerDepartment(){
+                        Name="STEM",
+                        Code=42
+                    }
+                },
+                new BannerCourse() {
+                    CourseName="Intro to Web Design",
+                    CRN=13464,
+                    ShortName="CS 129",
+                    Department = new BannerDepartment() {
                         Name="STEM",
                         Code=42
                     }

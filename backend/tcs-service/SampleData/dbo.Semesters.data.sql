@@ -1,13 +1,13 @@
 ﻿
 INSERT INTO [dbo].[Semesters]
-    ([Id], [Name])
+    ([Code])
 VALUES
-    (201903, N'Summer 2019')
+    (201903)
 INSERT INTO [dbo].[Semesters]
-    ([Id], [Name])
+    ([Code])
 VALUES
-    (201902, N'Spring 2019')
+    (201902)
 INSERT INTO [dbo].[Semesters]
-    ([Id], [Name])
+    ([Code])
 VALUES
-    (201901, N'Fall 2018')
+    (201901)

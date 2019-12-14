@@ -10,6 +10,6 @@ namespace tcs_service.Repos
     {
         public CourseRepo(DbContextOptions options) : base(options) { }
 
-        protected override IQueryable<Course> Include(DbSet<Course> set) => set;
+        protected override IQueryable<Course> Include(DbSet<Course> set) => set.Include(x => x.Department);
     }
 }

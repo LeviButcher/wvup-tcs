@@ -1,5 +1,4 @@
 using System;
-using System.Data.Common;
 using System.Linq;
 using System.Threading.Tasks;
 using tcs_service.Models.DTOs;
@@ -15,14 +14,16 @@ namespace tcs_service.UnitOfWorks
         private readonly IScheduleRepo scheduleRepo;
         private readonly ICourseRepo courseRepo;
         private readonly ISemesterRepo semesterRepo;
+        private readonly IDepartmentRepo departmentRepo;
         private readonly IBannerService bannerApi;
 
-        public UnitOfWorkPerson(IPersonRepo personRepo, IScheduleRepo scheduleRepo, ICourseRepo courseRepo, ISemesterRepo semesterRepo, IBannerService bannerApi)
+        public UnitOfWorkPerson(IPersonRepo personRepo, IScheduleRepo scheduleRepo, ICourseRepo courseRepo, ISemesterRepo semesterRepo, IDepartmentRepo departmentRepo, IBannerService bannerApi)
         {
             this.personRepo = personRepo;
             this.scheduleRepo = scheduleRepo;
             this.courseRepo = courseRepo;
             this.semesterRepo = semesterRepo;
+            this.departmentRepo = departmentRepo;
             this.bannerApi = bannerApi;
         }
 
@@ -96,17 +97,24 @@ namespace tcs_service.UnitOfWorks
                     PersonType = savedPerson.PersonType
                 };
             }
+            var departments = bannerInfo.Courses.Select(x => x.Department).Select(x => new Department()
+            {
+                Code = x.Code,
+                Name = x.Name
+            });
+            foreach (var d in departments)
+            {
+                await departmentRepo.CreateOrUpdate(x => x.Code == d.Code, d);
+            }
+
             var courses = bannerInfo.Courses.Select(x => new Course()
             {
                 CRN = x.CRN,
                 Name = x.CourseName,
                 ShortName = x.ShortName,
-                Department = new Department()
-                {
-                    Code = x.Department.Code,
-                    Name = x.Department.Name
-                }
+                DepartmentID = x.Department.Code
             });
+
             foreach (var c in courses)
             {
                 await courseRepo.CreateOrUpdate(x => x.CRN == c.CRN, c);

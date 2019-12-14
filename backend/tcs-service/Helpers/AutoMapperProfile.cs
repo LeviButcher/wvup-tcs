@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using System.Linq;
 using tcs_service.Models;
+using tcs_service.Models.DTOs;
 using tcs_service.Models.ViewModels;
 
 namespace tcs_service.Helpers

@@ -1,13 +1,8 @@
 using System;
 using System.Threading.Tasks;
-using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using tcs_service.Helpers;
-using tcs_service.Models;
-using tcs_service.Models.ViewModels;
-using tcs_service.Repos.Interfaces;
+using tcs_service.UnitOfWorks;
 
 namespace tcs_service.Controllers
 {
@@ -17,25 +12,18 @@ namespace tcs_service.Controllers
     [ApiController]
     public class PersonController : ControllerBase
     {
-        readonly IPersonRepo personRepo;
+        private readonly IUnitOfWorkPerson unitPerson;
 
-        public PersonController(IPersonRepo personRepo)
+        public PersonController(IUnitOfWorkPerson unitPerson)
         {
-            this.personRepo = personRepo;
+            this.unitPerson = unitPerson;
         }
 
-        [HttpGet("{email}")]
-        public IActionResult GetWithEmail(string email)
+        [HttpGet("{identifier}")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetInfo(string identifier)
         {
-            //Check
-
-            return Ok();
-        }
-
-        [HttpGet("{id:int}")]
-        public IActionResult GetWithId(int id)
-        {
-            return Ok();
+            return Ok(await unitPerson.GetPersonInfo(identifier, DateTime.Now));
         }
     }
 }

@@ -5,7 +5,6 @@ namespace tcs_service.Models
 {
     public class Schedule
     {
-        [Key]
         public int PersonId { get; set; }
 
         [ForeignKey(nameof(PersonId))]

@@ -7,16 +7,18 @@ using System.Threading.Tasks;
 using Xunit;
 using System.Collections.Generic;
 using tcs_service.Models;
+using tcs_service.Models.DTOs;
 using Newtonsoft.Json;
+using tcs_integration.test_utils;
 
 namespace tcs_integration.Controllers
 {
     [Collection("Integration")]
-    public class ReasonsControllerTest : IClassFixture<WebApplicationFactory<Startup>>
+    public class ReasonsControllerTest : IClassFixture<CustomWebApplicationFactory<Startup>>
     {
-        private readonly WebApplicationFactory<Startup> _factory;
+        private readonly CustomWebApplicationFactory<Startup> _factory;
 
-        public ReasonsControllerTest(WebApplicationFactory<Startup> factory)
+        public ReasonsControllerTest(CustomWebApplicationFactory<Startup> factory)
         {
             _factory = factory;
         }
@@ -72,7 +74,7 @@ namespace tcs_integration.Controllers
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             var reasons = await response.Content.ReadAsAsync<IEnumerable<Reason>>();
 
-            Assert.All(reasons, r => Assert.Equal(false, r.Deleted));
+            Assert.All(reasons, r => Assert.False(r.Deleted));
         }
 
         [Fact]
@@ -89,7 +91,7 @@ namespace tcs_integration.Controllers
             Assert.Equal(HttpStatusCode.Created, response.StatusCode);
             var reason = await response.Content.ReadAsAsync<Reason>();
             Assert.Equal("Bone Use", reason.Name);
-            Assert.Equal(false, reason.Deleted);
+            Assert.False(reason.Deleted);
         }
 
         [Fact]
@@ -106,7 +108,7 @@ namespace tcs_integration.Controllers
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             var reason = await response.Content.ReadAsAsync<Reason>();
             Assert.Equal("Computation Use", reason.Name);
-            Assert.Equal(true, reason.Deleted);
+            Assert.True(reason.Deleted);
         }
     }
 }
