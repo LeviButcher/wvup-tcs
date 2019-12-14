@@ -77,12 +77,12 @@ namespace tcs_service.UnitOfWorks
                 Id = bannerInfo.Id,
                 PersonType = bannerInfo.Teacher ? PersonType.Teacher : PersonType.Student
             };
-            var savedPerson = await personRepo.Create(newPerson);
+            var savedPerson = await personRepo.CreateOrUpdate(x => x.Id == newPerson.Id, newPerson);
             var semester = new Semester()
             {
                 Code = bannerInfo.SemesterId
             };
-            var savedSemester = await semesterRepo.Create(semester);
+            var savedSemester = await semesterRepo.CreateOrUpdate(x => x.Code == semester.Code, semester);
 
             // Done if person is a teacher
             if (savedPerson.PersonType == PersonType.Teacher)

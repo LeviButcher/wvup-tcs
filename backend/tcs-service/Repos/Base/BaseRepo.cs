@@ -41,9 +41,10 @@ namespace tcs_service.Repos.Base
 
         public async Task<T> CreateOrUpdate(Expression<Func<T, bool>> func, T t)
         {
-            var exists = await Exist(func);
-            if (exists)
+            var item = await Find(func);
+            if (item is T)
             {
+                _db.Entry(item).State = EntityState.Detached;
                 table.Update(t);
                 await SaveChangesAsync();
                 return t;
