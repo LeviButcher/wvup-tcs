@@ -4,25 +4,37 @@ using tcs_service.Models.ViewModels;
 using tcs_service.Services.Interfaces;
 using System.Threading.Tasks;
 using AutoMapper;
+using tcs_service.Helpers;
+using System.Net;
 
 namespace tcs_service.Services
 {
     public class LiveBannerService : IBannerService
     {
-        private readonly IMapper mapper;
-        private HttpClient bannerApi;
+        readonly private HttpClient bannerApi;
 
-        public LiveBannerService(IHttpClientFactory clientFactory, IMapper mapper)
+        public LiveBannerService(IHttpClientFactory clientFactory)
         {
             bannerApi = clientFactory.CreateClient("banner");
-            this.mapper = mapper;
         }
 
         public async Task<BannerPersonInfo> GetBannerInfo(string identifier)
         {
-            var response = await bannerApi.GetAsync($"student/{identifier}");
-            var personInfo = await response.Content.ReadAsAsync<BannerPersonInfo>();
-            return personInfo;
+            var cleanedIdentifier = identifier.Split("@")[0];
+
+            var studentResponse = await bannerApi.GetAsync($"student/{cleanedIdentifier}");
+            var studentInfo = await studentResponse.Content.ReadAsAsync<BannerPersonInfo>();
+            if (studentResponse.StatusCode == HttpStatusCode.OK) return studentInfo;
+
+
+            var teacherResponse = await bannerApi.GetAsync($"teacher/{cleanedIdentifier}");
+            var teacherInfo = await teacherResponse.Content.ReadAsAsync<BannerPersonInfo>();
+            if (teacherResponse.StatusCode == HttpStatusCode.OK) return teacherInfo;
+
+            if (studentResponse.StatusCode == HttpStatusCode.NotFound && teacherResponse.StatusCode == HttpStatusCode.NotFound)
+                throw new TCSException($"Could not find information on: {identifier}");
+
+            throw new TCSException("Banner is currently down");
         }
 
         public async Task<CourseWithGradeViewModel> GetStudentGrade(int studentId, int crn, int termCode)
@@ -39,39 +51,5 @@ namespace tcs_service.Services
                 Grade = (Grade)Enum.Parse(typeof(Grade), bannerGradeInfo.FinalGrade)
             };
         }
-
-        // public async Task<StudentInfoViewModel> GetStudentInfoWithEmail(string studentEmail)
-        // {
-        //     var emailStart = studentEmail.Split("@")[0];
-        //     var response = await bannerApi.GetAsync($"student/{emailStart}");
-        //     response.EnsureSuccessStatusCode();
-        //     var bannerStudentInfo = await response.Content.ReadAsAsync<BannerInformation>();
-        //     return mapper.Map<StudentInfoViewModel>(bannerStudentInfo);
-        // }
-
-        // public async Task<StudentInfoViewModel> GetStudentInfoWithID(int studentID)
-        // {
-        //     var response = await bannerApi.GetAsync($"student/{studentID}");
-        //     response.EnsureSuccessStatusCode();
-        //     var bannerStudentInfo = await response.Content.ReadAsAsync<BannerInformation>();
-        //     return mapper.Map<StudentInfoViewModel>(bannerStudentInfo);
-        // }
-
-        // public async Task<TeacherInfoViewModel> GetTeacherInfoWithEmail(string teacherEmail)
-        // {
-        //     var emailStart = teacherEmail.Split("@")[0];
-        //     var response = await bannerApi.GetAsync($"teacher/{emailStart}");
-        //     response.EnsureSuccessStatusCode();
-        //     var bannerStudentInfo = await response.Content.ReadAsAsync<BannerInformation>();
-        //     return mapper.Map<TeacherInfoViewModel>(bannerStudentInfo);
-        // }
-
-        // public async Task<TeacherInfoViewModel> GetTeacherInfoWithID(int teacherID)
-        // {
-        //     var response = await bannerApi.GetAsync($"teacher/{teacherID}");
-        //     response.EnsureSuccessStatusCode();
-        //     var bannerStudentInfo = await response.Content.ReadAsAsync<BannerInformation>();
-        //     return mapper.Map<TeacherInfoViewModel>(bannerStudentInfo);
-        // }
     }
 }

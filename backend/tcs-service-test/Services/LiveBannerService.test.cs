@@ -13,6 +13,7 @@ using WireMock.RequestBuilders;
 using WireMock.ResponseBuilders;
 using WireMock.Settings;
 using tcs_service_test.Helpers;
+using tcs_service.Helpers;
 
 namespace tcs_service_test.Services
 {
@@ -27,13 +28,15 @@ namespace tcs_service_test.Services
             {
                 Urls = new[] { "http://localhost:9000/" }
             });
-            var httpClient = new HttpClient();
-            httpClient.BaseAddress = new Uri("http://localhost:9000/");
+            var httpClient = new HttpClient()
+            {
+                BaseAddress = new Uri("http://localhost:9000/")
+            };
+
             Mock<IHttpClientFactory> mockHttpFactory = new Mock<IHttpClientFactory>();
             mockHttpFactory.Setup(x => x.CreateClient(It.IsAny<string>()))
                 .Returns(() => httpClient);
-            Mock<IMapper> mockMapper = new Mock<IMapper>();
-            bannerApi = new LiveBannerService(mockHttpFactory.Object, mockMapper.Object);
+            bannerApi = new LiveBannerService(mockHttpFactory.Object);
         }
 
         public void Dispose()
@@ -56,8 +59,10 @@ namespace tcs_service_test.Services
                 Teacher = false
             };
 
+            var cleanedIdentifier = identifier.Split("@")[0];
+
             server
-            .Given(Request.Create().WithPath($"/student/{identifier}").UsingGet())
+            .Given(Request.Create().WithPath($"/student/{cleanedIdentifier}").UsingGet())
             .RespondWith(
                 Response.Create()
                 .WithStatusCode(200)
@@ -84,9 +89,10 @@ namespace tcs_service_test.Services
                 LastName = "LoppySomph",
                 Teacher = true
             };
+            var cleanedIdentifier = identifier.Split("@")[0];
 
             server
-            .Given(Request.Create().WithPath($"/teacher/{identifier}").UsingGet())
+            .Given(Request.Create().WithPath($"/teacher/{cleanedIdentifier}").UsingGet())
             .RespondWith(
                 Response.Create()
                 .WithStatusCode(200)
@@ -98,6 +104,42 @@ namespace tcs_service_test.Services
 
             Assert.NotNull(teacherInfo);
             Assert.True(teacherInfo.Teacher);
+        }
+
+        [Fact]
+        public async Task GetBannerInfo_PersonNotFound_ShouldThrowTCSExceptionWithMessage()
+        {
+            var email = "whoami@wvup.edu";
+            var cleanedEmail = email.Split("@")[0];
+
+            server
+            .Given(Request.Create().WithPath($"/teacher/{cleanedEmail}").UsingGet())
+            .RespondWith(
+                Response.Create()
+                .WithStatusCode(404)
+                .WithHeader("Content-Type", "application/json")
+            );
+
+            var exception = await Assert.ThrowsAsync<TCSException>(async () => await bannerApi.GetBannerInfo(email));
+            Assert.Equal($"Could not find information on: {email}", exception.Message);
+        }
+
+        [Fact]
+        public async Task GetBannerInfo_BannerIsDown_ShouldThrowTCSExceptionWithMessage()
+        {
+            var email = "whoami@wvup.edu";
+            var cleanedEmail = email.Split("@")[0];
+
+            server
+            .Given(Request.Create().WithPath($"/teacher/{cleanedEmail}").UsingGet())
+            .RespondWith(
+                Response.Create()
+                .WithStatusCode(503)
+                .WithHeader("Content-Type", "application/json")
+            );
+
+            var exception = await Assert.ThrowsAsync<TCSException>(async () => await bannerApi.GetBannerInfo(email));
+            Assert.Equal($"Banner is currently down", exception.Message);
         }
     }
 }
