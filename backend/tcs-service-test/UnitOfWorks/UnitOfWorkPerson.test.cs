@@ -40,16 +40,6 @@ namespace tcs_service_test.Controllers
             db.Database.EnsureDeleted();
         }
 
-        private int ParseOrDefault(string toParse, int fallback)
-        {
-            int resultStorage;
-            bool success = Int32.TryParse(toParse, out resultStorage);
-            if (success) return resultStorage;
-            else return fallback;
-        }
-
-
-
         /*
             Use Case:
                 The very first student goes to sign into the system. Nothing exists in the database for that student or their courses.
@@ -68,7 +58,7 @@ namespace tcs_service_test.Controllers
         public async void GetPersonInfo_StudentIsNotSavedInDatabase_ShouldReturnPersonInfoAndSaveToDatabase(string identifier)
         {
             var email = identifier;
-            var id = ParseOrDefault(identifier, 19834567);
+            var id = Utils.ParseOrDefault(identifier, 19834567);
             var courses = new List<BannerCourse>()
             {
                 new BannerCourse() {
@@ -142,7 +132,7 @@ namespace tcs_service_test.Controllers
         public async void GetPersonInfo_StudentExistsButHasOldSchedule_ShouldReturnStudentInfoAndSaveToDatabase(string identifier)
         {
             var email = identifier;
-            var id = ParseOrDefault(identifier, 54321687);
+            var id = Utils.ParseOrDefault(identifier, 54321687);
             var person = new Person()
             {
                 Id = id,
@@ -222,7 +212,7 @@ namespace tcs_service_test.Controllers
         public async void GetPersonInfo_StudentDoesNotExist_StudentCoursesDoExist_ShouldReturnStudentAndNotSaveNewCoursesToDatabase(string identifier)
         {
             var email = identifier;
-            var id = ParseOrDefault(identifier, 54321687);
+            var id = Utils.ParseOrDefault(identifier, 54321687);
             var person = new Person()
             {
                 Email = email,
@@ -299,7 +289,7 @@ namespace tcs_service_test.Controllers
         public async void GetPersonInfo_TeacherDoesNotExists_ShouldReturnTeacherInfoAndSaveToDatabase(string identifier)
         {
             var email = identifier;
-            var id = ParseOrDefault(identifier, 54321687);
+            var id = Utils.ParseOrDefault(identifier, 54321687);
             var bannerPersonInfo = new BannerPersonInfo()
             {
                 Email = email,
@@ -336,7 +326,7 @@ namespace tcs_service_test.Controllers
         public async void GetPersonInfo_StudentExistsAndHasSemesterSchedule_ShouldReturnStudentInfoWithoutCallingBanner(string identifier)
         {
             var email = identifier;
-            var id = ParseOrDefault(identifier, 54321687);
+            var id = Utils.ParseOrDefault(identifier, 54321687);
             var person = new Person()
             {
                 Email = email,
