@@ -3,7 +3,7 @@ using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using tcs_service.UnitOfWorks;
+using tcs_service.UnitOfWorks.Interfaces;
 using tcs_service.Repos.Interfaces;
 
 namespace tcs_service.Controllers

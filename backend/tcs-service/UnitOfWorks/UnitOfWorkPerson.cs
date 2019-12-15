@@ -5,6 +5,7 @@ using tcs_service.Models.DTOs;
 using tcs_service.Repos.Interfaces;
 using tcs_service.Services.Interfaces;
 using tcs_service.Models;
+using tcs_service.UnitOfWorks.Interfaces;
 
 namespace tcs_service.UnitOfWorks
 {

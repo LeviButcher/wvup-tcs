@@ -1,8 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
-using System;
+﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
-using tcs_service.EF;
 using tcs_service.Helpers;
 using tcs_service.Models;
 using tcs_service.Models.ViewModels;

@@ -18,9 +18,11 @@ namespace tcs_service.Services
             this.mapper = mapper;
         }
 
-        public Task<BannerPersonInfo> GetBannerInfo(string identifier)
+        public async Task<BannerPersonInfo> GetBannerInfo(string identifier)
         {
-            return null;
+            var response = await bannerApi.GetAsync($"student/{identifier}");
+            var personInfo = await response.Content.ReadAsAsync<BannerPersonInfo>();
+            return personInfo;
         }
 
         public async Task<CourseWithGradeViewModel> GetStudentGrade(int studentId, int crn, int termCode)
@@ -38,38 +40,38 @@ namespace tcs_service.Services
             };
         }
 
-        public async Task<StudentInfoViewModel> GetStudentInfoWithEmail(string studentEmail)
-        {
-            var emailStart = studentEmail.Split("@")[0];
-            var response = await bannerApi.GetAsync($"student/{emailStart}");
-            response.EnsureSuccessStatusCode();
-            var bannerStudentInfo = await response.Content.ReadAsAsync<BannerInformation>();
-            return mapper.Map<StudentInfoViewModel>(bannerStudentInfo);
-        }
+        // public async Task<StudentInfoViewModel> GetStudentInfoWithEmail(string studentEmail)
+        // {
+        //     var emailStart = studentEmail.Split("@")[0];
+        //     var response = await bannerApi.GetAsync($"student/{emailStart}");
+        //     response.EnsureSuccessStatusCode();
+        //     var bannerStudentInfo = await response.Content.ReadAsAsync<BannerInformation>();
+        //     return mapper.Map<StudentInfoViewModel>(bannerStudentInfo);
+        // }
 
-        public async Task<StudentInfoViewModel> GetStudentInfoWithID(int studentID)
-        {
-            var response = await bannerApi.GetAsync($"student/{studentID}");
-            response.EnsureSuccessStatusCode();
-            var bannerStudentInfo = await response.Content.ReadAsAsync<BannerInformation>();
-            return mapper.Map<StudentInfoViewModel>(bannerStudentInfo);
-        }
+        // public async Task<StudentInfoViewModel> GetStudentInfoWithID(int studentID)
+        // {
+        //     var response = await bannerApi.GetAsync($"student/{studentID}");
+        //     response.EnsureSuccessStatusCode();
+        //     var bannerStudentInfo = await response.Content.ReadAsAsync<BannerInformation>();
+        //     return mapper.Map<StudentInfoViewModel>(bannerStudentInfo);
+        // }
 
-        public async Task<TeacherInfoViewModel> GetTeacherInfoWithEmail(string teacherEmail)
-        {
-            var emailStart = teacherEmail.Split("@")[0];
-            var response = await bannerApi.GetAsync($"teacher/{emailStart}");
-            response.EnsureSuccessStatusCode();
-            var bannerStudentInfo = await response.Content.ReadAsAsync<BannerInformation>();
-            return mapper.Map<TeacherInfoViewModel>(bannerStudentInfo);
-        }
+        // public async Task<TeacherInfoViewModel> GetTeacherInfoWithEmail(string teacherEmail)
+        // {
+        //     var emailStart = teacherEmail.Split("@")[0];
+        //     var response = await bannerApi.GetAsync($"teacher/{emailStart}");
+        //     response.EnsureSuccessStatusCode();
+        //     var bannerStudentInfo = await response.Content.ReadAsAsync<BannerInformation>();
+        //     return mapper.Map<TeacherInfoViewModel>(bannerStudentInfo);
+        // }
 
-        public async Task<TeacherInfoViewModel> GetTeacherInfoWithID(int teacherID)
-        {
-            var response = await bannerApi.GetAsync($"teacher/{teacherID}");
-            response.EnsureSuccessStatusCode();
-            var bannerStudentInfo = await response.Content.ReadAsAsync<BannerInformation>();
-            return mapper.Map<TeacherInfoViewModel>(bannerStudentInfo);
-        }
+        // public async Task<TeacherInfoViewModel> GetTeacherInfoWithID(int teacherID)
+        // {
+        //     var response = await bannerApi.GetAsync($"teacher/{teacherID}");
+        //     response.EnsureSuccessStatusCode();
+        //     var bannerStudentInfo = await response.Content.ReadAsAsync<BannerInformation>();
+        //     return mapper.Map<TeacherInfoViewModel>(bannerStudentInfo);
+        // }
     }
 }

@@ -23,6 +23,7 @@ using tcs_service.Services.Interfaces;
 using tcs_service.Services.ScheduledTasks;
 using Helpers;
 using tcs_service.UnitOfWorks;
+using tcs_service.UnitOfWorks.Interfaces;
 
 namespace tcs_service
 {

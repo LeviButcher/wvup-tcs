@@ -12,7 +12,7 @@ namespace tcs_service.EF
         public static void InitializeData(TCSContext context, IUserRepo userRepo, IHostingEnvironment env)
         {
             context.Database.Migrate();
-            if (env.IsDevelopment())
+            if (!env.IsProduction())
             {
                 ClearData(context);
                 SeedData(context);
