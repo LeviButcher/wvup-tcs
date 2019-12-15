@@ -24,7 +24,7 @@ const StudentSignInForm = ({ student }: Props) => {
         const signIn = {
           ...studentSignIn,
           courses: studentSignIn.courses.map(courseCRN =>
-            student.classSchedule.find(ele => ele.crn === courseCRN)
+            student.schedule.find(ele => ele.crn === courseCRN)
           ),
           reasons: studentSignIn.reasons.map(id =>
             reasons.find(ele => ele.id === id)
@@ -61,7 +61,7 @@ const StudentSignInForm = ({ student }: Props) => {
               touched={touched}
             />
             <CoursesCheckboxes
-              courses={student.classSchedule}
+              courses={student.schedule}
               errors={errors}
               touched={touched}
             />

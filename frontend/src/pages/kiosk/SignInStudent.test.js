@@ -68,7 +68,7 @@ test('Enter valid email and submit, fetch call to backend returns bad request, d
 test('Enter valid email and submit, fetch returns back student, display SignInForm to student', async () => {
   const fakeFetch = jest.fn(url => {
     switch (url) {
-      case `${backendURL}signins/test@wvup.edu/email`:
+      case `${backendURL}person/test@wvup.edu`:
         return Promise.resolve({
           status: 200,
           json: () => Promise.resolve({ firstName: 'Test', lastName: 'User' })

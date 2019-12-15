@@ -12,7 +12,7 @@ const backendURL = process.env.REACT_APP_BACKEND || '';
 const student = {
   firstName: 'Fake',
   lastName: 'Person',
-  classSchedule: [{ crn: '31546', shortName: 'Math121' }],
+  schedule: [{ crn: '31546', shortName: 'Math121' }],
   semesterId: '201902',
   studentID: '1',
   studentEmail: 'fake@wvup.edu'
@@ -64,7 +64,7 @@ test('Happy Path: Student Sign ins with tutoring, another reason, and 1 class, s
 
   fireEvent.click(await findByLabelText(/tutoring/i));
   fireEvent.click(getByLabelText(reasons[0].name));
-  fireEvent.click(getByLabelText(student.classSchedule[0].shortName));
+  fireEvent.click(getByLabelText(student.schedule[0].shortName));
   fireEvent.submit(getByText(/submit/i));
 
   await wait(() => {
@@ -101,7 +101,7 @@ test("During Submit, submit button disabled, after submit it's re-enabled", asyn
   );
 
   fireEvent.click(await findByLabelText(/tutoring/i));
-  fireEvent.click(getByLabelText(student.classSchedule[0].shortName));
+  fireEvent.click(getByLabelText(student.schedule[0].shortName));
   fireEvent.submit(getByText(/submit/i));
   expect(getByText(/submit/i)).toBeDisabled();
 

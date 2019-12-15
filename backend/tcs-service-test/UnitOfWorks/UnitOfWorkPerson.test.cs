@@ -107,6 +107,7 @@ namespace tcs_service_test.Controllers
 
             mockBannerService.Verify(x => x.GetBannerInfo(It.Is<string>(a => a == bannerPersonInfo.Email || a == bannerPersonInfo.Id.ToString())), Times.Once());
             Assert.NotNull(personInfo);
+            Assert.NotNull(personInfo.Schedule);
             var person = db.People.FirstOrDefault(x => x.Email == email || x.Id == id);
             Assert.NotNull(person);
             var semester = db.Semesters.FirstOrDefault(x => x.Code == semesterCode);
@@ -121,6 +122,7 @@ namespace tcs_service_test.Controllers
 
             var schedules = db.Schedules.Where(x => x.PersonId == person.Id);
             Assert.Equal(schedules.Count(), courses.Count);
+            Assert.Equal(schedules.Count(), personInfo.Schedule.Count());
             Assert.All(schedules, x => Assert.Equal(x.PersonId, person.Id));
         }
 

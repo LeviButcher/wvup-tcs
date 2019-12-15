@@ -12,7 +12,7 @@ export type Student = {
   semesterId: string,
   firstName: string,
   lastName: string,
-  classSchedule: Array<Course>
+  schedule: Array<Course>
 };
 
 export type Reason = {

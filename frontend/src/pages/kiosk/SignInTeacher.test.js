@@ -17,8 +17,8 @@ type Props = {
 // Used to mock out successful fetch calls during signIn process for teacher
 const buildSignInProcessFetch = ({ email, id }: Props) => url => {
   switch (url) {
-    case `${backendURL}signins/${id}/teacher/id`:
-    case `${backendURL}signins/${email}/teacher/email`:
+    case `${backendURL}person/${id}`:
+    case `${backendURL}person/${email}`:
       return Promise.resolve({
         status: 200,
         json: () =>
@@ -92,7 +92,7 @@ test('Submit with valid wvup.edu email, calls fetch with correct backend endpoin
   await wait(() => {
     expect(fakeFetch).toHaveBeenCalledTimes(2);
     expect(fakeFetch).toHaveBeenCalledWith(
-      `${backendURL}signins/test@wvup.edu/teacher/email`,
+      `${backendURL}person/test@wvup.edu`,
       {
         headers: {
           'Content-Type': 'application/json'
@@ -123,15 +123,12 @@ test('Card swipe calls fetch with correct backend endpoint', async () => {
 
   await wait(() => {
     expect(fakeFetch).toHaveBeenCalledTimes(2);
-    expect(fakeFetch).toHaveBeenCalledWith(
-      `${backendURL}signins/98/teacher/id`,
-      {
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        method: 'GET'
-      }
-    );
+    expect(fakeFetch).toHaveBeenCalledWith(`${backendURL}person/98`, {
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      method: 'GET'
+    });
   });
 });
 

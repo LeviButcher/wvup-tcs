@@ -15,42 +15,23 @@ const EmailSchema = Yup.object().shape({
     .required('Email is required')
 });
 
-const getStudentInfoWithEmail = email =>
-  callApi(`signins/${email}/email`, 'GET', null);
-
-const getStudentInfoWithId = (id: number) =>
-  callApi(`signins/${id}/id`, 'GET', null);
-
-const getTeacherInfoWithEmail = email =>
-  callApi(`signins/${email}/teacher/email`, 'GET', null);
-
-const getTeacherInfoWithId = (id: number) =>
-  callApi(`signins/${id}/teacher/id`, 'GET', null);
+// Can be called with either email or wvupId
+const getPersonInfo = (identifier: string | number) =>
+  callApi(`person/${identifier}`, 'GET', null);
 
 type Props = {
   afterValidSubmit: (Teacher & Student) => Promise<any>,
-  teacher?: boolean,
   children?: Node
 };
 
-const EmailOrCardSwipeForm = ({
-  afterValidSubmit,
-  teacher,
-  children
-}: Props) => {
+const EmailOrCardSwipeForm = ({ afterValidSubmit, children }: Props) => {
   const [data] = useCardReader();
-
-  const getInfoWithEmail = teacher
-    ? getTeacherInfoWithEmail
-    : getStudentInfoWithEmail;
-
-  const getInfoWithId = teacher ? getTeacherInfoWithId : getStudentInfoWithId;
 
   useEffect(() => {
     let isMounted = true;
     if (data && data.length > 2) {
       const wvupId = data.find(isWVUPId) || -1;
-      getInfoWithId(wvupId)
+      getPersonInfo(wvupId)
         .then(ensureResponseCode(200))
         .then(unwrapToJSON)
         .then(personInfo => {
@@ -60,12 +41,12 @@ const EmailOrCardSwipeForm = ({
     return () => {
       isMounted = false;
     };
-  }, [data, afterValidSubmit, getInfoWithId]);
+  }, [data, afterValidSubmit]);
 
   return (
     <Formik
       onSubmit={({ email }, { setStatus }) => {
-        return getInfoWithEmail(email)
+        return getPersonInfo(email)
           .then(ensureResponseCode(200))
           .then(unwrapToJSON)
           .then(afterValidSubmit)
@@ -111,8 +92,7 @@ const EmailOrCardSwipeForm = ({
 };
 
 EmailOrCardSwipeForm.defaultProps = {
-  children: null,
-  teacher: false
+  children: null
 };
 
 export default EmailOrCardSwipeForm;
