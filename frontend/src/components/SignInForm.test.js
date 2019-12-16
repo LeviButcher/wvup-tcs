@@ -7,6 +7,7 @@ import {
   waitForElement
 } from '../test-utils/CustomReactTestingLibrary';
 import SignInForm from './SignInForm';
+import { personTypeValues } from '../types';
 
 const backendURL = process.env.REACT_APP_BACKEND || '';
 
@@ -18,7 +19,7 @@ const reasons = [
 const studentSignIn = {
   email: 'something@wvup.edu',
   selectedReasons: [],
-  classSchedule: [
+  schedule: [
     { crn: '01234', shortName: 'CS101' },
     { crn: '4567', shortName: 'STEM329' }
   ],
@@ -27,7 +28,7 @@ const studentSignIn = {
   outTime: '',
   tutoring: false,
   id: '',
-  personType: 'Student',
+  personType: personTypeValues.student,
   semesterId: '201902',
   personId: '2'
 };
@@ -40,7 +41,7 @@ const teacherSignIn = {
   selectedReasons: [],
   tutoring: false,
   id: '',
-  personType: 'Teacher',
+  personType: personTypeValues.teacher,
   semesterId: '201902',
   personId: '4'
 };
@@ -85,7 +86,7 @@ describe('Form Errors for Student', () => {
     reasons.forEach(reason => {
       expect(getByText(reason.name)).toBeDefined();
     });
-    studentSignIn.classSchedule.forEach(course => {
+    studentSignIn.schedule.forEach(course => {
       expect(getByText(course.shortName)).toBeDefined();
     });
   });
@@ -107,7 +108,7 @@ describe('Form Errors for Student', () => {
       <SignInForm signInRecord={studentSignIn} reasons={reasons} />
     );
 
-    fireEvent.click(getByText(studentSignIn.classSchedule[0].shortName));
+    fireEvent.click(getByText(studentSignIn.schedule[0].shortName));
 
     await wait(() => {
       expect(getByText(/submit/i)).toBeDisabled();
@@ -144,7 +145,7 @@ describe('Create SignIn', () => {
     });
 
     fireEvent.click(getByText(reasons[0].name));
-    fireEvent.click(getByText(studentSignIn.classSchedule[0].shortName));
+    fireEvent.click(getByText(studentSignIn.schedule[0].shortName));
     fireEvent.submit(getByText(/submit/i));
     expect(getByText(/submitting/i)).toBeDefined();
 
@@ -244,7 +245,7 @@ describe('Update SignIn', () => {
     });
 
     fireEvent.click(getByText(reasons[0].name));
-    fireEvent.click(getByText(studentSignIn.classSchedule[1].shortName));
+    fireEvent.click(getByText(studentSignIn.schedule[1].shortName));
     fireEvent.click(getByLabelText(/tutoring/i));
     fireEvent.submit(getByText(/submit/i));
     expect(getByText(/submitting/i)).toBeDefined();
@@ -352,7 +353,7 @@ test('Should display fetch response message when fetch returns non 2XX status co
   });
 
   fireEvent.click(getByLabelText(/tutoring/i));
-  fireEvent.click(getByText(studentSignIn.classSchedule[0].shortName));
+  fireEvent.click(getByText(studentSignIn.schedule[0].shortName));
   fireEvent.submit(getByText(/submit/i));
 
   const error = await waitForElement(() => getByText(message));

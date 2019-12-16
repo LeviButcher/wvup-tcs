@@ -7,7 +7,8 @@ import { callApi, ensureResponseCode } from '../utils';
 import CoursesCheckboxes from './CoursesCheckboxes';
 import ReasonCheckboxes from './ReasonCheckboxes';
 import SignInSchema from '../schemas/SignInFormSchema';
-import type { Course, Reason } from '../types';
+import type { Course, Reason, PersonType } from '../types';
+import { personTypeValues } from '../types';
 
 function isBeforeInTime(outTime) {
   const inTime = this.resolve(Yup.ref('inTime'));
@@ -77,13 +78,13 @@ const postSignInTeacher = signIn =>
 type Props = {
   signInRecord: {
     email: string,
-    classSchedule?: Array<Course>,
+    schedule?: Array<Course>,
     selectedClasses: Array<string>,
     inTime: string,
     outTime: string,
     tutoring: boolean,
     selectedReasons: Array<string>,
-    personType: 'Student' | 'Teacher',
+    personType: PersonType,
     id?: string,
     personId: string,
     semesterId: string
@@ -93,7 +94,7 @@ type Props = {
 
 // test email = mtmqbude26@wvup.edu
 const SignInForm = ({ signInRecord, reasons }: Props) => {
-  const isStudent = signInRecord.personType === 'Student';
+  const isStudent = signInRecord.personType === personTypeValues.student;
   const shouldPostSignIn = !signInRecord.id;
 
   const callCorrectAPIEndpoint = signIn => {
@@ -186,7 +187,7 @@ const SignInForm = ({ signInRecord, reasons }: Props) => {
                   touched={touched}
                 />
                 <CoursesCheckboxes
-                  courses={signInRecord.classSchedule || []}
+                  courses={signInRecord.schedule || []}
                   errors={errors}
                   touched={touched}
                 />

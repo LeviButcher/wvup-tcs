@@ -1,5 +1,15 @@
 // Describe Universal Types of the application here
 // These types should closely mirror the classes on the backend
+const personTypeValues = {
+  student: 0,
+  teacher: 1
+};
+
+// eslint-disable-next-line import/prefer-default-export
+export { personTypeValues };
+
+// eslint-disable-next-line no-undef
+export type PersonType = 0 | 1;
 
 export type Course = {
   crn: string,
@@ -7,9 +17,8 @@ export type Course = {
 };
 
 export type Student = {
-  studentEmail: string,
-  studentID: string,
-  semesterId: string,
+  email: string,
+  id: string,
   firstName: string,
   lastName: string,
   schedule: Array<Course>
@@ -22,8 +31,8 @@ export type Reason = {
 };
 
 export type Teacher = {
-  teacherID: string,
-  teacherEmail: string
+  id: string,
+  email: string
 };
 
 export type ClassTour = {

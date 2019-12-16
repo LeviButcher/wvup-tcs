@@ -23,11 +23,11 @@ const buildSignInProcessFetch = ({ email, id }: Props) => url => {
         status: 200,
         json: () =>
           Promise.resolve({
-            teacherID: id,
-            teacherEmail: email
+            id,
+            email
           })
       });
-    case `${backendURL}signins?teacher=true`:
+    case `${backendURL}session/signin`:
       return Promise.resolve({
         status: 201,
         json: () => Promise.resolve({})
@@ -101,12 +101,12 @@ test('Submit with valid wvup.edu email, calls fetch with correct backend endpoin
       }
     );
   });
-  // Shouldn't this pass in body for the teacher, email maybe?
-  expect(fakeFetch).toHaveBeenCalledWith(`${backendURL}signins?teacher=true`, {
+
+  expect(fakeFetch).toHaveBeenCalledWith(`${backendURL}session/signin`, {
     headers: {
       'Content-Type': 'application/json'
     },
-    body: JSON.stringify({ personId: -1, email: 'test@wvup.edu' }),
+    body: JSON.stringify({ personId: -1 }),
     method: 'POST'
   });
 });

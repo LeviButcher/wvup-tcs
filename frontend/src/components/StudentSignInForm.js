@@ -9,7 +9,7 @@ import useApiWithHeaders from '../hooks/useApiWithHeaders';
 import SignInSchema from '../schemas/SignInFormSchema';
 import type { Student } from '../types';
 
-const postSignIn = callApi(`signins/`, 'POST');
+const postSignIn = callApi(`session/signin`, 'POST');
 
 type Props = {
   student: Student
@@ -20,40 +20,34 @@ const StudentSignInForm = ({ student }: Props) => {
 
   return (
     <Formik
-      onSubmit={studentSignIn => {
+      onSubmit={(studentSignIn, { setStatus }) => {
         const signIn = {
-          ...studentSignIn,
-          courses: studentSignIn.courses.map(courseCRN =>
-            student.schedule.find(ele => ele.crn === courseCRN)
-          ),
-          reasons: studentSignIn.reasons.map(id =>
-            reasons.find(ele => ele.id === id)
-          )
+          personId: studentSignIn.personId,
+          tutoring: studentSignIn.tutoring,
+          selectedReasons: studentSignIn.reasons,
+          selectedCourses: studentSignIn.courses
         };
         return postSignIn(signIn)
           .then(ensureResponseCode(201))
           .then(() => navigate('/', { state: { info: 'You have signed in!' } }))
-          .catch(e =>
-            console.error(
-              e.message,
-              'LEVI -> Write a test to make sure fetch errors are displayed to user'
-            )
-          );
+          .catch(e => {
+            setStatus(e.message);
+          });
       }}
       initialValues={{
-        email: student.studentEmail,
+        email: student.email,
         reasons: [],
         tutoring: false,
         courses: [],
-        semesterId: student.semesterId,
-        personId: student.studentID
+        personId: student.id
       }}
       validationSchema={SignInSchema}
     >
-      {({ values, isSubmitting, isValid, errors, touched }) => (
+      {({ values, isSubmitting, isValid, errors, touched, status }) => (
         <Form>
           <Stack>
             <h4>Welcome, {`${student.firstName} ${student.lastName}`}</h4>
+            <h5>{status}</h5>
             <ReasonCheckboxes
               reasons={reasons}
               values={values}

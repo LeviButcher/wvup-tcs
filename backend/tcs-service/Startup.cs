@@ -42,6 +42,7 @@ namespace tcs_service
         public void ConfigureServices(IServiceCollection services)
         {
             var dbConfig = Configuration.GetSection("Db").Get<DbConfig>();
+            var bannerConfig = Configuration.GetSection("Banner").Get<BannerConfig>();
 
 
             services.AddCors(options =>
@@ -84,13 +85,13 @@ namespace tcs_service
 
             if (Environment.IsProduction())
             {
-                var bannerAuth = Configuration["Banner:User"] + ":" + Configuration["Banner:Password"];
+                var bannerAuth = bannerConfig.User + ":" + bannerConfig.Password;
                 var encodedAuth = bannerAuth.ToBase64();
 
 
                 services.AddHttpClient("banner", c =>
                 {
-                    c.BaseAddress = new Uri(Configuration["Banner:api"]);
+                    c.BaseAddress = new Uri(bannerConfig.Api);
                     c.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", encodedAuth);
                 });
                 services.AddScoped<IBannerService, LiveBannerService>();
