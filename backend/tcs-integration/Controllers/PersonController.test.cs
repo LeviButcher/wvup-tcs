@@ -70,5 +70,40 @@ namespace tcs_integration.Controllers
                 Assert.Empty(person.Schedule);
             }
         }
+
+        private class ErrorMessage
+        {
+            public string Message { get; set; }
+        }
+
+        [Fact]
+        public async void GET_person_PersonDoesNotExist_ShouldReturn500WithErrorMessage()
+        {
+            var email = "doesnotExist@wvup.edu";
+            var client = _factory.CreateClient();
+
+            var response = await client.GetAsync($"api/person/{email}");
+            Assert.Equal(HttpStatusCode.InternalServerError, response.StatusCode);
+            var error = await response.Content.ReadAsAsync<ErrorMessage>();
+            Assert.NotNull(error);
+            Assert.NotNull(error.Message);
+        }
+
+        [Fact]
+        public async void GET_person_admin_PersonDoesNotExist_ShouldReturn500WithErrorMessage()
+        {
+            var email = "doesnotExist@wvup.edu";
+            var client = _factory.CreateClient();
+
+            var user = await Utils.Login(client);
+            var request = new HttpRequestMessage(HttpMethod.Get, $"api/person/{email}/admin");
+            request.Headers.Add("Authorization", $"Bearer {user.Token}");
+
+            var response = await client.SendAsync(request);
+            Assert.Equal(HttpStatusCode.InternalServerError, response.StatusCode);
+            var error = await response.Content.ReadAsAsync<ErrorMessage>();
+            Assert.NotNull(error);
+            Assert.NotNull(error.Message);
+        }
     }
 }

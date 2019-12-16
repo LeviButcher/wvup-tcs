@@ -25,12 +25,12 @@ namespace tcs_service.Services
         public async Task<BannerPersonInfo> GetBannerInfo(string identifier)
         {
             var person = await personRepo.Find(x => x.Email == identifier || x.Id.ToString() == identifier);
-            var currentSemester = semesterRepo.GetAll().Last();
-            var rand = new Random(person.Id);
-            var takeCount = Math.Ceiling(rand.NextDouble() * 5) + 1;
-            var randomCourses = courseRepo.GetAll().Take((int)takeCount);
             if (person is Person)
             {
+                var currentSemester = semesterRepo.GetAll().Last();
+                var rand = new Random(person.Id);
+                var takeCount = Math.Ceiling(rand.NextDouble() * 5) + 1;
+                var randomCourses = courseRepo.GetAll().Take((int)takeCount);
                 if (person.PersonType == PersonType.Student)
                 {
                     return new BannerPersonInfo()
