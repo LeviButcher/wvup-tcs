@@ -80,6 +80,16 @@ jobs:
             - ~/.nuget/packages
           key: v1-back-dependencies-{{ checksum "sXb-service/sXb-service.csproj" }}-{{ checksum "sXb-service-test/sXb-service-test.csproj" }}
 
+  flow:
+    executor: front-exec
+    working_directory: ~/repo/frontend
+    steps:
+      - checkout:
+          path: ~/repo
+      - *restore_npm_cache
+      - *install_npm
+      - run: npm run flow
+
   test-back:
     executor: back-exec
     working_directory: ~/repo/backend
@@ -148,6 +158,9 @@ workflows:
       - test-integration:
           requires:
             - setup-back
+      - flow:
+          requires:
+            - setup-front
       - deploy-back:
           requires:
             - test-back
@@ -155,3 +168,4 @@ workflows:
       - deploy-front:
           requires:
             - test-front
+            - flow
