@@ -46,10 +46,10 @@ namespace tcs_service.Models
         public bool Tutoring { get; set; }
 
         [InverseProperty(nameof(SessionClass.Session))]
-        public List<SessionClass> Classes { get; set; } = new List<SessionClass>();
+        public List<SessionClass> SessionClasses { get; set; } = new List<SessionClass>();
 
         [InverseProperty(nameof(SessionReason.Session))]
-        public List<SessionReason> Reasons { get; set; } = new List<SessionReason>();
+        public List<SessionReason> SessionReasons { get; set; } = new List<SessionReason>();
 
     }
 }

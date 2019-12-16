@@ -32,7 +32,7 @@ namespace tcs_service_test.Repos
             fixture.Customize<SignInCourse>((ob) => ob.Without(x => x.SignInID).Without(x => x.SignIn));
             fixture.Customize<SignInReason>((ob) => ob.Without(x => x.SignInID).Without(x => x.SignIn));
             fixture.Customize<Course>((ob) => ob.Without(x => x.Department).Without(x => x.SignInCourses));
-            fixture.Customize<Reason>((ob) => ob.Without(x => x.SignInReasons));
+            fixture.Customize<Reason>((ob) => ob.Without(x => x.SessionReasons));
         }
 
         public void Dispose()

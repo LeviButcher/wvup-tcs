@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -42,12 +43,18 @@ namespace tcs_service.Controllers
             return Ok(session);
         }
 
+        [HttpGet("signedin")]
+        public IActionResult GetSignedIn() => Ok(_iRepo.GetAll(x => x.OutTime == null));
+
         [HttpPost]
-        public async Task<IActionResult> CreateSession([FromBody] SessionCreateDTO sessionDTO)
+        public async Task<IActionResult> PostSession([FromBody] SessionCreateDTO sessionDTO)
         {
             var session = _mapper.Map<Session>(sessionDTO);
+            sessionDTO.SelectedClasses.ForEach(x => session.SessionClasses.Add(new SessionClass() { ClassID = x.CRN }));
+            sessionDTO.SelectedReasons.ForEach(x => session.SessionReasons.Add(new SessionReason() { ReasonID = x.Id }));
             await _iRepo.Create(session);
-            return Ok(session);
+
+            return Ok(session); 
         }
 
         [HttpPut("{id}")]
@@ -68,18 +75,21 @@ namespace tcs_service.Controllers
             }
         }
 
+        [HttpPut("signout/{id}")]
+        public async Task<IActionResult> SignOut([FromRoute] int id)
+        {
+            var session = await _iRepo.Find(x => x.ID == id);
+            session.OutTime = DateTime.Now;
+            await _iRepo.Update(session);
+
+            return Ok(session);
+        }
+
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteSession([FromRoute] int id)
         {
             var session = await _iRepo.Remove(x => x.ID == id);
             return Ok(session);
-        }
-
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(int id)
-        {            
-            await _iRepo.Remove(x => x.ID == id);
-            return Ok();    
         }
     }
 }
