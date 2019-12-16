@@ -57,22 +57,12 @@ const StyledReasonCheckboxes = styled(ReasonCheckboxes)`
   }
 `;
 
-// Student API Calls
-const putSignInStudent = signIn =>
-  callApi(`signIns/${signIn.id || ''}`, 'PUT', signIn).then(
-    ensureResponseCode(200)
-  );
-const postSignInStudent = signIn =>
-  callApi(`signIns/admin/`, 'POST', signIn).then(ensureResponseCode(201));
+const postSession = signIn =>
+  callApi(`session/`, 'POST', signIn).then(ensureResponseCode(201));
 
-// Teacher API Calls
-const putSignInTeacher = signIn =>
-  callApi(`signIns/${signIn.id || ''}?teacher=true`, 'PUT', signIn).then(
+const putSession = signIn =>
+  callApi(`session/${signIn.id || ''}`, 'PUT', signIn).then(
     ensureResponseCode(200)
-  );
-const postSignInTeacher = signIn =>
-  callApi(`signIns/admin/?teacher=true`, 'POST', signIn).then(
-    ensureResponseCode(201)
   );
 
 type Props = {
@@ -100,11 +90,9 @@ const SignInForm = ({ signInRecord, reasons }: Props) => {
   const callCorrectAPIEndpoint = signIn => {
     // signInRecord id is NOT a truthy value then we should create a new signin record
     // ELSE we should update the signin record with the associated ID
+    if (shouldPostSignIn) return postSession(signIn);
+    if (!shouldPostSignIn) return putSession(signIn);
 
-    if (isStudent && shouldPostSignIn) return postSignInStudent(signIn);
-    if (isStudent && !shouldPostSignIn) return putSignInStudent(signIn);
-    if (!isStudent && shouldPostSignIn) return postSignInTeacher(signIn);
-    if (!isStudent && !shouldPostSignIn) return putSignInTeacher(signIn);
     return Promise.reject(Error("Didn't hit a api case"));
   };
 
@@ -130,8 +118,8 @@ const SignInForm = ({ signInRecord, reasons }: Props) => {
           semesterId: signInRecord.semesterId,
           inTime: new Date(`${values.inDate} ${values.inTime}`),
           outTime: new Date(`${values.outDate} ${values.outTime}`),
-          courses: values.courses,
-          reasons: values.reasons,
+          selectedCourses: values.courses,
+          selectedReasons: values.reasons,
           tutoring: values.tutoring
         };
         // $FlowFixMe

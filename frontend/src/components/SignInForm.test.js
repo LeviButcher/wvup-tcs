@@ -151,7 +151,7 @@ describe('Create SignIn', () => {
 
     await wait(() => {
       expect(fakeFetch).toHaveBeenCalledTimes(1);
-      expect(fakeFetch).toHaveBeenCalledWith(`${backendURL}signIns/admin/`, {
+      expect(fakeFetch).toHaveBeenCalledWith(`${backendURL}session/`, {
         headers: {
           'Content-Type': 'application/json'
         },
@@ -162,8 +162,8 @@ describe('Create SignIn', () => {
           semesterId: studentSignIn.semesterId,
           inTime: new Date('2019-01-05 09:00'),
           outTime: new Date('2019-01-05 12:00'),
-          courses: ['01234'],
-          reasons: ['1'],
+          selectedCourses: ['01234'],
+          selectedReasons: ['1'],
           tutoring: false
         })
       });
@@ -203,25 +203,22 @@ describe('Create SignIn', () => {
 
     await wait(() => {
       expect(fakeFetch).toHaveBeenCalledTimes(1);
-      expect(fakeFetch).toHaveBeenCalledWith(
-        `${backendURL}signIns/admin/?teacher=true`,
-        {
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          method: 'POST',
-          body: JSON.stringify({
-            id: teacherSignIn.id,
-            personId: teacherSignIn.personId,
-            semesterId: teacherSignIn.semesterId,
-            inTime: new Date(`${inDT.date} ${inDT.time}`),
-            outTime: new Date(`${outDT.date} ${outDT.time}`),
-            courses: [],
-            reasons: [],
-            tutoring: false
-          })
-        }
-      );
+      expect(fakeFetch).toHaveBeenCalledWith(`${backendURL}session/`, {
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        method: 'POST',
+        body: JSON.stringify({
+          id: teacherSignIn.id,
+          personId: teacherSignIn.personId,
+          semesterId: teacherSignIn.semesterId,
+          inTime: new Date(`${inDT.date} ${inDT.time}`),
+          outTime: new Date(`${outDT.date} ${outDT.time}`),
+          selectedCourses: [],
+          selectedReasons: [],
+          tutoring: false
+        })
+      });
     });
   });
 });
@@ -252,7 +249,7 @@ describe('Update SignIn', () => {
     await wait(() => {
       expect(fakeFetch).toHaveBeenCalledTimes(1);
       expect(fakeFetch).toHaveBeenCalledWith(
-        `${backendURL}signIns/${existingStudentSignIn.id}`,
+        `${backendURL}session/${existingStudentSignIn.id}`,
         {
           headers: {
             'Content-Type': 'application/json'
@@ -264,8 +261,8 @@ describe('Update SignIn', () => {
             semesterId: existingStudentSignIn.semesterId,
             inTime: new Date('2019-01-05 09:00'),
             outTime: new Date('2019-01-05 14:00'),
-            courses: ['01234', '4567'],
-            reasons: [],
+            selectedCourses: ['01234', '4567'],
+            selectedReasons: [],
             tutoring: true
           })
         }
@@ -296,7 +293,7 @@ describe('Update SignIn', () => {
     await wait(() => {
       expect(fakeFetch).toHaveBeenCalledTimes(1);
       expect(fakeFetch).toHaveBeenCalledWith(
-        `${backendURL}signIns/${existingTeacherRecord.id}?teacher=true`,
+        `${backendURL}session/${existingTeacherRecord.id}`,
         {
           headers: {
             'Content-Type': 'application/json'
@@ -308,8 +305,8 @@ describe('Update SignIn', () => {
             semesterId: existingTeacherRecord.semesterId,
             inTime: new Date('2019-05-10 12:00'),
             outTime: new Date('2019-05-10 16:00'),
-            courses: [],
-            reasons: [],
+            selectedCourses: [],
+            selectedReasons: [],
             tutoring: false
           })
         }
