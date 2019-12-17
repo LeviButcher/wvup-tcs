@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using tcs_service.Helpers;
@@ -16,26 +17,28 @@ namespace tcs_service.Controllers
     [ApiController]
     public class SessionsController : ControllerBase
     {
-        readonly private ISessionRepo _iRepo;
+        readonly private ISessionRepo _sessionRepo;
+        readonly private ISemesterRepo _semesterRepo;
         readonly private IMapper _mapper;
 
-        public SessionsController(ISessionRepo iRepo, IMapper mapper)
+        public SessionsController(ISessionRepo sessionRepo, ISemesterRepo semesterRepo, IMapper mapper)
         {
             _mapper = mapper;
-            _iRepo = iRepo;
+            _sessionRepo = sessionRepo;
+            _semesterRepo = semesterRepo;
         }
 
         [HttpGet]
         public IActionResult GetSessions([FromQuery] int page = 1)
         {
-            var pageResult = new Paging<Session>(page, _iRepo.GetAll());
+            var pageResult = new Paging<Session>(page, _sessionRepo.GetAll());
             return Ok(pageResult);
         }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetSession([FromRoute] int id)
         {
-            var session = await _iRepo.Find(x => x.Id == id);
+            var session = await _sessionRepo.Find(x => x.Id == id);
 
             if (session == null)
             {
@@ -45,26 +48,26 @@ namespace tcs_service.Controllers
             return Ok(session);
         }
 
-        [HttpGet("signedin")]
-        public IActionResult GetSignedIn() => Ok(_iRepo.GetAll(x => x.OutTime == null));
+        [HttpGet("in")]
+        public IActionResult GetSignedIn() => Ok(_sessionRepo.GetAll(x => x.OutTime == null));
 
         [HttpPost]
         public async Task<IActionResult> PostSession([FromBody] SessionCreateDTO sessionDTO)
         {
             if (sessionDTO.SelectedClasses.Count < 1)
             {
-                return BadRequest(new { message = "Must select at least one class." });
+                throw new TCSException("Must select at least one class.");
             }
 
             if (sessionDTO.SelectedReasons.Count < 1 && !sessionDTO.Tutoring)
             {
-                return BadRequest(new { message = "Must select at least one reason for visit." });
+                throw new TCSException("Must select at least one reason for visit.");
             }
 
             var session = _mapper.Map<Session>(sessionDTO);
-            sessionDTO.SelectedClasses.ForEach(x => session.SessionClasses.Add(new SessionClass() { ClassId = x }));
-            sessionDTO.SelectedReasons.ForEach(x => session.SessionReasons.Add(new SessionReason() { ReasonId = x }));
-            await _iRepo.Create(session);
+            session.SessionClasses = sessionDTO.SelectedClasses.Select(x => new SessionClass() { ClassId = x }).ToList();
+            session.SessionReasons = sessionDTO.SelectedReasons.Select(x => new SessionReason() { ReasonId = x }).ToList();
+            await _sessionRepo.Create(session);
 
             return Ok(session);
         }
@@ -90,7 +93,7 @@ namespace tcs_service.Controllers
             try
             {
                 var session = _mapper.Map<Session>(sessionDTO);
-                var result = await _iRepo.Update(session);
+                var result = await _sessionRepo.Update(session);
                 return Ok(result);
             }
             catch (DbUpdateConcurrencyException)
@@ -99,18 +102,40 @@ namespace tcs_service.Controllers
             }
         }
 
-        [HttpPut("signout/{studentId}")]
-        public async Task<IActionResult> SignOut([FromRoute] int studentId)
+        [HttpPost("in")]
+        [AllowAnonymous]
+        public async Task<IActionResult> SignIn([FromBody] KioskSignInDTO signIn)
         {
-            var session = _iRepo.GetAll(x => x.PersonId == studentId).OrderBy(x => x.Id).LastOrDefault();
+            var alreadySignedIn = await _sessionRepo.Exist(x => x.PersonId == signIn.PersonId && x.OutTime == null);
+            if (alreadySignedIn) throw new TCSException("You are already signed in.");
 
-            if (session.OutTime != null)
+            var session = new Session()
             {
-                return BadRequest(new { message = "You aren't signed in" });
+                InTime = DateTime.Now,
+                SessionClasses = signIn.SelectedClasses.Select(x => new SessionClass() { ClassId = x }).ToList(),
+                SessionReasons = signIn.SelectedReasons.Select(x => new SessionReason() { ReasonId = x }).ToList(),
+                PersonId = signIn.PersonId,
+                SemesterCode = _semesterRepo.GetAll().Last().Code
+            };
+
+            var result = await _sessionRepo.Create(session);
+            if (result is Session)
+            {
+                return Created($"sessions/{result.Id}", result);
             }
+            throw new TCSException("Something went wrong");
+        }
+
+        [HttpPut("out")]
+        [AllowAnonymous]
+        public async Task<IActionResult> SignOut(KioskSignOutDTO signOut)
+        {
+            var session = await _sessionRepo.Find(x => x.PersonId == signOut.PersonId && x.OutTime == null);
+
+            if (!(session is Session)) throw new TCSException("You aren't signed in.");
 
             session.OutTime = DateTime.Now;
-            await _iRepo.Update(session);
+            var result = await _sessionRepo.Update(session);
 
             return Ok(session);
         }
@@ -118,7 +143,7 @@ namespace tcs_service.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteSession([FromRoute] int id)
         {
-            var session = await _iRepo.Remove(x => x.Id == id);
+            var session = await _sessionRepo.Remove(x => x.Id == id);
             return Ok(session);
         }
     }

@@ -1,7 +1,4 @@
-﻿using AutoFixture;
-using AutoFixture.AutoMoq;
-using Microsoft.AspNetCore.Mvc.Testing;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Net;
@@ -36,7 +33,7 @@ namespace tcs_integration.Controllers
         }
 
         [Fact]
-        public async void GET_sessions_ShouldReturnListOfSessions()
+        public async void GET_Sessions_ShouldReturnListOfSessions()
         {
             var client = _factory.CreateClient();
             var user = await Login(client);
@@ -52,7 +49,7 @@ namespace tcs_integration.Controllers
 
 
         [Fact]
-        public async void GET_sessions_id_ShouldReturnSessionWithMatchingId()
+        public async void GET_Sessions_Id_ShouldReturnSessionWithMatchingId()
         {
             var sessionId = 1;
             var client = _factory.CreateClient();
@@ -68,11 +65,11 @@ namespace tcs_integration.Controllers
         }
 
         [Fact]
-        public async void GET_outtime_null_ShouldReturnListOfSessionsWhereOutTimeIsNull()
+        public async void GET_Sessions_In_ShouldReturnListOfSessionsWhereOutTimeIsNull()
         {
             var client = _factory.CreateClient();
             var user = await Login(client);
-            var request = new HttpRequestMessage(HttpMethod.Get, "api/sessions/signedin");
+            var request = new HttpRequestMessage(HttpMethod.Get, "api/sessions/in");
             request.Headers.Add("Authorization", $"Bearer {user.Token}");
 
             var response = await client.SendAsync(request);
@@ -83,16 +80,18 @@ namespace tcs_integration.Controllers
         }
 
         [Fact]
-        public async void POST_sessions_ShouldReturn201WithCreatedSession()
+        public async void POST_Sessions_ShouldReturn201WithCreatedSession()
         {
             var client = _factory.CreateClient();
             var session = new SessionCreateDTO()
             {
                 InTime = DateTime.Now,
+                OutTime = DateTime.Now.Add(new TimeSpan(1)),
                 PersonId = 1,
                 Tutoring = true,
                 SelectedClasses = new List<int>() { 3, 4 },
-                SelectedReasons = new List<int>() { 2 }
+                SelectedReasons = new List<int>() { 2 },
+                SemesterCode = 201901
             };
             var user = await Login(client);
             var request = new HttpRequestMessage(HttpMethod.Post, "api/sessions");
@@ -108,16 +107,18 @@ namespace tcs_integration.Controllers
         }
 
         [Fact]
-        public async void POST_session_withnoselectedclasses_ShouldReturn400()
+        public async void POST_Session_WithNoSelectedClasses_ShouldReturn500()
         {
             var client = _factory.CreateClient();
             var session = new SessionCreateDTO()
             {
                 InTime = DateTime.Now,
+                OutTime = DateTime.Now.Add(new TimeSpan(1)),
                 PersonId = 1,
                 Tutoring = true,
                 SelectedClasses = new List<int>() { },
-                SelectedReasons = new List<int>() { 2 }
+                SelectedReasons = new List<int>() { 2 },
+                SemesterCode = 201901
             };
             var user = await Login(client);
             var request = new HttpRequestMessage(HttpMethod.Post, "api/sessions");
@@ -126,20 +127,22 @@ namespace tcs_integration.Controllers
             request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
 
             var response = await client.SendAsync(request);
-            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+            Assert.Equal(HttpStatusCode.InternalServerError, response.StatusCode);
         }
 
         [Fact]
-        public async void POST_session_withnoselectedreasons_tutoringtrue_ShouldReturn201WithCreatedSession()
+        public async void POST_Session_WithNoSelectedReasons_TutoringTrue_ShouldReturn201WithCreatedSession()
         {
             var client = _factory.CreateClient();
             var session = new SessionCreateDTO()
             {
                 InTime = DateTime.Now,
+                OutTime = DateTime.Now.Add(new TimeSpan(1)),
                 PersonId = 1,
                 Tutoring = true,
                 SelectedClasses = new List<int>() { 2 },
-                SelectedReasons = new List<int>() { }
+                SelectedReasons = new List<int>() { },
+                SemesterCode = 201901
             };
             var user = await Login(client);
             var request = new HttpRequestMessage(HttpMethod.Post, "api/sessions");
@@ -155,16 +158,18 @@ namespace tcs_integration.Controllers
         }
 
         [Fact]
-        public async void POST_session_withnoselectedreasons_tutoringfalse_ShouldReturn400()
+        public async void POST_Session_WithNoSelectedReasons_TutoringFalse_ShouldReturn500()
         {
             var client = _factory.CreateClient();
             var session = new SessionCreateDTO()
             {
                 InTime = DateTime.Now,
+                OutTime = DateTime.Now.Add(new TimeSpan(1)),
                 PersonId = 1,
                 Tutoring = false,
                 SelectedClasses = new List<int>() { 3 },
-                SelectedReasons = new List<int>() { }
+                SelectedReasons = new List<int>() { },
+                SemesterCode = 201901
             };
             var user = await Login(client);
             var request = new HttpRequestMessage(HttpMethod.Post, "api/sessions");
@@ -173,12 +178,12 @@ namespace tcs_integration.Controllers
             request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
 
             var response = await client.SendAsync(request);
-            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+            Assert.Equal(HttpStatusCode.InternalServerError, response.StatusCode);
         }
 
 
         [Fact]
-        public async void PUT_sessions_id_ShouldReturn200WithUpdatedSession()
+        public async void PUT_Sessions_Id_ShouldReturn200WithUpdatedSession()
         {
             var client = _factory.CreateClient();
             var user = await Login(client);
@@ -187,10 +192,12 @@ namespace tcs_integration.Controllers
             {
                 Id = 3,
                 InTime = DateTime.Now,
+                OutTime = DateTime.Now.Add(new TimeSpan(1)),
                 PersonId = 8,
                 Tutoring = true,
                 SelectedClasses = new List<int>() { 3 },
-                SelectedReasons = new List<int>() { }
+                SelectedReasons = new List<int>() { },
+                SemesterCode = 201901
             };
             request.Headers.Add("Authorization", $"Bearer {user.Token}");
             request.Content = new StringContent(JsonConvert.SerializeObject(sessionDTO));
@@ -203,34 +210,37 @@ namespace tcs_integration.Controllers
         }
 
         [Fact]
-        public async void PUT_signout_id_ShouldReturn200WithSignedOutSession()
+        public async void PUT_Session_Out_StudentSignedIn_ShouldReturn200WithSignedOutSession()
         {
             var client = _factory.CreateClient();
-            var user = await Login(client);
-            var request = new HttpRequestMessage(HttpMethod.Put, "api/sessions/signout/61");
-            request.Headers.Add("Authorization", $"Bearer {user.Token}");
-            request.Content = new StringContent(JsonConvert.SerializeObject(new Session { OutTime = DateTime.Now }));
-            request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+            var signOut = new KioskSignOutDTO()
+            {
+                PersonId = 61
+            };
+            var response = await client.PutAsJsonAsync("api/sessions/out", signOut);
 
-            var response = await client.SendAsync(request);
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             var session = await response.Content.ReadAsAsync<Session>();
             Assert.NotNull(session.OutTime);
         }
 
         [Fact]
-        public async void PUT_signout_studentnotsignedin_ShouldReturn400()
+        public async void PUT_Sessions_Out_StudentNotSignedIn_ShouldReturn500()
         {
+            var signOut = new KioskSignOutDTO()
+            {
+                PersonId = 35
+            };
+
             var client = _factory.CreateClient();
-            var user = await Login(client);
-            var request = new HttpRequestMessage(HttpMethod.Put, "api/sessions/signout/35");
-            request.Headers.Add("Authorization", $"Bearer {user.Token}");
-            var response = await client.SendAsync(request);
-            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+            var response = await client.PutAsJsonAsync("api/sessions/out", signOut);
+            Assert.Equal(HttpStatusCode.InternalServerError, response.StatusCode);
+            var errorMessage = await response.Content.ReadAsAsync<ErrorMessage>();
+            Assert.Equal("You aren't signed in.", errorMessage.Message);
         }
 
         [Fact]
-        public async void DELETE_sessions_id_ShouldReturn200WithDeletedSession()
+        public async void DELETE_sessions_Id_ShouldReturn200WithDeletedSession()
         {
             var client = _factory.CreateClient();
             var user = await Login(client);
@@ -249,5 +259,59 @@ namespace tcs_integration.Controllers
 
         }
 
+
+
+        [Fact]
+        public async void POST_Sessions_In_StudentNotSignedIn_ShouldReturn201()
+        {
+            var session = new KioskSignInDTO()
+            {
+                PersonId = 4,
+                Tutoring = false,
+                SelectedClasses = new List<int>() { 1, 2 },
+                SelectedReasons = new List<int>() { 1 }
+            };
+
+            var client = _factory.CreateClient();
+            var response = await client.PostAsJsonAsync("api/sessions/in", session);
+            Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+        }
+
+        [Fact]
+        public async void POST_Sessions_In_StudentAlreadySignedIn_ShouldReturn500WithMessage()
+        {
+            var session = new KioskSignInDTO()
+            {
+                PersonId = 2,
+                Tutoring = false,
+                SelectedClasses = new List<int>() { 1, 2 },
+                SelectedReasons = new List<int>() { 1 }
+            };
+
+            var client = _factory.CreateClient();
+
+            await client.PostAsJsonAsync("api/sessions/in", session);
+            var response = await client.PostAsJsonAsync("api/sessions/in", session);
+            Assert.Equal(HttpStatusCode.InternalServerError, response.StatusCode);
+            var errorMessage = await response.Content.ReadAsAsync<ErrorMessage>();
+            Assert.Equal("You are already signed in.", errorMessage.Message);
+        }
+
+        [Fact]
+        public async void POST_Sessions_In_StudentSelectsNoReasonsWithTutoringTrue_ShouldReturn201()
+        {
+            var session = new KioskSignInDTO()
+            {
+                PersonId = 7,
+                Tutoring = true,
+                SelectedClasses = new List<int>() { 1, 2 },
+                SelectedReasons = new List<int>() { }
+            };
+
+            var client = _factory.CreateClient();
+
+            var response = await client.PostAsJsonAsync("api/sessions/in", session);
+            Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+        }
     }
 }

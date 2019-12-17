@@ -242,7 +242,7 @@ VALUES
 INSERT INTO [dbo].[Sessions]
     ([Id], [PersonId], [SemesterCode], [InTime], [OutTime], [Tutoring])
 VALUES
-    (61, 79, 201901, N'2019-01-20 10:58:13', N'2019-01-21 12:53:09', 1)
+    (61, 79, 201901, N'2019-01-20 10:58:13', null, 1)
 INSERT INTO [dbo].[Sessions]
     ([Id], [PersonId], [SemesterCode], [InTime], [OutTime], [Tutoring])
 VALUES
@@ -754,5 +754,5 @@ VALUES
 INSERT INTO [dbo].[Sessions]
     ([Id], [PersonId], [SemesterCode], [InTime], [OutTime], [Tutoring])
 VALUES
-    (189, 61, 201903, N'2019-01-11 12:14:13', N'2019-01-11 13:57:04', 1)
+    (189, 61, 201903, N'2019-01-11 12:14:13', null, 1)
 SET IDENTITY_INSERT [dbo].[Sessions] OFF

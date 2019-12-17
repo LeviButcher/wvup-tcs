@@ -25,6 +25,6 @@ namespace tcs_service.Models
         public string ShortName { get; set; }
 
         [InverseProperty(nameof(SessionClass.Class))]
-        public List<SessionClass> SessionClasses { get; set; }
+        public IEnumerable<SessionClass> SessionClasses { get; set; }
     }
 }

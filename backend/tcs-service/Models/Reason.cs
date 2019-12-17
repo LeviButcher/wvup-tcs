@@ -18,6 +18,6 @@ namespace tcs_service.Models
         public bool Deleted { get; set; }
 
         [InverseProperty(nameof(SessionReason.Reason))]
-        public List<SessionReason> SessionReasons { get; set; }
+        public IEnumerable<SessionReason> SessionReasons { get; set; }
     }
 }
