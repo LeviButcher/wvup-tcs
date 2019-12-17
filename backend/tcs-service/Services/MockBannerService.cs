@@ -68,7 +68,7 @@ namespace tcs_service.Services
             }
             else
             {
-                newStudent = await PersonTable.Where(x => x.ID == id).FirstOrDefaultAsync();
+                newStudent = await PersonTable.Where(x => x.Id == id).FirstOrDefaultAsync();
             }
             if (newStudent == null)
             {
@@ -78,7 +78,7 @@ namespace tcs_service.Services
             student.studentEmail = newStudent.Email;
             student.firstName = newStudent.FirstName;
             student.lastName = newStudent.LastName;
-            student.studentID = newStudent.ID;
+            student.studentID = newStudent.Id;
             student.semesterId = 201903;
             student.personType = "Student";
 
@@ -126,7 +126,7 @@ namespace tcs_service.Services
             }
             else
             {
-                newTeacher = await PersonTable.Where(x => x.ID == id).FirstOrDefaultAsync();
+                newTeacher = await PersonTable.Where(x => x.Id == id).FirstOrDefaultAsync();
             }
 
             if (newTeacher == null)
@@ -137,7 +137,7 @@ namespace tcs_service.Services
             teacher.teacherEmail = newTeacher.Email;
             teacher.firstName = newTeacher.FirstName;
             teacher.lastName = newTeacher.LastName;
-            teacher.teacherID = newTeacher.ID;
+            teacher.teacherID = newTeacher.Id;
             teacher.semesterId = 201903;
             teacher.personType = "Teacher";
 

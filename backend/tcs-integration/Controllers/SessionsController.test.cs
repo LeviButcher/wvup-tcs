@@ -65,7 +65,7 @@ namespace tcs_integration.Controllers
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             var session = await response.Content.ReadAsAsync<Session>();
 
-            Assert.Equal(sessionId, session.ID);
+            Assert.Equal(sessionId, session.Id);
         }
         
         [Fact]
@@ -92,8 +92,8 @@ namespace tcs_integration.Controllers
                 InTime = DateTime.Now,
                 PersonId = 1,
                 Tutoring = true,
-                SelectedClasses = new List<Class>() { new Class { CRN = 4, DepartmentCode = 2, Name = "ENGLISH LIT", ShortName = "English 101" } } ,
-                SelectedReasons = new List<Reason>() { new Reason { Id = 2, Name = "Computer Use", Deleted = true} }  
+                SelectedClasses = new List<int>() { 3, 4 } ,
+                SelectedReasons = new List<int>() { 2 }  
             };
             var user = await Login(client);
             var request = new HttpRequestMessage(HttpMethod.Post, "api/sessions");
@@ -109,20 +109,98 @@ namespace tcs_integration.Controllers
         }
 
         [Fact]
+        public async void POST_session_withnoselectedclasses_ShouldReturn400()
+        {
+            var client = _factory.CreateClient();
+            var session = new SessionCreateDTO()
+            {
+                InTime = DateTime.Now,
+                PersonId = 1,
+                Tutoring = true,
+                SelectedClasses = new List<int>() {  },
+                SelectedReasons = new List<int>() { 2 }
+            };
+            var user = await Login(client);
+            var request = new HttpRequestMessage(HttpMethod.Post, "api/sessions");
+            request.Headers.Add("Authorization", $"Bearer {user.Token}");
+            request.Content = new StringContent(JsonConvert.SerializeObject(session));
+            request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+
+            var response = await client.SendAsync(request);
+            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        }
+
+        [Fact]
+        public async void POST_session_withnoselectedreasons_tutoringtrue_ShouldReturn201WithCreatedSession()
+        {
+            var client = _factory.CreateClient();
+            var session = new SessionCreateDTO()
+            {
+                InTime = DateTime.Now,
+                PersonId = 1,
+                Tutoring = true,
+                SelectedClasses = new List<int>() { 2 },
+                SelectedReasons = new List<int>() { }
+            };
+            var user = await Login(client);
+            var request = new HttpRequestMessage(HttpMethod.Post, "api/sessions");
+            request.Headers.Add("Authorization", $"Bearer {user.Token}");
+            request.Content = new StringContent(JsonConvert.SerializeObject(session));
+            request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+
+            var response = await client.SendAsync(request);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            var createdSession = await response.Content.ReadAsAsync<Session>();
+            Assert.Equal(1, createdSession.PersonId);
+            Assert.True(session.Tutoring);
+        }
+
+        [Fact]
+        public async void POST_session_withnoselectedreasons_tutoringfalse_ShouldReturn400()
+        {
+            var client = _factory.CreateClient();
+            var session = new SessionCreateDTO()
+            {
+                InTime = DateTime.Now,
+                PersonId = 1,
+                Tutoring = false,
+                SelectedClasses = new List<int>() { 3 },
+                SelectedReasons = new List<int>() {  }
+            };
+            var user = await Login(client);
+            var request = new HttpRequestMessage(HttpMethod.Post, "api/sessions");
+            request.Headers.Add("Authorization", $"Bearer {user.Token}");
+            request.Content = new StringContent(JsonConvert.SerializeObject(session));
+            request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+
+            var response = await client.SendAsync(request);
+            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        }
+
+
+        [Fact]
         public async void PUT_sessions_id_ShouldReturn200WithUpdatedSession()
         {
             var client = _factory.CreateClient();
             var user = await Login(client);
-            var request = new HttpRequestMessage(HttpMethod.Put, "api/sessions/1");
+            var request = new HttpRequestMessage(HttpMethod.Put, "api/sessions/3");
+            var sessionDTO = new SessionCreateDTO()
+            {
+                Id = 3,
+                InTime = DateTime.Now,
+                PersonId = 8,
+                Tutoring = true,
+                SelectedClasses = new List<int>() { 3 },
+                SelectedReasons = new List<int>() {  }
+            };
             request.Headers.Add("Authorization", $"Bearer {user.Token}");
-            request.Content = new StringContent(JsonConvert.SerializeObject(new Session {ID = 1, PersonId = 5, Tutoring = false, InTime = DateTime.Now, OutTime = null }));
+            request.Content = new StringContent(JsonConvert.SerializeObject(sessionDTO));
             request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
 
             var response = await client.SendAsync(request);
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             var session = await response.Content.ReadAsAsync<Session>();
-            Assert.False( session.Tutoring);
-            Assert.Equal(5, session.PersonId);
+            Assert.Equal(8, session.PersonId);
         }
 
         [Fact]
@@ -130,7 +208,7 @@ namespace tcs_integration.Controllers
         {
             var client = _factory.CreateClient();
             var user = await Login(client);
-            var request = new HttpRequestMessage(HttpMethod.Put, "api/sessions/signout/175");
+            var request = new HttpRequestMessage(HttpMethod.Put, "api/sessions/signout/61");
             request.Headers.Add("Authorization", $"Bearer {user.Token}");
             request.Content = new StringContent(JsonConvert.SerializeObject(new Session {  OutTime = DateTime.Now }));
             request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
@@ -142,7 +220,18 @@ namespace tcs_integration.Controllers
         }
 
         [Fact]
-        public async void DELETE_sessions_id_ShouldReturn200WithUpdatedSession()
+        public async void PUT_signout_studentnotsignedin_ShouldReturn400()
+        {
+            var client = _factory.CreateClient();
+            var user = await Login(client);
+            var request = new HttpRequestMessage(HttpMethod.Put, "api/sessions/signout/35");
+            request.Headers.Add("Authorization", $"Bearer {user.Token}");
+            var response = await client.SendAsync(request);
+            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        }
+
+        [Fact]
+        public async void DELETE_sessions_id_ShouldReturn200WithDeletedSession()
         {
             var client = _factory.CreateClient();
             var user = await Login(client);
@@ -152,7 +241,7 @@ namespace tcs_integration.Controllers
             var response = await client.SendAsync(request);
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             var session = await response.Content.ReadAsAsync<Session>();
-            Assert.Equal(27, session.ID);
+            Assert.Equal(27, session.Id);
             
             request = new HttpRequestMessage(HttpMethod.Get, $"api/sessions/27");
             request.Headers.Add("Authorization", $"Bearer {user.Token}");

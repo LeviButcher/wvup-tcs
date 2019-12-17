@@ -124,7 +124,7 @@ namespace tcs_service.Repos
                             LastName = x.Person.LastName,
                             FirstName = x.Person.FirstName,
                             OutTime = x.OutTime,
-                            WVUPId = x.Person.ID,
+                            WVUPId = x.Person.Id,
                         })
                         .ToListAsync();
     }

@@ -9,18 +9,18 @@ namespace tcs_service.Models
         [Key]
         [Column(Order = 1)]
         [Required]
-        public int ClassID { get; set; }
+        public int ClassId { get; set; }
 
-        [ForeignKey(nameof(ClassID))]
+        [ForeignKey(nameof(ClassId))]
         public Class Class { get; set; }
 
         [Key]
         [Column(Order = 2)]
         [Required]
-        public int SessionID { get; set; }
+        public int SessionId { get; set; }
 
 
-        [ForeignKey(nameof(SessionID))]
+        [ForeignKey(nameof(SessionId))]
         public Session Session { get; set; }
     }
 }

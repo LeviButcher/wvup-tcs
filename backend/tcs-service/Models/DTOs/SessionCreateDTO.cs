@@ -20,8 +20,8 @@ namespace tcs_service.Models.DTOs
 
         public bool Tutoring { get; set; }
 
-        public List<Class> SelectedClasses { get; set; }
+        public List<int> SelectedClasses { get; set; }
 
-        public List<Reason> SelectedReasons { get; set; }
+        public List<int> SelectedReasons { get; set; }
     }
 }

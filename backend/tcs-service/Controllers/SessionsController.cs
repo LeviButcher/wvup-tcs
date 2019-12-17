@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
@@ -33,7 +35,7 @@ namespace tcs_service.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetSession([FromRoute] int id)
         {
-            var session = await _iRepo.Find(x => x.ID == id);
+            var session = await _iRepo.Find(x => x.Id == id);
 
             if (session == null)
             {
@@ -49,23 +51,45 @@ namespace tcs_service.Controllers
         [HttpPost]
         public async Task<IActionResult> PostSession([FromBody] SessionCreateDTO sessionDTO)
         {
+            if(sessionDTO.SelectedClasses.Count < 1 )
+            {
+                return BadRequest(new { message = "Must select at least one class." });
+            }
+
+            if(sessionDTO.SelectedReasons.Count < 1 && !sessionDTO.Tutoring )
+            {
+                return BadRequest(new { message = "Must select at least one reason for visit." });
+            }
+
             var session = _mapper.Map<Session>(sessionDTO);
-            sessionDTO.SelectedClasses.ForEach(x => session.SessionClasses.Add(new SessionClass() { ClassID = x.CRN }));
-            sessionDTO.SelectedReasons.ForEach(x => session.SessionReasons.Add(new SessionReason() { ReasonID = x.Id }));
+            sessionDTO.SelectedClasses.ForEach(x => session.SessionClasses.Add(new SessionClass() { ClassId = x }));
+            sessionDTO.SelectedReasons.ForEach(x => session.SessionReasons.Add(new SessionReason() { ReasonId = x }));
             await _iRepo.Create(session);
 
             return Ok(session); 
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateSession([FromRoute] int id, [FromBody] Session session)
+        public async Task<IActionResult> UpdateSession([FromRoute] int id, [FromBody] SessionCreateDTO sessionDTO)
         {
-            if (id != session.ID)
+            if (id != sessionDTO.Id)
             {
                 return BadRequest();
             }
+
+            if (sessionDTO.SelectedClasses.Count < 1)
+            {
+                return BadRequest(new { message = "Must select at least one class." });
+            }
+
+            if (sessionDTO.SelectedReasons.Count < 1 && !sessionDTO.Tutoring)
+            {
+                return BadRequest(new { message = "Must select at least one reason for visit." });
+            }
+
             try
             {
+                var session = _mapper.Map<Session>(sessionDTO);
                 var result = await _iRepo.Update(session);
                 return Ok(result);
             }
@@ -75,10 +99,16 @@ namespace tcs_service.Controllers
             }
         }
 
-        [HttpPut("signout/{id}")]
-        public async Task<IActionResult> SignOut([FromRoute] int id)
+        [HttpPut("signout/{studentId}")]
+        public async Task<IActionResult> SignOut([FromRoute] int studentId)
         {
-            var session = await _iRepo.Find(x => x.ID == id);
+            var session = _iRepo.GetAll(x => x.PersonId == studentId).OrderBy(x => x.Id).LastOrDefault();
+            
+            if(session.OutTime != null)
+            {
+                return BadRequest(new { message = "You aren't signed in" });
+            }
+
             session.OutTime = DateTime.Now;
             await _iRepo.Update(session);
 
@@ -88,7 +118,7 @@ namespace tcs_service.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteSession([FromRoute] int id)
         {
-            var session = await _iRepo.Remove(x => x.ID == id);
+            var session = await _iRepo.Remove(x => x.Id == id);
             return Ok(session);
         }
     }

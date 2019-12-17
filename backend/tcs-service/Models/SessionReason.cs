@@ -8,17 +8,17 @@ namespace tcs_service.Models
         [Key]
         [Column(Order = 1)]
         [Required]
-        public int ReasonID { get; set; }
+        public int ReasonId { get; set; }
 
-        [ForeignKey(nameof(ReasonID))]
+        [ForeignKey(nameof(ReasonId))]
         public Reason Reason { get; set; }
 
         [Key]
         [Column(Order = 2)]
         [Required]
-        public int SessionID { get; set; }
+        public int SessionId { get; set; }
 
-        [ForeignKey(nameof(SessionID))]
+        [ForeignKey(nameof(SessionId))]
         public Session Session { get; set; }
     }
 }

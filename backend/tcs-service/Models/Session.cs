@@ -9,7 +9,7 @@ namespace tcs_service.Models
     public class Session
     {
         [Key]
-        public int ID { get; set; }
+        public int Id { get; set; }
 
         [Required]
         public int PersonId { get; set; }

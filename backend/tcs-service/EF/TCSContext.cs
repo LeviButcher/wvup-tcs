@@ -62,9 +62,9 @@ namespace tcs_service.EF
 
             modelBuilder.Entity<SignInReason>().HasKey(key => new { key.SignInID, key.ReasonID });
 
-            modelBuilder.Entity<SessionReason>().HasKey(key => new { key.SessionID, key.ReasonID });
+            modelBuilder.Entity<SessionReason>().HasKey(key => new { key.SessionId, key.ReasonId });
 
-            modelBuilder.Entity<SessionClass>().HasKey(key => new { key.SessionID, key.ClassID});
+            modelBuilder.Entity<SessionClass>().HasKey(key => new { key.SessionId, key.ClassId});
 
             modelBuilder.Entity<Course>()
             .Property(p => p.CRN)
@@ -75,11 +75,11 @@ namespace tcs_service.EF
              .ValueGeneratedNever();
 
             modelBuilder.Entity<Semester>()
-            .Property(p => p.ID)
+            .Property(p => p.Id)
             .ValueGeneratedNever();
 
             modelBuilder.Entity<Person>()
-             .Property(p => p.ID)
+             .Property(p => p.Id)
              .ValueGeneratedNever();
 
             modelBuilder.Entity<Department>()

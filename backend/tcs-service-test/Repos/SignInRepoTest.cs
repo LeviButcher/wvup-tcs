@@ -62,36 +62,7 @@ namespace tcs_service_test.Repos
             Assert.True(res);
         }
 
-        [Fact]
-        public async void AddCourseWithDepartment_ShouldWork()
-        {
-            var dept = fixture.Create<Department>();
-
-            var course = fixture.Create<Course>();
-            course.Department = dept;
-
-            var res = await signInRepo.AddCourse(course);
-
-            Assert.True(await signInRepo.DepartmentExist(dept.Code));
-            Assert.Equal(res.CRN, course.CRN);
-        }
-
-        [Fact]
-        public async void AddCourseAndDepartment_ShouldWork()
-        {
-            var dept = fixture.Create<Department>();
-
-            var department = await signInRepo.AddDepartment(dept);
-
-            var course = fixture.Create<Course>();
-            course.Department = dept;
-
-            var res = await signInRepo.AddCourse(course);
-
-            Assert.True(await signInRepo.DepartmentExist(department.Code));
-            Assert.Equal(res.CRN, course.CRN);
-        }
-
+       
         [Fact]
         public async void AddCourse_SignInWithNewPersonNewCoursesAndReasons_ShouldWork()
         {
@@ -126,7 +97,7 @@ namespace tcs_service_test.Repos
             await db.SaveChangesAsync();
 
             var signIn = fixture.Create<SignIn>();
-            signIn.PersonId = person.ID;
+            signIn.PersonId = person.Id;
             signIn.InTime = DateTime.Now.AddHours(-1);
             signIn.OutTime = DateTime.Now;
             var choosenCourses = fixture.CreateMany<Course>().Append(course).Select(x => new SignInCourse() { Course = x });
