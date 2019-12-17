@@ -41,10 +41,10 @@ namespace tcs_service.Migrations
                 {
                     b.Property<int>("CRN");
 
-                    b.Property<string>("CourseName")
-                        .IsRequired();
-
                     b.Property<int>("DepartmentID");
+
+                    b.Property<string>("Name")
+                        .IsRequired();
 
                     b.Property<string>("ShortName")
                         .IsRequired();
@@ -70,7 +70,7 @@ namespace tcs_service.Migrations
 
             modelBuilder.Entity("tcs_service.Models.Person", b =>
                 {
-                    b.Property<int>("ID");
+                    b.Property<int>("Id");
 
                     b.Property<string>("Email")
                         .IsRequired();
@@ -83,7 +83,7 @@ namespace tcs_service.Migrations
 
                     b.Property<int>("PersonType");
 
-                    b.HasKey("ID");
+                    b.HasKey("Id");
 
                     b.ToTable("People");
                 });
@@ -104,14 +104,28 @@ namespace tcs_service.Migrations
                     b.ToTable("Reasons");
                 });
 
+            modelBuilder.Entity("tcs_service.Models.Schedule", b =>
+                {
+                    b.Property<int>("CourseCRN");
+
+                    b.Property<int>("PersonId");
+
+                    b.Property<int>("SemesterCode");
+
+                    b.HasKey("CourseCRN", "PersonId", "SemesterCode");
+
+                    b.HasIndex("PersonId");
+
+                    b.HasIndex("SemesterCode");
+
+                    b.ToTable("Schedules");
+                });
+
             modelBuilder.Entity("tcs_service.Models.Semester", b =>
                 {
-                    b.Property<int>("ID");
+                    b.Property<int>("Code");
 
-                    b.Property<string>("Name")
-                        .IsRequired();
-
-                    b.HasKey("ID");
+                    b.HasKey("Code");
 
                     b.ToTable("Semesters");
                 });
@@ -196,6 +210,24 @@ namespace tcs_service.Migrations
                     b.HasOne("tcs_service.Models.Department", "Department")
                         .WithMany("Courses")
                         .HasForeignKey("DepartmentID")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("tcs_service.Models.Schedule", b =>
+                {
+                    b.HasOne("tcs_service.Models.Course", "Course")
+                        .WithMany()
+                        .HasForeignKey("CourseCRN")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("tcs_service.Models.Person", "Person")
+                        .WithMany()
+                        .HasForeignKey("PersonId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("tcs_service.Models.Semester", "Semester")
+                        .WithMany()
+                        .HasForeignKey("SemesterCode")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 

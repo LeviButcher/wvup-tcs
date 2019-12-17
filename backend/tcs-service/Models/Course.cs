@@ -16,7 +16,7 @@ namespace tcs_service.Models
         public Department Department { get; set; }
 
         [Required]
-        public string CourseName { get; set; }
+        public string Name { get; set; }
 
         [Required]
         public string ShortName { get; set; }

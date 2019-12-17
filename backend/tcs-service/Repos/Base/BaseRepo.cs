@@ -39,6 +39,22 @@ namespace tcs_service.Repos.Base
             return added.Entity;
         }
 
+        public async Task<T> CreateOrUpdate(Expression<Func<T, bool>> func, T t)
+        {
+            var item = await Find(func);
+            if (item is T)
+            {
+                _db.Entry(item).State = EntityState.Detached;
+                table.Update(t);
+                await SaveChangesAsync();
+                return t;
+            }
+            else
+            {
+                return await Create(t);
+            }
+        }
+
         public async Task<T> Update(T t)
         {
             var updated = table.Update(t);
@@ -48,26 +64,26 @@ namespace tcs_service.Repos.Base
 
         protected abstract IQueryable<T> Include(DbSet<T> set);
 
-        public async Task<bool> Exist(Expression<Func<T, Boolean>> function) => await table.AnyAsync(function);
+        public async Task<bool> Exist(Expression<Func<T, bool>> function) => await table.AnyAsync(function);
 
-        public async Task<T> Find(Expression<Func<T, Boolean>> function)
+        public async Task<T> Find(Expression<Func<T, bool>> function)
             => await Include(table).FirstOrDefaultAsync(function);
 
-        public IEnumerable<T> GetAll(Expression<Func<T, Boolean>> function) => Include(table).Where(function);
+        public IEnumerable<T> GetAll(Expression<Func<T, bool>> function) => Include(table).Where(function);
 
         public IEnumerable<T> GetAll() => Include(table);
 
-        public async Task<T> Remove(Expression<Func<T, Boolean>> function)
+        public async Task<T> Remove(Expression<Func<T, bool>> function)
         {
-            var found = await this.Find(function);
+            var found = await Find(function);
             var deleted = table.Remove(found);
             await SaveChangesAsync();
             return deleted.Entity;
         }
 
-        public async Task<IEnumerable<T>> RemoveAll(Expression<Func<T, Boolean>> function)
+        public async Task<IEnumerable<T>> RemoveAll(Expression<Func<T, bool>> function)
         {
-            var found = this.GetAll(function);
+            var found = GetAll(function);
             table.RemoveRange(found);
             await SaveChangesAsync();
             return found;

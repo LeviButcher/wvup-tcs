@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import type { Node } from 'react';
-import { Formik, Form, Field } from 'formik';
+import { Formik, Form, Field, useFormikContext } from 'formik';
 import * as Yup from 'yup';
 import { Input, Button, Stack } from '../ui';
 import { callApi, unwrapToJSON, ensureResponseCode, isWVUPId } from '../utils';
@@ -8,64 +8,61 @@ import useCardReader from '../hooks/useCardReader';
 import type { Teacher, Student } from '../types';
 
 const EmailSchema = Yup.object().shape({
-  email: Yup.string()
-    .email('Invalid email')
-    .matches(/^[A-Z0-9._%+-]+@wvup.edu$/i, 'Must be a wvup email address')
-    .trim()
-    .required('Email is required')
+  id: Yup.string(),
+  email: Yup.string().when(
+    'id',
+    // $FlowFixMe
+    {
+      is: val => {
+        return val && val !== '';
+      },
+      then: Yup.string(),
+      otherwise: Yup.string()
+        .email('Invalid email')
+        .matches(/^[A-Z0-9._%+-]+@wvup.edu$/i, 'Must be a wvup email address')
+        .trim()
+        .required('Email is required')
+    }
+  )
 });
 
-const getStudentInfoWithEmail = email =>
-  callApi(`signins/${email}/email`, 'GET', null);
-
-const getStudentInfoWithId = (id: number) =>
-  callApi(`signins/${id}/id`, 'GET', null);
-
-const getTeacherInfoWithEmail = email =>
-  callApi(`signins/${email}/teacher/email`, 'GET', null);
-
-const getTeacherInfoWithId = (id: number) =>
-  callApi(`signins/${id}/teacher/id`, 'GET', null);
+// Can be called with either email or wvupId
+const getPersonInfo = (identifier: string | number) =>
+  callApi(`person/${identifier}`, 'GET', null);
 
 type Props = {
   afterValidSubmit: (Teacher & Student) => Promise<any>,
-  teacher?: boolean,
   children?: Node
 };
 
-const EmailOrCardSwipeForm = ({
-  afterValidSubmit,
-  teacher,
-  children
-}: Props) => {
+const FormikCardReader = () => {
   const [data] = useCardReader();
-
-  const getInfoWithEmail = teacher
-    ? getTeacherInfoWithEmail
-    : getStudentInfoWithEmail;
-
-  const getInfoWithId = teacher ? getTeacherInfoWithId : getStudentInfoWithId;
+  const { setValues, submitForm, validateForm } = useFormikContext();
 
   useEffect(() => {
     let isMounted = true;
     if (data && data.length > 2) {
       const wvupId = data.find(isWVUPId) || -1;
-      getInfoWithId(wvupId)
-        .then(ensureResponseCode(200))
-        .then(unwrapToJSON)
-        .then(personInfo => {
-          if (isMounted) afterValidSubmit(personInfo);
-        });
+      if (wvupId) {
+        setValues({ id: wvupId });
+        if (isMounted) validateForm().then(() => submitForm());
+      }
     }
     return () => {
       isMounted = false;
     };
-  }, [data, afterValidSubmit, getInfoWithId]);
+  }, [data, setValues, submitForm, validateForm]);
 
+  return null;
+};
+
+const EmailOrCardSwipeForm = ({ afterValidSubmit, children }: Props) => {
   return (
     <Formik
-      onSubmit={({ email }, { setStatus }) => {
-        return getInfoWithEmail(email)
+      onSubmit={({ email, id }, { setStatus }) => {
+        const identifier = id && id !== '' ? id : email;
+
+        return getPersonInfo(identifier)
           .then(ensureResponseCode(200))
           .then(unwrapToJSON)
           .then(afterValidSubmit)
@@ -75,7 +72,7 @@ const EmailOrCardSwipeForm = ({
             }
           });
       }}
-      initialValues={{ email: '' }}
+      initialValues={{ email: '', id: '' }}
       validationSchema={EmailSchema}
       isInitialValid={false}
     >
@@ -102,6 +99,7 @@ const EmailOrCardSwipeForm = ({
               >
                 {isSubmitting ? 'Submitting...' : 'Submit'}
               </Button>
+              <FormikCardReader />
             </Stack>
           </Form>
         );
@@ -111,8 +109,7 @@ const EmailOrCardSwipeForm = ({
 };
 
 EmailOrCardSwipeForm.defaultProps = {
-  children: null,
-  teacher: false
+  children: null
 };
 
 export default EmailOrCardSwipeForm;

@@ -9,7 +9,7 @@ namespace tcs_service.Models
     public class Person
     {
         [Key]
-        public int ID { get; set; }
+        public int Id { get; set; }
 
         [Required]
         public string Email { get; set; }

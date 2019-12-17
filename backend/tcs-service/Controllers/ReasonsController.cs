@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using tcs_service.Models;
+using tcs_service.Models.DTOs;
 using tcs_service.Repos.Interfaces;
 
 namespace tcs_service.Controllers

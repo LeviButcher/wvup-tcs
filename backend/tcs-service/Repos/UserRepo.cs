@@ -16,11 +16,6 @@ namespace tcs_service.Repos
 
         private readonly AppSettings _appSettings;
 
-        public UserRepo(IOptions<AppSettings> appSettings)
-        {
-            _appSettings = appSettings.Value;
-        }
-
         public UserRepo(DbContextOptions options, IOptions<AppSettings> appSettings) : base(options)
         {
             _appSettings = appSettings.Value;

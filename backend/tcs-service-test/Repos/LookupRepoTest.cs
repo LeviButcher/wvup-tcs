@@ -51,13 +51,13 @@ namespace tcs_service_test.Repos
             db.SaveChanges();
             signIns = signIns.Select(x =>
             {
-                x.SemesterId = semester.ID;
-                x.PersonId = person.ID;
+                x.SemesterId = semester.Code;
+                x.PersonId = person.Id;
                 return x;
             });
             db.SignIns.AddRange(signIns);
             db.SaveChanges();
-            var semesterSignins = await lookupRepo.GetBySemester(semester.ID);
+            var semesterSignins = await lookupRepo.GetBySemester(semester.Code);
             Assert.Equal(signIns.Count(), semesterSignins.Count());
         }
     }

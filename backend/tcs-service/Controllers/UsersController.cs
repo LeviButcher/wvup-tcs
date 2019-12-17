@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using tcs_service.Exceptions;
 using tcs_service.Helpers;
 using tcs_service.Models;
+using tcs_service.Models.DTOs;
 using tcs_service.Repos.Interfaces;
 
 namespace tcs_service.Controllers

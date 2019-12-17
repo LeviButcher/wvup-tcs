@@ -22,6 +22,8 @@ using tcs_service.Services;
 using tcs_service.Services.Interfaces;
 using tcs_service.Services.ScheduledTasks;
 using Helpers;
+using tcs_service.UnitOfWorks;
+using tcs_service.UnitOfWorks.Interfaces;
 
 namespace tcs_service
 {
@@ -39,6 +41,10 @@ namespace tcs_service
 
         public void ConfigureServices(IServiceCollection services)
         {
+            var dbConfig = Configuration.GetSection("Db").Get<DbConfig>();
+            var bannerConfig = Configuration.GetSection("Banner").Get<BannerConfig>();
+
+
             services.AddCors(options =>
             {
                 options.AddPolicy(AllowAnywhere,
@@ -77,15 +83,15 @@ namespace tcs_service
                 });
 
 
-            if (!Environment.IsDevelopment())
+            if (Environment.IsProduction())
             {
-                var bannerAuth = Configuration["Banner:User"] + ":" + Configuration["Banner:Password"];
+                var bannerAuth = bannerConfig.User + ":" + bannerConfig.Password;
                 var encodedAuth = bannerAuth.ToBase64();
 
 
                 services.AddHttpClient("banner", c =>
                 {
-                    c.BaseAddress = new Uri(Configuration["Banner:api"]);
+                    c.BaseAddress = new Uri(bannerConfig.Api);
                     c.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", encodedAuth);
                 });
                 services.AddScoped<IBannerService, LiveBannerService>();
@@ -114,7 +120,7 @@ namespace tcs_service
                 .SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
             services.AddDbContext<TCSContext>(options =>
-               options.UseSqlServer(Configuration["DB:connectionString"]));
+               options.UseSqlServer(dbConfig.ConnectionString));
 
             services.AddScoped<IClassTourRepo, ClassTourRepo>();
             services.AddScoped<IUserRepo, UserRepo>();
@@ -122,21 +128,22 @@ namespace tcs_service
             services.AddScoped<IReportsRepo, ReportsRepo>();
             services.AddScoped<IReasonRepo, ReasonRepo>();
             services.AddScoped<ILookupRepo, LookupRepo>();
+            services.AddScoped<IPersonRepo, PersonRepo>();
+            services.AddScoped<IScheduleRepo, ScheduleRepo>();
+            services.AddScoped<ICourseRepo, CourseRepo>();
+            services.AddScoped<ISemesterRepo, SemesterRepo>();
+            services.AddScoped<IDepartmentRepo, DepartmentRepo>();
+            services.AddScoped<IUnitOfWorkPerson, UnitOfWorkPerson>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, TCSContext db, IUserRepo repo)
         {
             DbInitializer.InitializeData(db, repo, Environment);
-            if (Environment.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-            }
-            else
-            {
-                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-                app.UseHsts();
-            }
+
+            // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+            app.UseHsts();
+
             app.UseErrorWrapping();
 
             app.UseCors(AllowAnywhere);
