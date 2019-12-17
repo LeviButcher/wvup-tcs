@@ -16,8 +16,8 @@ namespace tcs_service.Controllers
     [ApiController]
     public class SessionsController : ControllerBase
     {
-        private ISessionRepo _iRepo;
-        private IMapper _mapper;
+        readonly private ISessionRepo _iRepo;
+        readonly private IMapper _mapper;
 
         public SessionsController(ISessionRepo iRepo, IMapper mapper)
         {
@@ -51,12 +51,12 @@ namespace tcs_service.Controllers
         [HttpPost]
         public async Task<IActionResult> PostSession([FromBody] SessionCreateDTO sessionDTO)
         {
-            if(sessionDTO.SelectedClasses.Count < 1 )
+            if (sessionDTO.SelectedClasses.Count < 1)
             {
                 return BadRequest(new { message = "Must select at least one class." });
             }
 
-            if(sessionDTO.SelectedReasons.Count < 1 && !sessionDTO.Tutoring )
+            if (sessionDTO.SelectedReasons.Count < 1 && !sessionDTO.Tutoring)
             {
                 return BadRequest(new { message = "Must select at least one reason for visit." });
             }
@@ -66,7 +66,7 @@ namespace tcs_service.Controllers
             sessionDTO.SelectedReasons.ForEach(x => session.SessionReasons.Add(new SessionReason() { ReasonId = x }));
             await _iRepo.Create(session);
 
-            return Ok(session); 
+            return Ok(session);
         }
 
         [HttpPut("{id}")]
@@ -103,8 +103,8 @@ namespace tcs_service.Controllers
         public async Task<IActionResult> SignOut([FromRoute] int studentId)
         {
             var session = _iRepo.GetAll(x => x.PersonId == studentId).OrderBy(x => x.Id).LastOrDefault();
-            
-            if(session.OutTime != null)
+
+            if (session.OutTime != null)
             {
                 return BadRequest(new { message = "You aren't signed in" });
             }

@@ -12,7 +12,7 @@ namespace tcs_service.Models.ViewModels
 
         public string lastName { get; set; }
 
-        public List<Course> classSchedule { get; set; }
+        public List<Class> classSchedule { get; set; }
 
         public int semesterId { get; set; }
 

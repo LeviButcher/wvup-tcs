@@ -80,6 +80,16 @@ jobs:
             - ~/.nuget/packages
           key: v1-back-dependencies-{{ checksum "sXb-service/sXb-service.csproj" }}-{{ checksum "sXb-service-test/sXb-service-test.csproj" }}
 
+  flow:
+    executor: front-exec
+    working_directory: ~/repo/frontend
+    steps:
+      - checkout:
+          path: ~/repo
+      - *restore_npm_cache
+      - *install_npm
+      - run: npm run flow
+
   test-back:
     executor: back-exec
     working_directory: ~/repo/backend
@@ -120,6 +130,18 @@ jobs:
           name: Pushing Image to Docker Hub
           command: docker push $DOCKER_USER/tcs-front:$CIRCLE_BRANCH
 
+  test-integration:
+    executor: docker-exec
+    working_directory: ~/repo/
+    steps:
+      - setup_remote_docker
+      - checkout:
+          path: ~/repo
+      - run:
+          name: Run Integration Tests
+          command: >
+            docker-compose -f docker-compose.Test.yml run tcs-integration
+
 workflows:
   version: 2
 
@@ -133,9 +155,17 @@ workflows:
       - test-back:
           requires:
             - setup-back
+      - test-integration:
+          requires:
+            - setup-back
+      - flow:
+          requires:
+            - setup-front
       - deploy-back:
           requires:
             - test-back
+            - test-integration
       - deploy-front:
           requires:
             - test-front
+            - flow

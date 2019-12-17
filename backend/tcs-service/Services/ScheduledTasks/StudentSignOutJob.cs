@@ -10,19 +10,22 @@ namespace tcs_service.Services.ScheduledTasks
 {
     public class StudentSignOutJob : IJob
     {
-        private readonly ISignInRepo _iRepo;
+        private readonly ISessionRepo _iRepo;
 
 
-        public StudentSignOutJob(ISignInRepo iRepo)
+        public StudentSignOutJob(ISessionRepo iRepo)
         {
             _iRepo = iRepo;
         }
-        
+
         public async Task Execute(IJobExecutionContext context)
         {
-            await _iRepo.UpdateNullSignOuts();
-          
-            return;
+            var signIns = _iRepo.GetAll(x => x.OutTime == null && x.InTime != null);
+            foreach (var signIn in signIns)
+            {
+                signIn.OutTime = signIn.InTime.Value.AddHours(2);
+                await _iRepo.Update(signIn);
+            }
         }
     }
 }

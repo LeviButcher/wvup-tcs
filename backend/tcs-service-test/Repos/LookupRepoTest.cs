@@ -31,8 +31,8 @@ namespace tcs_service_test.Repos
               .Customize(new AutoMoqCustomization());
             // Setting default values
             fixture.RepeatCount = 3;
-            fixture.Customize<SignIn>((ob) => ob.Without(x => x.Courses).Without(x => x.Person)
-                .Without(x => x.Semester).Without(x => x.Reasons));
+            fixture.Customize<Session>((ob) => ob.Without(x => x.SessionClasses).Without(x => x.Person)
+                .Without(x => x.Semester).Without(x => x.SessionReasons));
         }
 
         public void Dispose()
@@ -45,20 +45,20 @@ namespace tcs_service_test.Repos
         {
             var semester = fixture.Create<Semester>();
             var person = fixture.Create<Person>();
-            var signIns = fixture.CreateMany<SignIn>();
+            var sessions = fixture.CreateMany<Session>();
             db.Semesters.Add(semester);
             db.People.Add(person);
             db.SaveChanges();
-            signIns = signIns.Select(x =>
+            sessions = sessions.Select(x =>
             {
-                x.SemesterId = semester.Id;
+                x.SemesterCode = semester.Code;
                 x.PersonId = person.Id;
                 return x;
             });
-            db.SignIns.AddRange(signIns);
+            db.Sessions.AddRange(sessions);
             db.SaveChanges();
-            var semesterSignins = await lookupRepo.GetBySemester(semester.Id);
-            Assert.Equal(signIns.Count(), semesterSignins.Count());
+            var semesterSignins = await lookupRepo.GetBySemester(semester.Code);
+            Assert.Equal(sessions.Count(), semesterSignins.Count());
         }
     }
 }

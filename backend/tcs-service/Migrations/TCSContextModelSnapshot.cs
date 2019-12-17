@@ -15,7 +15,7 @@ namespace tcs_service.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "2.2.4-servicing-10062")
+                .HasAnnotation("ProductVersion", "2.2.6-servicing-10079")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
@@ -56,25 +56,6 @@ namespace tcs_service.Migrations
                     b.ToTable("ClassTours");
                 });
 
-            modelBuilder.Entity("tcs_service.Models.Course", b =>
-                {
-                    b.Property<int>("CRN");
-
-                    b.Property<string>("CourseName")
-                        .IsRequired();
-
-                    b.Property<int>("DepartmentID");
-
-                    b.Property<string>("ShortName")
-                        .IsRequired();
-
-                    b.HasKey("CRN");
-
-                    b.HasIndex("DepartmentID");
-
-                    b.ToTable("Courses");
-                });
-
             modelBuilder.Entity("tcs_service.Models.Department", b =>
                 {
                     b.Property<int>("Code");
@@ -89,7 +70,7 @@ namespace tcs_service.Migrations
 
             modelBuilder.Entity("tcs_service.Models.Person", b =>
                 {
-                    b.Property<int>("ID");
+                    b.Property<int>("Id");
 
                     b.Property<string>("Email")
                         .IsRequired();
@@ -102,7 +83,7 @@ namespace tcs_service.Migrations
 
                     b.Property<int>("PersonType");
 
-                    b.HasKey("ID");
+                    b.HasKey("Id");
 
                     b.ToTable("People");
                 });
@@ -123,21 +104,35 @@ namespace tcs_service.Migrations
                     b.ToTable("Reasons");
                 });
 
+            modelBuilder.Entity("tcs_service.Models.Schedule", b =>
+                {
+                    b.Property<int>("ClassCRN");
+
+                    b.Property<int>("PersonId");
+
+                    b.Property<int>("SemesterCode");
+
+                    b.HasKey("ClassCRN", "PersonId", "SemesterCode");
+
+                    b.HasIndex("PersonId");
+
+                    b.HasIndex("SemesterCode");
+
+                    b.ToTable("Schedules");
+                });
+
             modelBuilder.Entity("tcs_service.Models.Semester", b =>
                 {
-                    b.Property<int>("ID");
+                    b.Property<int>("Code");
 
-                    b.Property<string>("Name")
-                        .IsRequired();
-
-                    b.HasKey("ID");
+                    b.HasKey("Code");
 
                     b.ToTable("Semesters");
                 });
 
             modelBuilder.Entity("tcs_service.Models.Session", b =>
                 {
-                    b.Property<int>("ID")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
@@ -148,91 +143,43 @@ namespace tcs_service.Migrations
 
                     b.Property<int>("PersonId");
 
+                    b.Property<int>("SemesterCode");
+
                     b.Property<bool>("Tutoring");
 
-                    b.HasKey("ID");
+                    b.HasKey("Id");
 
                     b.HasIndex("PersonId");
+
+                    b.HasIndex("SemesterCode");
 
                     b.ToTable("Sessions");
                 });
 
             modelBuilder.Entity("tcs_service.Models.SessionClass", b =>
                 {
-                    b.Property<int>("SessionID");
+                    b.Property<int>("SessionId");
 
-                    b.Property<int>("ClassID");
+                    b.Property<int>("ClassId");
 
-                    b.HasKey("SessionID", "ClassID");
+                    b.HasKey("SessionId", "ClassId");
 
-                    b.HasAlternateKey("ClassID", "SessionID");
+                    b.HasAlternateKey("ClassId", "SessionId");
 
                     b.ToTable("SessionClasses");
                 });
 
             modelBuilder.Entity("tcs_service.Models.SessionReason", b =>
                 {
-                    b.Property<int>("SessionID");
+                    b.Property<int>("SessionId");
 
-                    b.Property<int>("ReasonID");
+                    b.Property<int>("ReasonId");
 
-                    b.HasKey("SessionID", "ReasonID");
+                    b.HasKey("SessionId", "ReasonId");
 
-                    b.HasAlternateKey("ReasonID", "SessionID");
+                    b.HasAlternateKey("ReasonId", "SessionId");
 
                     b.ToTable("SessionReasons");
-                });
-
-            modelBuilder.Entity("tcs_service.Models.SignIn", b =>
-                {
-                    b.Property<int>("ID")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<DateTimeOffset?>("InTime")
-                        .IsRequired();
-
-                    b.Property<DateTimeOffset?>("OutTime");
-
-                    b.Property<int>("PersonId");
-
-                    b.Property<int>("SemesterId");
-
-                    b.Property<bool>("Tutoring");
-
-                    b.HasKey("ID");
-
-                    b.HasIndex("PersonId");
-
-                    b.HasIndex("SemesterId");
-
-                    b.ToTable("SignIns");
-                });
-
-            modelBuilder.Entity("tcs_service.Models.SignInCourse", b =>
-                {
-                    b.Property<int>("SignInID");
-
-                    b.Property<int>("CourseID");
-
-                    b.HasKey("SignInID", "CourseID");
-
-                    b.HasAlternateKey("CourseID", "SignInID");
-
-                    b.ToTable("SignInCourses");
-                });
-
-            modelBuilder.Entity("tcs_service.Models.SignInReason", b =>
-                {
-                    b.Property<int>("SignInID");
-
-                    b.Property<int>("ReasonID");
-
-                    b.HasKey("SignInID", "ReasonID");
-
-                    b.HasAlternateKey("ReasonID", "SignInID");
-
-                    b.ToTable("SignInReasons");
                 });
 
             modelBuilder.Entity("tcs_service.Models.User", b =>
@@ -261,16 +208,26 @@ namespace tcs_service.Migrations
             modelBuilder.Entity("tcs_service.Models.Class", b =>
                 {
                     b.HasOne("tcs_service.Models.Department", "Department")
-                        .WithMany()
+                        .WithMany("Classes")
                         .HasForeignKey("DepartmentCode")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
-            modelBuilder.Entity("tcs_service.Models.Course", b =>
+            modelBuilder.Entity("tcs_service.Models.Schedule", b =>
                 {
-                    b.HasOne("tcs_service.Models.Department", "Department")
-                        .WithMany("Courses")
-                        .HasForeignKey("DepartmentID")
+                    b.HasOne("tcs_service.Models.Class", "Class")
+                        .WithMany()
+                        .HasForeignKey("ClassCRN")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("tcs_service.Models.Person", "Person")
+                        .WithMany()
+                        .HasForeignKey("PersonId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("tcs_service.Models.Semester", "Semester")
+                        .WithMany()
+                        .HasForeignKey("SemesterCode")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
@@ -280,70 +237,36 @@ namespace tcs_service.Migrations
                         .WithMany()
                         .HasForeignKey("PersonId")
                         .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("tcs_service.Models.Semester", "Semester")
+                        .WithMany()
+                        .HasForeignKey("SemesterCode")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("tcs_service.Models.SessionClass", b =>
                 {
                     b.HasOne("tcs_service.Models.Class", "Class")
                         .WithMany("SessionClasses")
-                        .HasForeignKey("ClassID")
+                        .HasForeignKey("ClassId")
                         .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("tcs_service.Models.Session", "Session")
-                        .WithMany("Classes")
-                        .HasForeignKey("SessionID")
+                        .WithMany("SessionClasses")
+                        .HasForeignKey("SessionId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("tcs_service.Models.SessionReason", b =>
                 {
                     b.HasOne("tcs_service.Models.Reason", "Reason")
-                        .WithMany()
-                        .HasForeignKey("ReasonID")
+                        .WithMany("SessionReasons")
+                        .HasForeignKey("ReasonId")
                         .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("tcs_service.Models.Session", "Session")
-                        .WithMany("Reasons")
-                        .HasForeignKey("SessionID")
-                        .OnDelete(DeleteBehavior.Cascade);
-                });
-
-            modelBuilder.Entity("tcs_service.Models.SignIn", b =>
-                {
-                    b.HasOne("tcs_service.Models.Person", "Person")
-                        .WithMany()
-                        .HasForeignKey("PersonId")
-                        .OnDelete(DeleteBehavior.Cascade);
-
-                    b.HasOne("tcs_service.Models.Semester", "Semester")
-                        .WithMany()
-                        .HasForeignKey("SemesterId")
-                        .OnDelete(DeleteBehavior.Cascade);
-                });
-
-            modelBuilder.Entity("tcs_service.Models.SignInCourse", b =>
-                {
-                    b.HasOne("tcs_service.Models.Course", "Course")
-                        .WithMany("SignInCourses")
-                        .HasForeignKey("CourseID")
-                        .OnDelete(DeleteBehavior.Cascade);
-
-                    b.HasOne("tcs_service.Models.SignIn", "SignIn")
-                        .WithMany("Courses")
-                        .HasForeignKey("SignInID")
-                        .OnDelete(DeleteBehavior.Cascade);
-                });
-
-            modelBuilder.Entity("tcs_service.Models.SignInReason", b =>
-                {
-                    b.HasOne("tcs_service.Models.Reason", "Reason")
-                        .WithMany("SignInReasons")
-                        .HasForeignKey("ReasonID")
-                        .OnDelete(DeleteBehavior.Cascade);
-
-                    b.HasOne("tcs_service.Models.SignIn", "SignIn")
-                        .WithMany("Reasons")
-                        .HasForeignKey("SignInID")
+                        .WithMany("SessionReasons")
+                        .HasForeignKey("SessionId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 #pragma warning restore 612, 618

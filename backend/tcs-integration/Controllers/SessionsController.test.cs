@@ -8,6 +8,7 @@ using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
+using tcs_integration.test_utils;
 using tcs_service;
 using tcs_service.Helpers;
 using tcs_service.Models;
@@ -17,15 +18,13 @@ using Xunit;
 namespace tcs_integration.Controllers
 {
     [Collection("Integration")]
-    public class SessionsControllerTest : IClassFixture<WebApplicationFactory<Startup>>
+    public class SessionsControllerTest : IClassFixture<CustomWebApplicationFactory<Startup>>
     {
-        private readonly WebApplicationFactory<Startup> _factory;
-        private IFixture fixture;
+        private readonly CustomWebApplicationFactory<Startup> _factory;
 
-        public SessionsControllerTest(WebApplicationFactory<Startup> factory)
+        public SessionsControllerTest(CustomWebApplicationFactory<Startup> factory)
         {
             _factory = factory;
-            fixture = new Fixture().Customize(new AutoMoqCustomization());
         }
 
         private async Task<UserDto> Login(HttpClient client)
@@ -67,7 +66,7 @@ namespace tcs_integration.Controllers
 
             Assert.Equal(sessionId, session.Id);
         }
-        
+
         [Fact]
         public async void GET_outtime_null_ShouldReturnListOfSessionsWhereOutTimeIsNull()
         {
@@ -80,7 +79,7 @@ namespace tcs_integration.Controllers
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             var sessions = await response.Content.ReadAsAsync<IEnumerable<Session>>();
 
-            Assert.All(sessions, s => Assert.Null( s.OutTime ));
+            Assert.All(sessions, s => Assert.Null(s.OutTime));
         }
 
         [Fact]
@@ -92,8 +91,8 @@ namespace tcs_integration.Controllers
                 InTime = DateTime.Now,
                 PersonId = 1,
                 Tutoring = true,
-                SelectedClasses = new List<int>() { 3, 4 } ,
-                SelectedReasons = new List<int>() { 2 }  
+                SelectedClasses = new List<int>() { 3, 4 },
+                SelectedReasons = new List<int>() { 2 }
             };
             var user = await Login(client);
             var request = new HttpRequestMessage(HttpMethod.Post, "api/sessions");
@@ -104,8 +103,8 @@ namespace tcs_integration.Controllers
             var response = await client.SendAsync(request);
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             var createdSession = await response.Content.ReadAsAsync<Session>();
-            Assert.Equal(1, createdSession.PersonId );
-            Assert.True( session.Tutoring);
+            Assert.Equal(1, createdSession.PersonId);
+            Assert.True(session.Tutoring);
         }
 
         [Fact]
@@ -117,7 +116,7 @@ namespace tcs_integration.Controllers
                 InTime = DateTime.Now,
                 PersonId = 1,
                 Tutoring = true,
-                SelectedClasses = new List<int>() {  },
+                SelectedClasses = new List<int>() { },
                 SelectedReasons = new List<int>() { 2 }
             };
             var user = await Login(client);
@@ -165,7 +164,7 @@ namespace tcs_integration.Controllers
                 PersonId = 1,
                 Tutoring = false,
                 SelectedClasses = new List<int>() { 3 },
-                SelectedReasons = new List<int>() {  }
+                SelectedReasons = new List<int>() { }
             };
             var user = await Login(client);
             var request = new HttpRequestMessage(HttpMethod.Post, "api/sessions");
@@ -191,7 +190,7 @@ namespace tcs_integration.Controllers
                 PersonId = 8,
                 Tutoring = true,
                 SelectedClasses = new List<int>() { 3 },
-                SelectedReasons = new List<int>() {  }
+                SelectedReasons = new List<int>() { }
             };
             request.Headers.Add("Authorization", $"Bearer {user.Token}");
             request.Content = new StringContent(JsonConvert.SerializeObject(sessionDTO));
@@ -210,7 +209,7 @@ namespace tcs_integration.Controllers
             var user = await Login(client);
             var request = new HttpRequestMessage(HttpMethod.Put, "api/sessions/signout/61");
             request.Headers.Add("Authorization", $"Bearer {user.Token}");
-            request.Content = new StringContent(JsonConvert.SerializeObject(new Session {  OutTime = DateTime.Now }));
+            request.Content = new StringContent(JsonConvert.SerializeObject(new Session { OutTime = DateTime.Now }));
             request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
 
             var response = await client.SendAsync(request);
@@ -242,12 +241,12 @@ namespace tcs_integration.Controllers
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             var session = await response.Content.ReadAsAsync<Session>();
             Assert.Equal(27, session.Id);
-            
+
             request = new HttpRequestMessage(HttpMethod.Get, $"api/sessions/27");
             request.Headers.Add("Authorization", $"Bearer {user.Token}");
             response = await client.SendAsync(request);
             Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
-           
+
         }
 
     }

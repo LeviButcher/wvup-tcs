@@ -1,4 +1,4 @@
-﻿namespace tcs_service.Models
+﻿namespace tcs_service.Models.DTOs
 {
     public class UserDto
     {

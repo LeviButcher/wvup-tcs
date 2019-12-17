@@ -7,7 +7,8 @@ import { callApi, ensureResponseCode } from '../utils';
 import CoursesCheckboxes from './CoursesCheckboxes';
 import ReasonCheckboxes from './ReasonCheckboxes';
 import SignInSchema from '../schemas/SignInFormSchema';
-import type { Course, Reason } from '../types';
+import type { Course, Reason, PersonType } from '../types';
+import { personTypeValues } from '../types';
 
 function isBeforeInTime(outTime) {
   const inTime = this.resolve(Yup.ref('inTime'));
@@ -56,34 +57,24 @@ const StyledReasonCheckboxes = styled(ReasonCheckboxes)`
   }
 `;
 
-// Student API Calls
-const putSignInStudent = signIn =>
-  callApi(`signIns/${signIn.id || ''}`, 'PUT', signIn).then(
-    ensureResponseCode(200)
-  );
-const postSignInStudent = signIn =>
-  callApi(`signIns/admin/`, 'POST', signIn).then(ensureResponseCode(201));
+const postSession = signIn =>
+  callApi(`session/`, 'POST', signIn).then(ensureResponseCode(201));
 
-// Teacher API Calls
-const putSignInTeacher = signIn =>
-  callApi(`signIns/${signIn.id || ''}?teacher=true`, 'PUT', signIn).then(
+const putSession = signIn =>
+  callApi(`session/${signIn.id || ''}`, 'PUT', signIn).then(
     ensureResponseCode(200)
-  );
-const postSignInTeacher = signIn =>
-  callApi(`signIns/admin/?teacher=true`, 'POST', signIn).then(
-    ensureResponseCode(201)
   );
 
 type Props = {
   signInRecord: {
     email: string,
-    classSchedule?: Array<Course>,
+    schedule?: Array<Course>,
     selectedClasses: Array<string>,
     inTime: string,
     outTime: string,
     tutoring: boolean,
     selectedReasons: Array<string>,
-    personType: 'Student' | 'Teacher',
+    personType: PersonType,
     id?: string,
     personId: string,
     semesterId: string
@@ -93,17 +84,15 @@ type Props = {
 
 // test email = mtmqbude26@wvup.edu
 const SignInForm = ({ signInRecord, reasons }: Props) => {
-  const isStudent = signInRecord.personType === 'Student';
+  const isStudent = signInRecord.personType === personTypeValues.student;
   const shouldPostSignIn = !signInRecord.id;
 
   const callCorrectAPIEndpoint = signIn => {
     // signInRecord id is NOT a truthy value then we should create a new signin record
     // ELSE we should update the signin record with the associated ID
+    if (shouldPostSignIn) return postSession(signIn);
+    if (!shouldPostSignIn) return putSession(signIn);
 
-    if (isStudent && shouldPostSignIn) return postSignInStudent(signIn);
-    if (isStudent && !shouldPostSignIn) return putSignInStudent(signIn);
-    if (!isStudent && shouldPostSignIn) return postSignInTeacher(signIn);
-    if (!isStudent && !shouldPostSignIn) return putSignInTeacher(signIn);
     return Promise.reject(Error("Didn't hit a api case"));
   };
 
@@ -129,8 +118,8 @@ const SignInForm = ({ signInRecord, reasons }: Props) => {
           semesterId: signInRecord.semesterId,
           inTime: new Date(`${values.inDate} ${values.inTime}`),
           outTime: new Date(`${values.outDate} ${values.outTime}`),
-          courses: values.courses,
-          reasons: values.reasons,
+          selectedCourses: values.courses,
+          selectedReasons: values.reasons,
           tutoring: values.tutoring
         };
         // $FlowFixMe
@@ -186,7 +175,7 @@ const SignInForm = ({ signInRecord, reasons }: Props) => {
                   touched={touched}
                 />
                 <CoursesCheckboxes
-                  courses={signInRecord.classSchedule || []}
+                  courses={signInRecord.schedule || []}
                   errors={errors}
                   touched={touched}
                 />

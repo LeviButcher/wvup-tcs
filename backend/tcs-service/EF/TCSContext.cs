@@ -10,19 +10,13 @@ namespace tcs_service.EF
 
         public DbSet<User> Users { get; set; }
 
-        public DbSet<Course> Courses { get; set; }
-
         public DbSet<Person> People { get; set; }
 
         public DbSet<Reason> Reasons { get; set; }
 
-        public DbSet<SignIn> SignIns { get; set; }
+        public DbSet<Schedule> Schedules { get; set; }
 
         public DbSet<Semester> Semesters { get; set; }
-
-        public DbSet<SignInCourse> SignInCourses { get; set; }
-
-        public DbSet<SignInReason> SignInReasons { get; set; }
 
         public DbSet<Department> Departments { get; set; }
 
@@ -30,9 +24,9 @@ namespace tcs_service.EF
 
         public DbSet<Class> Classes { get; set; }
 
-        public DbSet<SessionReason> SessionReasons { get; set; } 
+        public DbSet<SessionReason> SessionReasons { get; set; }
 
-        public DbSet<SessionClass> SessionClasses { get; set; } 
+        public DbSet<SessionClass> SessionClasses { get; set; }
 
         public TCSContext()
         {
@@ -58,15 +52,11 @@ namespace tcs_service.EF
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<SignInCourse>().HasKey(key => new { key.SignInID, key.CourseID });
-
-            modelBuilder.Entity<SignInReason>().HasKey(key => new { key.SignInID, key.ReasonID });
-
             modelBuilder.Entity<SessionReason>().HasKey(key => new { key.SessionId, key.ReasonId });
 
-            modelBuilder.Entity<SessionClass>().HasKey(key => new { key.SessionId, key.ClassId});
+            modelBuilder.Entity<SessionClass>().HasKey(key => new { key.SessionId, key.ClassId });
 
-            modelBuilder.Entity<Course>()
+            modelBuilder.Entity<Class>()
             .Property(p => p.CRN)
             .ValueGeneratedNever();
 
@@ -75,7 +65,7 @@ namespace tcs_service.EF
              .ValueGeneratedNever();
 
             modelBuilder.Entity<Semester>()
-            .Property(p => p.Id)
+            .Property(p => p.Code)
             .ValueGeneratedNever();
 
             modelBuilder.Entity<Person>()
@@ -85,6 +75,9 @@ namespace tcs_service.EF
             modelBuilder.Entity<Department>()
             .Property(p => p.Code)
             .ValueGeneratedNever();
+
+            modelBuilder.Entity<Schedule>()
+            .HasKey(key => new { key.ClassCRN, key.PersonId, key.SemesterCode });
         }
     }
 }

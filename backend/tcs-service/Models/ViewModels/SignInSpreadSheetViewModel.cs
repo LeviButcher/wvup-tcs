@@ -6,11 +6,11 @@ namespace tcs_service.Models.ViewModels
 {
     public class SignInSpreadSheetViewModel
     {
-        public SignInSpreadSheetViewModel(PersonType type, IEnumerable<Course> courses, IEnumerable<Reason> reasons, bool tutoring)
+        public SignInSpreadSheetViewModel(PersonType type, IEnumerable<Class> classes, IEnumerable<Reason> reasons, bool tutoring)
         {
             IsTeacher = type.Equals(PersonType.Teacher);
-            if (courses.Count() > 0)
-                ClassesVisitingFor = courses.Select(x => x.ShortName).Aggregate((acc, curr) => acc + ", " + curr);
+            if (classes.Count() > 0)
+                ClassesVisitingFor = classes.Select(x => x.ShortName).Aggregate((acc, curr) => acc + ", " + curr);
             if (tutoring)
                 ReasonsForVisiting += "Tutoring";
             if (reasons.Count() > 0)

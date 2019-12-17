@@ -16,7 +16,7 @@ namespace tcs_service.Repos
     public class ReportsRepo : IReportsRepo
     {
         private readonly TCSContext _db;
-        IBannerService _bannerService;
+        readonly IBannerService _bannerService;
         public ReportsRepo(TCSContext tcs, IBannerService bannerService)
         {
             _db = tcs;
@@ -31,7 +31,7 @@ namespace tcs_service.Repos
             {
                 result.Add(new WeeklyVisitsViewModel(startWeek, startWeek.Date.AddDays(6))
                 {
-                    Count = await _db.SignIns.Where(x => x.InTime >= startWeek && x.InTime <= startWeek.AddDays(6)).CountAsync()
+                    Count = await _db.Sessions.Where(x => x.InTime >= startWeek && x.InTime <= startWeek.AddDays(6)).CountAsync()
                 });
                 startWeek = startWeek.AddDays(7);
             }
@@ -40,7 +40,7 @@ namespace tcs_service.Repos
 
         // Get All SignIns between Start and End Date, group by Hour, count number of records for each hour
         public async Task<List<PeakHoursViewModel>> PeakHours(DateTime startWeek, DateTime endWeek)
-             => await _db.SignIns.Where(x => x.InTime >= startWeek && x.InTime <= endWeek)
+             => await _db.Sessions.Where(x => x.InTime >= startWeek && x.InTime <= endWeek)
                 .GroupBy(x => x.InTime.Value.Hour)
                 .Where(x => x.Count() > 1)
                 .Select(x => new PeakHoursViewModel(x.Key, x.Count()))
@@ -57,7 +57,7 @@ namespace tcs_service.Repos
 
         public async Task<List<TeacherSignInTimeViewModel>> Volunteers(DateTime startWeek, DateTime endWeek)
         {
-            var teachers = from signIn in _db.SignIns
+            var teachers = from signIn in _db.Sessions
                            where signIn.InTime >= startWeek
                            && signIn.InTime <= endWeek
                            && signIn.Person.PersonType == PersonType.Teacher
@@ -89,31 +89,31 @@ namespace tcs_service.Repos
 
         public async Task<List<ReasonWithClassVisitsViewModel>> Reasons(DateTime startWeek, DateTime endWeek)
         {
-            var result = from signIns in _db.SignIns
-                         from reason in signIns.Reasons
+            var result = from signIns in _db.Sessions
+                         from reason in signIns.SessionReasons
                          where reason.Reason.Name != "Tutoring"
-                         from course in signIns.Courses
+                         from course in signIns.SessionClasses
                          where signIns.InTime >= startWeek
                          && signIns.InTime <= endWeek
                          select new
                          {
                              ReasonName = reason.Reason.Name,
-                             ReasonId = reason.ReasonID,
-                             CourseName = course.Course.CourseName,
-                             CourseId = course.CourseID
+                             ReasonId = reason.ReasonId,
+                             CourseName = course.Class.Name,
+                             CourseId = course.ClassId
                          };
 
-            var tutoringResult = from signIns in _db.SignIns
-                                 from reason in signIns.Reasons
-                                 from course in signIns.Courses
+            var tutoringResult = from signIns in _db.Sessions
+                                 from reason in signIns.SessionReasons
+                                 from course in signIns.SessionClasses
                                  where signIns.Tutoring == true
                                  && signIns.InTime >= startWeek
                                  && signIns.InTime <= endWeek
                                  select new
                                  {
 
-                                     CourseName = course.Course.CourseName,
-                                     CourseId = course.CourseID
+                                     CourseName = course.Class.Name,
+                                     CourseId = course.ClassId
                                  };
 
             var resultGroup = from item in result
@@ -159,14 +159,14 @@ namespace tcs_service.Repos
 
         public async Task<List<CourseWithSuccessCountViewModel>> SuccessReport(int semesterId)
         {
-            var studentCourses = from item in _db.SignIns
-                                 from course in item.Courses
-                                 where item.SemesterId == semesterId
+            var studentCourses = from item in _db.Sessions
+                                 from course in item.SessionClasses
+                                 where item.SemesterCode == semesterId
                                  select new
                                  {
                                      item.PersonId,
-                                     course.Course,
-                                     course.Course.Department,
+                                     course.Class,
+                                     course.Class.Department,
                                  };
 
             List<CourseWithGradeViewModel> coursesWithGrades = new List<CourseWithGradeViewModel>();
@@ -175,7 +175,7 @@ namespace tcs_service.Repos
             {
                 try
                 {
-                    var grade = await _bannerService.GetStudentGrade(item.PersonId, item.Course.CRN, semesterId);
+                    var grade = await _bannerService.GetStudentGrade(item.PersonId, item.Class.CRN, semesterId);
                     coursesWithGrades.Add(grade);
                 }
                 catch

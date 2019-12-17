@@ -7,6 +7,7 @@ import {
   waitForElement
 } from '../test-utils/CustomReactTestingLibrary';
 import SignInForm from './SignInForm';
+import { personTypeValues } from '../types';
 
 const backendURL = process.env.REACT_APP_BACKEND || '';
 
@@ -18,7 +19,7 @@ const reasons = [
 const studentSignIn = {
   email: 'something@wvup.edu',
   selectedReasons: [],
-  classSchedule: [
+  schedule: [
     { crn: '01234', shortName: 'CS101' },
     { crn: '4567', shortName: 'STEM329' }
   ],
@@ -27,7 +28,7 @@ const studentSignIn = {
   outTime: '',
   tutoring: false,
   id: '',
-  personType: 'Student',
+  personType: personTypeValues.student,
   semesterId: '201902',
   personId: '2'
 };
@@ -40,7 +41,7 @@ const teacherSignIn = {
   selectedReasons: [],
   tutoring: false,
   id: '',
-  personType: 'Teacher',
+  personType: personTypeValues.teacher,
   semesterId: '201902',
   personId: '4'
 };
@@ -85,7 +86,7 @@ describe('Form Errors for Student', () => {
     reasons.forEach(reason => {
       expect(getByText(reason.name)).toBeDefined();
     });
-    studentSignIn.classSchedule.forEach(course => {
+    studentSignIn.schedule.forEach(course => {
       expect(getByText(course.shortName)).toBeDefined();
     });
   });
@@ -107,7 +108,7 @@ describe('Form Errors for Student', () => {
       <SignInForm signInRecord={studentSignIn} reasons={reasons} />
     );
 
-    fireEvent.click(getByText(studentSignIn.classSchedule[0].shortName));
+    fireEvent.click(getByText(studentSignIn.schedule[0].shortName));
 
     await wait(() => {
       expect(getByText(/submit/i)).toBeDisabled();
@@ -144,13 +145,13 @@ describe('Create SignIn', () => {
     });
 
     fireEvent.click(getByText(reasons[0].name));
-    fireEvent.click(getByText(studentSignIn.classSchedule[0].shortName));
+    fireEvent.click(getByText(studentSignIn.schedule[0].shortName));
     fireEvent.submit(getByText(/submit/i));
     expect(getByText(/submitting/i)).toBeDefined();
 
     await wait(() => {
       expect(fakeFetch).toHaveBeenCalledTimes(1);
-      expect(fakeFetch).toHaveBeenCalledWith(`${backendURL}signIns/admin/`, {
+      expect(fakeFetch).toHaveBeenCalledWith(`${backendURL}session/`, {
         headers: {
           'Content-Type': 'application/json'
         },
@@ -161,8 +162,8 @@ describe('Create SignIn', () => {
           semesterId: studentSignIn.semesterId,
           inTime: new Date('2019-01-05 09:00'),
           outTime: new Date('2019-01-05 12:00'),
-          courses: ['01234'],
-          reasons: ['1'],
+          selectedCourses: ['01234'],
+          selectedReasons: ['1'],
           tutoring: false
         })
       });
@@ -202,25 +203,22 @@ describe('Create SignIn', () => {
 
     await wait(() => {
       expect(fakeFetch).toHaveBeenCalledTimes(1);
-      expect(fakeFetch).toHaveBeenCalledWith(
-        `${backendURL}signIns/admin/?teacher=true`,
-        {
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          method: 'POST',
-          body: JSON.stringify({
-            id: teacherSignIn.id,
-            personId: teacherSignIn.personId,
-            semesterId: teacherSignIn.semesterId,
-            inTime: new Date(`${inDT.date} ${inDT.time}`),
-            outTime: new Date(`${outDT.date} ${outDT.time}`),
-            courses: [],
-            reasons: [],
-            tutoring: false
-          })
-        }
-      );
+      expect(fakeFetch).toHaveBeenCalledWith(`${backendURL}session/`, {
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        method: 'POST',
+        body: JSON.stringify({
+          id: teacherSignIn.id,
+          personId: teacherSignIn.personId,
+          semesterId: teacherSignIn.semesterId,
+          inTime: new Date(`${inDT.date} ${inDT.time}`),
+          outTime: new Date(`${outDT.date} ${outDT.time}`),
+          selectedCourses: [],
+          selectedReasons: [],
+          tutoring: false
+        })
+      });
     });
   });
 });
@@ -244,14 +242,14 @@ describe('Update SignIn', () => {
     });
 
     fireEvent.click(getByText(reasons[0].name));
-    fireEvent.click(getByText(studentSignIn.classSchedule[1].shortName));
+    fireEvent.click(getByText(studentSignIn.schedule[1].shortName));
     fireEvent.click(getByLabelText(/tutoring/i));
     fireEvent.submit(getByText(/submit/i));
     expect(getByText(/submitting/i)).toBeDefined();
     await wait(() => {
       expect(fakeFetch).toHaveBeenCalledTimes(1);
       expect(fakeFetch).toHaveBeenCalledWith(
-        `${backendURL}signIns/${existingStudentSignIn.id}`,
+        `${backendURL}session/${existingStudentSignIn.id}`,
         {
           headers: {
             'Content-Type': 'application/json'
@@ -263,8 +261,8 @@ describe('Update SignIn', () => {
             semesterId: existingStudentSignIn.semesterId,
             inTime: new Date('2019-01-05 09:00'),
             outTime: new Date('2019-01-05 14:00'),
-            courses: ['01234', '4567'],
-            reasons: [],
+            selectedCourses: ['01234', '4567'],
+            selectedReasons: [],
             tutoring: true
           })
         }
@@ -295,7 +293,7 @@ describe('Update SignIn', () => {
     await wait(() => {
       expect(fakeFetch).toHaveBeenCalledTimes(1);
       expect(fakeFetch).toHaveBeenCalledWith(
-        `${backendURL}signIns/${existingTeacherRecord.id}?teacher=true`,
+        `${backendURL}session/${existingTeacherRecord.id}`,
         {
           headers: {
             'Content-Type': 'application/json'
@@ -307,8 +305,8 @@ describe('Update SignIn', () => {
             semesterId: existingTeacherRecord.semesterId,
             inTime: new Date('2019-05-10 12:00'),
             outTime: new Date('2019-05-10 16:00'),
-            courses: [],
-            reasons: [],
+            selectedCourses: [],
+            selectedReasons: [],
             tutoring: false
           })
         }
@@ -352,7 +350,7 @@ test('Should display fetch response message when fetch returns non 2XX status co
   });
 
   fireEvent.click(getByLabelText(/tutoring/i));
-  fireEvent.click(getByText(studentSignIn.classSchedule[0].shortName));
+  fireEvent.click(getByText(studentSignIn.schedule[0].shortName));
   fireEvent.submit(getByText(/submit/i));
 
   const error = await waitForElement(() => getByText(message));

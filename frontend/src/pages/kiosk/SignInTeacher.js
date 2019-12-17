@@ -5,7 +5,7 @@ import { Card, KioskFullScreenContainer } from '../../ui';
 import EmailOrCardSwipeForm from '../../components/EmailOrCardSwipeForm';
 import type { Teacher } from '../../types';
 
-const postSignInTeacher = callApi(`signins?teacher=true`, 'POST');
+const postSignInTeacher = callApi(`session/signin`, 'POST');
 
 // test email : teacher@wvup.edu
 const SignInTeacher = () => {
@@ -13,11 +13,9 @@ const SignInTeacher = () => {
     <KioskFullScreenContainer>
       <Card>
         <EmailOrCardSwipeForm
-          teacher
           afterValidSubmit={(teacher: Teacher) => {
             const signIn = {
-              personId: teacher.teacherID,
-              email: teacher.teacherEmail
+              personId: teacher.id
             };
             return postSignInTeacher(signIn)
               .then(ensureResponseCode(201))

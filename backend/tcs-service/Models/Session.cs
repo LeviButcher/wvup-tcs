@@ -16,7 +16,7 @@ namespace tcs_service.Models
 
         [ForeignKey(nameof(PersonId))]
         public Person Person { get; set; }
-        
+
         private DateTimeOffset? inTime;
 
         [Required]
@@ -50,6 +50,12 @@ namespace tcs_service.Models
 
         [InverseProperty(nameof(SessionReason.Session))]
         public List<SessionReason> SessionReasons { get; set; } = new List<SessionReason>();
+
+
+        public int SemesterCode { get; set; }
+
+        [ForeignKey(nameof(SemesterCode))]
+        public Semester Semester { get; set; }
 
     }
 }
