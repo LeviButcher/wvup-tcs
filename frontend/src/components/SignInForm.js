@@ -7,7 +7,7 @@ import { callApi, ensureResponseCode } from '../utils';
 import CoursesCheckboxes from './CoursesCheckboxes';
 import ReasonCheckboxes from './ReasonCheckboxes';
 import SignInSchema from '../schemas/SignInFormSchema';
-import type { Course, Reason, PersonType } from '../types';
+import type { Course, Reason, PersonType, Semester } from '../types';
 import { personTypeValues } from '../types';
 
 function isBeforeInTime(outTime) {
@@ -20,8 +20,13 @@ const TeacherSignInSchema = Yup.object().shape({
   outTime: Yup.string()
     .required()
     .test('date-test', 'Must be after In Time', isBeforeInTime),
-  inDate: Yup.date().required(),
-  outDate: Yup.date().required()
+  inDate: Yup.date()
+    .typeError('Date is not in correct format')
+    .required(),
+  outDate: Yup.date()
+    .typeError('Date is not in correct format')
+    .required(),
+  semesterCode: Yup.number().required()
 });
 
 const StudentSignInSchema = SignInSchema.shape({
@@ -32,8 +37,13 @@ const StudentSignInSchema = SignInSchema.shape({
     .typeError('Invalid Date format')
     .test('date-test', 'Must be after In Time', isBeforeInTime)
     .required(),
-  inDate: Yup.date().required(),
-  outDate: Yup.date().required()
+  inDate: Yup.date()
+    .typeError('Date is not in correct format')
+    .required(),
+  outDate: Yup.date()
+    .typeError('Date is not in correct format')
+    .required(),
+  semesterCode: Yup.number().required()
 })
   .from('inTime', 'startDate', true)
   .from('outTime', 'endDate', true);
@@ -58,10 +68,10 @@ const StyledReasonCheckboxes = styled(ReasonCheckboxes)`
 `;
 
 const postSession = signIn =>
-  callApi(`session/`, 'POST', signIn).then(ensureResponseCode(201));
+  callApi(`sessions/`, 'POST', signIn).then(ensureResponseCode(201));
 
 const putSession = signIn =>
-  callApi(`session/${signIn.id || ''}`, 'PUT', signIn).then(
+  callApi(`sessions/${signIn.id || ''}`, 'PUT', signIn).then(
     ensureResponseCode(200)
   );
 
@@ -77,13 +87,14 @@ type Props = {
     personType: PersonType,
     id?: string,
     personId: string,
-    semesterId: string
+    semesterCode?: number
   },
+  semesters: Array<Semester>,
   reasons?: Array<Reason>
 };
 
 // test email = mtmqbude26@wvup.edu
-const SignInForm = ({ signInRecord, reasons }: Props) => {
+const SignInForm = ({ signInRecord, reasons, semesters }: Props) => {
   const isStudent = signInRecord.personType === personTypeValues.student;
   const shouldPostSignIn = !signInRecord.id;
 
@@ -106,7 +117,8 @@ const SignInForm = ({ signInRecord, reasons }: Props) => {
         inTime: new Date(signInRecord.inTime).toTimeString(),
         outTime: new Date(signInRecord.outTime).toTimeString(),
         inDate: new Date(signInRecord.outTime).toDateString(),
-        outDate: new Date(signInRecord.outTime).toDateString()
+        outDate: new Date(signInRecord.outTime).toDateString(),
+        semesterCode: signInRecord.semesterCode
       }}
       isInitialValid={false}
       validationSchema={isStudent ? StudentSignInSchema : TeacherSignInSchema}
@@ -115,10 +127,10 @@ const SignInForm = ({ signInRecord, reasons }: Props) => {
         const signIn = {
           id: signInRecord.id,
           personId: signInRecord.personId,
-          semesterId: signInRecord.semesterId,
+          semesterCode: values.semesterCode,
           inTime: new Date(`${values.inDate} ${values.inTime}`),
           outTime: new Date(`${values.outDate} ${values.outTime}`),
-          selectedCourses: values.courses,
+          selectedClasses: values.courses,
           selectedReasons: values.reasons,
           tutoring: values.tutoring
         };
@@ -136,7 +148,7 @@ const SignInForm = ({ signInRecord, reasons }: Props) => {
           <Stack>
             <Header>{shouldPostSignIn ? 'Create' : 'Update'} Sign In</Header>
             <div>KEY: Green = Active, Red = Deleted</div>
-            {status && <div>{status}</div>}
+            {status && <div style={{ color: 'red' }}>{status}</div>}
             <h2>{signInRecord.email}</h2>
             <Field
               id="inDate"
@@ -166,6 +178,23 @@ const SignInForm = ({ signInRecord, reasons }: Props) => {
               component={Input}
               label="Out Time"
             />
+            <Field
+              id="semesterCode"
+              name="semesterCode"
+              component="select"
+              label="Semester"
+              data-testid="semester-select"
+            >
+              <option style={{ display: 'none' }}>Select a Value</option>
+              {semesters &&
+                semesters
+                  .sort((a, b) => b.code - a.code)
+                  .map(({ code, name }) => (
+                    <option value={code} key={code}>
+                      {name}
+                    </option>
+                  ))}
+            </Field>
             {isStudent && (
               <>
                 <StyledReasonCheckboxes

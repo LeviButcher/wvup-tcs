@@ -2,28 +2,20 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Threading.Tasks;
 using tcs_service.Models.Attributes;
 
 namespace tcs_service.Models
 {
-    public class SignIn
+    public class Session
     {
         [Key]
-        public int ID { get; set; }
+        public int Id { get; set; }
 
         [Required]
         public int PersonId { get; set; }
 
         [ForeignKey(nameof(PersonId))]
         public Person Person { get; set; }
-
-        [Required]
-        public int SemesterId { get; set; }
-
-        [ForeignKey(nameof(SemesterId))]
-        public Semester Semester { get; set; }
 
         private DateTimeOffset? inTime;
 
@@ -53,10 +45,17 @@ namespace tcs_service.Models
 
         public bool Tutoring { get; set; }
 
-        [InverseProperty(nameof(SignInCourse.SignIn))]
-        public List<SignInCourse> Courses { get; set; } = new List<SignInCourse>();
+        [InverseProperty(nameof(SessionClass.Session))]
+        public IEnumerable<SessionClass> SessionClasses { get; set; }
 
-        [InverseProperty(nameof(SignInReason.SignIn))]
-        public List<SignInReason> Reasons { get; set; } = new List<SignInReason>();
+        [InverseProperty(nameof(SessionReason.Session))]
+        public IEnumerable<SessionReason> SessionReasons { get; set; }
+
+
+        public int SemesterCode { get; set; }
+
+        [ForeignKey(nameof(SemesterCode))]
+        public Semester Semester { get; set; }
+
     }
 }

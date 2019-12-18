@@ -19,11 +19,11 @@ public class BannerPersonInfo
     public string LastName { get; set; }
     public int SemesterId { get; set; }
     public bool Teacher { get; set; }
-    public IEnumerable<BannerCourse> Courses { get; set; }
+    public IEnumerable<BannerClass> Classes { get; set; }
 }
 
 
-public class BannerCourse
+public class BannerClass
 {
     public string CourseName { get; set; }
     public string ShortName { get; set; }

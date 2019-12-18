@@ -12,7 +12,7 @@ namespace tcs_service.Models
         [Required]
         public string Name { get; set; }
 
-        [InverseProperty(nameof(Course.Department))]
-        public List<Course> Courses { get; set; }
+        [InverseProperty(nameof(Class.Department))]
+        public List<Class> Classes { get; set; }
     }
 }

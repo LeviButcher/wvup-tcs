@@ -1,5 +1,5 @@
 import React from 'react';
-import { Formik, Form, Field } from 'formik';
+import { Formik, Form } from 'formik';
 import { pipe } from 'ramda';
 import * as Yup from 'yup';
 import { Card, Header, Button, Stack } from '../ui';
@@ -7,9 +7,10 @@ import useQuery from '../hooks/useQuery';
 import callApi from '../utils/callApi';
 import ensureResponseCode from '../utils/ensureResponseCode';
 import unwrapToJSON from '../utils/unwrapToJSON';
+import SemesterDropdown from './SemesterDropdown';
 
 const semesterSchema = Yup.object().shape({
-  semester: Yup.string().required()
+  semesterCode: Yup.string().required()
 });
 
 const getSemesters = () => callApi(`reports/semesters`, 'GET', null);
@@ -25,7 +26,7 @@ type Props = {
   onSubmit: (any, any) => Promise<any> & any,
   title: string,
   initialValues?: {
-    semester: string
+    semesterCode: string
   }
 };
 
@@ -45,23 +46,7 @@ const SemesterForm = ({ onSubmit, title, initialValues, ...props }: Props) => {
         {({ isSubmitting, isValid }) => (
           <Form>
             <Stack>
-              <Field
-                id="semester"
-                name="semester"
-                component="select"
-                label="Semester"
-                data-testid="semester-select"
-              >
-                <option style={{ display: 'none' }}>Select a Value</option>
-                {semesters &&
-                  semesters
-                    .sort((a, b) => b.id - a.id)
-                    .map(({ id, name: semesterName }) => (
-                      <option value={id} key={id}>
-                        {semesterName}
-                      </option>
-                    ))}
-              </Field>
+              <SemesterDropdown semesters={semesters} />
               <Button
                 type="submit"
                 fullWidth
@@ -80,7 +65,7 @@ const SemesterForm = ({ onSubmit, title, initialValues, ...props }: Props) => {
 
 SemesterForm.defaultProps = {
   initialValues: {
-    semester: ''
+    semesterCode: ''
   }
 };
 

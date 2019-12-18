@@ -10,23 +10,23 @@ namespace tcs_service.EF
 
         public DbSet<User> Users { get; set; }
 
-        public DbSet<Course> Courses { get; set; }
-
         public DbSet<Person> People { get; set; }
 
         public DbSet<Reason> Reasons { get; set; }
 
         public DbSet<Schedule> Schedules { get; set; }
 
-        public DbSet<SignIn> SignIns { get; set; }
-
         public DbSet<Semester> Semesters { get; set; }
 
-        public DbSet<SignInCourse> SignInCourses { get; set; }
-
-        public DbSet<SignInReason> SignInReasons { get; set; }
-
         public DbSet<Department> Departments { get; set; }
+
+        public DbSet<Session> Sessions { get; set; }
+
+        public DbSet<Class> Classes { get; set; }
+
+        public DbSet<SessionReason> SessionReasons { get; set; }
+
+        public DbSet<SessionClass> SessionClasses { get; set; }
 
         public TCSContext()
         {
@@ -52,13 +52,17 @@ namespace tcs_service.EF
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<SignInCourse>().HasKey(key => new { key.SignInID, key.CourseID });
+            modelBuilder.Entity<SessionReason>().HasKey(key => new { key.SessionId, key.ReasonId });
 
-            modelBuilder.Entity<SignInReason>().HasKey(key => new { key.SignInID, key.ReasonID });
+            modelBuilder.Entity<SessionClass>().HasKey(key => new { key.SessionId, key.ClassId });
 
-            modelBuilder.Entity<Course>()
+            modelBuilder.Entity<Class>()
             .Property(p => p.CRN)
             .ValueGeneratedNever();
+
+            modelBuilder.Entity<Class>()
+             .Property(p => p.CRN)
+             .ValueGeneratedNever();
 
             modelBuilder.Entity<Semester>()
             .Property(p => p.Code)
@@ -73,7 +77,7 @@ namespace tcs_service.EF
             .ValueGeneratedNever();
 
             modelBuilder.Entity<Schedule>()
-            .HasKey(key => new { key.CourseCRN, key.PersonId, key.SemesterCode });
+            .HasKey(key => new { key.ClassCRN, key.PersonId, key.SemesterCode });
         }
     }
 }

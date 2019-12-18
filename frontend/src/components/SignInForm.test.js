@@ -16,6 +16,12 @@ const reasons = [
   { id: '2', name: 'Bone Use', deleted: true }
 ];
 
+const semesters = [
+  { name: 'Fall 2019', code: 201901 },
+  { name: 'Spring', code: 201902 },
+  { name: 'Summer 2019', code: 201903 }
+];
+
 const studentSignIn = {
   email: 'something@wvup.edu',
   selectedReasons: [],
@@ -29,7 +35,6 @@ const studentSignIn = {
   tutoring: false,
   id: '',
   personType: personTypeValues.student,
-  semesterId: '201902',
   personId: '2'
 };
 
@@ -42,7 +47,6 @@ const teacherSignIn = {
   tutoring: false,
   id: '',
   personType: personTypeValues.teacher,
-  semesterId: '201902',
   personId: '4'
 };
 
@@ -52,7 +56,8 @@ const existingTeacherRecord = {
   selectedClasses: [],
   selectedReasons: [],
   inTime: '2019-05-10 14:00',
-  outTime: '2019-05-10 16:00'
+  outTime: '2019-05-10 16:00',
+  semesterCode: semesters[1].code
 };
 
 const existingStudentSignIn = {
@@ -61,19 +66,28 @@ const existingStudentSignIn = {
   inTime: '2019-01-05 09:00',
   outTime: '2019-01-05 12:00',
   selectedReasons: ['1'],
-  selectedClasses: ['01234']
+  selectedClasses: ['01234'],
+  semesterCode: semesters[2].code
 };
 
 test('Renders with required props', () => {
   const { container } = render(
-    <SignInForm signInRecord={studentSignIn} reasons={reasons} />
+    <SignInForm
+      signInRecord={studentSignIn}
+      reasons={reasons}
+      semesters={semesters}
+    />
   );
   expect(container).toBeDefined();
 });
 
 test('Should render with submit button disabled', () => {
   const { getByText } = render(
-    <SignInForm signInRecord={studentSignIn} reasons={reasons} />
+    <SignInForm
+      signInRecord={studentSignIn}
+      reasons={reasons}
+      semesters={semesters}
+    />
   );
   expect(getByText(/submit/i)).toBeDisabled();
 });
@@ -81,7 +95,11 @@ test('Should render with submit button disabled', () => {
 describe('Form Errors for Student', () => {
   test('Should display email, reasons and persons classSchedule when a student', () => {
     const { getByText } = render(
-      <SignInForm signInRecord={studentSignIn} reasons={reasons} />
+      <SignInForm
+        signInRecord={studentSignIn}
+        reasons={reasons}
+        semesters={semesters}
+      />
     );
     reasons.forEach(reason => {
       expect(getByText(reason.name)).toBeDefined();
@@ -93,7 +111,11 @@ describe('Form Errors for Student', () => {
 
   test('Should have submit disabled if reason has been selected with no courses', async () => {
     const { getByText } = render(
-      <SignInForm signInRecord={studentSignIn} reasons={reasons} />
+      <SignInForm
+        signInRecord={studentSignIn}
+        reasons={reasons}
+        semesters={semesters}
+      />
     );
 
     fireEvent.click(getByText(reasons[0].name));
@@ -105,7 +127,11 @@ describe('Form Errors for Student', () => {
 
   test('Should have submit disabled if course is selected with no reason', async () => {
     const { getByText } = render(
-      <SignInForm signInRecord={studentSignIn} reasons={reasons} />
+      <SignInForm
+        signInRecord={studentSignIn}
+        reasons={reasons}
+        semesters={semesters}
+      />
     );
 
     fireEvent.click(getByText(studentSignIn.schedule[0].shortName));
@@ -127,8 +153,12 @@ describe('Create SignIn', () => {
     );
     global.fetch = fakeFetch;
 
-    const { getByLabelText, getByText } = render(
-      <SignInForm signInRecord={studentSignIn} reasons={reasons} />
+    const { getByLabelText, getByText, getByTestId } = render(
+      <SignInForm
+        signInRecord={studentSignIn}
+        reasons={reasons}
+        semesters={semesters}
+      />
     );
 
     fireEvent.change(getByLabelText(/in date/i), {
@@ -143,15 +173,19 @@ describe('Create SignIn', () => {
     fireEvent.change(getByLabelText(/out time/i), {
       target: { value: '12:00' }
     });
+    fireEvent.change(getByTestId('semester-select'), {
+      target: { value: semesters[0].code }
+    });
 
     fireEvent.click(getByText(reasons[0].name));
     fireEvent.click(getByText(studentSignIn.schedule[0].shortName));
     fireEvent.submit(getByText(/submit/i));
+
     expect(getByText(/submitting/i)).toBeDefined();
 
     await wait(() => {
       expect(fakeFetch).toHaveBeenCalledTimes(1);
-      expect(fakeFetch).toHaveBeenCalledWith(`${backendURL}session/`, {
+      expect(fakeFetch).toHaveBeenCalledWith(`${backendURL}sessions/`, {
         headers: {
           'Content-Type': 'application/json'
         },
@@ -159,10 +193,10 @@ describe('Create SignIn', () => {
         body: JSON.stringify({
           id: studentSignIn.id,
           personId: studentSignIn.personId,
-          semesterId: studentSignIn.semesterId,
+          semesterCode: `${semesters[0].code}`,
           inTime: new Date('2019-01-05 09:00'),
           outTime: new Date('2019-01-05 12:00'),
-          selectedCourses: ['01234'],
+          selectedClasses: ['01234'],
           selectedReasons: ['1'],
           tutoring: false
         })
@@ -179,8 +213,8 @@ describe('Create SignIn', () => {
     );
     global.fetch = fakeFetch;
 
-    const { getByLabelText, getByText } = render(
-      <SignInForm signInRecord={teacherSignIn} />
+    const { getByLabelText, getByText, getByTestId } = render(
+      <SignInForm signInRecord={teacherSignIn} semesters={semesters} />
     );
     const inDT = { date: '2019-05-10', time: '14:00' };
     const outDT = { date: '2019-05-11', time: '16:00' };
@@ -197,13 +231,16 @@ describe('Create SignIn', () => {
     fireEvent.change(getByLabelText(/out time/i), {
       target: { value: outDT.time }
     });
+    fireEvent.change(getByTestId('semester-select'), {
+      target: { value: semesters[0].code }
+    });
 
     fireEvent.submit(getByText(/submit/i));
     expect(getByText(/submitting/i)).toBeDefined();
 
     await wait(() => {
       expect(fakeFetch).toHaveBeenCalledTimes(1);
-      expect(fakeFetch).toHaveBeenCalledWith(`${backendURL}session/`, {
+      expect(fakeFetch).toHaveBeenCalledWith(`${backendURL}sessions/`, {
         headers: {
           'Content-Type': 'application/json'
         },
@@ -211,10 +248,10 @@ describe('Create SignIn', () => {
         body: JSON.stringify({
           id: teacherSignIn.id,
           personId: teacherSignIn.personId,
-          semesterId: teacherSignIn.semesterId,
+          semesterCode: `${semesters[0].code}`,
           inTime: new Date(`${inDT.date} ${inDT.time}`),
           outTime: new Date(`${outDT.date} ${outDT.time}`),
-          selectedCourses: [],
+          selectedClasses: [],
           selectedReasons: [],
           tutoring: false
         })
@@ -234,7 +271,11 @@ describe('Update SignIn', () => {
     global.fetch = fakeFetch;
 
     const { getByLabelText, getByText } = render(
-      <SignInForm signInRecord={existingStudentSignIn} reasons={reasons} />
+      <SignInForm
+        signInRecord={existingStudentSignIn}
+        reasons={reasons}
+        semesters={semesters}
+      />
     );
 
     fireEvent.change(getByLabelText(/out time/i), {
@@ -249,7 +290,7 @@ describe('Update SignIn', () => {
     await wait(() => {
       expect(fakeFetch).toHaveBeenCalledTimes(1);
       expect(fakeFetch).toHaveBeenCalledWith(
-        `${backendURL}session/${existingStudentSignIn.id}`,
+        `${backendURL}sessions/${existingStudentSignIn.id}`,
         {
           headers: {
             'Content-Type': 'application/json'
@@ -258,10 +299,10 @@ describe('Update SignIn', () => {
           body: JSON.stringify({
             id: existingStudentSignIn.id,
             personId: existingStudentSignIn.personId,
-            semesterId: existingStudentSignIn.semesterId,
+            semesterCode: existingStudentSignIn.semesterCode,
             inTime: new Date('2019-01-05 09:00'),
             outTime: new Date('2019-01-05 14:00'),
-            selectedCourses: ['01234', '4567'],
+            selectedClasses: ['01234', '4567'],
             selectedReasons: [],
             tutoring: true
           })
@@ -280,7 +321,7 @@ describe('Update SignIn', () => {
     global.fetch = fakeFetch;
 
     const { getByLabelText, getByText } = render(
-      <SignInForm signInRecord={existingTeacherRecord} />
+      <SignInForm signInRecord={existingTeacherRecord} semesters={semesters} />
     );
 
     fireEvent.change(getByLabelText(/in time/i), {
@@ -293,7 +334,7 @@ describe('Update SignIn', () => {
     await wait(() => {
       expect(fakeFetch).toHaveBeenCalledTimes(1);
       expect(fakeFetch).toHaveBeenCalledWith(
-        `${backendURL}session/${existingTeacherRecord.id}`,
+        `${backendURL}sessions/${existingTeacherRecord.id}`,
         {
           headers: {
             'Content-Type': 'application/json'
@@ -302,10 +343,10 @@ describe('Update SignIn', () => {
           body: JSON.stringify({
             id: existingTeacherRecord.id,
             personId: existingTeacherRecord.personId,
-            semesterId: existingTeacherRecord.semesterId,
+            semesterCode: existingTeacherRecord.semesterCode,
             inTime: new Date('2019-05-10 12:00'),
             outTime: new Date('2019-05-10 16:00'),
-            selectedCourses: [],
+            selectedClasses: [],
             selectedReasons: [],
             tutoring: false
           })
@@ -314,11 +355,6 @@ describe('Update SignIn', () => {
     });
   });
 });
-
-// NEED MORE TESTS
-// [ ] Check status is displayed from fetch error
-// [ ] Student Form errors on date, intime after outTime
-// [ ] Teacher Form Errors, inTime after outTime
 
 test('Should display fetch response message when fetch returns non 2XX status code', async () => {
   const message = 'Something went terribly wrong while saving to database';
@@ -330,8 +366,8 @@ test('Should display fetch response message when fetch returns non 2XX status co
   );
   global.fetch = fakeFetch;
 
-  const { getByLabelText, getByText } = render(
-    <SignInForm signInRecord={studentSignIn} />
+  const { getByLabelText, getByText, getByTestId } = render(
+    <SignInForm signInRecord={studentSignIn} semesters={semesters} />
   );
   const inDT = { date: '2019-05-10', time: '14:00' };
   const outDT = { date: '2019-05-11', time: '16:00' };
@@ -348,6 +384,9 @@ test('Should display fetch response message when fetch returns non 2XX status co
   fireEvent.change(getByLabelText(/out time/i), {
     target: { value: outDT.time }
   });
+  fireEvent.change(getByTestId('semester-select'), {
+    target: { value: semesters[0].code }
+  });
 
   fireEvent.click(getByLabelText(/tutoring/i));
   fireEvent.click(getByText(studentSignIn.schedule[0].shortName));
@@ -360,7 +399,7 @@ test('Should display fetch response message when fetch returns non 2XX status co
 [existingTeacherRecord, existingStudentSignIn].forEach(person => {
   test(`Should not be able to submit if inTime is after outTime when person is ${person.personType}`, async () => {
     const { getByLabelText, getByText } = render(
-      <SignInForm signInRecord={person} />
+      <SignInForm signInRecord={person} semesters={semesters} />
     );
 
     fireEvent.change(getByLabelText(/in time/i), {

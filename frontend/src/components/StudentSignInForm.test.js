@@ -69,12 +69,12 @@ test('Happy Path: Student Sign ins with tutoring, another reason, and 1 class, s
 
   await wait(() => {
     expect(fakeFetch).toHaveBeenCalledTimes(2);
-    expect(fakeFetch).toHaveBeenCalledWith(`${backendURL}session/signin`, {
+    expect(fakeFetch).toHaveBeenCalledWith(`${backendURL}sessions/in`, {
       body: JSON.stringify({
         personId: '1',
         tutoring: true,
         selectedReasons: ['1'],
-        selectedCourses: ['31546']
+        selectedClasses: ['31546']
       }),
       headers: {
         'Content-Type': 'application/json'

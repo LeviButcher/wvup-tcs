@@ -13,16 +13,16 @@ namespace tcs_service.UnitOfWorks
     {
         private readonly IPersonRepo personRepo;
         private readonly IScheduleRepo scheduleRepo;
-        private readonly ICourseRepo courseRepo;
+        private readonly IClassRepo classRepo;
         private readonly ISemesterRepo semesterRepo;
         private readonly IDepartmentRepo departmentRepo;
         private readonly IBannerService bannerApi;
 
-        public UnitOfWorkPerson(IPersonRepo personRepo, IScheduleRepo scheduleRepo, ICourseRepo courseRepo, ISemesterRepo semesterRepo, IDepartmentRepo departmentRepo, IBannerService bannerApi)
+        public UnitOfWorkPerson(IPersonRepo personRepo, IScheduleRepo scheduleRepo, IClassRepo classRepo, ISemesterRepo semesterRepo, IDepartmentRepo departmentRepo, IBannerService bannerApi)
         {
             this.personRepo = personRepo;
             this.scheduleRepo = scheduleRepo;
-            this.courseRepo = courseRepo;
+            this.classRepo = classRepo;
             this.semesterRepo = semesterRepo;
             this.departmentRepo = departmentRepo;
             this.bannerApi = bannerApi;
@@ -58,7 +58,7 @@ namespace tcs_service.UnitOfWorks
             // if outdated, call banner, and if schedule doesn't exist for current semester
             if (person is Person && IsOutdatedSemester(currentSemester, currentDate) && hasSchedule)
             {
-                var schedule = scheduleRepo.GetAll(x => x.PersonId == person.Id).Select(x => x.Course);
+                var schedule = scheduleRepo.GetAll(x => x.PersonId == person.Id).Select(x => x.Class);
                 return new PersonInfoDTO()
                 {
                     Id = person.Id,
@@ -98,7 +98,7 @@ namespace tcs_service.UnitOfWorks
                     PersonType = savedPerson.PersonType
                 };
             }
-            var departments = bannerInfo.Courses.Select(x => x.Department).Select(x => new Department()
+            var departments = bannerInfo.Classes.Select(x => x.Department).Select(x => new Department()
             {
                 Code = x.Code,
                 Name = x.Name
@@ -108,22 +108,22 @@ namespace tcs_service.UnitOfWorks
                 await departmentRepo.CreateOrUpdate(x => x.Code == d.Code, d);
             }
 
-            var courses = bannerInfo.Courses.Select(x => new Course()
+            var courses = bannerInfo.Classes.Select(x => new Class()
             {
                 CRN = x.CRN,
                 Name = x.CourseName,
                 ShortName = x.ShortName,
-                DepartmentID = x.Department.Code
+                DepartmentCode = x.Department.Code
             });
 
             foreach (var c in courses)
             {
-                await courseRepo.CreateOrUpdate(x => x.CRN == c.CRN, c);
+                await classRepo.CreateOrUpdate(x => x.CRN == c.CRN, c);
                 await scheduleRepo.Create(new Schedule()
                 {
                     SemesterCode = bannerInfo.SemesterId,
                     PersonId = savedPerson.Id,
-                    CourseCRN = c.CRN
+                    ClassCRN = c.CRN
                 });
             }
 

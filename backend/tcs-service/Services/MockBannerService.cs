@@ -13,13 +13,13 @@ namespace tcs_service.Services
     {
         private readonly IPersonRepo personRepo;
         private readonly ISemesterRepo semesterRepo;
-        private readonly ICourseRepo courseRepo;
+        private readonly IClassRepo classRepo;
 
-        public MockBannerService(IPersonRepo personRepo, ISemesterRepo semesterRepo, ICourseRepo courseRepo)
+        public MockBannerService(IPersonRepo personRepo, ISemesterRepo semesterRepo, IClassRepo classRepo)
         {
             this.personRepo = personRepo;
             this.semesterRepo = semesterRepo;
-            this.courseRepo = courseRepo;
+            this.classRepo = classRepo;
         }
 
         public async Task<BannerPersonInfo> GetBannerInfo(string identifier)
@@ -30,7 +30,7 @@ namespace tcs_service.Services
                 var currentSemester = semesterRepo.GetAll().Last();
                 var rand = new Random(person.Id);
                 var takeCount = Math.Ceiling(rand.NextDouble() * 5) + 1;
-                var randomCourses = courseRepo.GetAll().Take((int)takeCount);
+                var randomCourses = classRepo.GetAll().Take((int)takeCount);
                 if (person.PersonType == PersonType.Student)
                 {
                     return new BannerPersonInfo()
@@ -41,7 +41,7 @@ namespace tcs_service.Services
                         Id = person.Id,
                         Teacher = false,
                         SemesterId = currentSemester.Code,
-                        Courses = randomCourses.Select(x => new BannerCourse()
+                        Classes = randomCourses.Select(x => new BannerClass()
                         {
                             CourseName = x.Name,
                             CRN = x.CRN,
@@ -75,7 +75,7 @@ namespace tcs_service.Services
         {
             var grades = Enum.GetValues(typeof(Grade));
 
-            var course = await courseRepo.Find(x => x.CRN == crn);
+            var course = await classRepo.Find(x => x.CRN == crn);
 
             return new CourseWithGradeViewModel()
             {

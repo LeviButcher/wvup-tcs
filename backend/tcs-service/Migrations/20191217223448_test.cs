@@ -2,7 +2,7 @@
 
 namespace tcs_service.Migrations
 {
-    public partial class UpdateSignOut : Migration
+    public partial class test : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {

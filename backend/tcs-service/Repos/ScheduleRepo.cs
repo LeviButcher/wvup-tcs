@@ -10,6 +10,6 @@ namespace tcs_service.Repos
     {
         public ScheduleRepo(DbContextOptions options) : base(options) { }
 
-        protected override IQueryable<Schedule> Include(DbSet<Schedule> set) => set.Include(x => x.Course).ThenInclude(x => x.Department);
+        protected override IQueryable<Schedule> Include(DbSet<Schedule> set) => set.Include(x => x.Class).ThenInclude(x => x.Department);
     }
 }

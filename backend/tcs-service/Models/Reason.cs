@@ -17,7 +17,7 @@ namespace tcs_service.Models
         [Required]
         public bool Deleted { get; set; }
 
-        [InverseProperty(nameof(SignInReason.Reason))]
-        public List<SignInReason> SignInReasons { get; set; }
+        [InverseProperty(nameof(SessionReason.Reason))]
+        public IEnumerable<SessionReason> SessionReasons { get; set; }
     }
 }

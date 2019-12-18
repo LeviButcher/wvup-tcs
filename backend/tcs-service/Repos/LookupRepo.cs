@@ -7,6 +7,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using tcs_service.EF;
 using tcs_service.Helpers;
+using tcs_service.Models;
 using tcs_service.Models.ViewModels;
 using tcs_service.Repos.Interfaces;
 
@@ -29,36 +30,36 @@ namespace tcs_service.Repos
         public async Task<PagingModel<SignInViewModel>> Get(DateTime start, DateTime end, int? crn, string email, int skip, int take)
         {
 
-            var signInsBetweenDate = _db.SignIns.OrderBy(x => x.InTime)
-               .Include(x => x.Courses).ThenInclude(x => x.Course)
-               .Include(x => x.Reasons).ThenInclude(x => x.Reason)
+            var sessionsBetweenDate = _db.Sessions.OrderBy(x => x.InTime)
+               .Include(x => x.SessionClasses).ThenInclude(x => x.Class)
+               .Include(x => x.SessionReasons).ThenInclude(x => x.Reason)
                .Where(x => x.InTime >= start && x.InTime <= end);
 
             if (crn != null)
             {
-                signInsBetweenDate = signInsBetweenDate.Where(x => x.Courses.Any(y => y.CourseID == crn));
+                sessionsBetweenDate = sessionsBetweenDate.Where(x => x.SessionClasses.Any(y => y.ClassId == crn));
             }
 
             if (email != null && !email.Equals(""))
             {
-                signInsBetweenDate = signInsBetweenDate.Where(x => x.Person.Email.Equals(email));
+                sessionsBetweenDate = sessionsBetweenDate.Where(x => x.Person.Email.Equals(email));
             }
 
-            var totalDataCount = await signInsBetweenDate.CountAsync();
-            var pageData = GetPageData(signInsBetweenDate, skip, take);
+            var totalDataCount = await sessionsBetweenDate.CountAsync();
+            var pageData = GetPageData(sessionsBetweenDate, skip, take);
 
             return new PagingModel<SignInViewModel>(skip, take, totalDataCount, pageData);
         }
 
         public async Task<PagingModel<SignInViewModel>> Daily(int skip, int take)
         {
-            var dailySignIns = _db.SignIns
+            var dailySignIns = _db.Sessions
                 .OrderByDescending(x => x.InTime)
                 .Where(x => x.InTime.Value.Day == DateTime.UtcNow.Day
                 && x.InTime.Value.Month == DateTime.UtcNow.Month
                 && x.InTime.Value.Year == DateTime.UtcNow.Year)
-               .Include(x => x.Courses).ThenInclude(x => x.Course)
-               .Include(x => x.Reasons).ThenInclude(x => x.Reason);
+               .Include(x => x.SessionClasses).ThenInclude(x => x.Class)
+               .Include(x => x.SessionReasons).ThenInclude(x => x.Reason);
 
             var totalDataCount = await dailySignIns.CountAsync();
             var pageData = GetPageData(dailySignIns, skip, take);
@@ -68,9 +69,9 @@ namespace tcs_service.Repos
 
         public async Task<PagingModel<SignInViewModel>> GetByCRN(int crn, DateTime start, DateTime end, int skip, int take)
         {
-            var signInsBetweenDateByCRN = _db.SignIns.Where(x => x.InTime >= start && x.InTime <= end && x.Courses.Any(y => y.CourseID == crn))
-                .Include(x => x.Courses).ThenInclude(x => x.Course)
-                .Include(x => x.Reasons).ThenInclude(x => x.Reason);
+            var signInsBetweenDateByCRN = _db.Sessions.Where(x => x.InTime >= start && x.InTime <= end && x.SessionClasses.Any(y => y.ClassId == crn))
+                .Include(x => x.SessionClasses).ThenInclude(x => x.Class)
+                .Include(x => x.SessionReasons).ThenInclude(x => x.Reason);
 
             var totalDataCount = await signInsBetweenDateByCRN.CountAsync();
             var pageData = GetPageData(signInsBetweenDateByCRN, skip, take);
@@ -80,9 +81,9 @@ namespace tcs_service.Repos
 
         public async Task<PagingModel<SignInViewModel>> GetByEmail(string email, DateTime start, DateTime end, int skip, int take)
         {
-            var signInsBetweenDateByEmail = _db.SignIns.Where(x => x.InTime >= start && x.InTime <= end && x.Person.Email == email)
-                .Include(x => x.Courses).ThenInclude(x => x.Course)
-                .Include(x => x.Reasons).ThenInclude(x => x.Reason);
+            var signInsBetweenDateByEmail = _db.Sessions.Where(x => x.InTime >= start && x.InTime <= end && x.Person.Email == email)
+                .Include(x => x.SessionClasses).ThenInclude(x => x.Class)
+                .Include(x => x.SessionReasons).ThenInclude(x => x.Reason);
 
             var totalDataCount = await signInsBetweenDateByEmail.CountAsync();
             var pageData = GetPageData(signInsBetweenDateByEmail, skip, take);
@@ -90,7 +91,7 @@ namespace tcs_service.Repos
             return new PagingModel<SignInViewModel>(skip, take, totalDataCount, pageData);
         }
 
-        private IQueryable<SignInViewModel> GetPageData(IQueryable<Models.SignIn> signIns, int skip, int take)
+        private IQueryable<SignInViewModel> GetPageData(IQueryable<Session> signIns, int skip, int take)
         {
             return signIns
                 .Skip(skip).Take(take)
@@ -104,20 +105,20 @@ namespace tcs_service.Repos
                     OutTime = x.OutTime,
                     SemesterName = x.Semester.Name,
                     Tutoring = x.Tutoring,
-                    SemesterId = x.SemesterId,
+                    SemesterId = x.Semester.Code,
                     PersonId = x.PersonId,
-                    Id = x.ID,
-                    Courses = x.Courses.Select(signInCourse => signInCourse.Course).ToList(),
-                    Reasons = x.Reasons.Select(signInReason => signInReason.Reason).ToList(),
+                    Id = x.Id,
+                    Classes = x.SessionClasses.Select(signInCourse => signInCourse.Class).ToList(),
+                    Reasons = x.SessionReasons.Select(signInReason => signInReason.Reason).ToList(),
                     Type = x.Person.PersonType
                 });
         }
 
         public async Task<List<SignInSpreadSheetViewModel>> GetBySemester(int semesterId)
-            => await _db.SignIns.Include(x => x.Person).Include(x => x.Courses)
-                        .ThenInclude(x => x.Course).Include(x => x.Reasons).ThenInclude(x => x.Reason)
-                        .Where(x => x.SemesterId == semesterId)
-                        .Select(x => new SignInSpreadSheetViewModel(x.Person.PersonType, x.Courses.Select(c => c.Course), x.Reasons.Select(r => r.Reason), x.Tutoring)
+            => await _db.Sessions.Include(x => x.Person).Include(x => x.SessionClasses)
+                        .ThenInclude(x => x.Class).Include(x => x.SessionReasons).ThenInclude(x => x.Reason)
+                        .Where(x => x.SemesterCode == semesterId)
+                        .Select(x => new SignInSpreadSheetViewModel(x.Person.PersonType, x.SessionClasses.Select(c => c.Class), x.SessionReasons.Select(r => r.Reason), x.Tutoring)
                         {
                             Email = x.Person.Email,
                             InTime = x.InTime,

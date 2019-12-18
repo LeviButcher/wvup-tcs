@@ -25,14 +25,14 @@ namespace tcs_service_test.Controllers
         {
             var dbInMemory = DbInMemory.getDbInMemoryOptions(dbName);
             var personRepo = new PersonRepo(dbInMemory);
-            var courseRepo = new CourseRepo(dbInMemory);
+            var classRepo = new ClassRepo(dbInMemory);
             var scheduleRepo = new ScheduleRepo(dbInMemory);
             var semesterRepo = new SemesterRepo(dbInMemory);
             var departmentRepo = new DepartmentRepo(dbInMemory);
             db = new TCSContext(dbInMemory);
             mockBannerService = new Mock<IBannerService>();
 
-            unitPerson = new UnitOfWorkPerson(personRepo, scheduleRepo, courseRepo, semesterRepo, departmentRepo, mockBannerService.Object);
+            unitPerson = new UnitOfWorkPerson(personRepo, scheduleRepo, classRepo, semesterRepo, departmentRepo, mockBannerService.Object);
         }
 
         public void Dispose()
@@ -59,9 +59,9 @@ namespace tcs_service_test.Controllers
         {
             var email = identifier;
             var id = Utils.ParseOrDefault(identifier, 19834567);
-            var courses = new List<BannerCourse>()
+            var courses = new List<BannerClass>()
             {
-                new BannerCourse() {
+                new BannerClass() {
                     CourseName="Intro to Computation",
                     CRN=13548,
                     ShortName="CS 101",
@@ -70,7 +70,7 @@ namespace tcs_service_test.Controllers
                         Code=42
                     }
                 },
-                new BannerCourse() {
+                new BannerClass() {
                     CourseName="Intro to Web Design",
                     CRN=13464,
                     ShortName="CS 129",
@@ -85,7 +85,7 @@ namespace tcs_service_test.Controllers
             {
                 Id = id,
                 Email = identifier,
-                Courses = courses,
+                Classes = courses,
                 FirstName = "Bob",
                 LastName = "Dylan",
                 SemesterId = semesterCode
@@ -104,7 +104,7 @@ namespace tcs_service_test.Controllers
             Assert.NotNull(semester);
             courses.ForEach(c =>
             {
-                var course = db.Courses.FirstOrDefault(x => c.CRN == x.CRN);
+                var course = db.Classes.FirstOrDefault(x => c.CRN == x.CRN);
                 Assert.NotNull(course);
                 var department = db.Departments.FirstOrDefault(x => x.Code == c.Department.Code);
                 Assert.NotNull(department);
@@ -146,8 +146,8 @@ namespace tcs_service_test.Controllers
             };
 
             var newSemesterId = 201902;
-            var oldCourses = new List<Course>() {
-                new Course() {
+            var oldCourses = new List<Class>() {
+                new Class() {
                     CRN = 13465,
                     Name = "Intro to Computers",
                     Department = new Department() {
@@ -161,8 +161,8 @@ namespace tcs_service_test.Controllers
             {
                 Id = person.Id,
                 Email = person.Email,
-                Courses = new List<BannerCourse>() {
-                    new BannerCourse(){
+                Classes = new List<BannerClass>() {
+                    new BannerClass(){
                     CRN = 11112,
                     CourseName = "Intro to Excel",
                     ShortName = "CS 101",
@@ -179,7 +179,7 @@ namespace tcs_service_test.Controllers
 
             db.People.Add(person);
             db.Semesters.Add(semester);
-            db.Courses.AddRange(oldCourses);
+            db.Classes.AddRange(oldCourses);
             db.SaveChanges();
 
 
@@ -189,10 +189,10 @@ namespace tcs_service_test.Controllers
 
             mockBannerService.Verify(x => x.GetBannerInfo(It.Is<string>(a => a == person.Email || a == person.Id.ToString())), Times.Once());
 
-            Assert.Equal(personInfo.Schedule.Select(x => x.CRN), bannerPersonInfo.Courses.Select(x => x.CRN));
+            Assert.Equal(personInfo.Schedule.Select(x => x.CRN), bannerPersonInfo.Classes.Select(x => x.CRN));
             var addedSemester = db.Semesters.SingleOrDefault(x => x.Code == newSemesterId);
             Assert.NotNull(addedSemester);
-            Assert.Equal(personInfo.Schedule.Select(x => x.CRN), db.Schedules.Where(x => x.Person.Email == person.Email).Select(x => x.CourseCRN));
+            Assert.Equal(personInfo.Schedule.Select(x => x.CRN), db.Schedules.Where(x => x.Person.Email == person.Email).Select(x => x.ClassCRN));
         }
 
         /*
@@ -225,8 +225,8 @@ namespace tcs_service_test.Controllers
             {
                 Code = 201901
             };
-            var courses = new List<Course>() {
-                new Course() {
+            var classes = new List<Class>() {
+                new Class() {
                     CRN = 16748,
                     Name = "Yoga",
                     ShortName = "GYM302",
@@ -236,7 +236,7 @@ namespace tcs_service_test.Controllers
                     }
                 }
             };
-            db.Courses.AddRange(courses);
+            db.Classes.AddRange(classes);
             db.Semesters.Add(semester);
             db.SaveChanges();
 
@@ -244,7 +244,7 @@ namespace tcs_service_test.Controllers
             {
                 Id = person.Id,
                 Email = person.Email,
-                Courses = courses.Select(x => new BannerCourse()
+                Classes = classes.Select(x => new BannerClass()
                 {
                     CourseName = x.Name,
                     CRN = x.CRN,
@@ -268,9 +268,9 @@ namespace tcs_service_test.Controllers
 
             var addedPerson = db.People.Find(personInfo.Id);
             Assert.NotNull(addedPerson);
-            Assert.Equal(courses.Count(), db.Courses.Count());
+            Assert.Equal(classes.Count(), db.Classes.Count());
             var schedule = db.Schedules.Where(x => x.PersonId == addedPerson.Id);
-            Assert.Equal(schedule.Count(), courses.Count());
+            Assert.Equal(schedule.Count(), classes.Count());
             Assert.NotNull(db.Semesters.Find(semester.Code));
         }
 
@@ -338,8 +338,8 @@ namespace tcs_service_test.Controllers
             {
                 Code = 201901
             };
-            var courses = new List<Course>(){
-                new Course(){
+            var classes = new List<Class>(){
+                new Class(){
                     CRN=163574,
                     Name="Intro to Powerpoint",
                     ShortName="PO124",
@@ -352,12 +352,12 @@ namespace tcs_service_test.Controllers
             var schedule = new Schedule()
             {
                 PersonId = person.Id,
-                CourseCRN = courses[0].CRN,
+                ClassCRN = classes[0].CRN,
                 SemesterCode = semester.Code
             };
             db.Semesters.Add(semester);
             db.People.Add(person);
-            db.Courses.AddRange(courses);
+            db.Classes.AddRange(classes);
             db.Schedules.Add(schedule);
             await db.SaveChangesAsync();
 
@@ -365,7 +365,7 @@ namespace tcs_service_test.Controllers
             {
                 Id = person.Id,
                 Email = person.Email,
-                Courses = null,
+                Classes = null,
                 FirstName = "Bob",
                 LastName = "Dylan",
                 SemesterId = semester.Code
@@ -377,9 +377,9 @@ namespace tcs_service_test.Controllers
             Assert.NotNull(personInfo);
             Assert.Equal(personInfo.Email, person.Email);
             mockBannerService.Verify(x => x.GetBannerInfo(It.IsAny<string>()), Times.Never());
-            Assert.Equal(courses.Select(x => x.CRN), personInfo.Schedule.ToList().Select(x => x.CRN));
+            Assert.Equal(classes.Select(x => x.CRN), personInfo.Schedule.ToList().Select(x => x.CRN));
             var inDBSchedule = db.Schedules.Where(x => x.PersonId == person.Id);
-            Assert.Equal(courses.Count(), inDBSchedule.Count());
+            Assert.Equal(classes.Count(), inDBSchedule.Count());
         }
     }
 }

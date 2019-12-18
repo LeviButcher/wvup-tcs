@@ -10,10 +10,10 @@ namespace tcs_service.Services.ScheduledTasks
 {
     public class StudentSignOutJob : IJob
     {
-        private readonly ISignInRepo _iRepo;
+        private readonly ISessionRepo _iRepo;
 
 
-        public StudentSignOutJob(ISignInRepo iRepo)
+        public StudentSignOutJob(ISessionRepo iRepo)
         {
             _iRepo = iRepo;
         }

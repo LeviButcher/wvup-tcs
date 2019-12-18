@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace tcs_service.Migrations
 {
-    public partial class SignIn : Migration
+    public partial class init : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -12,7 +12,7 @@ namespace tcs_service.Migrations
                 name: "ClassTours",
                 columns: table => new
                 {
-                    ID = table.Column<int>(nullable: false)
+                    Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
                     Name = table.Column<string>(nullable: false),
                     DayVisited = table.Column<DateTime>(nullable: false),
@@ -20,7 +20,7 @@ namespace tcs_service.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ClassTours", x => x.ID);
+                    table.PrimaryKey("PK_ClassTours", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -39,181 +39,213 @@ namespace tcs_service.Migrations
                 name: "People",
                 columns: table => new
                 {
-                    ID = table.Column<int>(nullable: false),
-                    Name = table.Column<string>(nullable: false),
+                    Id = table.Column<int>(nullable: false),
+                    Email = table.Column<string>(nullable: false),
                     PersonType = table.Column<int>(nullable: false),
                     FirstName = table.Column<string>(nullable: false),
                     LastName = table.Column<string>(nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_People", x => x.ID);
+                    table.PrimaryKey("PK_People", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
                 name: "Reasons",
                 columns: table => new
                 {
-                    ID = table.Column<int>(nullable: false)
+                    Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
                     Name = table.Column<string>(nullable: false),
                     Deleted = table.Column<bool>(nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Reasons", x => x.ID);
+                    table.PrimaryKey("PK_Reasons", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
                 name: "Semesters",
                 columns: table => new
                 {
-                    ID = table.Column<int>(nullable: false),
-                    Name = table.Column<string>(nullable: false)
+                    Code = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Semesters", x => x.ID);
+                    table.PrimaryKey("PK_Semesters", x => x.Code);
                 });
 
             migrationBuilder.CreateTable(
                 name: "Users",
                 columns: table => new
                 {
-                    ID = table.Column<int>(nullable: false)
+                    Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
                     FirstName = table.Column<string>(nullable: true),
                     LastName = table.Column<string>(nullable: true),
-                    Username = table.Column<string>(nullable: true),
+                    Username = table.Column<string>(maxLength: 25, nullable: false),
                     PasswordHash = table.Column<byte[]>(nullable: true),
                     PasswordSalt = table.Column<byte[]>(nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Users", x => x.ID);
+                    table.PrimaryKey("PK_Users", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
-                name: "Courses",
+                name: "Classes",
                 columns: table => new
                 {
                     CRN = table.Column<int>(nullable: false),
-                    DepartmentID = table.Column<int>(nullable: false),
-                    CourseName = table.Column<string>(nullable: false),
+                    DepartmentCode = table.Column<int>(nullable: false),
+                    Name = table.Column<string>(nullable: false),
                     ShortName = table.Column<string>(nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Courses", x => x.CRN);
+                    table.PrimaryKey("PK_Classes", x => x.CRN);
                     table.ForeignKey(
-                        name: "FK_Courses_Departments_DepartmentID",
-                        column: x => x.DepartmentID,
+                        name: "FK_Classes_Departments_DepartmentCode",
+                        column: x => x.DepartmentCode,
                         principalTable: "Departments",
                         principalColumn: "Code",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "SignIns",
+                name: "Sessions",
                 columns: table => new
                 {
-                    ID = table.Column<int>(nullable: false)
+                    Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
                     PersonId = table.Column<int>(nullable: false),
-                    SemesterId = table.Column<int>(nullable: false),
-                    InTime = table.Column<DateTime>(nullable: false),
-                    OutTime = table.Column<DateTime>(nullable: true),
-                    Tutoring = table.Column<bool>(nullable: false)
+                    InTime = table.Column<DateTimeOffset>(nullable: false),
+                    OutTime = table.Column<DateTimeOffset>(nullable: true),
+                    Tutoring = table.Column<bool>(nullable: false),
+                    SemesterCode = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_SignIns", x => x.ID);
+                    table.PrimaryKey("PK_Sessions", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_SignIns_People_PersonId",
+                        name: "FK_Sessions_People_PersonId",
                         column: x => x.PersonId,
                         principalTable: "People",
-                        principalColumn: "ID",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_SignIns_Semesters_SemesterId",
-                        column: x => x.SemesterId,
+                        name: "FK_Sessions_Semesters_SemesterCode",
+                        column: x => x.SemesterCode,
                         principalTable: "Semesters",
-                        principalColumn: "ID",
+                        principalColumn: "Code",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "SignInCourses",
+                name: "Schedules",
                 columns: table => new
                 {
-                    CourseID = table.Column<int>(nullable: false),
-                    SignInID = table.Column<int>(nullable: false)
+                    PersonId = table.Column<int>(nullable: false),
+                    ClassCRN = table.Column<int>(nullable: false),
+                    SemesterCode = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_SignInCourses", x => new { x.SignInID, x.CourseID });
+                    table.PrimaryKey("PK_Schedules", x => new { x.ClassCRN, x.PersonId, x.SemesterCode });
                     table.ForeignKey(
-                        name: "FK_SignInCourses_Courses_CourseID",
-                        column: x => x.CourseID,
-                        principalTable: "Courses",
+                        name: "FK_Schedules_Classes_ClassCRN",
+                        column: x => x.ClassCRN,
+                        principalTable: "Classes",
                         principalColumn: "CRN",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_SignInCourses_SignIns_SignInID",
-                        column: x => x.SignInID,
-                        principalTable: "SignIns",
-                        principalColumn: "ID",
+                        name: "FK_Schedules_People_PersonId",
+                        column: x => x.PersonId,
+                        principalTable: "People",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Schedules_Semesters_SemesterCode",
+                        column: x => x.SemesterCode,
+                        principalTable: "Semesters",
+                        principalColumn: "Code",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "SignInReasons",
+                name: "SessionClasses",
                 columns: table => new
                 {
-                    ReasonID = table.Column<int>(nullable: false),
-                    SignInID = table.Column<int>(nullable: false)
+                    ClassId = table.Column<int>(nullable: false),
+                    SessionId = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_SignInReasons", x => new { x.SignInID, x.ReasonID });
+                    table.PrimaryKey("PK_SessionClasses", x => new { x.SessionId, x.ClassId });
+                    table.UniqueConstraint("AK_SessionClasses_ClassId_SessionId", x => new { x.ClassId, x.SessionId });
                     table.ForeignKey(
-                        name: "FK_SignInReasons_Reasons_ReasonID",
-                        column: x => x.ReasonID,
-                        principalTable: "Reasons",
-                        principalColumn: "ID",
+                        name: "FK_SessionClasses_Classes_ClassId",
+                        column: x => x.ClassId,
+                        principalTable: "Classes",
+                        principalColumn: "CRN",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_SignInReasons_SignIns_SignInID",
-                        column: x => x.SignInID,
-                        principalTable: "SignIns",
-                        principalColumn: "ID",
+                        name: "FK_SessionClasses_Sessions_SessionId",
+                        column: x => x.SessionId,
+                        principalTable: "Sessions",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "SessionReasons",
+                columns: table => new
+                {
+                    ReasonId = table.Column<int>(nullable: false),
+                    SessionId = table.Column<int>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_SessionReasons", x => new { x.SessionId, x.ReasonId });
+                    table.UniqueConstraint("AK_SessionReasons_ReasonId_SessionId", x => new { x.ReasonId, x.SessionId });
+                    table.ForeignKey(
+                        name: "FK_SessionReasons_Reasons_ReasonId",
+                        column: x => x.ReasonId,
+                        principalTable: "Reasons",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_SessionReasons_Sessions_SessionId",
+                        column: x => x.SessionId,
+                        principalTable: "Sessions",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Courses_DepartmentID",
-                table: "Courses",
-                column: "DepartmentID");
+                name: "IX_Classes_DepartmentCode",
+                table: "Classes",
+                column: "DepartmentCode");
 
             migrationBuilder.CreateIndex(
-                name: "IX_SignInCourses_CourseID",
-                table: "SignInCourses",
-                column: "CourseID");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_SignInReasons_ReasonID",
-                table: "SignInReasons",
-                column: "ReasonID");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_SignIns_PersonId",
-                table: "SignIns",
+                name: "IX_Schedules_PersonId",
+                table: "Schedules",
                 column: "PersonId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_SignIns_SemesterId",
-                table: "SignIns",
-                column: "SemesterId");
+                name: "IX_Schedules_SemesterCode",
+                table: "Schedules",
+                column: "SemesterCode");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Sessions_PersonId",
+                table: "Sessions",
+                column: "PersonId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Sessions_SemesterCode",
+                table: "Sessions",
+                column: "SemesterCode");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -222,22 +254,25 @@ namespace tcs_service.Migrations
                 name: "ClassTours");
 
             migrationBuilder.DropTable(
-                name: "SignInCourses");
+                name: "Schedules");
 
             migrationBuilder.DropTable(
-                name: "SignInReasons");
+                name: "SessionClasses");
+
+            migrationBuilder.DropTable(
+                name: "SessionReasons");
 
             migrationBuilder.DropTable(
                 name: "Users");
 
             migrationBuilder.DropTable(
-                name: "Courses");
+                name: "Classes");
 
             migrationBuilder.DropTable(
                 name: "Reasons");
 
             migrationBuilder.DropTable(
-                name: "SignIns");
+                name: "Sessions");
 
             migrationBuilder.DropTable(
                 name: "Departments");

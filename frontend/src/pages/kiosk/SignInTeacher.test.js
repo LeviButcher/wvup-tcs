@@ -102,7 +102,7 @@ test('Submit with valid wvup.edu email, calls fetch with correct backend endpoin
     );
   });
 
-  expect(fakeFetch).toHaveBeenCalledWith(`${backendURL}session/signin`, {
+  expect(fakeFetch).toHaveBeenCalledWith(`${backendURL}sessions/in`, {
     headers: {
       'Content-Type': 'application/json'
     },

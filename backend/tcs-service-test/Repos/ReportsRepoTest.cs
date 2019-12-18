@@ -26,14 +26,14 @@ namespace tcs_service_test.Repos
         {
             var dbOptions = DbInMemory.getDbInMemoryOptions(dbName);
             db = new TCSContext(dbOptions);
-            IBannerService bs = new MockBannerService(new PersonRepo(dbOptions), new SemesterRepo(dbOptions), new CourseRepo(dbOptions));
+            IBannerService bs = new MockBannerService(new PersonRepo(dbOptions), new SemesterRepo(dbOptions), new ClassRepo(dbOptions));
             reportsRepo = new ReportsRepo(db, bs);
             fixture = new Fixture()
               .Customize(new AutoMoqCustomization());
             // Setting default values
             fixture.RepeatCount = 3;
-            fixture.Customize<SignIn>((ob) => ob.Without(x => x.Courses).Without(x => x.Person)
-                .Without(x => x.Semester).Without(x => x.Reasons));
+            fixture.Customize<Session>((ob) => ob.Without(x => x.SessionClasses).Without(x => x.Person)
+                .Without(x => x.Semester).Without(x => x.SessionReasons));
         }
 
         public void Dispose()
@@ -46,14 +46,14 @@ namespace tcs_service_test.Repos
         {
             var startDate = new DateTime(2019, 8, 4);
             var endDate = startDate.AddDays(5);
-            var signins = fixture.CreateMany<SignIn>().Select(x =>
+            var sessions = fixture.CreateMany<Session>().Select(x =>
             {
                 x.InTime = startDate;
                 x.OutTime = startDate.AddDays(2);
                 return x;
             });
 
-            db.SignIns.AddRange(signins);
+            db.Sessions.AddRange(sessions);
             db.SaveChanges();
 
             var results = await reportsRepo.WeeklyVisits(startDate, endDate);
@@ -87,9 +87,9 @@ namespace tcs_service_test.Repos
                 }
             }.ToList();
 
-            var signIns = weeks.Aggregate(new List<SignIn>(), (acc, curr) =>
+            var sessions = weeks.Aggregate(new List<Session>(), (acc, curr) =>
             {
-                var weeksSignIns = fixture.CreateMany<SignIn>().Select(x =>
+                var weeksSignIns = fixture.CreateMany<Session>().Select(x =>
                 {
                     x.InTime = curr.startDate;
                     x.OutTime = curr.startDate.AddDays(1);
@@ -99,7 +99,7 @@ namespace tcs_service_test.Repos
                 return acc;
             });
 
-            db.SignIns.AddRange(signIns);
+            db.Sessions.AddRange(sessions);
             db.SaveChanges();
 
             var results = await reportsRepo.WeeklyVisits(weeks[0].startDate, weeks.Last().endDate);

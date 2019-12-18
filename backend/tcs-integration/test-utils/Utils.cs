@@ -17,4 +17,9 @@ namespace tcs_integration.test_utils
             return user;
         }
     }
+
+    public class ErrorMessage
+    {
+        public string Message { get; set; }
+    }
 }

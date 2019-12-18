@@ -36,7 +36,7 @@ namespace tcs_service.Models.ViewModels
 
         public bool Tutoring { get; set; }
 
-        public List<Course> Courses { get; set; }
+        public List<Class> Classes { get; set; }
 
         public List<Reason> Reasons { get; set; }
     }

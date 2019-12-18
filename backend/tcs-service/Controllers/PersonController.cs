@@ -35,7 +35,7 @@ namespace tcs_service.Controllers
         {
             var personInfo = await unitPerson.GetPersonInfo(identifier, DateTime.Now);
             var schedules = scheduleRepo.GetAll(x => x.PersonId == personInfo.Id);
-            personInfo.Schedule = schedules.Select(x => x.Course);
+            personInfo.Schedule = schedules.Select(x => x.Class);
 
             return Ok(personInfo);
         }

@@ -1,18 +1,21 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace tcs_service.Models
 {
-    public class Course
+    public class Class
     {
         [Key]
         public int CRN { get; set; }
 
         [Required]
-        public int DepartmentID { get; set; }
+        public int DepartmentCode { get; set; }
 
-        [ForeignKey(nameof(DepartmentID))]
+        [ForeignKey(nameof(DepartmentCode))]
         public Department Department { get; set; }
 
         [Required]
@@ -21,7 +24,7 @@ namespace tcs_service.Models
         [Required]
         public string ShortName { get; set; }
 
-        [InverseProperty(nameof(SignInCourse.Course))]
-        public List<SignInCourse> SignInCourses { get; set; }
+        [InverseProperty(nameof(SessionClass.Class))]
+        public IEnumerable<SessionClass> SessionClasses { get; set; }
     }
 }

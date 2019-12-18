@@ -71,10 +71,7 @@ namespace tcs_integration.Controllers
             }
         }
 
-        private class ErrorMessage
-        {
-            public string Message { get; set; }
-        }
+
 
         [Fact]
         public async void GET_person_PersonDoesNotExist_ShouldReturn500WithErrorMessage()

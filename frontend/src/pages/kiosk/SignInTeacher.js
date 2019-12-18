@@ -5,7 +5,7 @@ import { Card, KioskFullScreenContainer } from '../../ui';
 import EmailOrCardSwipeForm from '../../components/EmailOrCardSwipeForm';
 import type { Teacher } from '../../types';
 
-const postSignInTeacher = callApi(`session/signin`, 'POST');
+const postSignInTeacher = callApi(`sessions/in`, 'POST');
 
 // test email : teacher@wvup.edu
 const SignInTeacher = () => {

@@ -124,13 +124,13 @@ namespace tcs_service
 
             services.AddScoped<IClassTourRepo, ClassTourRepo>();
             services.AddScoped<IUserRepo, UserRepo>();
-            services.AddScoped<ISignInRepo, SignInRepo>();
             services.AddScoped<IReportsRepo, ReportsRepo>();
             services.AddScoped<IReasonRepo, ReasonRepo>();
             services.AddScoped<ILookupRepo, LookupRepo>();
+            services.AddScoped<ISessionRepo, SessionRepo>();
             services.AddScoped<IPersonRepo, PersonRepo>();
             services.AddScoped<IScheduleRepo, ScheduleRepo>();
-            services.AddScoped<ICourseRepo, CourseRepo>();
+            services.AddScoped<IClassRepo, ClassRepo>();
             services.AddScoped<ISemesterRepo, SemesterRepo>();
             services.AddScoped<IDepartmentRepo, DepartmentRepo>();
             services.AddScoped<IUnitOfWorkPerson, UnitOfWorkPerson>();
