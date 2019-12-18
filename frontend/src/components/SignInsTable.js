@@ -54,7 +54,7 @@ const SignInRow = ({
     id,
     email,
     fullName,
-    courses,
+    classes,
     reasons,
     inTime,
     outTime,
@@ -79,7 +79,7 @@ const SignInRow = ({
           ? hourDifferenceInTime(new Date(inTime), new Date(outTime))
           : ''}
       </td>
-      <td>{courses.map(course => course.shortName).join(', ')}</td>
+      <td>{classes.map(course => course.shortName).join(', ')}</td>
       <td>
         {reasons
           .map(reason => reason.name)

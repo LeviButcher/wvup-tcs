@@ -11,14 +11,14 @@ type Props = {
 };
 
 const SemesterSignIns = ({ navigate, '*': unMatchedUri }: Props) => {
-  const [semesterUri] = unMatchedUri.split('/');
+  const [semesterUri] = unMatchedUri ? unMatchedUri.split('/') : [''];
   return (
     <>
       <SemesterForm
         title="Semester Lookup"
-        initialValues={{ semester: semesterUri }}
-        onSubmit={({ semester }) => {
-          return Promise.resolve(navigate(semester));
+        initialValues={{ semesterCode: semesterUri }}
+        onSubmit={({ semesterCode }) => {
+          return Promise.resolve(navigate(semesterCode));
         }}
       />
       <Router primary={false} component={({ children }) => <>{children}</>}>

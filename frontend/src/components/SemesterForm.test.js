@@ -12,7 +12,7 @@ beforeEach(() => {
     Promise.resolve({
       status: 200,
       headers: [],
-      json: () => Promise.resolve([{ id: 1, name: '201901' }])
+      json: () => Promise.resolve([{ code: 1, name: '201901' }])
     })
   );
   global.fetch = fakeFetch;
@@ -46,7 +46,7 @@ test('Should call onSubmit with semester values', async () => {
   await wait(() => {
     expect(mockSubmit).toHaveBeenCalledTimes(1);
     expect(mockSubmit).toHaveBeenCalledWith(
-      { semester: '1' },
+      { semesterCode: '1' },
       expect.anything()
     );
   });

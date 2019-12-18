@@ -60,7 +60,7 @@ export type SignIn = {
   id: string,
   email: string,
   fullName: string,
-  courses: [Course],
+  classes: [Course],
   reasons: [Reason],
   inTime: string,
   outTime: string,

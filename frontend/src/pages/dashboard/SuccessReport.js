@@ -64,9 +64,9 @@ const SuccessReport = ({ navigate, '*': unMatchedUri }: Props) => {
         title="Success Report"
         style={{ gridArea: 'form' }}
         width="500px"
-        initialValues={{ semester: semesterUri }}
-        onSubmit={({ semester }) => {
-          return Promise.resolve(navigate(`${semester}/`));
+        initialValues={{ semesterCode: semesterUri }}
+        onSubmit={({ semesterCode }) => {
+          return Promise.resolve(navigate(`${semesterCode}/`));
         }}
       />
       <Router primary={false} component={({ children }) => <>{children}</>}>

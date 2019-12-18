@@ -58,6 +58,8 @@ function App() {
               {/* // $FlowFixMe */}
               <UpdateSignIn path="/signins/:id" />
               {/* // $FlowFixMe */}
+              <SemesterSignIns path="/signins/semester/" />
+              {/* // $FlowFixMe */}
               <SemesterSignIns path="/signins/semester/*" />
               {/* // $FlowFixMe */}
               <ClassTourLookup path="/tours/" />
