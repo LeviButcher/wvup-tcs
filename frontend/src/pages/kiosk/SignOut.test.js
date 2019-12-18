@@ -84,12 +84,12 @@ test('Should send fetch call with expected body when using valid email address',
 
   await wait(() => {
     expect(fakeFetch).toHaveBeenCalledTimes(2);
-    expect(fakeFetch).toHaveBeenCalledWith(`${backendURL}session/signout`, {
+    expect(fakeFetch).toHaveBeenCalledWith(`${backendURL}sessions/out`, {
       headers: {
         'Content-Type': 'application/json'
       },
       method: 'PUT',
-      body: JSON.stringify({ id: '98' })
+      body: JSON.stringify({ personId: '98' })
     });
   });
 });
@@ -113,12 +113,12 @@ test('Card swipe calls fetch with correct arguments', async () => {
 
   await wait(() => {
     expect(fakeFetch).toHaveBeenCalledTimes(2);
-    expect(fakeFetch).toHaveBeenCalledWith(`${backendURL}session/signout`, {
+    expect(fakeFetch).toHaveBeenCalledWith(`${backendURL}sessions/out`, {
       headers: {
         'Content-Type': 'application/json'
       },
       method: 'PUT',
-      body: JSON.stringify({ id: '98' })
+      body: JSON.stringify({ personId: '98' })
     });
   });
 });
@@ -134,7 +134,7 @@ test('Should display fetch error message when fetch returns non 2XX status code'
           json: () => Promise.resolve({ id: '98' }),
           status: 200
         });
-      case `${backendURL}session/signout`:
+      case `${backendURL}sessions/out`:
         return Promise.resolve({
           status: 400,
           json: () => Promise.resolve(error)
@@ -172,7 +172,7 @@ test('Should display fetch error message when fetch returns non 2XX with card sw
           json: () => Promise.resolve({ id: '98' }),
           status: 200
         });
-      case `${backendURL}session/signout`:
+      case `${backendURL}sessions/out`:
         return Promise.resolve({
           status: 400,
           json: () => Promise.resolve(error)

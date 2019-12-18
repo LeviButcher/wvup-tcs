@@ -7,6 +7,7 @@ import { Card } from '../../ui';
 const CreateSignIn = () => {
   const [person, setPerson]: [any, any] = useState();
   const [, { body: reasons }] = useApiWithHeaders('reasons/active');
+  const [, { body: semesters }] = useApiWithHeaders('reports/semesters');
 
   return (
     <Card>
@@ -21,7 +22,6 @@ const CreateSignIn = () => {
         <div>
           <SignInForm
             signInRecord={{
-              semesterId: '',
               email: person.email,
               schedule: person.schedule,
               inTime: '',
@@ -33,6 +33,7 @@ const CreateSignIn = () => {
               tutoring: false
             }}
             reasons={reasons}
+            semesters={semesters}
           />
         </div>
       )}

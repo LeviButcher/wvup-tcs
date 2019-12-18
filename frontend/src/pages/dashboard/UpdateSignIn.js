@@ -12,6 +12,7 @@ const UpdateSignIn = ({ id }: Props) => {
     `signins/${id}`
   );
   const [, { body: reasons }] = useApiWithHeaders('reasons/active');
+  const [, { body: semesters }] = useApiWithHeaders('reports/semesters');
 
   // Doesn't work because api doesn't give everything needed
   return (
@@ -33,6 +34,7 @@ const UpdateSignIn = ({ id }: Props) => {
               id: signIn.id
             }}
             reasons={reasons}
+            semesters={semesters}
           />
         </Card>
       )}

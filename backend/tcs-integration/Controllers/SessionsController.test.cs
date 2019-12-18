@@ -100,10 +100,31 @@ namespace tcs_integration.Controllers
             request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
 
             var response = await client.SendAsync(request);
-            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            Assert.Equal(HttpStatusCode.Created, response.StatusCode);
             var createdSession = await response.Content.ReadAsAsync<Session>();
             Assert.Equal(1, createdSession.PersonId);
             Assert.True(session.Tutoring);
+        }
+
+        [Fact]
+        public async void POST_Sessions_TeacherSession_ShouldReturn201()
+        {
+            var client = _factory.CreateClient();
+            var session = new SessionCreateDTO()
+            {
+                InTime = DateTime.Now,
+                OutTime = DateTime.Now.Add(new TimeSpan(1)),
+                PersonId = 771771771,
+                SemesterCode = 201901
+            };
+            var user = await Login(client);
+            var request = new HttpRequestMessage(HttpMethod.Post, "api/sessions");
+            request.Headers.Add("Authorization", $"Bearer {user.Token}");
+            request.Content = new StringContent(JsonConvert.SerializeObject(session));
+            request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+
+            var response = await client.SendAsync(request);
+            Assert.Equal(HttpStatusCode.Created, response.StatusCode);
         }
 
         [Fact]
@@ -151,7 +172,7 @@ namespace tcs_integration.Controllers
             request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
 
             var response = await client.SendAsync(request);
-            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            Assert.Equal(HttpStatusCode.Created, response.StatusCode);
             var createdSession = await response.Content.ReadAsAsync<Session>();
             Assert.Equal(1, createdSession.PersonId);
             Assert.True(session.Tutoring);
@@ -240,7 +261,7 @@ namespace tcs_integration.Controllers
         }
 
         [Fact]
-        public async void DELETE_sessions_Id_ShouldReturn200WithDeletedSession()
+        public async void DELETE_Sessions_Id_ShouldReturn200WithDeletedSession()
         {
             var client = _factory.CreateClient();
             var user = await Login(client);
@@ -313,5 +334,37 @@ namespace tcs_integration.Controllers
             var response = await client.PostAsJsonAsync("api/sessions/in", session);
             Assert.Equal(HttpStatusCode.Created, response.StatusCode);
         }
+
+        [Fact]
+        public async void POST_Session_In_StudentSelectsNoReasonsWithTutoringFalse_ShouldReturn500WithMessage()
+        {
+            var session = new KioskSignInDTO()
+            {
+                PersonId = 7,
+                Tutoring = false,
+                SelectedClasses = new List<int>() { 1, 2 },
+                SelectedReasons = new List<int>() { }
+            };
+
+            var client = _factory.CreateClient();
+
+            var response = await client.PostAsJsonAsync("api/sessions/in", session);
+            Assert.Equal(HttpStatusCode.InternalServerError, response.StatusCode);
+        }
+
+        [Fact]
+        public async void POST_Session_In_TeacherSignsIn_ShouldReturn201()
+        {
+            var session = new KioskSignInDTO()
+            {
+                PersonId = 771771771
+            };
+
+            var client = _factory.CreateClient();
+
+            var response = await client.PostAsJsonAsync("api/sessions/in", session);
+            Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+        }
+
     }
 }

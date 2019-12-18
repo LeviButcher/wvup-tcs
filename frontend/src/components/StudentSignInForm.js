@@ -9,7 +9,7 @@ import useApiWithHeaders from '../hooks/useApiWithHeaders';
 import SignInSchema from '../schemas/SignInFormSchema';
 import type { Student } from '../types';
 
-const postSignIn = callApi(`session/signin`, 'POST');
+const postSignIn = callApi(`sessions/in`, 'POST');
 
 type Props = {
   student: Student
@@ -25,7 +25,7 @@ const StudentSignInForm = ({ student }: Props) => {
           personId: studentSignIn.personId,
           tutoring: studentSignIn.tutoring,
           selectedReasons: studentSignIn.reasons,
-          selectedCourses: studentSignIn.courses
+          selectedClasses: studentSignIn.courses
         };
         return postSignIn(signIn)
           .then(ensureResponseCode(201))

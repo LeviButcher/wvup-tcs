@@ -16,6 +16,11 @@ export type Course = {
   shortName: string
 };
 
+export type Semester = {
+  code: number,
+  name: string
+};
+
 export type Student = {
   email: string,
   id: string,

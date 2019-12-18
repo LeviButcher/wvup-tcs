@@ -5,7 +5,8 @@ import ensureResponseCode from '../../utils/ensureResponseCode';
 import { KioskFullScreenContainer, Card, Stack } from '../../ui';
 import EmailOrCardSwipeForm from '../../components/EmailOrCardSwipeForm';
 
-const putSignOut = (id: string) => callApi(`session/signout`, 'PUT', { id });
+const putSignOut = (personId: string) =>
+  callApi(`sessions/out`, 'PUT', { personId });
 
 const SignOutPage = () => {
   return (

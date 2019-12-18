@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -19,13 +18,15 @@ namespace tcs_service.Controllers
     {
         readonly private ISessionRepo _sessionRepo;
         readonly private ISemesterRepo _semesterRepo;
+        readonly private IPersonRepo _personRepo;
         readonly private IMapper _mapper;
 
-        public SessionsController(ISessionRepo sessionRepo, ISemesterRepo semesterRepo, IMapper mapper)
+        public SessionsController(ISessionRepo sessionRepo, ISemesterRepo semesterRepo, IPersonRepo personRepo, IMapper mapper)
         {
             _mapper = mapper;
             _sessionRepo = sessionRepo;
             _semesterRepo = semesterRepo;
+            _personRepo = personRepo;
         }
 
         [HttpGet]
@@ -54,6 +55,14 @@ namespace tcs_service.Controllers
         [HttpPost]
         public async Task<IActionResult> PostSession([FromBody] SessionCreateDTO sessionDTO)
         {
+            var person = await _personRepo.Find(x => x.Id == sessionDTO.PersonId);
+            if (person.PersonType == PersonType.Teacher)
+            {
+                var sessionTeacher = _mapper.Map<Session>(sessionDTO);
+                await _sessionRepo.Create(sessionTeacher);
+                return Created($"sessions/{sessionTeacher.Id}", sessionTeacher);
+            }
+
             if (sessionDTO.SelectedClasses.Count < 1)
             {
                 throw new TCSException("Must select at least one class.");
@@ -69,7 +78,7 @@ namespace tcs_service.Controllers
             session.SessionReasons = sessionDTO.SelectedReasons.Select(x => new SessionReason() { ReasonId = x }).ToList();
             await _sessionRepo.Create(session);
 
-            return Ok(session);
+            return Created($"sessions/{session.Id}", session);
         }
 
         [HttpPut("{id}")]
@@ -77,17 +86,17 @@ namespace tcs_service.Controllers
         {
             if (id != sessionDTO.Id)
             {
-                return BadRequest();
+                throw new TCSException("Session does not exist");
             }
 
             if (sessionDTO.SelectedClasses.Count < 1)
             {
-                return BadRequest(new { message = "Must select at least one class." });
+                throw new TCSException("Must select at least one class.");
             }
 
             if (sessionDTO.SelectedReasons.Count < 1 && !sessionDTO.Tutoring)
             {
-                return BadRequest(new { message = "Must select at least one reason for visit." });
+                throw new TCSException("Must select at least one reason for visit.");
             }
 
             try
@@ -106,6 +115,26 @@ namespace tcs_service.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> SignIn([FromBody] KioskSignInDTO signIn)
         {
+            var person = await _personRepo.Find(x => x.Id == signIn.PersonId);
+            if (person.PersonType == PersonType.Teacher)
+            {
+                var teacherSession = new Session()
+                {
+                    InTime = DateTime.Now,
+                    PersonId = signIn.PersonId,
+                    SemesterCode = _semesterRepo.GetAll().Last().Code
+                };
+                var teacherResult = await _sessionRepo.Create(teacherSession);
+                if (teacherResult is Session)
+                {
+                    return Created($"sessions/{teacherResult.Id}", teacherResult);
+                }
+                throw new TCSException("Something went wrong");
+            }
+
+
+            if (!signIn.Tutoring && signIn.SelectedReasons.Count() < 1) throw new TCSException("Must select 1 or more reasons for visiting.");
+
             var alreadySignedIn = await _sessionRepo.Exist(x => x.PersonId == signIn.PersonId && x.OutTime == null);
             if (alreadySignedIn) throw new TCSException("You are already signed in.");
 
@@ -115,7 +144,8 @@ namespace tcs_service.Controllers
                 SessionClasses = signIn.SelectedClasses.Select(x => new SessionClass() { ClassId = x }).ToList(),
                 SessionReasons = signIn.SelectedReasons.Select(x => new SessionReason() { ReasonId = x }).ToList(),
                 PersonId = signIn.PersonId,
-                SemesterCode = _semesterRepo.GetAll().Last().Code
+                SemesterCode = _semesterRepo.GetAll().Last().Code,
+                Tutoring = signIn.Tutoring
             };
 
             var result = await _sessionRepo.Create(session);
@@ -137,7 +167,7 @@ namespace tcs_service.Controllers
             session.OutTime = DateTime.Now;
             var result = await _sessionRepo.Update(session);
 
-            return Ok(session);
+            return Ok(result);
         }
 
         [HttpDelete("{id}")]
