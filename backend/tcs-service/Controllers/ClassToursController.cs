@@ -10,6 +10,7 @@ using tcs_service.Repos.Interfaces;
 namespace tcs_service.Controllers
 {
     [Route("api/ClassTours")]
+    [Authorize]
     [ApiController]
     public class ClassToursController : ControllerBase
     {

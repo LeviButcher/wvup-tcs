@@ -155,8 +155,13 @@ namespace tcs_integration.Controllers
             };
 
             var client = _factory.CreateClient();
-            await client.PostAsJsonAsync("api/classtours", tour);
-            var response = await client.PostAsJsonAsync("api/classtours", tour);
+            var user = await Utils.Login(client);
+            var request = new HttpRequestMessage(HttpMethod.Post, "api/classtours");
+            request.Headers.Add("Authorization", $"Bearer {user.Token}");
+            request.Content = new StringContent(JsonConvert.SerializeObject(tour));
+            request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+
+            var response = await client.SendAsync(request);           
             Assert.Equal(HttpStatusCode.Created, response.StatusCode);
             var createdTour = await response.Content.ReadAsAsync<ClassTour>();
             Assert.Equal("PPHS", createdTour.Name);
@@ -173,8 +178,13 @@ namespace tcs_integration.Controllers
             };
 
             var client = _factory.CreateClient();
-            await client.PostAsJsonAsync("api/classtours", tour);
-            var response = await client.PostAsJsonAsync("api/classtours", tour);
+            var user = await Utils.Login(client);
+            var request = new HttpRequestMessage(HttpMethod.Post, "api/classtours");
+            request.Headers.Add("Authorization", $"Bearer {user.Token}");
+            request.Content = new StringContent(JsonConvert.SerializeObject(tour));
+            request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+
+            var response = await client.SendAsync(request);
             Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
         }
 
@@ -206,6 +216,19 @@ namespace tcs_integration.Controllers
             var response = await client.SendAsync(request);
 
             Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+        }
+
+        [Fact]
+        public async void DELETE_classtour_usernotloggedin_ShouldReturn401()
+        {
+            var tourId = 600;
+            var client = _factory.CreateClient();
+            
+
+            var request = new HttpRequestMessage(HttpMethod.Delete, $"api/classtours/{tourId}");
+            var response = await client.SendAsync(request);
+
+            Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
         }
     }  
 }
