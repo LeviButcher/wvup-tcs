@@ -110,5 +110,66 @@ namespace tcs_service_test.Repos
 
             Assert.Equal(expectedResult, results);
         }
+
+        [Fact]
+        public async void PeakHours_SignInsSpreadAcross2Months()
+        {
+            var startDate = new DateTime(2019, 8, 1);
+            var endDate = new DateTime(2019, 10, 1);
+
+            TimeSpan timeSpan = endDate - startDate;
+            var sessions = new List<Session>();
+
+            for(int i = 0; i < 100; i++)
+            {
+                var randomTest = new Random();
+                TimeSpan newSpan = new TimeSpan(0, randomTest.Next(0, (int)timeSpan.TotalMinutes), 0);
+                DateTime newDate = startDate + newSpan;
+                var session = fixture.Create<Session>();
+                session.InTime = newDate;
+                session.OutTime = newDate.AddHours(1);
+                sessions.Add(session);
+            }            
+
+            db.Sessions.AddRange(sessions);
+            db.SaveChanges();
+
+            var twelvePM = new List<int>();
+            foreach(var s in sessions)
+            {
+                if(s.InTime.Value.Hour == 12)
+                {
+                    twelvePM.Add(s.InTime.Value.Hour);
+                }
+            }
+
+            var twoPM = new List<int>();
+            foreach (var s in sessions)
+            {
+                if (s.InTime.Value.Hour == 14)
+                {
+                    twoPM.Add(s.InTime.Value.Hour);
+                }
+            }
+
+            var fivePM = new List<int>();
+            foreach (var s in sessions)
+            {
+                if (s.InTime.Value.Hour == 17)
+                {
+                    fivePM.Add(s.InTime.Value.Hour);
+                }
+            }
+
+            var results = await reportsRepo.PeakHours(startDate, endDate);
+
+            var twelvePMActualCount = results.Any(x => x.Hour == "12 P.M") ? results.Find(x => x.Hour == "12 P.M") : new PeakHoursViewModel(12, 0);
+            var twoPMActualCount = results.Any(x => x.Hour == "2 P.M") ? results.Find(x => x.Hour == "2 P.M") : new PeakHoursViewModel(14, 0);
+            var fivePMActualCount = results.Any(x => x.Hour == "5 P.M") ? results.Find(x => x.Hour == "5 P.M") : new PeakHoursViewModel(17, 0);
+
+            Assert.Equal(twelvePM.Count(), twelvePMActualCount.Count);
+            Assert.Equal(twoPM.Count(), twoPMActualCount.Count);
+            Assert.Equal(fivePM.Count(), fivePMActualCount.Count);
+        }
     }
 }
