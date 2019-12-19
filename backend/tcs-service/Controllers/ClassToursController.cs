@@ -47,22 +47,11 @@ namespace tcs_service.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<PagingModel<ClassTour>>> Get([FromQuery] DateTime start, [FromQuery] DateTime end, [FromQuery] int skip = 0, [FromQuery] int take = 20)
+        public async Task<ActionResult<Paging<ClassTour>>> Get([FromQuery] DateTime start, [FromQuery] DateTime end, [FromQuery] int skip = 0, [FromQuery] int take = 20)
         {
             var page = await _iRepo.GetBetweenDates(start, end, skip, take);
-            if (page.isNext)
-            {
-                Response.Headers.Add("Next", $"/api/classtours/?start={start}&end={end}&skip={page.Skip + page.Take}&take={page.Take}");
-            }
-            if (page.isPrev)
-            {
-                Response.Headers.Add("Prev", $"/api/classtours/?start={start}&end={end}&skip={page.Skip - page.Take}&take={page.Take}");
-            }
-            Response.Headers.Add("Total-Pages", $"{page.TotalPages}");
-            Response.Headers.Add("Total-Records", $"{page.TotalDataCount}");
-            Response.Headers.Add("Current-Page", $"{page.CurrentPage}");
 
-            return Ok(page.data);
+            return Ok(page);
         }
 
         [HttpPut("{id}")]

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-
 namespace tcs_service.Helpers
 {
     public class Paging<T>
@@ -25,6 +24,7 @@ namespace tcs_service.Helpers
         public Paging(int page, IEnumerable<T> allData) : this(page, 20, allData)
         {
         }
+
         public int TotalRecords { get; set; }
         public int TotalPages => (int)Math.Ceiling((decimal)TotalRecords / PageSize);
         public int PageSize { get; set; }
@@ -32,5 +32,17 @@ namespace tcs_service.Helpers
         public bool HasPrev => CurrentPage > 1;
         public int CurrentPage { get; set; }
         public IEnumerable<T> Data { get; set; }
+
+        public static Paging<T> ApplyPaging(int totalItems, IEnumerable<T> pageData, int currentPage, int PageSize = 10)
+        {
+            Paging<T> paging = new Paging<T>()
+            {
+                PageSize = PageSize,
+                TotalRecords = totalItems,
+                Data = pageData,
+                CurrentPage = currentPage,
+            };
+            return paging;
+        }
     }
 }

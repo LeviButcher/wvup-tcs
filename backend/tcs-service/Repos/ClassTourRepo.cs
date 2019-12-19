@@ -26,13 +26,13 @@ namespace tcs_service.Repos
         }
 
 
-        public async Task<PagingModel<ClassTourViewModel>> GetBetweenDates(DateTime start, DateTime end, int skip, int take)
+        public async Task<Paging<ClassTourViewModel>> GetBetweenDates(DateTime start, DateTime end, int skip, int take)
         {
             var tours = _db.ClassTours.Where(a => a.DayVisited > start && a.DayVisited < end);
             var totalDataCount = await tours.CountAsync();
             var pageData = GetPageData(tours, skip, take);
 
-            return new PagingModel<ClassTourViewModel>(skip, take, totalDataCount, pageData);
+            return new Paging<ClassTourViewModel>(skip, take, pageData);
         }
 
         protected override IQueryable<ClassTour> Include(DbSet<ClassTour> set) => set;

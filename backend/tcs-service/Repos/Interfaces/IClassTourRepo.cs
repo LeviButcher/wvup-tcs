@@ -9,6 +9,6 @@ namespace tcs_service.Repos.Interfaces
 {
     public interface IClassTourRepo : IRepo<ClassTour>
     {
-        Task<PagingModel<ClassTourViewModel>> GetBetweenDates(DateTime start, DateTime end, int skip, int take);
+        Task<Paging<ClassTourViewModel>> GetBetweenDates(DateTime start, DateTime end, int skip, int take);
     }
 }
