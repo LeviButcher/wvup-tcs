@@ -152,11 +152,7 @@ namespace tcs_service.Repos
 
             return await finalResult.ToListAsync();
         }
-        public List<Semester> Semesters()
-        {
-            return _db.Semesters.ToList();
-        }
-
+      
         public async Task<List<CourseWithSuccessCountViewModel>> SuccessReport(int semesterId)
         {
             var studentCourses = from item in _db.Sessions

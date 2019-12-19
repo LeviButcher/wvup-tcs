@@ -21,6 +21,5 @@ namespace tcs_service.Repos.Interfaces
 
         Task<List<CourseWithSuccessCountViewModel>> SuccessReport(int semesterId);
 
-        List<Semester> Semesters();
     }
 }

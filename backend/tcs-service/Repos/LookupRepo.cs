@@ -103,7 +103,6 @@ namespace tcs_service.Repos
                     LastName = x.Person.LastName,
                     InTime = x.InTime,
                     OutTime = x.OutTime,
-                    SemesterName = x.Semester.Name,
                     Tutoring = x.Tutoring,
                     SemesterId = x.Semester.Code,
                     PersonId = x.PersonId,

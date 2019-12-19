@@ -11,7 +11,6 @@ using tcs_service.Repos.Interfaces;
 namespace tcs_service.Controllers
 {
     [Route("api/[controller]")]
-    [Authorize]
     [ApiController]
     public class ReportsController : ControllerBase
     {
@@ -50,12 +49,6 @@ namespace tcs_service.Controllers
         public async Task<ActionResult<IEnumerable<ReasonWithClassVisitsViewModel>>> Reasons([FromQuery] DateTime start, [FromQuery] DateTime end)
         {
             return Ok(await _iRepo.Reasons(start, end));
-        }
-
-        [HttpGet("semesters")]
-        public IActionResult Semesters()
-        {
-            return Ok(_iRepo.Semesters());
         }
 
         [HttpGet("success/{semesterId}")]
