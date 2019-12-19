@@ -9,9 +9,7 @@ using tcs_service.Repos.Interfaces;
 
 namespace tcs_service.Controllers
 {
-    [Produces("application/json")]
     [Route("api/ClassTours")]
-    [Authorize]
     [ApiController]
     public class ClassToursController : ControllerBase
     {
@@ -22,20 +20,9 @@ namespace tcs_service.Controllers
             _iRepo = iRepo;
         }
 
-        private async Task<bool> ClassTourExists(int id)
-        {
-            return await _iRepo.Exist(x => x.Id == id);
-        }
-
         [HttpGet("{id}")]
-        [Produces(typeof(ClassTour))]
         public async Task<IActionResult> GetClassTour([FromRoute] int id)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
             var classTour = await _iRepo.Find(x => x.Id == id);
 
             if (classTour == null)
@@ -47,36 +34,19 @@ namespace tcs_service.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<PagingModel<ClassTour>>> Get([FromQuery] DateTime start, [FromQuery] DateTime end, [FromQuery] int skip = 0, [FromQuery] int take = 20)
+        public IActionResult Get([FromQuery] DateTime start, [FromQuery] DateTime end, [FromQuery] int page = 1)
         {
-            var page = await _iRepo.GetBetweenDates(start, end, skip, take);
-            if (page.isNext)
-            {
-                Response.Headers.Add("Next", $"/api/classtours/?start={start}&end={end}&skip={page.Skip + page.Take}&take={page.Take}");
-            }
-            if (page.isPrev)
-            {
-                Response.Headers.Add("Prev", $"/api/classtours/?start={start}&end={end}&skip={page.Skip - page.Take}&take={page.Take}");
-            }
-            Response.Headers.Add("Total-Pages", $"{page.TotalPages}");
-            Response.Headers.Add("Total-Records", $"{page.TotalDataCount}");
-            Response.Headers.Add("Current-Page", $"{page.CurrentPage}");
-
-            return Ok(page.data);
+            var pageResult = new Paging<ClassTour>(page, _iRepo.GetBetweenDates(start, end));
+            
+            return Ok(pageResult);
         }
 
         [HttpPut("{id}")]
-        [Produces(typeof(ClassTour))]
         public async Task<IActionResult> PutClassTour([FromRoute] int id, [FromBody] ClassTour classTour)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
             if (id != classTour.Id)
             {
-                return BadRequest("ID's do not match");
+                throw new TCSException("Class Tour does not exist");
             }
 
             try
@@ -86,48 +56,24 @@ namespace tcs_service.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!await ClassTourExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
+               return NotFound(new { message = "Something went wrong" });
             }
 
         }
 
         [HttpPost]
-        [Produces(typeof(ClassTour))]
         public async Task<IActionResult> PostClassTour([FromBody] ClassTour classTour)
         {
-            if (!ModelState.IsValid || classTour.Name == null)
-            {
-                return BadRequest(ModelState);
-            }
+            var tour = await _iRepo.Create(classTour);
 
-            await _iRepo.Create(classTour);
-
-            return CreatedAtAction("GetClassTour", new { id = classTour.Id }, classTour);
+            return Ok(tour);
         }
 
         [HttpDelete("{id}")]
         [Produces(typeof(ClassTour))]
         public async Task<IActionResult> DeleteClassTour([FromRoute] int id)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
-            if (!await ClassTourExists(id))
-            {
-                return NotFound();
-            }
-
             var tour = await _iRepo.Remove(x => x.Id == id);
-
             return Ok(tour);
         }
     }
