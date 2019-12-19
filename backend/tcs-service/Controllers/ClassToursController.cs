@@ -66,14 +66,20 @@ namespace tcs_service.Controllers
         {
             var tour = await _iRepo.Create(classTour);
 
-            return Ok(tour);
+            return Created($"classtours/{tour.Id}", tour);
         }
 
         [HttpDelete("{id}")]
-        [Produces(typeof(ClassTour))]
         public async Task<IActionResult> DeleteClassTour([FromRoute] int id)
         {
+            if (! await _iRepo.Exist(x => x.Id == id))
+            {
+                return NotFound(new { message = "Something went wrong" });
+            }
             var tour = await _iRepo.Remove(x => x.Id == id);
+
+            
+
             return Ok(tour);
         }
     }
