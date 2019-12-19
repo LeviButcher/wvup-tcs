@@ -17,39 +17,22 @@ namespace tcs_service.Models
         [ForeignKey(nameof(PersonId))]
         public Person Person { get; set; }
 
-        private DateTimeOffset? inTime;
 
         [Required]
-        public DateTimeOffset? InTime
-        {
-            get
-            {
-                if (!inTime.HasValue) return null;
-                return inTime.Value.AddTicks(-inTime.Value.Ticks % TimeSpan.TicksPerSecond);
-            }
-            set => inTime = value;
-        }
+        public DateTime? InTime { get; set; }
 
-        private DateTimeOffset? outTime;
 
         [SignOutValidation("InTime")]
-        public DateTimeOffset? OutTime
-        {
-            get
-            {
-                if (!outTime.HasValue) return null;
-                return outTime.Value.AddTicks(-outTime.Value.Ticks % TimeSpan.TicksPerSecond);
-            }
-            set => outTime = value;
-        }
+        public DateTime? OutTime { get; set; }
+
 
         public bool Tutoring { get; set; }
 
         [InverseProperty(nameof(SessionClass.Session))]
-        public IEnumerable<SessionClass> SessionClasses { get; set; }
+        public IEnumerable<SessionClass> SessionClasses { get; set; } = new List<SessionClass>();
 
         [InverseProperty(nameof(SessionReason.Session))]
-        public IEnumerable<SessionReason> SessionReasons { get; set; }
+        public IEnumerable<SessionReason> SessionReasons { get; set; } = new List<SessionReason>();
 
 
         public int SemesterCode { get; set; }

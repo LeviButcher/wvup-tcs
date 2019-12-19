@@ -22,6 +22,8 @@ const CreateSignIn = () => {
         <div>
           <SignInForm
             signInRecord={{
+              firstName: person.firstName,
+              lastName: person.lastName,
               email: person.email,
               schedule: person.schedule,
               inTime: '',

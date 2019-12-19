@@ -133,6 +133,8 @@ namespace tcs_service
             services.AddScoped<IClassRepo, ClassRepo>();
             services.AddScoped<ISemesterRepo, SemesterRepo>();
             services.AddScoped<IDepartmentRepo, DepartmentRepo>();
+            services.AddScoped<ISessionClassRepo, SessionClassRepo>();
+            services.AddScoped<ISessionReasonRepo, SessionReasonRepo>();
             services.AddScoped<IUnitOfWorkPerson, UnitOfWorkPerson>();
         }
 

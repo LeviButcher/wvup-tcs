@@ -9,29 +9,30 @@ type Props = {
 
 const UpdateSignIn = ({ id }: Props) => {
   const [, { body: signIn }]: [boolean, { body: any }, any] = useApiWithHeaders(
-    `signins/${id}`
+    `sessions/${id}`
   );
-  const [, { body: reasons }] = useApiWithHeaders('reasons/active');
+  const [, { body: reasons }] = useApiWithHeaders('reasons');
   const [, { body: semesters }] = useApiWithHeaders('reports/semesters');
 
-  // Doesn't work because api doesn't give everything needed
   return (
     <>
-      {signIn && (
+      {signIn && signIn.email && reasons.length > 0 && semesters.length > 0 && (
         <Card>
           <SignInForm
             signInRecord={{
-              semesterId: signIn.semesterId,
+              semesterCode: signIn.semesterCode,
               email: signIn.email,
-              classSchedule: signIn.courses,
+              schedule: signIn.schedule,
               inTime: signIn.inTime,
               outTime: signIn.outTime,
-              selectedReasons: signIn.reasons,
-              selectedClasses: signIn.courses,
+              selectedReasons: signIn.selectedReasons,
+              selectedClasses: signIn.selectedClasses,
               personId: signIn.personId,
               personType: signIn.personType,
               tutoring: signIn.tutoring,
-              id: signIn.id
+              id: signIn.id,
+              firstName: signIn.firstName,
+              lastName: signIn.lastName
             }}
             reasons={reasons}
             semesters={semesters}

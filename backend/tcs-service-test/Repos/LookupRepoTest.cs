@@ -33,6 +33,7 @@ namespace tcs_service_test.Repos
             fixture.RepeatCount = 3;
             fixture.Customize<Session>((ob) => ob.Without(x => x.SessionClasses).Without(x => x.Person)
                 .Without(x => x.Semester).Without(x => x.SessionReasons));
+            fixture.Customize<Person>((ob) => ob.Without(x => x.Schedules));
         }
 
         public void Dispose()

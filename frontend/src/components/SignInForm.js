@@ -9,6 +9,7 @@ import ReasonCheckboxes from './ReasonCheckboxes';
 import SignInSchema from '../schemas/SignInFormSchema';
 import type { Course, Reason, PersonType, Semester } from '../types';
 import { personTypeValues } from '../types';
+import SemesterDropdown from './SemesterDropdown';
 
 function isBeforeInTime(outTime) {
   const inTime = this.resolve(Yup.ref('inTime'));
@@ -75,6 +76,14 @@ const putSession = signIn =>
     ensureResponseCode(200)
   );
 
+const getDateOrTime = option => dateTimeString => {
+  const [date, time] = dateTimeString.split(/[T]/);
+  if (option === 'time') return time;
+  return date;
+};
+const getDate = getDateOrTime('date');
+const getTime = getDateOrTime('time');
+
 type Props = {
   signInRecord: {
     email: string,
@@ -87,7 +96,9 @@ type Props = {
     personType: PersonType,
     id?: string,
     personId: string,
-    semesterCode?: number
+    semesterCode?: number,
+    firstName: string,
+    lastName: string
   },
   semesters: Array<Semester>,
   reasons?: Array<Reason>
@@ -114,26 +125,28 @@ const SignInForm = ({ signInRecord, reasons, semesters }: Props) => {
         reasons: signInRecord.selectedReasons,
         tutoring: signInRecord.tutoring,
         courses: signInRecord.selectedClasses,
-        inTime: new Date(signInRecord.inTime).toTimeString(),
-        outTime: new Date(signInRecord.outTime).toTimeString(),
-        inDate: new Date(signInRecord.outTime).toDateString(),
-        outDate: new Date(signInRecord.outTime).toDateString(),
+        inTime: getTime(signInRecord.inTime),
+        outTime: getTime(signInRecord.outTime),
+        inDate: getDate(signInRecord.inTime),
+        outDate: getDate(signInRecord.outTime),
         semesterCode: signInRecord.semesterCode
       }}
       isInitialValid={false}
       validationSchema={isStudent ? StudentSignInSchema : TeacherSignInSchema}
+      enableReinitialize
       onSubmit={(values, { setStatus }) => {
         // massage data back into server format
         const signIn = {
           id: signInRecord.id,
           personId: signInRecord.personId,
           semesterCode: values.semesterCode,
-          inTime: new Date(`${values.inDate} ${values.inTime}`),
-          outTime: new Date(`${values.outDate} ${values.outTime}`),
+          inTime: `${values.inDate}T${values.inTime}`,
+          outTime: `${values.outDate}T${values.outTime}`,
           selectedClasses: values.courses,
           selectedReasons: values.reasons,
           tutoring: values.tutoring
         };
+
         // $FlowFixMe
         return callCorrectAPIEndpoint(signIn)
           .then(() => {
@@ -149,7 +162,8 @@ const SignInForm = ({ signInRecord, reasons, semesters }: Props) => {
             <Header>{shouldPostSignIn ? 'Create' : 'Update'} Sign In</Header>
             <div>KEY: Green = Active, Red = Deleted</div>
             {status && <div style={{ color: 'red' }}>{status}</div>}
-            <h2>{signInRecord.email}</h2>
+            <h2>{`${signInRecord.firstName} ${signInRecord.lastName}`}</h2>
+            <h3>{signInRecord.email}</h3>
             <Field
               id="inDate"
               type="date"
@@ -178,23 +192,7 @@ const SignInForm = ({ signInRecord, reasons, semesters }: Props) => {
               component={Input}
               label="Out Time"
             />
-            <Field
-              id="semesterCode"
-              name="semesterCode"
-              component="select"
-              label="Semester"
-              data-testid="semester-select"
-            >
-              <option style={{ display: 'none' }}>Select a Value</option>
-              {semesters &&
-                semesters
-                  .sort((a, b) => b.code - a.code)
-                  .map(({ code, name }) => (
-                    <option value={code} key={code}>
-                      {name}
-                    </option>
-                  ))}
-            </Field>
+            <SemesterDropdown semesters={semesters} />
             {isStudent && (
               <>
                 <StyledReasonCheckboxes

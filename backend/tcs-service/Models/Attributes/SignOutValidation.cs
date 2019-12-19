@@ -23,9 +23,9 @@ namespace tcs_service.Models.Attributes
                 return ValidationResult.Success;
             }
 
-            DateTimeOffset outTime = (DateTimeOffset)value;
+            DateTime outTime = (DateTime)value;
 
-            DateTimeOffset inTime = (DateTimeOffset)validationContext.ObjectType.GetProperty(DateToCompareToFieldName).GetValue(validationContext.ObjectInstance, null);
+            DateTime inTime = (DateTime)validationContext.ObjectType.GetProperty(DateToCompareToFieldName).GetValue(validationContext.ObjectInstance, null);
 
             if (outTime > inTime)
             {
