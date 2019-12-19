@@ -19,14 +19,19 @@ namespace tcs_service.Controllers
         readonly private ISessionRepo _sessionRepo;
         readonly private ISemesterRepo _semesterRepo;
         readonly private IPersonRepo _personRepo;
+        private readonly ISessionReasonRepo _sessionReasonRepo;
+        private readonly ISessionClassRepo _sessionClassRepo;
         readonly private IMapper _mapper;
 
-        public SessionsController(ISessionRepo sessionRepo, ISemesterRepo semesterRepo, IPersonRepo personRepo, IMapper mapper)
+        public SessionsController(ISessionRepo sessionRepo, ISemesterRepo semesterRepo, IPersonRepo personRepo,
+         ISessionReasonRepo sessionReasonRepo, ISessionClassRepo sessionClassRepo, IMapper mapper)
         {
             _mapper = mapper;
             _sessionRepo = sessionRepo;
             _semesterRepo = semesterRepo;
             _personRepo = personRepo;
+            _sessionReasonRepo = sessionReasonRepo;
+            _sessionClassRepo = sessionClassRepo;
         }
 
         [HttpGet]
@@ -45,8 +50,9 @@ namespace tcs_service.Controllers
             {
                 return NotFound();
             }
+            var sessionUpdate = _mapper.Map<SessionUpdateDTO>(session);
 
-            return Ok(session);
+            return Ok(sessionUpdate);
         }
 
         [HttpGet("in")]
@@ -84,26 +90,56 @@ namespace tcs_service.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateSession([FromRoute] int id, [FromBody] SessionCreateDTO sessionDTO)
         {
+            var person = await _personRepo.Find(x => x.Id == sessionDTO.PersonId);
+            var isTeacher = person.PersonType == PersonType.Teacher;
+
             if (id != sessionDTO.Id)
             {
                 throw new TCSException("Session does not exist");
             }
 
-            if (sessionDTO.SelectedClasses.Count < 1)
+            if (!isTeacher)
             {
-                throw new TCSException("Must select at least one class.");
-            }
 
-            if (sessionDTO.SelectedReasons.Count < 1 && !sessionDTO.Tutoring)
-            {
-                throw new TCSException("Must select at least one reason for visit.");
+                if (sessionDTO.SelectedClasses.Count < 1)
+                {
+                    throw new TCSException("Must select at least one class.");
+                }
+
+                if (sessionDTO.SelectedReasons.Count < 1 && !sessionDTO.Tutoring)
+                {
+                    throw new TCSException("Must select at least one reason for visit.");
+                }
             }
 
             try
             {
-                var session = _mapper.Map<Session>(sessionDTO);
-                var result = await _sessionRepo.Update(session);
-                return Ok(result);
+                var session = new Session()
+                {
+                    Id = sessionDTO.Id,
+                    InTime = sessionDTO.InTime,
+                    OutTime = sessionDTO.OutTime,
+                    PersonId = sessionDTO.PersonId,
+                    SemesterCode = sessionDTO.SemesterCode,
+                    Tutoring = sessionDTO.Tutoring,
+                };
+
+                await _sessionRepo.Update(session);
+                if (!isTeacher)
+                {
+                    await _sessionClassRepo.RemoveAll(x => x.SessionId == sessionDTO.Id);
+                    foreach (var x in sessionDTO.SelectedClasses)
+                    {
+                        await _sessionClassRepo.Create(new SessionClass() { SessionId = sessionDTO.Id, ClassId = x });
+                    }
+                    await _sessionReasonRepo.RemoveAll(x => x.SessionId == sessionDTO.Id);
+                    foreach (var x in sessionDTO.SelectedReasons)
+                    {
+                        await _sessionReasonRepo.Create(new SessionReason() { SessionId = sessionDTO.Id, ReasonId = x });
+                    }
+                }
+                var updatedSession = await _sessionRepo.Find(x => x.Id == sessionDTO.Id);
+                return Ok(updatedSession);
             }
             catch (DbUpdateConcurrencyException)
             {

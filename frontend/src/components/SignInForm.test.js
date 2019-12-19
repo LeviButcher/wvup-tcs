@@ -35,7 +35,9 @@ const studentSignIn = {
   tutoring: false,
   id: '',
   personType: personTypeValues.student,
-  personId: '2'
+  personId: '2',
+  firstName: 'Billy',
+  lastName: 'Bob'
 };
 
 const teacherSignIn = {
@@ -47,7 +49,9 @@ const teacherSignIn = {
   tutoring: false,
   id: '',
   personType: personTypeValues.teacher,
-  personId: '4'
+  personId: '4',
+  firstName: 'Silly',
+  lastName: 'Lob'
 };
 
 const existingTeacherRecord = {
@@ -55,16 +59,16 @@ const existingTeacherRecord = {
   id: '401',
   selectedClasses: [],
   selectedReasons: [],
-  inTime: '2019-05-10 14:00',
-  outTime: '2019-05-10 16:00',
+  inTime: '2019-05-10T14:00',
+  outTime: '2019-05-10T16:00',
   semesterCode: semesters[1].code
 };
 
 const existingStudentSignIn = {
   ...studentSignIn,
   id: '5',
-  inTime: '2019-01-05 09:00',
-  outTime: '2019-01-05 12:00',
+  inTime: '2019-01-05T09:00',
+  outTime: '2019-01-05T12:00',
   selectedReasons: ['1'],
   selectedClasses: ['01234'],
   semesterCode: semesters[2].code
@@ -142,6 +146,32 @@ describe('Form Errors for Student', () => {
   });
 });
 
+test('Should display correct time and date from signInRecord InTime and outTime', () => {
+  const signIn = {
+    email: '',
+    selectedClasses: [],
+    selectedReasons: [],
+    inTime: '2019-05-13T13:40:39',
+    outTime: '2019-05-13T16:31:31',
+    personType: 0,
+    tutoring: false,
+    personId: '1',
+    firstName: 'Sam',
+    lastName: 'Puckett'
+  };
+
+  const { getByLabelText, debug } = render(
+    <SignInForm signInRecord={signIn} reasons={reasons} semesters={semesters} />
+  );
+
+  debug();
+  expect(getByLabelText(/in date/i)).toHaveValue('2019-05-13');
+  expect(getByLabelText(/out date/i)).toHaveValue('2019-05-13');
+  expect(getByLabelText(/in time/i)).toHaveValue('13:40:39');
+
+  expect(getByLabelText(/out time/i)).toHaveValue('16:31:31');
+});
+
 describe('Create SignIn', () => {
   // Fails because inTime and outTime have to be set before onSubmit will ever be executed.
   test('Should call fetch with expected arguments when person is a student', async () => {
@@ -194,8 +224,8 @@ describe('Create SignIn', () => {
           id: studentSignIn.id,
           personId: studentSignIn.personId,
           semesterCode: `${semesters[0].code}`,
-          inTime: new Date('2019-01-05 09:00'),
-          outTime: new Date('2019-01-05 12:00'),
+          inTime: '2019-01-05T09:00',
+          outTime: '2019-01-05T12:00',
           selectedClasses: ['01234'],
           selectedReasons: ['1'],
           tutoring: false
@@ -249,8 +279,8 @@ describe('Create SignIn', () => {
           id: teacherSignIn.id,
           personId: teacherSignIn.personId,
           semesterCode: `${semesters[0].code}`,
-          inTime: new Date(`${inDT.date} ${inDT.time}`),
-          outTime: new Date(`${outDT.date} ${outDT.time}`),
+          inTime: `${inDT.date}T${inDT.time}`,
+          outTime: `${outDT.date}T${outDT.time}`,
           selectedClasses: [],
           selectedReasons: [],
           tutoring: false
@@ -287,6 +317,7 @@ describe('Update SignIn', () => {
     fireEvent.click(getByLabelText(/tutoring/i));
     fireEvent.submit(getByText(/submit/i));
     expect(getByText(/submitting/i)).toBeDefined();
+
     await wait(() => {
       expect(fakeFetch).toHaveBeenCalledTimes(1);
       expect(fakeFetch).toHaveBeenCalledWith(
@@ -300,8 +331,8 @@ describe('Update SignIn', () => {
             id: existingStudentSignIn.id,
             personId: existingStudentSignIn.personId,
             semesterCode: existingStudentSignIn.semesterCode,
-            inTime: new Date('2019-01-05 09:00'),
-            outTime: new Date('2019-01-05 14:00'),
+            inTime: '2019-01-05T09:00',
+            outTime: '2019-01-05T14:00',
             selectedClasses: ['01234', '4567'],
             selectedReasons: [],
             tutoring: true
@@ -344,8 +375,8 @@ describe('Update SignIn', () => {
             id: existingTeacherRecord.id,
             personId: existingTeacherRecord.personId,
             semesterCode: existingTeacherRecord.semesterCode,
-            inTime: new Date('2019-05-10 12:00'),
-            outTime: new Date('2019-05-10 16:00'),
+            inTime: '2019-05-10T12:00',
+            outTime: '2019-05-10T16:00',
             selectedClasses: [],
             selectedReasons: [],
             tutoring: false

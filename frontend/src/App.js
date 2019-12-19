@@ -44,7 +44,7 @@ function App() {
           <KioskLayout path="/">
             {/* $FlowFixMe */}
             <Home path="/" />
-            <SignInStudent path="/signin/*" />
+            <SignInStudent path="/signin" />
             <SignOut path="/signout" />
             <SignInTeacher path="/signin/teacher" />
             <NotFound default />
