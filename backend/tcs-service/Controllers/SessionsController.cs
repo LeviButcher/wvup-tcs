@@ -36,27 +36,27 @@ namespace tcs_service.Controllers
         }
 
         [HttpGet]
-        public IActionResult GetSessions([FromQuery] DateTime start, [FromQuery] DateTime end, [FromQuery] int? crn, [FromQuery] string email, [FromQuery] int page = 1)
+        public IActionResult GetSessions([FromQuery] DateTime? start, [FromQuery] DateTime? end, [FromQuery] int? crn, [FromQuery] string email, [FromQuery] int page = 1)
         {
             var resultSet = _sessionRepo.GetAll();
-            if (start != null)
+            if (start.HasValue)
             {
-                resultSet = resultSet.Where(x => x.InTime.Date >= start.Date);
+                resultSet = resultSet.Where(x => x.InTime.Date >= start.Value.Date);
             }
-            if (end != null)
+            if (end.HasValue)
             {
-                resultSet = resultSet.Where(x => x.OutTime.GetValueOrDefault(end).Date <= end.Date);
+                resultSet = resultSet.Where(x => x.OutTime.GetValueOrDefault(end.Value).Date <= end.Value.Date);
             }
             if (crn.HasValue)
             {
                 resultSet = resultSet.Where(x => x.SessionClasses.Any(c => c.ClassId == crn.Value));
             }
-            if (email != null)
+            if (!string.IsNullOrEmpty(email))
             {
                 resultSet = resultSet.Where(x => x.Person.Email == email);
             }
-
-            var pageResult = new Paging<SessionDisplayDTO>(page, resultSet.Select(x => _mapper.Map<SessionDisplayDTO>(x)));
+            var sessionsDisplay = resultSet.Select(x => _mapper.Map<SessionDisplayDTO>(x));
+            var pageResult = new Paging<SessionDisplayDTO>(page, sessionsDisplay);
             return Ok(pageResult);
         }
 

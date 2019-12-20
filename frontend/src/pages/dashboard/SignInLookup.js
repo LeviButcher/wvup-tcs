@@ -8,8 +8,7 @@ import StartToEndDate from '../../components/StartToEndDateForm';
 import { Link, Card, Button, Input } from '../../ui';
 import Paging from '../../components/Paging';
 import SignInsTable from '../../components/SignInsTable';
-import useApiWithHeaders from '../../hooks/useApiWithHeaders';
-import { getProperty } from '../../utils';
+import useApi from '../../hooks/useApi';
 
 const SignInLookupSchema = StartToEndDateSchema.shape({
   email: Yup.string()
@@ -21,12 +20,9 @@ const SignInLookupSchema = StartToEndDateSchema.shape({
     .typeError('Must be a number')
 });
 
-const take = 20;
 const getSignInUrl = (start, end, crn = '', email = '', page = 1) => {
   if (start == null || end == null) return '';
-  const requiredEndpoint = `lookups/?start=${start}&end=${end}&skip=${page *
-    take -
-    take}&take=${take}`;
+  const requiredEndpoint = `sessions?start=${start}&end=${end}&page=${page}`;
   const crnQuery = crn !== '' ? `&crn=${crn}` : '';
   const emailQuery = email !== '' ? `&email=${email}` : '';
   const endPoint = requiredEndpoint.concat('', crnQuery).concat('', emailQuery);
@@ -133,7 +129,7 @@ const LookupResults = ({
   ]);
   const { email, crn } = getQueryParams(window.location.search);
   const endPoint = getSignInUrl(startDate, endDate, crn, email, page);
-  const [loading, data] = useApiWithHeaders(endPoint);
+  const [loading, sessionsPage] = useApi(endPoint);
 
   useEffect(() => {
     cachedSetFormValues({ startDate, endDate, email, crn });
@@ -142,18 +138,20 @@ const LookupResults = ({
   return (
     <>
       <ScaleLoader sizeUnit="px" size={150} loading={loading} align="center" />
-      {!loading && data.body.length < 1 && <h3>No records found for search</h3>}
-      {!loading && data && data.headers && data.body.length >= 1 && (
+      {!loading && sessionsPage && sessionsPage.data.length < 1 && (
+        <h3>No records found for search</h3>
+      )}
+      {!loading && sessionsPage && sessionsPage.data.length >= 1 && (
         <Card width="auto">
           <Paging
-            currentPage={getProperty(data.headers, 'current-page')}
-            totalPages={getProperty(data.headers, 'total-pages')}
+            currentPage={sessionsPage.currentPage}
+            totalPages={sessionsPage.totalPages}
             basePath={`/dashboard/signins/${startDate}/${endDate}`}
           />
-          <SignInsTable signIns={data.body} />
+          <SignInsTable signIns={sessionsPage.data} />
           <Paging
-            currentPage={getProperty(data.headers, 'current-page')}
-            totalPages={getProperty(data.headers, 'total-pages')}
+            currentPage={sessionsPage.currentPage}
+            totalPages={sessionsPage.totalPages}
             basePath={`/dashboard/signins/${startDate}/${endDate}`}
           />
         </Card>

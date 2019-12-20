@@ -1,21 +1,21 @@
 import React from 'react';
 import { Link } from '@reach/router';
 import { Table, Header, Card } from '../../ui';
-import useApiWithHeaders from '../../hooks/useApiWithHeaders';
+import useApi from '../../hooks/useApi';
 import { Gear } from '../../ui/icons';
-import LoadingContent from '../../components/LoadingContent';
 
 const ReasonManagement = () => {
-  const [loading, data, errors] = useApiWithHeaders('reasons/');
+  const [loading, reasons] = useApi('reasons/');
 
   return (
     <div>
       <Link to="create">Add Reason</Link>
-      <LoadingContent loading={loading} data={data} errors={errors}>
+      {loading && <div>Loading...</div>}
+      {!loading && reasons && (
         <Card width="auto">
-          <ReasonTable reasons={data.body} />
+          <ReasonTable reasons={reasons} />
         </Card>
-      </LoadingContent>
+      )}
     </div>
   );
 };

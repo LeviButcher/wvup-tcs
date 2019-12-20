@@ -15,10 +15,10 @@ namespace tcs_service.Helpers
             if (pageSize < 0) throw new Exception($"PageSize can't be less then 0: take was {pageSize}");
 
             var skip = page * pageSize - pageSize;
-            this.PageSize = pageSize;
-            this.CurrentPage = page;
-            this.Data = allData.Skip(skip).Take(this.PageSize);
-            this.TotalRecords = allData.Count();
+            PageSize = pageSize;
+            CurrentPage = page;
+            Data = allData.Skip(skip).Take(PageSize).ToList();
+            TotalRecords = allData.Count();
         }
 
         public Paging(int page, IEnumerable<T> allData) : this(page, 20, allData)

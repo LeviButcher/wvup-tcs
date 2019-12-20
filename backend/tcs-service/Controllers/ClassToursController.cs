@@ -47,9 +47,9 @@ namespace tcs_service.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<Paging<ClassTour>>> Get([FromQuery] DateTime start, [FromQuery] DateTime end, [FromQuery] int skip = 0, [FromQuery] int take = 20)
+        public ActionResult Get([FromQuery] DateTime start, [FromQuery] DateTime end, [FromQuery] int skip = 0, [FromQuery] int take = 20)
         {
-            var page = await _iRepo.GetBetweenDates(start, end, skip, take);
+            var page = _iRepo.GetBetweenDates(start, end, skip, take);
 
             return Ok(page);
         }

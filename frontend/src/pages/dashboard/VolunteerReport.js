@@ -3,8 +3,7 @@ import { CSVLink } from 'react-csv';
 import { Router } from '@reach/router';
 import { ReportLayout, Table, Header, Card, BarChart } from '../../ui';
 import StartToEndDateForm from '../../components/StartToEndDateForm';
-import useApiWithHeaders from '../../hooks/useApiWithHeaders';
-import LoadingContent from '../../components/LoadingContent';
+import useApi from '../../hooks/useApi';
 
 type Props = {
   navigate: any,
@@ -37,26 +36,31 @@ type VolunteerResultProps = {
 };
 
 const VolunteerResult = ({ startDate, endDate }: VolunteerResultProps) => {
-  const [loading, data, errors] = useApiWithHeaders(
+  const [loading, volunteerData] = useApi(
     `reports/volunteers?start=${startDate}&end=${endDate}`
   );
 
   return (
-    <LoadingContent loading={loading} data={data} errors={errors}>
-      <Card width="600px" style={{ gridArea: 'chart' }}>
-        <BarChart
-          data={data.body}
-          x={d => d.fullName}
-          y={d => d.totalHours}
-          yLabel="Total Hours"
-          title="Volunteer Total Chart"
-          labels={d => d.totalHours}
-        />
-      </Card>
-      <Card width="900px" style={{ gridArea: 'table' }}>
-        <VolunteerTable volunteers={data.body} />
-      </Card>
-    </LoadingContent>
+    <>
+      {loading && <div>Loading...</div>}
+      {!loading && volunteerData && (
+        <>
+          <Card width="600px" style={{ gridArea: 'chart' }}>
+            <BarChart
+              data={volunteerData}
+              x={d => d.fullName}
+              y={d => d.totalHours}
+              yLabel="Total Hours"
+              title="Volunteer Total Chart"
+              labels={d => d.totalHours}
+            />
+          </Card>
+          <Card width="900px" style={{ gridArea: 'table' }}>
+            <VolunteerTable volunteers={volunteerData} />
+          </Card>
+        </>
+      )}
+    </>
   );
 };
 

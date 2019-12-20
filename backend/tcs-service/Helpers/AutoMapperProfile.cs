@@ -39,9 +39,15 @@ namespace tcs_service.Helpers
                 opts.MapFrom(src => src.Person.Schedules.Select(x => x.Class)));
 
             CreateMap<Session, SessionDisplayDTO>()
-            .ForMember(dest => dest.SelectedClasses, opts => opts.MapFrom(src => src.SessionClasses.Select(x => x.Class)))
-            .ForMember(dest => dest.SelectedReasons, opts => opts.MapFrom(src => src.SessionReasons.Select(x => x.Reason)));
+            .ForMember(dest => dest.SelectedClasses, opts =>
+                opts.MapFrom(src => src.SessionClasses.Select(x => x.Class)))
+            .ForMember(dest => dest.SelectedReasons, opts =>
+                opts.MapFrom(src => src.SessionReasons.Select(x => x.Reason)));
 
+            CreateMap<Person, PersonDisplayDTO>();
+            CreateMap<Reason, ReasonDisplayDTO>();
+            CreateMap<Class, ClassDisplayDTO>();
+            CreateMap<Semester, SemesterDisplayDTO>();
         }
     }
 }

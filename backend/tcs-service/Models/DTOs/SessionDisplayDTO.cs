@@ -13,11 +13,9 @@ namespace tcs_service.Models.DTOs
 
         public int PersonId { get; set; }
 
-        public Person Person { get; set; }
+        public PersonDisplayDTO Person { get; set; }
 
-        public Semester Semester { get; set; }
-
-        public int SemesterId { get; set; }
+        public SemesterDisplayDTO Semester { get; set; }
 
         public DateTime InTime { get; set; }
 
@@ -27,8 +25,50 @@ namespace tcs_service.Models.DTOs
 
         public bool Tutoring { get; set; }
 
-        public IEnumerable<Class> SelectedClasses { get; set; }
+        public IEnumerable<ClassDisplayDTO> SelectedClasses { get; set; }
 
-        public IEnumerable<Reason> SelectedReasons { get; set; }
+        public IEnumerable<ReasonDisplayDTO> SelectedReasons { get; set; }
+    }
+
+    public class PersonDisplayDTO
+    {
+        public int Id { get; set; }
+
+        public string Email { get; set; }
+
+        public string FirstName { get; set; }
+
+        public string LastName { get; set; }
+
+        public PersonType PersonType { get; set; }
+
+        public string FullName => FirstName + " " + LastName;
+    }
+
+    public class SemesterDisplayDTO
+    {
+        public int Code { get; set; }
+        public string Name { get; set; }
+    }
+
+    public class ClassDisplayDTO
+    {
+        public int CRN { get; set; }
+        public string Name { get; set; }
+        public string ShortName { get; set; }
+        public DepartmentDisplayDTO Department { get; set; }
+    }
+
+    public class DepartmentDisplayDTO
+    {
+        public string Name { get; set; }
+        public int Code { get; set; }
+    }
+
+    public class ReasonDisplayDTO
+    {
+        public string Name { get; set; }
+        public bool Deleted { get; set; }
+        public int Id { get; set; }
     }
 }
