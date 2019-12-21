@@ -129,8 +129,8 @@ namespace tcs_service_test.Repos
                 session.InTime = newDate;
                 session.OutTime = newDate.AddHours(1);
                 sessions.Add(session);
-            }            
-
+            }
+            
             db.Sessions.AddRange(sessions);
             db.SaveChanges();
 

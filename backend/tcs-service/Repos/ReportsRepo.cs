@@ -42,7 +42,7 @@ namespace tcs_service.Repos
         public async Task<List<PeakHoursViewModel>> PeakHours(DateTime startWeek, DateTime endWeek)
              => await _db.Sessions.Where(x => x.InTime >= startWeek && x.InTime <= endWeek)
                 .GroupBy(x => x.InTime.Value.Hour)
-                .Where(x => x.Count() > 1)
+                .Where(x => x.Count() >= 1)
                 .Select(x => new PeakHoursViewModel(x.Key, x.Count()))
                 .ToListAsync();
 
