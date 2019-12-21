@@ -122,8 +122,8 @@ namespace tcs_service_test.Repos
 
             for(int i = 0; i < 100; i++)
             {
-                var randomTest = new Random();
-                TimeSpan newSpan = new TimeSpan(0, randomTest.Next(0, (int)timeSpan.TotalMinutes), 0);
+                var random = new Random();
+                TimeSpan newSpan = new TimeSpan(0, random.Next(0, (int)timeSpan.TotalMinutes), 0);
                 DateTime newDate = startDate + newSpan;
                 var session = fixture.Create<Session>();
                 session.InTime = newDate;
@@ -134,33 +134,10 @@ namespace tcs_service_test.Repos
             db.Sessions.AddRange(sessions);
             db.SaveChanges();
 
-            var twelvePM = new List<int>();
-            foreach(var s in sessions)
-            {
-                if(s.InTime.Value.Hour == 12)
-                {
-                    twelvePM.Add(s.InTime.Value.Hour);
-                }
-            }
-
-            var twoPM = new List<int>();
-            foreach (var s in sessions)
-            {
-                if (s.InTime.Value.Hour == 14)
-                {
-                    twoPM.Add(s.InTime.Value.Hour);
-                }
-            }
-
-            var fivePM = new List<int>();
-            foreach (var s in sessions)
-            {
-                if (s.InTime.Value.Hour == 17)
-                {
-                    fivePM.Add(s.InTime.Value.Hour);
-                }
-            }
-
+            var twelvePM = sessions.Where(x => x.InTime.Value.Hour == 12).ToList();
+            var twoPM = sessions.Where(x => x.InTime.Value.Hour == 14).ToList();
+            var fivePM = sessions.Where(x => x.InTime.Value.Hour == 17).ToList();
+          
             var results = await reportsRepo.PeakHours(startDate, endDate);
 
             var twelvePMActualCount = results.Any(x => x.Hour == "12 P.M") ? results.Find(x => x.Hour == "12 P.M") : new PeakHoursViewModel(12, 0);
@@ -170,6 +147,159 @@ namespace tcs_service_test.Repos
             Assert.Equal(twelvePM.Count(), twelvePMActualCount.Count);
             Assert.Equal(twoPM.Count(), twoPMActualCount.Count);
             Assert.Equal(fivePM.Count(), fivePMActualCount.Count);
+        }
+
+        [Fact]
+        public async void ClassTours_StudentsSummedCorrectly()
+        {
+            var startDate = new DateTime(2019, 8, 1);
+            var endDate = new DateTime(2019,9, 25);
+            var schoolNames = new List<String>() { "One School", "Two School", "Three School", "Four School", "Five School" };
+
+            TimeSpan timeSpan = endDate - startDate;
+            var tours = new List<ClassTour>();
+
+            for (int i = 0; i < 100; i++)
+            {
+                var random = new Random();
+                TimeSpan newSpan = new TimeSpan(0, random.Next(0, (int)timeSpan.TotalMinutes), 0);
+                DateTime newDate = startDate + newSpan;
+                var tour = fixture.Create<ClassTour>();
+                tour.DayVisited = newDate;
+                int num = random.Next(5);
+                tour.Name = schoolNames[num];
+                tours.Add(tour);
+            }
+
+            db.ClassTours.AddRange(tours);
+            db.SaveChanges();
+
+            var results = await reportsRepo.ClassTours(startDate, endDate);
+
+            var firstSchoolTotalStudents = tours.Where(x => x.Name == "One School").Sum(x => x.NumberOfStudents);            
+            var oneSchool = results.Where(x => x.Name == "One School").FirstOrDefault();
+
+            Assert.Equal(firstSchoolTotalStudents, oneSchool.Students);
+        }
+
+        [Fact]
+        public async void Volunteer_TotalHoursSummedCorrectly()
+        {
+            var startDate = new DateTime(2019, 8, 1);
+            var endDate = new DateTime(2019, 9, 25);
+           
+            TimeSpan timeSpan = endDate - startDate;
+            var sessions = new List<Session>();
+            
+            var teacher = fixture.Create<Person>();
+            teacher.PersonType = PersonType.Teacher;
+             
+            db.People.Add(teacher);
+            db.SaveChanges();
+
+            var savedteachers = db.People.ToList();
+
+            // six one hour sessions for this teacher
+            for (int i = 0; i < 6; i++)
+            {
+                var random = new Random();
+                TimeSpan newSpan = new TimeSpan(0, random.Next(0, (int)timeSpan.TotalMinutes), 0);
+                DateTime newDate = startDate + newSpan;
+                var session = fixture.Create<Session>();
+                int num = random.Next(5);
+                session.PersonId = db.People.FirstOrDefault().Id;
+                session.InTime = newDate;
+                session.OutTime = newDate.AddHours(1);
+                sessions.Add(session);
+            }
+
+            db.Sessions.AddRange(sessions);
+            db.SaveChanges();
+
+            var results = await reportsRepo.Volunteers(startDate, endDate);
+            
+            Assert.Equal(6, results.FirstOrDefault().totalHours);
+        }
+
+        [Fact]
+        public async void Reasons_StudentsSummedCorrectly()
+        {
+            var startDate = new DateTime(2019, 8, 1);
+            var endDate = new DateTime(2019, 9, 25);
+
+            TimeSpan timeSpan = endDate - startDate;
+
+            var computerUse = new Reason(){ Name = "Computer Use", Deleted = false };
+            var studyTime = new Reason(){ Name = "Study Time", Deleted = false };
+
+            db.Reasons.Add(computerUse);
+            db.Reasons.Add(studyTime);
+
+            var histDept = new Department() { Code = 111, Name = "History Department" };
+            db.Departments.Add(histDept);
+            db.SaveChanges();
+
+            var history = new Class() {CRN = 123,  Name = "History", DepartmentCode = 111 , ShortName = "Hist" };
+
+            db.Classes.Add(history);
+            
+            db.SaveChanges();
+
+            var reasons = db.Reasons.ToList();
+            var classes = db.Classes;
+
+            var sessions = new List<Session>();
+            for (int i = 0; i < 100; i++)
+            {
+                var random = new Random();
+                TimeSpan newSpan = new TimeSpan(0, random.Next(0, (int)timeSpan.TotalMinutes), 0);
+                DateTime newDate = startDate + newSpan;
+                var session = fixture.Create<Session>();
+                int num = random.Next(2);
+                var sessionClass = new SessionClass() { ClassId = classes.FirstOrDefault().CRN };
+                var sessionReason = new SessionReason() { ReasonId = reasons[num].Id };
+                session.SessionClasses = new List<SessionClass>() { sessionClass };
+                session.SessionReasons = new List<SessionReason>() { sessionReason };
+                session.InTime = newDate;
+                session.OutTime = newDate.AddHours(1);
+                sessions.Add(session);
+            }
+
+            db.Sessions.AddRange(sessions);
+            db.SaveChanges();
+
+            var results = await reportsRepo.Reasons(startDate, endDate);
+            var computerUseReasons = new List<Session>();
+            foreach(var s in sessions)
+            {
+                if(s.SessionReasons.FirstOrDefault().Reason.Name == "Computer Use")
+                {
+                    computerUseReasons.Add(s);
+                }
+            }
+
+            var studyTimeReasons = new List<Session>();
+            foreach (var s in sessions)
+            {
+                if (s.SessionReasons.FirstOrDefault().Reason.Name == "Study Time")
+                {
+                    studyTimeReasons.Add(s);
+                }
+            }
+
+
+            var tutoringReasons = new List<Session>();
+            foreach (var s in sessions)
+            {
+                if (s.Tutoring)
+                {
+                    tutoringReasons.Add(s);
+                }
+            }
+
+            Assert.Equal(computerUseReasons.Count(), results.Where(x => x.reasonName == "Computer Use").FirstOrDefault().visits);
+            Assert.Equal(studyTimeReasons.Count(), results.Where(x => x.reasonName == "Study Time").FirstOrDefault().visits);
+            Assert.Equal(tutoringReasons.Count(), results.Where(x => x.reasonName == "Tutoring").FirstOrDefault().visits);
         }
     }
 }

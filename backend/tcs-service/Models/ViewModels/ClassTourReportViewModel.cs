@@ -10,5 +10,7 @@ namespace tcs_service.Models.ViewModels
         public string Name { get; set; }
 
         public int Students { get; set; }
+
+        public DateTime DayVisited { get; set; }
     }
 }
