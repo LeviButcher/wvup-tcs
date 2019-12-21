@@ -9,6 +9,7 @@ namespace tcs_service.Models
     public class Session
     {
         [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 
         [Required]

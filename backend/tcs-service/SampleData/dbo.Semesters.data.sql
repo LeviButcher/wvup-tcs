@@ -1,13 +1,13 @@
 ﻿
-INSERT INTO [dbo].[Semesters]
-    ([Code])
+INSERT INTO "Semesters"
+    ("Code")
 VALUES
-    (201903)
-INSERT INTO [dbo].[Semesters]
-    ([Code])
+    (201903);
+INSERT INTO "Semesters"
+    ("Code")
 VALUES
-    (201902)
-INSERT INTO [dbo].[Semesters]
-    ([Code])
+    (201902);
+INSERT INTO "Semesters"
+    ("Code")
 VALUES
-    (201901)
+    (201901);

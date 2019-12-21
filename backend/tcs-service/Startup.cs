@@ -120,7 +120,7 @@ namespace tcs_service
                 .SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
             services.AddDbContext<TCSContext>(options =>
-               options.UseSqlServer(dbConfig.ConnectionString));
+               options.UseNpgsql(dbConfig.ConnectionString));
 
             services.AddScoped<IClassTourRepo, ClassTourRepo>();
             services.AddScoped<IUserRepo, UserRepo>();
