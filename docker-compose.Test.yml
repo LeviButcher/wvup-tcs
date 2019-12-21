@@ -8,16 +8,10 @@ services:
     depends_on:
       - tcs-db
     environment:
-      Db:ConnectionString: "Server=tcs-db;Database=TCS;User Id=SA;Password=Develop@90"
+      Db:ConnectionString: "Host=tcs-db;Database=test;Username=test;Password=Develop@90"
   tcs-db:
-    image: microsoft/mssql-server-linux
+    image: postgres
     environment:
-      ACCEPT_EULA: Y
-      SA_PASSWORD: Develop@90
-    expose:
-      - "1443"
-    volumes:
-      - db-data:/var/opt/mssql
-
-volumes:
-  db-data:
+      POSTGRES_USER: test
+      POSTGRES_DB: TCS
+      POSTGRES_PASSWORD: Develop@90
