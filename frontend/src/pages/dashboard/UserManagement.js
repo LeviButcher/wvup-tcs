@@ -1,24 +1,24 @@
 import React from 'react';
 import { Link, navigate } from '@reach/router';
-import LoadingContent from '../../components/LoadingContent';
 import { Table, Header, Card } from '../../ui';
 import { callApi } from '../../utils';
 import { Gear, Trashcan } from '../../ui/icons';
-import useApiWithHeaders from '../../hooks/useApiWithHeaders';
+import useApi from '../../hooks/useApi';
 
 const deleteUser = id => callApi(`users/${id}`, 'DELETE', null);
 
 const UserManagement = () => {
-  const [loading, data, errors] = useApiWithHeaders('users/');
+  const [loading, data] = useApi('users/');
 
   return (
     <div>
-      <a href="users/create">Add User</a>
-      <LoadingContent loading={loading} data={data} errors={errors}>
+      <Link to="create">Add User</Link>
+      {loading && <div>Loading...</div>}
+      {!loading && data && (
         <Card width="auto">
-          <UserTable users={data.body} navigate={navigate} />
+          <UserTable users={data} navigate={navigate} />
         </Card>
-      </LoadingContent>
+      )}
     </div>
   );
 };

@@ -4,8 +4,7 @@ import { clone } from 'ramda';
 import { Router } from '@reach/router';
 import { ReportLayout, Table, Header, Card, PieChart } from '../../ui';
 import StartToEndDateForm from '../../components/StartToEndDateForm';
-import LoadingContent from '../../components/LoadingContent';
-import useApiWithHeaders from '../../hooks/useApiWithHeaders';
+import useApi from '../../hooks/useApi';
 
 // take all reasons and split up into reason groups
 const filterReason = reason => element => element.reasonName === reason;
@@ -63,35 +62,42 @@ type ReasonsResultProps = {
 };
 
 const ReasonsResult = ({ startDate, endDate }: ReasonsResultProps) => {
-  const [loading, data, errors] = useApiWithHeaders(
+  const [loading, reasonData] = useApi(
     `reports/reasons?start=${startDate}&end=${endDate}`
   );
   return (
-    <LoadingContent loading={loading} data={data} errors={errors}>
-      <Card width="600px" style={{ gridArea: 'chart' }}>
-        <PieChart
-          title="Reason For Visiting Percentages"
-          data={data.body.reduce(reasonTotalStudentReducer, [])}
-          x={d => d.reasonName}
-          y={d => d.visits}
-        />
-      </Card>
-      <Card width="900px" style={{ gridArea: 'table' }}>
-        <Header align="center">
-          Reason for Visiting Summary -{' '}
-          <CSVLink data={data.body} filename="reasonForVisiting">
-            Download All Data
-          </CSVLink>
-        </Header>
-        {data.body.reduce(reasonForVisitingToReasonsReducer, []).map(reason => (
-          <ReasonsTable
-            key={reason}
-            name={reason}
-            reasons={data.body.filter(filterReason(reason))}
-          />
-        ))}
-      </Card>
-    </LoadingContent>
+    <>
+      {loading && <div>Loading...</div>}
+      {!loading && reasonData && (
+        <>
+          <Card width="600px" style={{ gridArea: 'chart' }}>
+            <PieChart
+              title="Reason For Visiting Percentages"
+              data={reasonData.reduce(reasonTotalStudentReducer, [])}
+              x={d => d.reasonName}
+              y={d => d.visits}
+            />
+          </Card>
+          <Card width="900px" style={{ gridArea: 'table' }}>
+            <Header align="center">
+              Reason for Visiting Summary -{' '}
+              <CSVLink data={reasonData} filename="reasonForVisiting.csv">
+                Download All Data
+              </CSVLink>
+            </Header>
+            {reasonData
+              .reduce(reasonForVisitingToReasonsReducer, [])
+              .map(reason => (
+                <ReasonsTable
+                  key={reason}
+                  name={reason}
+                  reasons={reasonData.filter(filterReason(reason))}
+                />
+              ))}
+          </Card>
+        </>
+      )}
+    </>
   );
 };
 
@@ -101,7 +107,7 @@ const ReasonsTable = ({ reasons, name }) => {
       <caption>
         <Header type="h3">
           {name} -{' '}
-          <CSVLink data={reasons} filename={`${name}`}>
+          <CSVLink data={reasons} filename={`${name}.csv`}>
             Download
           </CSVLink>
         </Header>

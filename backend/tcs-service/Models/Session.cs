@@ -19,7 +19,7 @@ namespace tcs_service.Models
 
 
         [Required]
-        public DateTime? InTime { get; set; }
+        public DateTime InTime { get; set; }
 
 
         [SignOutValidation("InTime")]

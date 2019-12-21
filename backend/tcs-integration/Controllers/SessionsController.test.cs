@@ -366,5 +366,79 @@ namespace tcs_integration.Controllers
             Assert.Equal(HttpStatusCode.Created, response.StatusCode);
         }
 
+        [Fact]
+        public async void GET_Sessions_StartEqualToday_ShouldReturn200WithPageOfSessionsOnOrAfterToday()
+        {
+            var startDate = new DateTime(2019, 5, 1).Date;
+            var client = _factory.CreateClient();
+            var user = await Login(client);
+            var request = new HttpRequestMessage(HttpMethod.Get, $"api/sessions?start={startDate}");
+            request.Headers.Add("Authorization", $"Bearer {user.Token}");
+
+            var response = await client.SendAsync(request);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            var page = await response.Content.ReadAsAsync<Paging<SessionDisplayDTO>>();
+            Assert.All(page.Data, x => Assert.True(startDate <= x.InTime.Date));
+        }
+
+        [Fact]
+        public async void GET_Sessions_EndEqualToday_ShouldReturn200WithPageOfSessionsBeforeOrOnEndDate()
+        {
+            var endDate = new DateTime(2019, 7, 1).Date;
+            var client = _factory.CreateClient();
+            var user = await Login(client);
+            var request = new HttpRequestMessage(HttpMethod.Get, $"api/sessions?end={endDate}");
+            request.Headers.Add("Authorization", $"Bearer {user.Token}");
+
+            var response = await client.SendAsync(request);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            var page = await response.Content.ReadAsAsync<Paging<SessionDisplayDTO>>();
+            Assert.All(page.Data, x => Assert.True(endDate >= x.InTime.Date));
+        }
+
+        [Fact]
+        public async void GET_Sessions_CRNIsGiven_ShouldReturn200WithSessionsOnlyForThatClass()
+        {
+            var crn = 1;
+            var client = _factory.CreateClient();
+            var user = await Login(client);
+            var request = new HttpRequestMessage(HttpMethod.Get, $"api/sessions?crn={crn}");
+            request.Headers.Add("Authorization", $"Bearer {user.Token}");
+
+            var response = await client.SendAsync(request);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            var page = await response.Content.ReadAsAsync<Paging<SessionDisplayDTO>>();
+            Assert.All(page.Data, x => Assert.Contains(x.SelectedClasses, a => a.CRN == crn));
+        }
+
+        [Fact]
+        public async void GET_Sessions_EmailIsGiven_ShouldReturn200WithSessionOnlyForThePersonWithThatEmail()
+        {
+            var email = "lbutche3@wvup.edu";
+            var client = _factory.CreateClient();
+            var user = await Login(client);
+            var request = new HttpRequestMessage(HttpMethod.Get, $"api/sessions?email={email}");
+            request.Headers.Add("Authorization", $"Bearer {user.Token}");
+
+            var response = await client.SendAsync(request);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            var page = await response.Content.ReadAsAsync<Paging<SessionDisplayDTO>>();
+            Assert.All(page.Data, x => Assert.Equal(x.Person.Email, email));
+        }
+
+        [Fact]
+        public async void GET_Sessions_Semester_ShouldReturn200WithSessionsOnlyForThatSemester()
+        {
+            var semesterCode = 201902;
+            var client = _factory.CreateClient();
+            var user = await Login(client);
+            var request = new HttpRequestMessage(HttpMethod.Get, $"api/sessions/semester/{semesterCode}");
+            request.Headers.Add("Authorization", $"Bearer {user.Token}");
+
+            var response = await client.SendAsync(request);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            var result = await response.Content.ReadAsAsync<IEnumerable<SessionDisplayDTO>>();
+            Assert.All(result, x => Assert.Equal(semesterCode, x.SemesterCode));
+        }
     }
 }

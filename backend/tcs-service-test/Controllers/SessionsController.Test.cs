@@ -112,7 +112,7 @@ namespace tcs_service_test
 
             var sessionUpdate = new SessionCreateDTO()
             {
-                InTime = session.InTime.Value,
+                InTime = session.InTime,
                 OutTime = session.OutTime.Value,
                 PersonId = session.PersonId,
                 Id = session.Id,
@@ -161,7 +161,7 @@ namespace tcs_service_test
 
             var sessionUpdate = new SessionCreateDTO()
             {
-                InTime = session.InTime.Value,
+                InTime = session.InTime,
                 OutTime = session.OutTime.Value.Add(new TimeSpan(5)),
                 PersonId = session.PersonId,
                 Id = session.Id,

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using System.Net;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -35,10 +36,35 @@ namespace tcs_service.Controllers
         }
 
         [HttpGet]
-        public IActionResult GetSessions([FromQuery] int page = 1)
+        public IActionResult GetSessions([FromQuery] DateTime? start, [FromQuery] DateTime? end, [FromQuery] int? crn, [FromQuery] string email, [FromQuery] int page = 1)
         {
-            var pageResult = new Paging<Session>(page, _sessionRepo.GetAll());
+            var resultSet = _sessionRepo.GetAll();
+            if (start.HasValue)
+            {
+                resultSet = resultSet.Where(x => x.InTime.Date >= start.Value.Date);
+            }
+            if (end.HasValue)
+            {
+                resultSet = resultSet.Where(x => x.OutTime.GetValueOrDefault(end.Value).Date <= end.Value.Date);
+            }
+            if (crn.HasValue)
+            {
+                resultSet = resultSet.Where(x => x.SessionClasses.Any(c => c.ClassId == crn.Value));
+            }
+            if (!string.IsNullOrEmpty(email))
+            {
+                resultSet = resultSet.Where(x => x.Person.Email == email);
+            }
+            var sessionsDisplay = resultSet.Select(x => _mapper.Map<SessionDisplayDTO>(x));
+            var pageResult = new Paging<SessionDisplayDTO>(page, sessionsDisplay);
             return Ok(pageResult);
+        }
+
+        [HttpGet("semester/{semesterCode}")]
+        public IActionResult SemesterSession(int semesterCode)
+        {
+            var result = _sessionRepo.GetAll(x => x.SemesterCode == semesterCode).Select(x => _mapper.Map<SessionDisplayDTO>(x));
+            return Ok(result);
         }
 
         [HttpGet("{id}")]

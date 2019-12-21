@@ -4,8 +4,7 @@ import styled from 'styled-components';
 import { Router } from '@reach/router';
 import { ReportLayout, Table, Header, Card, PieChart } from '../../ui';
 import SemesterForm from '../../components/SemesterForm';
-import LoadingContent from '../../components/LoadingContent';
-import useApiWithHeaders from '../../hooks/useApiWithHeaders';
+import useApi from '../../hooks/useApi';
 
 const inDepartment = department => record =>
   department.departmentName === record.departmentName;
@@ -82,35 +81,38 @@ type SuccessReportProps = {
 };
 
 const SuccessResult = ({ semester }: SuccessReportProps) => {
-  const [loading, data, errors] = useApiWithHeaders(
-    `reports/success/${semester}`
-  );
+  const [loading, successData] = useApi(`reports/success/${semester}`);
   const [pieChartData, setPieChartData] = useState();
   return (
-    <LoadingContent loading={loading} data={data} errors={errors}>
-      <Card width="auto" style={{ gridArea: 'table' }}>
-        <SuccessTable
-          successRecords={data.body}
-          setPieChartData={setPieChartData}
-        />
-      </Card>
-      <Card width="500px" style={{ gridArea: 'chart' }}>
-        <PieChart
-          title={pieChartData ? pieChartData.name : 'Total of Everything'}
-          data={
-            pieChartData
-              ? pieChartData.records
-                  .reduce(sumColumnsForPieChartsReducer, [])
-                  .filter(x => x.value > 0)
-              : data.body
-                  .reduce(sumColumnsForPieChartsReducer, [])
-                  .filter(x => x.value > 0)
-          }
-          x={x => x.name}
-          y={y => y.value}
-        />
-      </Card>
-    </LoadingContent>
+    <>
+      {loading && <div>Loading...</div>}
+      {!loading && successData && (
+        <>
+          <Card width="auto" style={{ gridArea: 'table' }}>
+            <SuccessTable
+              successRecords={successData}
+              setPieChartData={setPieChartData}
+            />
+          </Card>
+          <Card width="500px" style={{ gridArea: 'chart' }}>
+            <PieChart
+              title={pieChartData ? pieChartData.name : 'Total of Everything'}
+              data={
+                pieChartData
+                  ? pieChartData.records
+                      .reduce(sumColumnsForPieChartsReducer, [])
+                      .filter(x => x.value > 0)
+                  : successData
+                      .reduce(sumColumnsForPieChartsReducer, [])
+                      .filter(x => x.value > 0)
+              }
+              x={x => x.name}
+              y={y => y.value}
+            />
+          </Card>
+        </>
+      )}
+    </>
   );
 };
 
