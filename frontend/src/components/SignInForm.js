@@ -77,7 +77,8 @@ const putSession = signIn =>
   );
 
 const getDateOrTime = option => dateTimeString => {
-  const [date, time] = dateTimeString.split(/[T]/);
+  if (!dateTimeString) return '';
+  const [date, time] = dateTimeString.split(/T|:\d*\./); // '.' removes milliseconds
   if (option === 'time') return time;
   return date;
 };
@@ -90,7 +91,7 @@ type Props = {
     schedule?: Array<Course>,
     selectedClasses: Array<string>,
     inTime: string,
-    outTime: string,
+    outTime?: string | null,
     tutoring: boolean,
     selectedReasons: Array<string>,
     personType: PersonType,

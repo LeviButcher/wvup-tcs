@@ -13,10 +13,10 @@ namespace tcs_service.Helpers
         {
             CreateMap<User, UserDto>();
             CreateMap<UserDto, User>();
-            CreateMap<Session, SessionCreateDTO>()
+            CreateMap<Session, SessionPostOrPutDTO>()
                 .ForMember(dest => dest.SelectedClasses, opts =>
                 opts.MapFrom(src => src.SessionClasses.Select(x => x.Class)));
-            CreateMap<SessionCreateDTO, Session>();
+            CreateMap<SessionPostOrPutDTO, Session>();
             CreateMap<Session, SignInViewModel>()
                 .ForMember(dest => dest.Classes, opts =>
                     opts.MapFrom(src => src.SessionClasses.Select(x => x.Class)));
@@ -26,7 +26,7 @@ namespace tcs_service.Helpers
                 .ForMember(dest => dest.SessionReasons, opts =>
                     opts.MapFrom(src => src.Reasons.Select(x => new SessionReason() { Reason = x })));
 
-            CreateMap<Session, SessionUpdateDTO>()
+            CreateMap<Session, SessionInfoDTO>()
                 .ForMember(dest => dest.SelectedClasses, opts =>
                 opts.MapFrom(src => src.SessionClasses.Select(x => x.ClassId)))
                 .ForMember(dest => dest.SelectedReasons, opts =>
