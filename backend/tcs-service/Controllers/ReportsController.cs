@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using tcs_service.Models;
 using tcs_service.Models.ViewModels;
 using tcs_service.Repos.Interfaces;
+using tcs_service.Services;
 
 namespace tcs_service.Controllers
 {
@@ -54,7 +55,9 @@ namespace tcs_service.Controllers
         [HttpGet("success/{semesterId}")]
         public async Task<IActionResult> SuccessReport(int semesterId)
         {
-            return Ok(await _iRepo.SuccessReport(semesterId));
+            var courses = await _iRepo.SuccessReport(semesterId);
+            
+            return Ok(ReportsBusinessLogic.SuccessReport(courses));
         }
     }
 }

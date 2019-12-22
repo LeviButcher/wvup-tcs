@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using tcs_service.EF;
+using tcs_service.Helpers;
 using tcs_service.Models;
 using tcs_service.Models.ViewModels;
 using tcs_service.Repos.Base;
@@ -152,7 +153,7 @@ namespace tcs_service.Repos
             return await finalResult.ToListAsync();
         }
       
-        public async Task<List<CourseWithSuccessCountViewModel>> SuccessReport(int semesterId)
+        public async Task<List<CourseWithGradeViewModel>> SuccessReport(int semesterId)
         {
             var studentCourses = from item in _db.Sessions
                                  from course in item.SessionClasses
@@ -175,58 +176,12 @@ namespace tcs_service.Repos
                 }
                 catch
                 {
-
+                    throw new TCSException("Something went wrong");
                 }
             }
 
-            List<CourseWithSuccessCountViewModel> coursesWithSuccessCount = new List<CourseWithSuccessCountViewModel>();
-
-            foreach (var course in coursesWithGrades)
-            {
-                CourseWithSuccessCountViewModel successCount = null;
-
-                if (coursesWithSuccessCount.Any(x => x.CRN == course.CRN))
-                {
-                    successCount = coursesWithSuccessCount.Where(x => x.CRN == course.CRN).First();
-                }
-                if (successCount != null)
-                {
-                    DetermineSuccess(course.Grade, successCount);
-                }
-                else
-                {
-                    var successCourse = new CourseWithSuccessCountViewModel()
-                    {
-                        ClassName = course.CourseName,
-                        CRN = course.CRN,
-                        DepartmentName = course.DepartmentName
-                    };
-
-                    DetermineSuccess(course.Grade, successCourse);
-                    coursesWithSuccessCount.Add(successCourse);
-                }
-            }
-
-            return await Task.FromResult(coursesWithSuccessCount);
-
-        }
-
-        private void DetermineSuccess(Grade grade, CourseWithSuccessCountViewModel vm)
-        {
-            if (grade <= Grade.I)
-            {
-                vm.PassedSuccessfullyCount++;
-            }
-            else if (grade <= Grade.F)
-            {
-                vm.CompletedCourseCount++;
-            }
-            else
-            {
-                vm.DroppedStudentCount++;
-            }
-
-            vm.UniqueStudentCount++;
+            return coursesWithGrades;
+            
         }
     }
 }

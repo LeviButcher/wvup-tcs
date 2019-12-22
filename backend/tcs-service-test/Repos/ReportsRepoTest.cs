@@ -239,7 +239,7 @@ namespace tcs_service_test.Repos
             db.Departments.Add(histDept);
             db.SaveChanges();
 
-            var history = new Class() {CRN = 123,  Name = "History", DepartmentCode = 111 , ShortName = "Hist" };
+            var history = new Class() {CRN = 123,  Name = "History", ShortName = "Hist" };
 
             db.Classes.Add(history);
             
@@ -301,5 +301,7 @@ namespace tcs_service_test.Repos
             Assert.Equal(studyTimeReasons.Count(), results.Where(x => x.reasonName == "Study Time").FirstOrDefault().visits);
             Assert.Equal(tutoringReasons.Count(), results.Where(x => x.reasonName == "Tutoring").FirstOrDefault().visits);
         }
+
+       
     }
 }
