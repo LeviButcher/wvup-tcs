@@ -5,6 +5,7 @@ services:
     image: lcbutch/tcs-front:master
     depends_on:
       - "tcs-service"
+      - "letsencrypt"
     expose:
       - "5000"
     env_file:
@@ -15,6 +16,7 @@ services:
     image: lcbutch/tcs-service:master
     depends_on:
       - "tcs-db"
+      - "letsencrypt"
     expose:
       - "80"
     env_file:
@@ -22,13 +24,13 @@ services:
     restart: always
 
   tcs-db:
-    image: microsoft/mssql-server-linux
+    image: postgres
     env_file:
       - .env
     expose:
-      - "1443"
+      - "5432"
     volumes:
-      - db-data:/var/opt/mssql
+      - db-data:/var/lib/postgresql/data
     restart: always
 
   letsencrypt:
@@ -40,9 +42,6 @@ services:
       - "443:443"
     volumes:
       - ./nginx:/config/nginx/site-confs
-    depends_on:
-      - "tcs-front"
-      - "tcs-service"
 
   watchtower:
     image: containrrr/watchtower

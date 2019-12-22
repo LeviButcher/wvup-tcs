@@ -119,7 +119,9 @@ namespace tcs_service.UnitOfWorks
             foreach (var c in courses)
             {
                 await classRepo.CreateOrUpdate(x => x.CRN == c.CRN, c);
-                await scheduleRepo.Create(new Schedule()
+                await scheduleRepo.CreateOrUpdate(x => x.PersonId == savedPerson.Id
+                && x.SemesterCode == bannerInfo.SemesterId
+                && x.ClassCRN == c.CRN, new Schedule()
                 {
                     SemesterCode = bannerInfo.SemesterId,
                     PersonId = savedPerson.Id,
