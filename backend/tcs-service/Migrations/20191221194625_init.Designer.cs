@@ -2,24 +2,24 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using tcs_service.EF;
 
 namespace tcs_service.Migrations
 {
     [DbContext(typeof(TCSContext))]
-    [Migration("20191217223448_test")]
-    partial class test
+    [Migration("20191221194625_init")]
+    partial class init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
+                .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.SerialColumn)
                 .HasAnnotation("ProductVersion", "2.2.6-servicing-10079")
-                .HasAnnotation("Relational:MaxIdentifierLength", 128)
-                .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             modelBuilder.Entity("tcs_service.Models.Class", b =>
                 {
@@ -43,8 +43,7 @@ namespace tcs_service.Migrations
             modelBuilder.Entity("tcs_service.Models.ClassTour", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .ValueGeneratedOnAdd();
 
                     b.Property<DateTime>("DayVisited");
 
@@ -93,8 +92,7 @@ namespace tcs_service.Migrations
             modelBuilder.Entity("tcs_service.Models.Reason", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .ValueGeneratedOnAdd();
 
                     b.Property<bool>("Deleted");
 
@@ -135,13 +133,11 @@ namespace tcs_service.Migrations
             modelBuilder.Entity("tcs_service.Models.Session", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .ValueGeneratedOnAdd();
 
-                    b.Property<DateTimeOffset?>("InTime")
-                        .IsRequired();
+                    b.Property<DateTime>("InTime");
 
-                    b.Property<DateTimeOffset?>("OutTime");
+                    b.Property<DateTime?>("OutTime");
 
                     b.Property<int>("PersonId");
 
@@ -187,8 +183,7 @@ namespace tcs_service.Migrations
             modelBuilder.Entity("tcs_service.Models.User", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .ValueGeneratedOnAdd();
 
                     b.Property<string>("FirstName");
 
@@ -223,7 +218,7 @@ namespace tcs_service.Migrations
                         .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("tcs_service.Models.Person", "Person")
-                        .WithMany()
+                        .WithMany("Schedules")
                         .HasForeignKey("PersonId")
                         .OnDelete(DeleteBehavior.Cascade);
 

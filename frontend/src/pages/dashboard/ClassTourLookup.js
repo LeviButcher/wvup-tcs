@@ -4,8 +4,7 @@ import StartToEndDateForm from '../../components/StartToEndDateForm';
 import ClassToursTable from '../../components/ClassToursTable';
 import { Link, Button, Card } from '../../ui';
 import Paging from '../../components/Paging';
-import { getProperty } from '../../utils';
-import useApiWithHeaders from '../../hooks/useApiWithHeaders';
+import useApi from '../../hooks/useApi';
 
 const take = 20;
 const getClassTourUrl = (start, end, page = 1) => {
@@ -29,7 +28,7 @@ const ClassTourLookup = ({
   page = 1
 }: Props) => {
   const endpoint = getClassTourUrl(startDate, endDate, page);
-  const [loading, data, errors] = useApiWithHeaders(endpoint);
+  const [loading, classTourPage, errors] = useApi(endpoint);
   const isDefaultForm = () => startDate === '' && endDate === '';
 
   return (
@@ -44,7 +43,7 @@ const ClassTourLookup = ({
             gridGap: '1rem'
           }}
         >
-          <Link to="create">
+          <Link to="/dashboard/tours/create">
             <Button intent="primary" align="left">
               Add Class Tour
             </Button>
@@ -64,28 +63,30 @@ const ClassTourLookup = ({
         }}
       />
       <ScaleLoader loading={loading && !isDefaultForm()} />
-      {!loading && !isDefaultForm() && (
+      {!loading && classTourPage && !isDefaultForm() && (
         <>
-          {data.body.length <= 0 ? (
+          {classTourPage.data.length <= 0 ? (
             <div>No records found</div>
           ) : (
             <Card width="auto">
               <Paging
-                currentPage={getProperty(data.headers, 'current-page')}
-                totalPages={getProperty(data.headers, 'total-pages')}
+                currentPage={classTourPage.currentPage}
+                totalPages={classTourPage.totalPages}
                 basePath={`/dashboard/tours/${startDate}/${endDate}`}
               />
-              <ClassToursTable classTours={data.body} />
+              <ClassToursTable classTours={classTourPage.data} />
               <Paging
-                currentPage={getProperty(data.headers, 'current-page')}
-                totalPages={getProperty(data.headers, 'total-pages')}
+                currentPage={classTourPage.currentPage}
+                totalPages={classTourPage.totalPages}
                 basePath={`/dashboard/tours/${startDate}/${endDate}`}
               />
             </Card>
           )}
         </>
       )}
-      {errors && errors.message && <div>{errors.message}</div>}
+      {!isDefaultForm() && errors && errors.message && (
+        <div>{errors.message}</div>
+      )}
     </div>
   );
 };

@@ -67,3 +67,20 @@ export type SignIn = {
   tutoring: string,
   type: string
 };
+
+export type SignInDisplay = {
+  id: string,
+  person: {
+    email: string,
+    firstName: string,
+    lastName: string,
+    fullName: string,
+    personType: PersonType
+  },
+  semester: Semester,
+  selectedClasses: Array<Course>,
+  selectedReasons: Array<Reason>,
+  inTime: string,
+  outTime: string,
+  tutoring: boolean
+};

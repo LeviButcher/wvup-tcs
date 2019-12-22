@@ -22,5 +22,7 @@ namespace tcs_service.Repos
             
             return tours;
         }
+
+        protected override IQueryable<ClassTour> Include(DbSet<ClassTour> set) => set;
     }
 }

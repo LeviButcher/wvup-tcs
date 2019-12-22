@@ -1,7 +1,7 @@
 import React from 'react';
 import { Table, Link } from '../ui';
 import { Gear, Trashcan } from '../ui/icons';
-import type { SignIn } from '../types';
+import type { SignInDisplay } from '../types';
 
 function hourDifferenceInTime(date, date2) {
   const { bigDate, smallDate } =
@@ -13,7 +13,7 @@ function hourDifferenceInTime(date, date2) {
 }
 
 type Props = {
-  signIns: Array<SignIn>
+  signIns: Array<SignInDisplay>
 };
 
 const SignInsTable = ({ signIns }: Props) => {
@@ -52,20 +52,18 @@ const dateOptions = {
 const SignInRow = ({
   signIn: {
     id,
-    email,
-    fullName,
-    classes,
-    reasons,
+    person: { email, personType, fullName },
+    selectedClasses,
+    selectedReasons,
     inTime,
     outTime,
-    tutoring,
-    type
+    tutoring
   }
 }) => {
   return (
     <tr>
       <td style={{ maxWidth: '150px' }}>{email.split('@')[0]}</td>
-      <td>{fullName}</td>
+      <td>{`${fullName}`}</td>
       <td align="center">
         {new Date(inTime).toLocaleDateString(undefined, dateOptions)}
       </td>
@@ -79,12 +77,12 @@ const SignInRow = ({
           ? hourDifferenceInTime(new Date(inTime), new Date(outTime))
           : ''}
       </td>
-      <td>{classes.map(course => course.shortName).join(', ')}</td>
+      <td>{selectedClasses.map(course => course.shortName).join(', ')}</td>
       <td>
-        {reasons
+        {selectedReasons
           .map(reason => reason.name)
           .concat([tutoring ? 'Tutoring' : null])
-          .concat([type === 1 ? 'Teacher Volunteering' : null])
+          .concat([personType === 1 ? 'Teacher Volunteering' : null])
           .filter(x => x !== null)
           .join(', ')}
       </td>

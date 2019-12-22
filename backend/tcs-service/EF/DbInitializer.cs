@@ -22,16 +22,18 @@ namespace tcs_service.EF
 
         private static void ClearData(TCSContext context)
         {
-            context.Database.ExecuteSqlCommand("DELETE FROM [dbo].[ClassTours]");
-            context.Database.ExecuteSqlCommand("DELETE FROM [dbo].[SessionReasons]");
-            context.Database.ExecuteSqlCommand("DELETE FROM [dbo].[SessionClasses]");
-            context.Database.ExecuteSqlCommand("DELETE FROM [dbo].[Sessions]");
-            context.Database.ExecuteSqlCommand("DELETE FROM [dbo].[Classes]");
-            context.Database.ExecuteSqlCommand("DELETE FROM [dbo].[Departments]");
-            context.Database.ExecuteSqlCommand("DELETE FROM [dbo].[Reasons]");
-            context.Database.ExecuteSqlCommand("DELETE FROM [dbo].[People]");
-            context.Database.ExecuteSqlCommand("DELETE FROM [dbo].[Semesters]");
-            context.Database.ExecuteSqlCommand("DELETE FROM [dbo].[Users]");
+            // All Identifiers in Postgres must be wrapped
+            // in double quotes to preserve capitalization
+            context.Database.ExecuteSqlCommand("DELETE FROM \"ClassTours\"");
+            context.Database.ExecuteSqlCommand("DELETE FROM \"SessionReasons\"");
+            context.Database.ExecuteSqlCommand("DELETE FROM \"SessionClasses\"");
+            context.Database.ExecuteSqlCommand("DELETE FROM \"Sessions\"");
+            context.Database.ExecuteSqlCommand("DELETE FROM \"Classes\"");
+            context.Database.ExecuteSqlCommand("DELETE FROM \"Departments\"");
+            context.Database.ExecuteSqlCommand("DELETE FROM \"Reasons\"");
+            context.Database.ExecuteSqlCommand("DELETE FROM \"People\"");
+            context.Database.ExecuteSqlCommand("DELETE FROM \"Semesters\"");
+            context.Database.ExecuteSqlCommand("DELETE FROM \"Users\"");
         }
 
         private async static Task SeedAdmin(TCSContext context, IUserRepo userRepo)

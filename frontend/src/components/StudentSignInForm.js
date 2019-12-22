@@ -5,7 +5,7 @@ import { Button, Stack } from '../ui';
 import { callApi, ensureResponseCode } from '../utils';
 import CoursesCheckboxes from './CoursesCheckboxes';
 import ReasonCheckboxes from './ReasonCheckboxes';
-import useApiWithHeaders from '../hooks/useApiWithHeaders';
+import useApi from '../hooks/useApi';
 import SignInSchema from '../schemas/SignInFormSchema';
 import type { Student } from '../types';
 
@@ -16,7 +16,7 @@ type Props = {
 };
 
 const StudentSignInForm = ({ student }: Props) => {
-  const [, { body: reasons }] = useApiWithHeaders('reasons/active');
+  const [, reasons] = useApi('reasons/active');
 
   return (
     <Formik
@@ -49,7 +49,7 @@ const StudentSignInForm = ({ student }: Props) => {
             <h4>Welcome, {`${student.firstName} ${student.lastName}`}</h4>
             <h5>{status}</h5>
             <ReasonCheckboxes
-              reasons={reasons}
+              reasons={reasons || []}
               values={values}
               errors={errors}
               touched={touched}

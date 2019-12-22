@@ -11,6 +11,10 @@ namespace tcs_service.Repos
     {
         public SessionRepo(DbContextOptions options) : base(options) { }
 
-        protected override IQueryable<Session> Include(DbSet<Session> set) => set.Include(x => x.SessionClasses).Include(x => x.SessionReasons);
+        protected override IQueryable<Session> Include(DbSet<Session> set) =>
+            set.Include(x => x.SessionClasses).ThenInclude(x => x.Class)
+            .Include(x => x.SessionReasons).ThenInclude(x => x.Reason)
+            .Include(x => x.Person).ThenInclude(x => x.Schedules).ThenInclude(x => x.Class)
+            .Include(x => x.Semester);
     }
 }

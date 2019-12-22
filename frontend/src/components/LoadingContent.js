@@ -14,8 +14,8 @@ const LoadingContent = ({ loading, children, data }: Props) => (
     <ScaleLoader sizeUnit="px" size={150} loading={loading} align="center" />
     {!loading && (
       <>
-        {data.body && data.body.length >= 1 && children}
-        {data.body && data.body.length < 1 && <h3>No content was returned</h3>}
+        {data && data.data.length >= 1 && children}
+        {data && data.data.length < 1 && <h3>No content was returned</h3>}
       </>
     )}
   </>

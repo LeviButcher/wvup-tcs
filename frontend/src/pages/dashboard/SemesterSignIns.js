@@ -1,13 +1,33 @@
 import React from 'react';
 import { Router } from '@reach/router';
 import { CSVLink } from 'react-csv';
-import LoadingContent from '../../components/LoadingContent';
 import SemesterForm from '../../components/SemesterForm';
-import useApiWithHeaders from '../../hooks/useApiWithHeaders';
+import useApi from '../../hooks/useApi';
 
 type Props = {
   navigate: any,
   '*': string
+};
+
+const headers = [
+  { label: 'Session Id', key: 'id' },
+  { label: 'Full Name', key: 'person.fullName' },
+  { label: 'Email', key: 'person.email' },
+  { label: 'In Time', key: 'inTime' },
+  { label: 'Out Time', key: 'outTime' },
+  { label: 'Tutoring', key: 'tutoring' },
+  { label: 'Classes', key: 'selectedClasses' },
+  { label: 'Reasons', key: 'selectedReasons' },
+  { label: 'Semester', key: 'semester.name' },
+  { label: 'Semester Code', key: 'semester.code' }
+];
+
+const formatToCorrectTableForm = sessions => {
+  return sessions.map(x => ({
+    ...x,
+    selectedClasses: x.selectedClasses.map(c => c.name),
+    selectedReasons: x.selectedReasons.map(r => r.name)
+  }));
 };
 
 const SemesterSignIns = ({ navigate, '*': unMatchedUri }: Props) => {
@@ -34,23 +54,26 @@ type SemesterResultsProps = {
 };
 
 const SemesterResults = ({ semester }: SemesterResultsProps) => {
-  const [loading, data, errors] = useApiWithHeaders(
-    `lookups/semester/${semester}`
-  );
+  const [loading, semesterSessions] = useApi(`sessions/semester/${semester}`);
   return (
     <>
       {loading && <h1>This might be a while...</h1>}
-      <LoadingContent data={data} loading={loading} errors={errors}>
-        <h1>There were {data.body.length} signins during this semester</h1>
-        <h2>
-          <CSVLink
-            data={data.body}
-            filename={`semester-${semester}-signins.csv`}
-          >
-            Download Now
-          </CSVLink>
-        </h2>
-      </LoadingContent>
+      {!loading && semesterSessions && (
+        <>
+          <h1>
+            There were {semesterSessions.length} signins during this semester
+          </h1>
+          <h2>
+            <CSVLink
+              headers={headers}
+              data={formatToCorrectTableForm(semesterSessions)}
+              filename={`semester-${semester}-signins.csv`}
+            >
+              Download Now
+            </CSVLink>
+          </h2>
+        </>
+      )}
     </>
   );
 };
