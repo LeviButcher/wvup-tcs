@@ -69,7 +69,7 @@ namespace tcs_integration.Controllers
 
             foreach(var tour in tours.Data)
             {
-                Assert.True(tour.DayVisited > Convert.ToDateTime(start) && tour.DayVisited < Convert.ToDateTime(end));
+                Assert.True(tour.DayVisited >= Convert.ToDateTime(start) && tour.DayVisited <= Convert.ToDateTime(end));
             }           
         }
 
