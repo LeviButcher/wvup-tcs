@@ -11,7 +11,6 @@ namespace tcs_service.Repos
 {
     public class ClassTourRepo : BaseRepo<ClassTour>, IClassTourRepo
     {
-
         public ClassTourRepo(DbContextOptions options) : base(options) { } 
 
         protected override IQueryable<ClassTour> Include(DbSet<ClassTour> set) => set;
@@ -22,7 +21,5 @@ namespace tcs_service.Repos
             
             return tours;
         }
-
-        protected override IQueryable<ClassTour> Include(DbSet<ClassTour> set) => set;
     }
 }
