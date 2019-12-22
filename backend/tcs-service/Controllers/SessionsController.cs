@@ -15,6 +15,7 @@ namespace tcs_service.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class SessionsController : ControllerBase
     {
         readonly private ISessionRepo _sessionRepo;
