@@ -9,10 +9,9 @@ using tcs_service.Repos.Interfaces;
 
 namespace tcs_service.Controllers
 {
-    [Produces("application/json")]
     [Route("api/ClassTours")]
-    [Authorize]
     [ApiController]
+    [Authorize]
     public class ClassToursController : ControllerBase
     {
         private readonly IClassTourRepo _iRepo;
@@ -22,20 +21,9 @@ namespace tcs_service.Controllers
             _iRepo = iRepo;
         }
 
-        private async Task<bool> ClassTourExists(int id)
-        {
-            return await _iRepo.Exist(x => x.Id == id);
-        }
-
         [HttpGet("{id}")]
-        [Produces(typeof(ClassTour))]
         public async Task<IActionResult> GetClassTour([FromRoute] int id)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
             var classTour = await _iRepo.Find(x => x.Id == id);
 
             if (classTour == null)
@@ -47,25 +35,19 @@ namespace tcs_service.Controllers
         }
 
         [HttpGet]
-        public ActionResult Get([FromQuery] DateTime start, [FromQuery] DateTime end, [FromQuery] int skip = 0, [FromQuery] int take = 20)
+        public IActionResult Get([FromQuery] DateTime start, [FromQuery] DateTime end, [FromQuery] int page = 1)
         {
-            var page = _iRepo.GetBetweenDates(start, end, skip, take);
-
-            return Ok(page);
+            var pageResult = new Paging<ClassTour>(page, _iRepo.GetBetweenDates(start, end));
+            
+            return Ok(pageResult);
         }
 
         [HttpPut("{id}")]
-        [Produces(typeof(ClassTour))]
         public async Task<IActionResult> PutClassTour([FromRoute] int id, [FromBody] ClassTour classTour)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
             if (id != classTour.Id)
             {
-                return BadRequest("ID's do not match");
+                throw new TCSException("Class Tour does not exist");
             }
 
             try
@@ -75,48 +57,28 @@ namespace tcs_service.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!await ClassTourExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
+               return NotFound(new { message = "Something went wrong" });
             }
 
         }
 
         [HttpPost]
-        [Produces(typeof(ClassTour))]
         public async Task<IActionResult> PostClassTour([FromBody] ClassTour classTour)
         {
-            if (!ModelState.IsValid || classTour.Name == null)
-            {
-                return BadRequest(ModelState);
-            }
-
             await _iRepo.Create(classTour);
 
-            return CreatedAtAction("GetClassTour", new { id = classTour.Id }, classTour);
+            return Created($"classtours/{classTour.Id}", classTour);
         }
 
         [HttpDelete("{id}")]
-        [Produces(typeof(ClassTour))]
         public async Task<IActionResult> DeleteClassTour([FromRoute] int id)
         {
-            if (!ModelState.IsValid)
+            if (! await _iRepo.Exist(x => x.Id == id))
             {
-                return BadRequest(ModelState);
+                return NotFound(new { message = "Something went wrong" });
             }
-
-            if (!await ClassTourExists(id))
-            {
-                return NotFound();
-            }
-
             var tour = await _iRepo.Remove(x => x.Id == id);
-
+            
             return Ok(tour);
         }
     }

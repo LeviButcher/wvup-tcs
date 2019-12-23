@@ -60,10 +60,6 @@ namespace tcs_service.EF
             .Property(p => p.CRN)
             .ValueGeneratedNever();
 
-            modelBuilder.Entity<Class>()
-             .Property(p => p.CRN)
-             .ValueGeneratedNever();
-
             modelBuilder.Entity<Semester>()
             .Property(p => p.Code)
             .ValueGeneratedNever();
