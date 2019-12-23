@@ -28,35 +28,15 @@ namespace tcs_service.UnitOfWorks
             this.bannerApi = bannerApi;
         }
 
-        // Need to know exactly when a new semester code should be generated
-        // On what day?
-        private bool IsOutdatedSemester(Semester semester, DateTime currentDate)
-        {
-            // 201901
-            // 01 -> [January -> May]
-            // 02 -> [May -> August]
-            // 03 -> [August -> December]
-            int getMonthCode(int month)
-            {
-                if (month < 5) return 1;
-                if (month < 8) return 2;
-                else return 3;
-            };
-
-
-            var year = currentDate.Year;
-            var monthCode = getMonthCode(currentDate.Month);
-            return semester.Code == year * 100 + monthCode;
-        }
-
-        public async Task<PersonInfoDTO> GetPersonInfo(string identifier, DateTime currentDate)
+        public async Task<PersonInfoDTO> GetPersonInfo(string identifier)
         {
             var person = await personRepo.Find(x => x.Email == identifier || x.Id.ToString() == identifier);
-            var currentSemester = semesterRepo.GetAll().LastOrDefault();
-            var hasSchedule = await scheduleRepo.Exist(x => currentSemester is Semester && person is Person && x.SemesterCode == currentSemester.Code && x.PersonId == person.Id);
 
-            // if outdated, call banner, and if schedule doesn't exist for current semester
-            if (person is Person && IsOutdatedSemester(currentSemester, currentDate) && hasSchedule)
+            var bannerInfo = await bannerApi.GetBannerInfo(identifier);
+            var hasSchedule = await scheduleRepo.Exist(x => person is Person && x.SemesterCode == bannerInfo.SemesterId && x.PersonId == person.Id);
+
+            // if person has a schedule, just return their schedule
+            if (person is Person && hasSchedule)
             {
                 var schedule = scheduleRepo.GetAll(x => x.PersonId == person.Id).Select(x => x.Class);
                 return new PersonInfoDTO()
@@ -70,7 +50,7 @@ namespace tcs_service.UnitOfWorks
                 };
             }
 
-            var bannerInfo = await bannerApi.GetBannerInfo(identifier);
+
             var newPerson = new Person()
             {
                 Email = bannerInfo.Email,
