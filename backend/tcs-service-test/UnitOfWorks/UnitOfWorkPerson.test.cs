@@ -221,6 +221,15 @@ namespace tcs_service_test.Controllers
                 Id = id,
                 PersonType = PersonType.Student
             };
+            var otherPerson = new Person()
+            {
+                Email = "somebody@wvup.edu",
+                FirstName = "Bob",
+                LastName = "Parker",
+                Id = 13496,
+                PersonType = PersonType.Student
+            };
+
             var semester = new Semester()
             {
                 Code = 201901
@@ -236,7 +245,15 @@ namespace tcs_service_test.Controllers
                     }
                 }
             };
+            var previousSchedule = new Schedule()
+            {
+                Person = otherPerson,
+                Class = classes[0],
+                Semester = semester
+            };
+            db.People.Add(otherPerson);
             db.Classes.AddRange(classes);
+            db.Schedules.Add(previousSchedule);
             db.Semesters.Add(semester);
             db.SaveChanges();
 

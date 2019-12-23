@@ -23,7 +23,7 @@ namespace tcs_service.Services.ScheduledTasks
             var signIns = _iRepo.GetAll(x => x.OutTime == null && x.InTime != null);
             foreach (var signIn in signIns)
             {
-                signIn.OutTime = signIn.InTime.Value.AddHours(2);
+                signIn.OutTime = signIn.InTime.AddHours(2);
                 await _iRepo.Update(signIn);
             }
         }

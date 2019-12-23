@@ -3,8 +3,7 @@ import { CSVLink } from 'react-csv';
 import { Router } from '@reach/router';
 import { ReportLayout, Table, Header, Card, LineChart } from '../../ui';
 import StartToEndDateForm from '../../components/StartToEndDateForm';
-import useApiWithHeaders from '../../hooks/useApiWithHeaders';
-import LoadingContent from '../../components/LoadingContent';
+import useApi from '../../hooks/useApi';
 
 type Props = {
   navigate: any,
@@ -37,27 +36,32 @@ type VisitsResultsProps = {
 };
 
 const VisitsResults = ({ startDate, endDate }: VisitsResultsProps) => {
-  const [loading, data, errors] = useApiWithHeaders(
+  const [loading, visitsData] = useApi(
     `reports/weekly-visits?start=${startDate}&end=${endDate}`
   );
   return (
-    <LoadingContent loading={loading} data={data} errors={errors}>
-      <Card style={{ gridArea: 'chart' }}>
-        <LineChart
-          data={data.body}
-          x={d => d.item}
-          y={d => d.count}
-          xLabel="Week"
-          yLabel="Total Visitors"
-          title="Weekly Visits"
-          labels={d => d.count}
-          domain={{ x: [1, 2], y: [1, 2] }}
-        />
-      </Card>
-      <Card style={{ gridArea: 'table' }}>
-        <VisitsTable visits={data.body} />
-      </Card>
-    </LoadingContent>
+    <>
+      {loading && <div>Loading...</div>}
+      {!loading && visitsData && (
+        <>
+          <Card style={{ gridArea: 'chart' }}>
+            <LineChart
+              data={visitsData}
+              x={d => d.item}
+              y={d => d.count}
+              xLabel="Week"
+              yLabel="Total Visitors"
+              title="Weekly Visits"
+              labels={d => d.count}
+              domain={{ x: [1, 2], y: [1, 2] }}
+            />
+          </Card>
+          <Card style={{ gridArea: 'table' }}>
+            <VisitsTable visits={visitsData} />
+          </Card>
+        </>
+      )}
+    </>
   );
 };
 

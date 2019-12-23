@@ -66,7 +66,7 @@ namespace tcs_service.Repos
                            {
                                fullName = $"{signIn.Person.FirstName} {signIn.Person.LastName}",
                                teacherEmail = signIn.Person.Email,
-                               totalHours = Convert.ToDecimal(signIn.OutTime.Value.Ticks) - Convert.ToDecimal(signIn.InTime.Value.Ticks)
+                               totalHours = Convert.ToDecimal(signIn.OutTime.Value.Ticks) - Convert.ToDecimal(signIn.InTime.Ticks)
                            };
 
 

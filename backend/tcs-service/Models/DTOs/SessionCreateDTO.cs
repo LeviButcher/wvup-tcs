@@ -12,11 +12,11 @@ namespace tcs_service.Models.DTOs
         public int PersonId { get; set; }
 
         [DataType(DataType.DateTime)]
-        public DateTimeOffset InTime { get; set; }
+        public DateTime InTime { get; set; }
 
         [DataType(DataType.DateTime)]
         [SignOutValidation("InTime")]
-        public DateTimeOffset OutTime { get; set; }
+        public DateTime OutTime { get; set; }
 
         public int SemesterCode { get; set; }
 

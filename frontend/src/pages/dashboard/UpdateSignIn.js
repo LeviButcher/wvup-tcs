@@ -1,6 +1,6 @@
 import React from 'react';
 import SignInForm from '../../components/SignInForm';
-import useApiWithHeaders from '../../hooks/useApiWithHeaders';
+import useApi from '../../hooks/useApi';
 import { Card } from '../../ui';
 
 type Props = {
@@ -8,36 +8,40 @@ type Props = {
 };
 
 const UpdateSignIn = ({ id }: Props) => {
-  const [, { body: signIn }]: [boolean, { body: any }, any] = useApiWithHeaders(
-    `signins/${id}`
-  );
-  const [, { body: reasons }] = useApiWithHeaders('reasons/active');
-  const [, { body: semesters }] = useApiWithHeaders('reports/semesters');
+  const [, signIn] = useApi(`sessions/${id}`);
+  const [, reasons] = useApi('reasons');
+  const [, semesters] = useApi('reports/semesters');
 
-  // Doesn't work because api doesn't give everything needed
   return (
     <>
-      {signIn && (
-        <Card>
-          <SignInForm
-            signInRecord={{
-              semesterId: signIn.semesterId,
-              email: signIn.email,
-              classSchedule: signIn.courses,
-              inTime: signIn.inTime,
-              outTime: signIn.outTime,
-              selectedReasons: signIn.reasons,
-              selectedClasses: signIn.courses,
-              personId: signIn.personId,
-              personType: signIn.personType,
-              tutoring: signIn.tutoring,
-              id: signIn.id
-            }}
-            reasons={reasons}
-            semesters={semesters}
-          />
-        </Card>
-      )}
+      {signIn &&
+        reasons &&
+        semesters &&
+        signIn.email &&
+        reasons.length > 0 &&
+        semesters.length > 0 && (
+          <Card>
+            <SignInForm
+              signInRecord={{
+                semesterCode: signIn.semesterCode,
+                email: signIn.email,
+                schedule: signIn.schedule,
+                inTime: signIn.inTime,
+                outTime: signIn.outTime,
+                selectedReasons: signIn.selectedReasons,
+                selectedClasses: signIn.selectedClasses,
+                personId: signIn.personId,
+                personType: signIn.personType,
+                tutoring: signIn.tutoring,
+                id: signIn.id,
+                firstName: signIn.firstName,
+                lastName: signIn.lastName
+              }}
+              reasons={reasons}
+              semesters={semesters}
+            />
+          </Card>
+        )}
     </>
   );
 };

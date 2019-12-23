@@ -28,11 +28,11 @@ namespace tcs_service.Models.ViewModels
         public string SemesterName { get; set; }
 
         [DataType(DataType.DateTime)]
-        public DateTimeOffset? InTime { get; set; }
+        public DateTime? InTime { get; set; }
 
         [DataType(DataType.DateTime)]
         [SignOutValidation("InTime")]
-        public DateTimeOffset? OutTime { get; set; }
+        public DateTime? OutTime { get; set; }
 
         public bool Tutoring { get; set; }
 

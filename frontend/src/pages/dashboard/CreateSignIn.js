@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import SignInForm from '../../components/SignInForm';
 import EmailOrCardSwipeForm from '../../components/EmailOrCardSwipeForm';
-import useApiWithHeaders from '../../hooks/useApiWithHeaders';
+import useApi from '../../hooks/useApi';
 import { Card } from '../../ui';
 
 const CreateSignIn = () => {
   const [person, setPerson]: [any, any] = useState();
-  const [, { body: reasons }] = useApiWithHeaders('reasons/active');
-  const [, { body: semesters }] = useApiWithHeaders('reports/semesters');
+  const [, reasons] = useApi('reasons/active');
+  const [, semesters] = useApi('reports/semesters');
 
   return (
     <Card>
@@ -22,6 +22,8 @@ const CreateSignIn = () => {
         <div>
           <SignInForm
             signInRecord={{
+              firstName: person.firstName,
+              lastName: person.lastName,
               email: person.email,
               schedule: person.schedule,
               inTime: '',
@@ -32,8 +34,8 @@ const CreateSignIn = () => {
               personType: person.personType,
               tutoring: false
             }}
-            reasons={reasons}
-            semesters={semesters}
+            reasons={reasons || []}
+            semesters={semesters || []}
           />
         </div>
       )}

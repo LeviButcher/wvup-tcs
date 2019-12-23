@@ -1,26 +1,13 @@
 import React from 'react';
 import { Formik, Form } from 'formik';
-import { pipe } from 'ramda';
 import * as Yup from 'yup';
 import { Card, Header, Button, Stack } from '../ui';
-import useQuery from '../hooks/useQuery';
-import callApi from '../utils/callApi';
-import ensureResponseCode from '../utils/ensureResponseCode';
-import unwrapToJSON from '../utils/unwrapToJSON';
+import useApi from '../hooks/useApi';
 import SemesterDropdown from './SemesterDropdown';
 
 const semesterSchema = Yup.object().shape({
   semesterCode: Yup.string().required()
 });
-
-const getSemesters = () => callApi(`reports/semesters`, 'GET', null);
-
-const querySemesters = pipe(
-  getSemesters,
-  // $FlowFixMe
-  ensureResponseCode(200),
-  unwrapToJSON
-);
 
 type Props = {
   onSubmit: (any, any) => Promise<any> & any,
@@ -31,7 +18,7 @@ type Props = {
 };
 
 const SemesterForm = ({ onSubmit, title, initialValues, ...props }: Props) => {
-  const [semesters] = useQuery(querySemesters);
+  const [, semesters] = useApi('reports/semesters');
   return (
     <Card {...props}>
       <Header>{title}</Header>
@@ -46,7 +33,7 @@ const SemesterForm = ({ onSubmit, title, initialValues, ...props }: Props) => {
         {({ isSubmitting, isValid }) => (
           <Form>
             <Stack>
-              <SemesterDropdown semesters={semesters} />
+              <SemesterDropdown semesters={semesters || []} />
               <Button
                 type="submit"
                 fullWidth

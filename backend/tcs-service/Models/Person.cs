@@ -1,4 +1,5 @@
-﻿using System;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -22,6 +23,9 @@ namespace tcs_service.Models
 
         [Required]
         public string LastName { get; set; }
+
+        [InverseProperty(nameof(Schedule.Person))]
+        public IEnumerable<Schedule> Schedules { get; set; }
     }
 
     public enum PersonType

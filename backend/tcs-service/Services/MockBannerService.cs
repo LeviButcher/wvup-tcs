@@ -30,7 +30,7 @@ namespace tcs_service.Services
                 var currentSemester = semesterRepo.GetAll().Last();
                 var rand = new Random(person.Id);
                 var takeCount = Math.Ceiling(rand.NextDouble() * 5) + 1;
-                var randomCourses = classRepo.GetAll().Take((int)takeCount);
+                var randomCourses = classRepo.GetAll().ToList().Take((int)takeCount);
                 if (person.PersonType == PersonType.Student)
                 {
                     return new BannerPersonInfo()

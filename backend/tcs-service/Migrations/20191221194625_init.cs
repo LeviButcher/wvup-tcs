@@ -1,6 +1,6 @@
 ﻿using System;
-using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
+using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace tcs_service.Migrations
 {
@@ -13,7 +13,7 @@ namespace tcs_service.Migrations
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.SerialColumn),
                     Name = table.Column<string>(nullable: false),
                     DayVisited = table.Column<DateTime>(nullable: false),
                     NumberOfStudents = table.Column<int>(nullable: false)
@@ -55,7 +55,7 @@ namespace tcs_service.Migrations
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.SerialColumn),
                     Name = table.Column<string>(nullable: false),
                     Deleted = table.Column<bool>(nullable: false)
                 },
@@ -80,7 +80,7 @@ namespace tcs_service.Migrations
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.SerialColumn),
                     FirstName = table.Column<string>(nullable: true),
                     LastName = table.Column<string>(nullable: true),
                     Username = table.Column<string>(maxLength: 25, nullable: false),
@@ -117,10 +117,10 @@ namespace tcs_service.Migrations
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.SerialColumn),
                     PersonId = table.Column<int>(nullable: false),
-                    InTime = table.Column<DateTimeOffset>(nullable: false),
-                    OutTime = table.Column<DateTimeOffset>(nullable: true),
+                    InTime = table.Column<DateTime>(nullable: false),
+                    OutTime = table.Column<DateTime>(nullable: true),
                     Tutoring = table.Column<bool>(nullable: false),
                     SemesterCode = table.Column<int>(nullable: false)
                 },

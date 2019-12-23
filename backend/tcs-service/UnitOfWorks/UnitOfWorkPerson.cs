@@ -53,7 +53,7 @@ namespace tcs_service.UnitOfWorks
         {
             var person = await personRepo.Find(x => x.Email == identifier || x.Id.ToString() == identifier);
             var currentSemester = semesterRepo.GetAll().LastOrDefault();
-            var hasSchedule = await scheduleRepo.Exist(x => currentSemester is Semester && x.SemesterCode == currentSemester.Code);
+            var hasSchedule = await scheduleRepo.Exist(x => currentSemester is Semester && person is Person && x.SemesterCode == currentSemester.Code && x.PersonId == person.Id);
 
             // if outdated, call banner, and if schedule doesn't exist for current semester
             if (person is Person && IsOutdatedSemester(currentSemester, currentDate) && hasSchedule)
@@ -119,7 +119,9 @@ namespace tcs_service.UnitOfWorks
             foreach (var c in courses)
             {
                 await classRepo.CreateOrUpdate(x => x.CRN == c.CRN, c);
-                await scheduleRepo.Create(new Schedule()
+                await scheduleRepo.CreateOrUpdate(x => x.PersonId == savedPerson.Id
+                && x.SemesterCode == bannerInfo.SemesterId
+                && x.ClassCRN == c.CRN, new Schedule()
                 {
                     SemesterCode = bannerInfo.SemesterId,
                     PersonId = savedPerson.Id,

@@ -18,36 +18,22 @@ namespace tcs_service.Repos
 
         }
 
-        public async Task<ClassTour> Add(ClassTour tour)
+        // Just changing this for now, this will be removed with testing of the ClassTour Repo
+        public Paging<ClassTourViewModel> GetBetweenDates(DateTime start, DateTime end, int skip, int take)
         {
-            await _db.AddAsync(tour);
-            await _db.SaveChangesAsync();
-            return tour;
-        }
+            var tours = _db.ClassTours.Where(a => a.DayVisited > start && a.DayVisited < end).Select(x => new ClassTourViewModel()
+            {
+                Id = x.Id,
+                Name = x.Name,
+                DayVisited = x.DayVisited,
+                NumberOfStudents = x.NumberOfStudents
+            });
 
+            var page = (int)Math.Ceiling((decimal)tours.Count() / take);
 
-        public async Task<PagingModel<ClassTourViewModel>> GetBetweenDates(DateTime start, DateTime end, int skip, int take)
-        {
-            var tours = _db.ClassTours.Where(a => a.DayVisited > start && a.DayVisited < end);
-            var totalDataCount = await tours.CountAsync();
-            var pageData = GetPageData(tours, skip, take);
-
-            return new PagingModel<ClassTourViewModel>(skip, take, totalDataCount, pageData);
+            return new Paging<ClassTourViewModel>(page, take, tours);
         }
 
         protected override IQueryable<ClassTour> Include(DbSet<ClassTour> set) => set;
-
-        private IQueryable<ClassTourViewModel> GetPageData(IQueryable<ClassTour> tours, int skip, int take)
-        {
-            return tours
-                .Skip(skip).Take(take)
-                .Select(x => new ClassTourViewModel()
-                {
-                    Id = x.Id,
-                    Name = x.Name,
-                    DayVisited = x.DayVisited,
-                    NumberOfStudents = x.NumberOfStudents
-                });
-        }
     }
 }

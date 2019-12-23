@@ -3,8 +3,7 @@ import { CSVLink } from 'react-csv';
 import { Router } from '@reach/router';
 import { Card, Header, Table, ReportLayout, BarChart } from '../../ui';
 import StartToEndDateForm from '../../components/StartToEndDateForm';
-import LoadingContent from '../../components/LoadingContent';
-import useApiWithHeaders from '../../hooks/useApiWithHeaders';
+import useApi from '../../hooks/useApi';
 
 type Props = {
   navigate: any,
@@ -40,29 +39,32 @@ type ClassTourResultProps = {
 };
 
 const ClassTourResult = ({ startDate, endDate }: ClassTourResultProps) => {
-  const [loading, data, errors]: [
-    boolean,
-    { body: any },
-    any
-  ] = useApiWithHeaders(`reports/classtours?start=${startDate}&end=${endDate}`);
+  const [loading, classTourData] = useApi(
+    `reports/classtours?start=${startDate}&end=${endDate}`
+  );
   return (
-    <LoadingContent loading={loading} data={data} errors={errors}>
-      <Card width="900px" style={{ gridArea: 'table' }}>
-        <ClassTourSumTable classTours={data.body} />
-      </Card>
-      <Card width="600px" style={{ gridArea: 'chart' }}>
-        <BarChart
-          data={data.body}
-          x={d => d.name}
-          y={d => d.students}
-          title="Class Tour Chart"
-          horizontal
-          yLabel="# of Students"
-          labels={d => d.students}
-          padding={{ left: 75, right: 75, top: 50, bottom: 50 }}
-        />
-      </Card>
-    </LoadingContent>
+    <>
+      {loading && <div>Loading...</div>}
+      {!loading && classTourData && (
+        <>
+          <Card width="900px" style={{ gridArea: 'table' }}>
+            <ClassTourSumTable classTours={classTourData} />
+          </Card>
+          <Card width="600px" style={{ gridArea: 'chart' }}>
+            <BarChart
+              data={classTourData}
+              x={d => d.name}
+              y={d => d.students}
+              title="Class Tour Chart"
+              horizontal
+              yLabel="# of Students"
+              labels={d => d.students}
+              padding={{ left: 75, right: 75, top: 50, bottom: 50 }}
+            />
+          </Card>
+        </>
+      )}
+    </>
   );
 };
 

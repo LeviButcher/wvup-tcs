@@ -120,19 +120,20 @@ namespace tcs_service
                 .SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
             services.AddDbContext<TCSContext>(options =>
-               options.UseSqlServer(dbConfig.ConnectionString));
+               options.UseNpgsql(dbConfig.ConnectionString));
 
             services.AddScoped<IClassTourRepo, ClassTourRepo>();
             services.AddScoped<IUserRepo, UserRepo>();
             services.AddScoped<IReportsRepo, ReportsRepo>();
             services.AddScoped<IReasonRepo, ReasonRepo>();
-            services.AddScoped<ILookupRepo, LookupRepo>();
             services.AddScoped<ISessionRepo, SessionRepo>();
             services.AddScoped<IPersonRepo, PersonRepo>();
             services.AddScoped<IScheduleRepo, ScheduleRepo>();
             services.AddScoped<IClassRepo, ClassRepo>();
             services.AddScoped<ISemesterRepo, SemesterRepo>();
             services.AddScoped<IDepartmentRepo, DepartmentRepo>();
+            services.AddScoped<ISessionClassRepo, SessionClassRepo>();
+            services.AddScoped<ISessionReasonRepo, SessionReasonRepo>();
             services.AddScoped<IUnitOfWorkPerson, UnitOfWorkPerson>();
         }
 

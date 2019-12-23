@@ -10,7 +10,7 @@ namespace tcs_service.Models.DTOs
         public string FirstName { get; set; }
         public string LastName { get; set; }
 
-        public IEnumerable<Class> Schedule { get; set; }
+        public IEnumerable<Class> Schedule { get; set; } = new List<Class>();
 
         public PersonType PersonType { get; set; }
     }

@@ -6,8 +6,6 @@ using tcs_service.Models;
 using tcs_service.Models.DTOs;
 using tcs_integration.test_utils;
 
-// Need to add in Admin api endpoints that sends back all Courses if student
-
 namespace tcs_integration.Controllers
 {
     [Collection("Integration")]

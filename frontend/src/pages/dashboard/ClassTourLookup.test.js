@@ -19,11 +19,10 @@ describe('Class Tour Lookup', () => {
     const fakeFetch = jest.fn(() =>
       Promise.resolve({
         status: 200,
-        headers: [],
         json: () =>
-          Promise.resolve([
-            { shortName: 'Ripley', name: 'Ripley', id: 1, crn: '12236' }
-          ])
+          Promise.resolve({
+            data: [{ shortName: 'Ripley', name: 'Ripley', id: 1, crn: '12236' }]
+          })
       })
     );
     global.fetch = fakeFetch;

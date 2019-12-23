@@ -5,6 +5,7 @@ const backendURL = process.env.REACT_APP_BACKEND || '';
 type HTTPMethod = 'POST' | 'GET' | 'PUT' | 'DELETE';
 
 function callApi(uri: string, method: HTTPMethod, data: {}) {
+  console.warn('Deprecating callApi eventually, use fetchLight');
   const token = localStorage.getItem(`${process.env.REACT_APP_TOKEN || ''}`);
   const options = {
     method,

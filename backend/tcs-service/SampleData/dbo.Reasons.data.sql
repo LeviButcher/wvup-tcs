@@ -1,18 +1,17 @@
-﻿SET IDENTITY_INSERT [dbo].[Reasons] ON
-INSERT INTO [dbo].[Reasons]
-    ([Id], [Name], [Deleted])
+﻿INSERT INTO "Reasons"
+    ("Id", "Name", "Deleted")
 VALUES
-    (1, N'Study Time', 1)
-INSERT INTO [dbo].[Reasons]
-    ([Id], [Name], [Deleted])
+    (1, 'Study Time', '1');
+INSERT INTO "Reasons"
+    ("Id", "Name", "Deleted")
 VALUES
-    (2, N'Computer Use', 1)
-INSERT INTO [dbo].[Reasons]
-    ([Id], [Name], [Deleted])
+    (2, 'Computer Use', '1');
+INSERT INTO "Reasons"
+    ("Id", "Name", "Deleted")
 VALUES
-    (3, N'Printer Use', 0)
-INSERT INTO [dbo].[Reasons]
-    ([Id], [Name], [Deleted])
+    (3, 'Printer Use', '0');
+INSERT INTO "Reasons"
+    ("Id", "Name", "Deleted")
 VALUES
-    (4, N'Bone Use', 1)
-SET IDENTITY_INSERT [dbo].[Reasons] OFF
+    (4, 'Bone Use', '1');
+ALTER SEQUENCE "Reasons_Id_seq" RESTART WITH 1000;
