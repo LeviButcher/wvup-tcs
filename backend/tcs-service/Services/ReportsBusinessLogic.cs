@@ -47,6 +47,7 @@ namespace tcs_service.Services
             if (grade <= Grade.I)
             {
                 vm.PassedSuccessfullyCount++;
+                vm.CompletedCourseCount++;
             }
             else if (grade <= Grade.F)
             {

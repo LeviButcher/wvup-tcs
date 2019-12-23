@@ -42,7 +42,7 @@ namespace tcs_service.Repos
         // Get All SignIns between Start and End Date, group by Hour, count number of records for each hour
         public async Task<List<PeakHoursViewModel>> PeakHours(DateTime startWeek, DateTime endWeek)
              => await _db.Sessions.Where(x => x.InTime >= startWeek && x.InTime <= endWeek)
-                .GroupBy(x => x.InTime.Value.Hour)
+                .GroupBy(x => x.InTime.Hour)
                 .Where(x => x.Count() >= 1)
                 .Select(x => new PeakHoursViewModel(x.Key, x.Count()))
                 .ToListAsync();

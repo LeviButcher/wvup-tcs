@@ -31,6 +31,9 @@ namespace tcs_service_test.Repos
             fixture = new Fixture()
               .Customize(new AutoMoqCustomization());
             // Setting default values
+            fixture.Behaviors.OfType<ThrowingRecursionBehavior>().ToList()
+             .ForEach(b => fixture.Behaviors.Remove(b));
+            fixture.Behaviors.Add(new OmitOnRecursionBehavior());
             fixture.RepeatCount = 3;
             fixture.Customize<Session>((ob) => ob.Without(x => x.SessionClasses).Without(x => x.Person)
                 .Without(x => x.Semester).Without(x => x.SessionReasons));
@@ -134,9 +137,9 @@ namespace tcs_service_test.Repos
             db.Sessions.AddRange(sessions);
             db.SaveChanges();
 
-            var twelvePM = sessions.Where(x => x.InTime.Value.Hour == 12).ToList();
-            var twoPM = sessions.Where(x => x.InTime.Value.Hour == 14).ToList();
-            var fivePM = sessions.Where(x => x.InTime.Value.Hour == 17).ToList();
+            var twelvePM = sessions.Where(x => x.InTime.Hour == 12).ToList();
+            var twoPM = sessions.Where(x => x.InTime.Hour == 14).ToList();
+            var fivePM = sessions.Where(x => x.InTime.Hour == 17).ToList();
           
             var results = await reportsRepo.PeakHours(startDate, endDate);
 
@@ -193,6 +196,7 @@ namespace tcs_service_test.Repos
             
             var teacher = fixture.Create<Person>();
             teacher.PersonType = PersonType.Teacher;
+            teacher.Schedules = null;
              
             db.People.Add(teacher);
             db.SaveChanges();
