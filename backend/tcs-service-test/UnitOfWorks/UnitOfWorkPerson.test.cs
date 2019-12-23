@@ -93,7 +93,7 @@ namespace tcs_service_test.Controllers
             mockBannerService.Setup(x => x.GetBannerInfo(It.IsAny<string>())).ReturnsAsync(() => bannerPersonInfo);
 
 
-            var personInfo = await unitPerson.GetPersonInfo(email, new DateTime(2019, 7, 1));
+            var personInfo = await unitPerson.GetPersonInfo(email);
 
             mockBannerService.Verify(x => x.GetBannerInfo(It.Is<string>(a => a == bannerPersonInfo.Email || a == bannerPersonInfo.Id.ToString())), Times.Once());
             Assert.NotNull(personInfo);
@@ -185,7 +185,7 @@ namespace tcs_service_test.Controllers
 
             mockBannerService.Setup(x => x.GetBannerInfo(It.IsAny<string>())).ReturnsAsync(() => bannerPersonInfo);
 
-            var personInfo = await unitPerson.GetPersonInfo(identifier, new DateTime(2019, 8, 1));
+            var personInfo = await unitPerson.GetPersonInfo(identifier);
 
             mockBannerService.Verify(x => x.GetBannerInfo(It.Is<string>(a => a == person.Email || a == person.Id.ToString())), Times.Once());
 
@@ -197,7 +197,9 @@ namespace tcs_service_test.Controllers
 
         /*
             Use Case:
-                A student has not signed in yet during this semester. Several student have signed in so that student's courses already exist in the system. The semester also already exists in the system.
+                A student has not signed in yet during this semester. Several student have signed in so
+                that student's courses already exist in the system.
+                The semester also already exists in the system.
 
             Assertions:
                 BannerApi should be called once
@@ -279,7 +281,7 @@ namespace tcs_service_test.Controllers
 
             mockBannerService.Setup(x => x.GetBannerInfo(It.IsAny<string>())).ReturnsAsync(() => bannerPersonInfo);
 
-            var personInfo = await unitPerson.GetPersonInfo(identifier, new DateTime(2019, 2, 1));
+            var personInfo = await unitPerson.GetPersonInfo(identifier);
 
             mockBannerService.Verify(x => x.GetBannerInfo(It.Is<string>(a => a == person.Email || a == person.Id.ToString())), Times.Once());
 
@@ -318,7 +320,7 @@ namespace tcs_service_test.Controllers
 
             mockBannerService.Setup(x => x.GetBannerInfo(It.IsAny<string>())).ReturnsAsync(() => bannerPersonInfo);
 
-            var personInfo = await unitPerson.GetPersonInfo(identifier, new DateTime(2019, 2, 1));
+            var personInfo = await unitPerson.GetPersonInfo(identifier);
 
             var teacher = db.People.LastOrDefault(x => x.Email == bannerPersonInfo.Email || x.Id == bannerPersonInfo.Id);
             Assert.NotNull(teacher);
@@ -333,7 +335,7 @@ namespace tcs_service_test.Controllers
                 A student has frequently come to the tutoring center during a semester. They try to sign into the center for the 100th time this semester. Yay! The system should already have all their information on hand from their previous visits this semester.
 
             Assertions:
-                BannerApi should not be called
+                BannerApi should be called
                 GetPersonInfo should return back this semester schedule
                 The student shouldn't gain any more schedule records in the database
         */
@@ -389,11 +391,11 @@ namespace tcs_service_test.Controllers
             };
             mockBannerService.Setup(x => x.GetBannerInfo(It.IsAny<string>())).ReturnsAsync(() => bannerPersonInfo);
 
-            var personInfo = await unitPerson.GetPersonInfo(person.Email, new DateTime(2019, 1, 1));
+            var personInfo = await unitPerson.GetPersonInfo(person.Email);
 
             Assert.NotNull(personInfo);
             Assert.Equal(personInfo.Email, person.Email);
-            mockBannerService.Verify(x => x.GetBannerInfo(It.IsAny<string>()), Times.Never());
+            mockBannerService.Verify(x => x.GetBannerInfo(It.IsAny<string>()), Times.Once());
             Assert.Equal(classes.Select(x => x.CRN), personInfo.Schedule.ToList().Select(x => x.CRN));
             var inDBSchedule = db.Schedules.Where(x => x.PersonId == person.Id);
             Assert.Equal(classes.Count(), inDBSchedule.Count());

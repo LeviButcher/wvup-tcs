@@ -160,11 +160,10 @@ test('Should display correct time and date from signInRecord InTime and outTime'
     lastName: 'Puckett'
   };
 
-  const { getByLabelText, debug } = render(
+  const { getByLabelText } = render(
     <SignInForm signInRecord={signIn} reasons={reasons} semesters={semesters} />
   );
 
-  debug();
   expect(getByLabelText(/in date/i)).toHaveValue('2019-05-13');
   expect(getByLabelText(/out date/i)).toHaveValue('2019-05-13');
   expect(getByLabelText(/in time/i)).toHaveValue('13:40:39');
@@ -440,4 +439,28 @@ test('Should display fetch response message when fetch returns non 2XX status co
       expect(getByText(/submit/i)).toBeDisabled();
     });
   });
+});
+
+test('Should display inTime when inTime has milliseconds and should not fill in outTime when null', async () => {
+  const signInRecord = {
+    inTime: '2019-05-12T01:00:30.6748946',
+    outTime: null,
+    personId: '1',
+    selectedClasses: [],
+    selectedReasons: [],
+    personType: 0,
+    email: 'lbutche3@wvup.edu',
+    firstName: 'L',
+    lastName: 'C',
+    tutoring: true
+  };
+
+  const { getByLabelText } = render(
+    <SignInForm signInRecord={signInRecord} semesters={semesters} />
+  );
+
+  expect(getByLabelText(/in date/i)).toHaveValue('2019-05-12');
+  expect(getByLabelText(/in time/i)).toHaveValue('01:00');
+  expect(getByLabelText(/out date/i)).toHaveValue('');
+  expect(getByLabelText(/out time/i)).toHaveValue('');
 });
