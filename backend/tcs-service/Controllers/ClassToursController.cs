@@ -10,8 +10,8 @@ using tcs_service.Repos.Interfaces;
 namespace tcs_service.Controllers
 {
     [Route("api/ClassTours")]
-    [Authorize]
     [ApiController]
+    [Authorize]
     public class ClassToursController : ControllerBase
     {
         private readonly IClassTourRepo _iRepo;
@@ -65,9 +65,9 @@ namespace tcs_service.Controllers
         [HttpPost]
         public async Task<IActionResult> PostClassTour([FromBody] ClassTour classTour)
         {
-            var tour = await _iRepo.Create(classTour);
+            await _iRepo.Create(classTour);
 
-            return Created($"classtours/{tour.Id}", tour);
+            return Created($"classtours/{classTour.Id}", classTour);
         }
 
         [HttpDelete("{id}")]
@@ -78,9 +78,7 @@ namespace tcs_service.Controllers
                 return NotFound(new { message = "Something went wrong" });
             }
             var tour = await _iRepo.Remove(x => x.Id == id);
-
             
-
             return Ok(tour);
         }
     }

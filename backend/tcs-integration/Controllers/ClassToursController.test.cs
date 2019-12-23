@@ -147,18 +147,11 @@ namespace tcs_integration.Controllers
         [Fact]
         public async void POST_classtour_validData_ShouldReturn201WithClassTour()
         {
-            var tour = new ClassTour()
-            {
-                DayVisited = DateTime.Now,
-                Name = "PPHS",
-                NumberOfStudents = 23
-            };
-
             var client = _factory.CreateClient();
             var user = await Utils.Login(client);
             var request = new HttpRequestMessage(HttpMethod.Post, "api/classtours");
             request.Headers.Add("Authorization", $"Bearer {user.Token}");
-            request.Content = new StringContent(JsonConvert.SerializeObject(tour));
+            request.Content = new StringContent(JsonConvert.SerializeObject(new ClassTour { DayVisited = DateTime.Now, Name = "PPHS", NumberOfStudents = 21}));
             request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
 
             var response = await client.SendAsync(request);           
