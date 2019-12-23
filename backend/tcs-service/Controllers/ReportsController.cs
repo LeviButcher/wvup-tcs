@@ -16,16 +16,19 @@ namespace tcs_service.Controllers
     public class ReportsController : ControllerBase
     {
         private IReportsRepo _iRepo;
+        private ISessionRepo _sessionRepo;
 
-        public ReportsController(IReportsRepo iRepo)
+        public ReportsController(IReportsRepo iRepo, ISessionRepo sessionRepo)
         {
             _iRepo = iRepo;
+            _sessionRepo = sessionRepo;
         }
 
         [HttpGet("weekly-visits")]
         public async Task<ActionResult<IEnumerable<WeeklyVisitsViewModel>>> Get([FromQuery] DateTime start, [FromQuery] DateTime end)
         {
-            return Ok(await _iRepo.WeeklyVisits(start, end));
+            return ReportsBusinessLogic.WeeklyVisits( _sessionRepo.GetAll(), start, end);
+           // return Ok(await _iRepo.WeeklyVisits(start, end));
         }
 
         [HttpGet("peakhours")]
@@ -54,10 +57,8 @@ namespace tcs_service.Controllers
 
         [HttpGet("success/{semesterId}")]
         public async Task<IActionResult> SuccessReport(int semesterId)
-        {
-            var courses = await _iRepo.SuccessReport(semesterId);
-            
-            return Ok(ReportsBusinessLogic.SuccessReport(courses));
+        { 
+            return Ok(ReportsBusinessLogic.SuccessReport(await _iRepo.SuccessReport(semesterId)));
         }
     }
 }

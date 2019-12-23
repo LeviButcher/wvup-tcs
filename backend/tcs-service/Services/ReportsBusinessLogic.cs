@@ -2,12 +2,33 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using tcs_service.Models;
 using tcs_service.Models.ViewModels;
 
 namespace tcs_service.Services
 {
     public class ReportsBusinessLogic
     {
+
+        public static List<WeeklyVisitsViewModel> WeeklyVisits(IEnumerable<Session> sessions, DateTime start, DateTime end)
+        {
+            var result = new List<WeeklyVisitsViewModel>();
+            while (start <= end)
+            {
+                result.Add(new WeeklyVisitsViewModel(start, start.Date.AddDays(6))
+                {
+                    Count = sessions.Where(x => x.InTime >= start && x.InTime <= start.AddDays(6)).Count()
+                });
+                start = start.AddDays(7);
+            }
+            return result;
+        }
+
+        public static List<PeakHoursViewModel> PeakHours(List<Session> sessions, DateTime start, DateTime end)
+        {
+            return null;
+        }
+
         public static List<CourseWithSuccessCountViewModel> SuccessReport(List<CourseWithGradeViewModel> classesWithGrades)
         {
 
