@@ -93,9 +93,13 @@ const SignInRow = ({
         <Link to={`/dashboard/signins/${id}`}>
           <Gear />
         </Link>
-        <Link to={`${window.location.pathname}${window.location.search}`}>
-          <Trashcan onClick={() => removeSession(id)} />
-        </Link>
+        <Trashcan
+          onClick={() => {
+            const accepted = window.confirm('Are you sure?');
+            if (accepted)
+              removeSession(id).then(() => window.location.reload());
+          }}
+        />
       </td>
     </tr>
   );
