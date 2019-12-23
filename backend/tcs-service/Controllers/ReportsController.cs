@@ -13,6 +13,7 @@ namespace tcs_service.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class ReportsController : ControllerBase
     {
         private IReportsRepo _iRepo;
