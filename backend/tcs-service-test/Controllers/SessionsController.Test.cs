@@ -110,7 +110,7 @@ namespace tcs_service_test
             db.Sessions.Add(session);
             db.SaveChanges();
 
-            var sessionUpdate = new SessionCreateDTO()
+            var sessionUpdate = new SessionPostOrPutDTO()
             {
                 InTime = session.InTime,
                 OutTime = session.OutTime.Value,
@@ -159,7 +159,7 @@ namespace tcs_service_test
             db.Sessions.Add(session);
             db.SaveChanges();
 
-            var sessionUpdate = new SessionCreateDTO()
+            var sessionUpdate = new SessionPostOrPutDTO()
             {
                 InTime = session.InTime,
                 OutTime = session.OutTime.Value.Add(new TimeSpan(5)),

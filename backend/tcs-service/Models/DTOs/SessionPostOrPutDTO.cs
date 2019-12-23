@@ -5,7 +5,7 @@ using tcs_service.Models.Attributes;
 
 namespace tcs_service.Models.DTOs
 {
-    public class SessionCreateDTO
+    public class SessionPostOrPutDTO
     {
         public int Id { get; set; }
 

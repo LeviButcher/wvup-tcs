@@ -77,7 +77,7 @@ namespace tcs_service.Controllers
             {
                 return NotFound();
             }
-            var sessionUpdate = _mapper.Map<SessionUpdateDTO>(session);
+            var sessionUpdate = _mapper.Map<SessionInfoDTO>(session);
 
             return Ok(sessionUpdate);
         }
@@ -86,7 +86,7 @@ namespace tcs_service.Controllers
         public IActionResult GetSignedIn() => Ok(_sessionRepo.GetAll(x => x.OutTime == null));
 
         [HttpPost]
-        public async Task<IActionResult> PostSession([FromBody] SessionCreateDTO sessionDTO)
+        public async Task<IActionResult> PostSession([FromBody] SessionPostOrPutDTO sessionDTO)
         {
             var person = await _personRepo.Find(x => x.Id == sessionDTO.PersonId);
             if (person.PersonType == PersonType.Teacher)
@@ -115,7 +115,7 @@ namespace tcs_service.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateSession([FromRoute] int id, [FromBody] SessionCreateDTO sessionDTO)
+        public async Task<IActionResult> UpdateSession([FromRoute] int id, [FromBody] SessionPostOrPutDTO sessionDTO)
         {
             var person = await _personRepo.Find(x => x.Id == sessionDTO.PersonId);
             var isTeacher = person.PersonType == PersonType.Teacher;

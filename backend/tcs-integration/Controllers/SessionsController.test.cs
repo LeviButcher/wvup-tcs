@@ -83,7 +83,7 @@ namespace tcs_integration.Controllers
         public async void POST_Sessions_ShouldReturn201WithCreatedSession()
         {
             var client = _factory.CreateClient();
-            var session = new SessionCreateDTO()
+            var session = new SessionPostOrPutDTO()
             {
                 InTime = DateTime.Now,
                 OutTime = DateTime.Now.Add(new TimeSpan(1)),
@@ -110,7 +110,7 @@ namespace tcs_integration.Controllers
         public async void POST_Sessions_TeacherSession_ShouldReturn201()
         {
             var client = _factory.CreateClient();
-            var session = new SessionCreateDTO()
+            var session = new SessionPostOrPutDTO()
             {
                 InTime = DateTime.Now,
                 OutTime = DateTime.Now.Add(new TimeSpan(1)),
@@ -131,7 +131,7 @@ namespace tcs_integration.Controllers
         public async void POST_Session_WithNoSelectedClasses_ShouldReturn500()
         {
             var client = _factory.CreateClient();
-            var session = new SessionCreateDTO()
+            var session = new SessionPostOrPutDTO()
             {
                 InTime = DateTime.Now,
                 OutTime = DateTime.Now.Add(new TimeSpan(1)),
@@ -155,7 +155,7 @@ namespace tcs_integration.Controllers
         public async void POST_Session_WithNoSelectedReasons_TutoringTrue_ShouldReturn201WithCreatedSession()
         {
             var client = _factory.CreateClient();
-            var session = new SessionCreateDTO()
+            var session = new SessionPostOrPutDTO()
             {
                 InTime = DateTime.Now,
                 OutTime = DateTime.Now.Add(new TimeSpan(1)),
@@ -182,7 +182,7 @@ namespace tcs_integration.Controllers
         public async void POST_Session_WithNoSelectedReasons_TutoringFalse_ShouldReturn500()
         {
             var client = _factory.CreateClient();
-            var session = new SessionCreateDTO()
+            var session = new SessionPostOrPutDTO()
             {
                 InTime = DateTime.Now,
                 OutTime = DateTime.Now.Add(new TimeSpan(1)),
@@ -209,7 +209,7 @@ namespace tcs_integration.Controllers
             var client = _factory.CreateClient();
             var user = await Login(client);
             var request = new HttpRequestMessage(HttpMethod.Put, "api/sessions/3");
-            var sessionDTO = new SessionCreateDTO()
+            var sessionDTO = new SessionPostOrPutDTO()
             {
                 Id = 3,
                 InTime = DateTime.Now,
