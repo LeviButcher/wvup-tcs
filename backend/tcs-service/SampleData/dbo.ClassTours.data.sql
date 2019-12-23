@@ -66,3 +66,4 @@ INSERT INTO "ClassTours"
     ("Id", "Name", "DayVisited", "NumberOfStudents")
 VALUES
     (16, 'Randolph', '2019-08-04 03:18:52', 83);
+ALTER SEQUENCE "ClassTours_Id_seq" RESTART WITH 1000;
