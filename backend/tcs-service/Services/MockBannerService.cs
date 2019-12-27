@@ -71,13 +71,13 @@ namespace tcs_service.Services
         }
 
 
-        public async Task<CourseWithGradeDTO> GetStudentGrade(int studentId, int crn, int termCode)
+        public async Task<ClassWithGradeDTO> GetStudentGrade(int studentId, int crn, int termCode)
         {
             var grades = Enum.GetValues(typeof(Grade));
 
             var course = await classRepo.Find(x => x.CRN == crn);
 
-            return new CourseWithGradeDTO()
+            return new ClassWithGradeDTO()
             {
                 CRN = course.CRN,
                 CourseName = course.Name,

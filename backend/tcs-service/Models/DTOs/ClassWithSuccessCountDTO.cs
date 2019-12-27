@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace tcs_service.Models.DTO
 {
-    public class CourseWithSuccessCountDTO
+    public class ClassWithSuccessCountDTO
     {
         public int CRN { get; set; }
 

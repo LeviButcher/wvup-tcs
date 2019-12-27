@@ -17,7 +17,7 @@ namespace tcs_service.Repos.Interfaces
 
         Task<List<ReasonWithClassVisitsDTO>> Reasons(DateTime startWeek, DateTime endWeek);
 
-        Task<List<CourseWithGradeDTO>> SuccessReport(int semesterId);
+        Task<List<ClassWithGradeDTO>> SuccessReport(int semesterId);
 
     }
 }

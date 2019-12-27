@@ -12,7 +12,7 @@ namespace tcs_service_test.Services
 {
     public class ReportBusinessLogicTest : IDisposable
     {
-        readonly string dbName = "ReportRepoTest";
+        readonly string dbName = "ReportBusinessLogicTest";
         readonly IFixture fixture;
         readonly TCSContext db;
 
@@ -32,13 +32,13 @@ namespace tcs_service_test.Services
         [Fact]
         public void SuccessReport_StudentsSummedCorrectly()
         {
-            var courseWithGradeList = new List<CourseWithGradeDTO>();
+            var courseWithGradeList = new List<ClassWithGradeDTO>();
             
             for (int i = 0; i < 100; i++)
             {
                 Random rand = new Random();
                 var num = rand.Next(3);
-                var courseWithGrade = fixture.Create<CourseWithGradeDTO>();
+                var courseWithGrade = fixture.Create<ClassWithGradeDTO>();
                 courseWithGrade.CRN = 555;
                 courseWithGrade.CourseName = "history";
                 courseWithGrade.DepartmentName = "History";

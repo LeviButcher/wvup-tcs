@@ -23,8 +23,7 @@ namespace tcs_service.Repos
             _db = tcs;
             _bannerService = bannerService;
         }
-
-
+        
         public async Task<List<WeeklyVisitsDTO>> WeeklyVisits(DateTime startWeek, DateTime endWeek)
         {
             var result = new List<WeeklyVisitsDTO>();
@@ -39,7 +38,6 @@ namespace tcs_service.Repos
             return result;
         }
 
-        // Get All SignIns between Start and End Date, group by Hour, count number of records for each hour
         public async Task<List<PeakHoursDTO>> PeakHours(DateTime startWeek, DateTime endWeek)
              => await _db.Sessions.Where(x => x.InTime >= startWeek && x.InTime <= endWeek)
                 .GroupBy(x => x.InTime.Hour)
@@ -153,7 +151,7 @@ namespace tcs_service.Repos
             return await finalResult.ToListAsync();
         }
       
-        public async Task<List<CourseWithGradeDTO>> SuccessReport(int semesterId)
+        public async Task<List<ClassWithGradeDTO>> SuccessReport(int semesterId)
         {
             var studentCourses = from item in _db.Sessions
                                  from course in item.SessionClasses
@@ -165,7 +163,7 @@ namespace tcs_service.Repos
                                      course.Class.Department,
                                  };
 
-            List<CourseWithGradeDTO> coursesWithGrades = new List<CourseWithGradeDTO>();
+            List<ClassWithGradeDTO> coursesWithGrades = new List<ClassWithGradeDTO>();
 
             foreach (var item in studentCourses.Distinct())
             {
