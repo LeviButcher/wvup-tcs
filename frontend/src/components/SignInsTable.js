@@ -1,6 +1,7 @@
 import React from 'react';
 import { Table, Link } from '../ui';
 import { Gear, Trashcan } from '../ui/icons';
+import { callApi } from '../utils';
 import type { SignInDisplay } from '../types';
 
 function hourDifferenceInTime(date, date2) {
@@ -15,6 +16,8 @@ function hourDifferenceInTime(date, date2) {
 type Props = {
   signIns: Array<SignInDisplay>
 };
+
+const removeSession = id => callApi(`sessions/${id}`, 'DELETE', null);
 
 const SignInsTable = ({ signIns }: Props) => {
   return (
@@ -90,7 +93,13 @@ const SignInRow = ({
         <Link to={`/dashboard/signins/${id}`}>
           <Gear />
         </Link>
-        <Trashcan onClick={() => alert('Not implemented yet')} />
+        <Trashcan
+          onClick={() => {
+            const accepted = window.confirm('Are you sure?');
+            if (accepted)
+              removeSession(id).then(() => window.location.reload());
+          }}
+        />
       </td>
     </tr>
   );
