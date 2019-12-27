@@ -1,14 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
-using tcs_service.Models;
-using tcs_service.Models.ViewModels;
+using tcs_service.Models.DTO;
 
 namespace tcs_service.Services
 {
     public class ReportsBusinessLogic
     {
+        public static List<CourseWithSuccessCountDTO> SuccessReport(List<CourseWithGradeDTO> classesWithGrades)
 
         public static List<WeeklyVisitsViewModel> WeeklyVisits(IEnumerable<Session> sessions, DateTime start, DateTime end)
         {
@@ -32,11 +30,11 @@ namespace tcs_service.Services
         public static List<CourseWithSuccessCountViewModel> SuccessReport(List<CourseWithGradeViewModel> classesWithGrades)
         {
 
-            List<CourseWithSuccessCountViewModel> coursesWithSuccessCount = new List<CourseWithSuccessCountViewModel>();
+            List<CourseWithSuccessCountDTO> coursesWithSuccessCount = new List<CourseWithSuccessCountDTO>();
 
             foreach (var course in classesWithGrades)
             {
-                CourseWithSuccessCountViewModel successCount = null;
+                CourseWithSuccessCountDTO successCount = null;
 
                 if (coursesWithSuccessCount.Any(x => x.CRN == course.CRN))
                 {
@@ -48,7 +46,7 @@ namespace tcs_service.Services
                 }
                 else
                 {
-                    var successCourse = new CourseWithSuccessCountViewModel()
+                    var successCourse = new CourseWithSuccessCountDTO()
                     {
                         ClassName = course.CourseName,
                         CRN = course.CRN,
@@ -63,7 +61,7 @@ namespace tcs_service.Services
             return coursesWithSuccessCount;
         }
 
-        private static void DetermineSuccess(Grade grade, CourseWithSuccessCountViewModel vm)
+        private static void DetermineSuccess(Grade grade, CourseWithSuccessCountDTO vm)
         {
             if (grade <= Grade.I)
             {

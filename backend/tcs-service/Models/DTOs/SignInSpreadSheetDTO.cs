@@ -2,11 +2,11 @@ using System.Linq;
 using System;
 using System.Collections.Generic;
 
-namespace tcs_service.Models.ViewModels
+namespace tcs_service.Models.DTO
 {
-    public class SignInSpreadSheetViewModel
+    public class SignInSpreadSheetDTO
     {
-        public SignInSpreadSheetViewModel(PersonType type, IEnumerable<Class> classes, IEnumerable<Reason> reasons, bool tutoring)
+        public SignInSpreadSheetDTO(PersonType type, IEnumerable<Class> classes, IEnumerable<Reason> reasons, bool tutoring)
         {
             IsTeacher = type.Equals(PersonType.Teacher);
             if (classes.Count() > 0)

@@ -6,6 +6,6 @@ namespace tcs_service.UnitOfWorks.Interfaces
 {
     public interface IUnitOfWorkPerson
     {
-        Task<PersonInfoDTO> GetPersonInfo(string identifier, DateTime currentDate);
+        Task<PersonInfoDTO> GetPersonInfo(string identifier);
     }
 }

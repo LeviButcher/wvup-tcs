@@ -41,7 +41,7 @@ namespace tcs_service.EF
             }
             catch (Exception ex)
             {
-                // logger.Error("Exception running migrations. ", ex);
+                Console.WriteLine(ex);
             }
         }
 
@@ -59,10 +59,6 @@ namespace tcs_service.EF
             modelBuilder.Entity<Class>()
             .Property(p => p.CRN)
             .ValueGeneratedNever();
-
-            modelBuilder.Entity<Class>()
-             .Property(p => p.CRN)
-             .ValueGeneratedNever();
 
             modelBuilder.Entity<Semester>()
             .Property(p => p.Code)

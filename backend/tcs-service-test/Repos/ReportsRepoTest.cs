@@ -6,7 +6,7 @@ using tcs_service_test.Helpers;
 using System.Linq;
 using AutoFixture;
 using System.Collections.Generic;
-using tcs_service.Models.ViewModels;
+using tcs_service.Models.DTO;
 using tcs_service.Models;
 using AutoFixture.AutoMoq;
 using tcs_service.Services;
@@ -60,8 +60,8 @@ namespace tcs_service_test.Repos
             db.SaveChanges();
 
             var results = await reportsRepo.WeeklyVisits(startDate, endDate);
-            var expectedResult = new List<WeeklyVisitsViewModel>(){
-                new WeeklyVisitsViewModel(startDate, startDate.AddDays(6)){
+            var expectedResult = new List<WeeklyVisitsDTO>(){
+                new WeeklyVisitsDTO(startDate, startDate.AddDays(6)){
                     Count = 3
                 }
             };
@@ -106,7 +106,7 @@ namespace tcs_service_test.Repos
             db.SaveChanges();
 
             var results = await reportsRepo.WeeklyVisits(weeks[0].startDate, weeks.Last().endDate);
-            var expectedResult = weeks.Select(x => new WeeklyVisitsViewModel(x.startDate, x.endDate)
+            var expectedResult = weeks.Select(x => new WeeklyVisitsDTO(x.startDate, x.endDate)
             {
                 Count = 3
             }).ToList();
@@ -143,9 +143,9 @@ namespace tcs_service_test.Repos
           
             var results = await reportsRepo.PeakHours(startDate, endDate);
 
-            var twelvePMActualCount = results.Any(x => x.Hour == "12 P.M") ? results.Find(x => x.Hour == "12 P.M") : new PeakHoursViewModel(12, 0);
-            var twoPMActualCount = results.Any(x => x.Hour == "2 P.M") ? results.Find(x => x.Hour == "2 P.M") : new PeakHoursViewModel(14, 0);
-            var fivePMActualCount = results.Any(x => x.Hour == "5 P.M") ? results.Find(x => x.Hour == "5 P.M") : new PeakHoursViewModel(17, 0);
+            var twelvePMActualCount = results.Any(x => x.Hour == "12 P.M") ? results.Find(x => x.Hour == "12 P.M") : new PeakHoursDTO(12, 0);
+            var twoPMActualCount = results.Any(x => x.Hour == "2 P.M") ? results.Find(x => x.Hour == "2 P.M") : new PeakHoursDTO(14, 0);
+            var fivePMActualCount = results.Any(x => x.Hour == "5 P.M") ? results.Find(x => x.Hour == "5 P.M") : new PeakHoursDTO(17, 0);
 
             Assert.Equal(twelvePM.Count(), twelvePMActualCount.Count);
             Assert.Equal(twoPM.Count(), twoPMActualCount.Count);
@@ -222,7 +222,7 @@ namespace tcs_service_test.Repos
 
             var results = await reportsRepo.Volunteers(startDate, endDate);
             
-            Assert.Equal(6, results.FirstOrDefault().totalHours);
+            Assert.Equal(6, results.FirstOrDefault().TotalHours);
         }
 
         [Fact]
@@ -301,9 +301,9 @@ namespace tcs_service_test.Repos
                 }
             }
 
-            Assert.Equal(computerUseReasons.Count(), results.Where(x => x.reasonName == "Computer Use").FirstOrDefault().visits);
-            Assert.Equal(studyTimeReasons.Count(), results.Where(x => x.reasonName == "Study Time").FirstOrDefault().visits);
-            Assert.Equal(tutoringReasons.Count(), results.Where(x => x.reasonName == "Tutoring").FirstOrDefault().visits);
+            Assert.Equal(computerUseReasons.Count(), results.Where(x => x.ReasonName == "Computer Use").FirstOrDefault().Visits);
+            Assert.Equal(studyTimeReasons.Count(), results.Where(x => x.ReasonName == "Study Time").FirstOrDefault().Visits);
+            Assert.Equal(tutoringReasons.Count(), results.Where(x => x.ReasonName == "Tutoring").FirstOrDefault().Visits);
         }
 
        

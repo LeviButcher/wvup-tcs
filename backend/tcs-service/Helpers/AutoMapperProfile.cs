@@ -3,7 +3,7 @@ using AutoMapper;
 using System.Linq;
 using tcs_service.Models;
 using tcs_service.Models.DTOs;
-using tcs_service.Models.ViewModels;
+using tcs_service.Models.DTO;
 
 namespace tcs_service.Helpers
 {
@@ -13,20 +13,20 @@ namespace tcs_service.Helpers
         {
             CreateMap<User, UserDto>();
             CreateMap<UserDto, User>();
-            CreateMap<Session, SessionCreateDTO>()
+            CreateMap<Session, SessionPostOrPutDTO>()
                 .ForMember(dest => dest.SelectedClasses, opts =>
                 opts.MapFrom(src => src.SessionClasses.Select(x => x.Class)));
-            CreateMap<SessionCreateDTO, Session>();
-            CreateMap<Session, SignInViewModel>()
+            CreateMap<SessionPostOrPutDTO, Session>();
+            CreateMap<Session, SignInDTO>()
                 .ForMember(dest => dest.Classes, opts =>
                     opts.MapFrom(src => src.SessionClasses.Select(x => x.Class)));
-            CreateMap<SignInViewModel, Session>()
+            CreateMap<SignInDTO, Session>()
                 .ForMember(dest => dest.SessionClasses, opts =>
                     opts.MapFrom(src => src.Classes.Select(x => new SessionClass() { Class = x })))
                 .ForMember(dest => dest.SessionReasons, opts =>
                     opts.MapFrom(src => src.Reasons.Select(x => new SessionReason() { Reason = x })));
 
-            CreateMap<Session, SessionUpdateDTO>()
+            CreateMap<Session, SessionInfoDTO>()
                 .ForMember(dest => dest.SelectedClasses, opts =>
                 opts.MapFrom(src => src.SessionClasses.Select(x => x.ClassId)))
                 .ForMember(dest => dest.SelectedReasons, opts =>

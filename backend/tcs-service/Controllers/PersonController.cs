@@ -27,13 +27,13 @@ namespace tcs_service.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> GetInfo(string identifier)
         {
-            return Ok(await unitPerson.GetPersonInfo(identifier, DateTime.Now));
+            return Ok(await unitPerson.GetPersonInfo(identifier));
         }
 
         [HttpGet("{identifier}/admin")]
         public async Task<IActionResult> GetInfoAdmin(string identifier)
         {
-            var personInfo = await unitPerson.GetPersonInfo(identifier, DateTime.Now);
+            var personInfo = await unitPerson.GetPersonInfo(identifier);
             var schedules = scheduleRepo.GetAll(x => x.PersonId == personInfo.Id);
             personInfo.Schedule = schedules.Select(x => x.Class);
 

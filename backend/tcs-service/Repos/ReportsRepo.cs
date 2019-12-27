@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using tcs_service.EF;
 using tcs_service.Helpers;
 using tcs_service.Models;
-using tcs_service.Models.ViewModels;
+using tcs_service.Models.DTO;
 using tcs_service.Repos.Base;
 using tcs_service.Repos.Interfaces;
 using tcs_service.Services.Interfaces;
@@ -25,12 +25,12 @@ namespace tcs_service.Repos
         }
 
 
-        public async Task<List<WeeklyVisitsViewModel>> WeeklyVisits(DateTime startWeek, DateTime endWeek)
+        public async Task<List<WeeklyVisitsDTO>> WeeklyVisits(DateTime startWeek, DateTime endWeek)
         {
-            var result = new List<WeeklyVisitsViewModel>();
+            var result = new List<WeeklyVisitsDTO>();
             while (startWeek <= endWeek)
             {
-                result.Add(new WeeklyVisitsViewModel(startWeek, startWeek.Date.AddDays(6))
+                result.Add(new WeeklyVisitsDTO(startWeek, startWeek.Date.AddDays(6))
                 {
                     Count = await _db.Sessions.Where(x => x.InTime >= startWeek && x.InTime <= startWeek.AddDays(6)).CountAsync()
                 });
@@ -40,23 +40,23 @@ namespace tcs_service.Repos
         }
 
         // Get All SignIns between Start and End Date, group by Hour, count number of records for each hour
-        public async Task<List<PeakHoursViewModel>> PeakHours(DateTime startWeek, DateTime endWeek)
+        public async Task<List<PeakHoursDTO>> PeakHours(DateTime startWeek, DateTime endWeek)
              => await _db.Sessions.Where(x => x.InTime >= startWeek && x.InTime <= endWeek)
                 .GroupBy(x => x.InTime.Hour)
                 .Where(x => x.Count() >= 1)
-                .Select(x => new PeakHoursViewModel(x.Key, x.Count()))
+                .Select(x => new PeakHoursDTO(x.Key, x.Count()))
                 .ToListAsync();
 
 
-        public async Task<List<ClassTourReportViewModel>> ClassTours(DateTime startWeek, DateTime endWeek)
+        public async Task<List<ClassTourReportDTO>> ClassTours(DateTime startWeek, DateTime endWeek)
         {
             var result = await _db.ClassTours.Where(x => x.DayVisited >= startWeek && x.DayVisited <= endWeek)
-                .GroupBy(x => x.Name).Select(x => new ClassTourReportViewModel { Name = x.Key, Students = x.Sum(s => s.NumberOfStudents) }).ToListAsync();
+                .GroupBy(x => x.Name).Select(x => new ClassTourReportDTO { Name = x.Key, Students = x.Sum(s => s.NumberOfStudents) }).ToListAsync();
             
             return result;
         }
 
-        public async Task<List<TeacherSignInTimeViewModel>> Volunteers(DateTime startWeek, DateTime endWeek)
+        public async Task<List<TeacherSignInTimeDTO>> Volunteers(DateTime startWeek, DateTime endWeek)
         {
             var teachers = from signIn in _db.Sessions
                            where signIn.InTime >= startWeek
@@ -77,17 +77,17 @@ namespace tcs_service.Repos
                              item.fullName
                          }
                          into grp
-                         select new TeacherSignInTimeViewModel()
+                         select new TeacherSignInTimeDTO()
                          {
-                             fullName = grp.Key.fullName,
-                             teacherEmail = grp.Key.teacherEmail,
-                             totalHours = Math.Round(grp.Sum(x => x.totalHours / 600000000) / 60, 2)
+                             FullName = grp.Key.fullName,
+                             TeacherEmail = grp.Key.teacherEmail,
+                             TotalHours = Math.Round(grp.Sum(x => x.totalHours / 600000000) / 60, 2)
                          };
 
             return await result.ToListAsync();
         }
 
-        public async Task<List<ReasonWithClassVisitsViewModel>> Reasons(DateTime startWeek, DateTime endWeek)
+        public async Task<List<ReasonWithClassVisitsDTO>> Reasons(DateTime startWeek, DateTime endWeek)
         {
             var result = from signIns in _db.Sessions
                          from reason in signIns.SessionReasons
@@ -124,13 +124,13 @@ namespace tcs_service.Repos
                                   item.CourseName,
                                   item.ReasonName
                               } into grp
-                              select new ReasonWithClassVisitsViewModel()
+                              select new ReasonWithClassVisitsDTO()
                               {
-                                  reasonId = grp.Key.ReasonId,
-                                  reasonName = grp.Key.ReasonName,
-                                  courseCRN = grp.Key.CourseId,
-                                  courseName = grp.Key.CourseName,
-                                  visits = grp.Count()
+                                  ReasonId = grp.Key.ReasonId,
+                                  ReasonName = grp.Key.ReasonName,
+                                  CourseCRN = grp.Key.CourseId,
+                                  CourseName = grp.Key.CourseName,
+                                  Visits = grp.Count()
                               };
 
             var tutorResult = from item in tutoringResult
@@ -139,13 +139,13 @@ namespace tcs_service.Repos
                                   item.CourseId,
                                   item.CourseName
                               } into grp
-                              select new ReasonWithClassVisitsViewModel()
+                              select new ReasonWithClassVisitsDTO()
                               {
-                                  reasonId = 0,
-                                  reasonName = "Tutoring",
-                                  courseCRN = grp.Key.CourseId,
-                                  courseName = grp.Key.CourseName,
-                                  visits = grp.Count()
+                                  ReasonId = 0,
+                                  ReasonName = "Tutoring",
+                                  CourseCRN = grp.Key.CourseId,
+                                  CourseName = grp.Key.CourseName,
+                                  Visits = grp.Count()
                               };
 
             var finalResult = resultGroup.Concat(tutorResult);
@@ -153,7 +153,7 @@ namespace tcs_service.Repos
             return await finalResult.ToListAsync();
         }
       
-        public async Task<List<CourseWithGradeViewModel>> SuccessReport(int semesterId)
+        public async Task<List<CourseWithGradeDTO>> SuccessReport(int semesterId)
         {
             var studentCourses = from item in _db.Sessions
                                  from course in item.SessionClasses
@@ -165,7 +165,7 @@ namespace tcs_service.Repos
                                      course.Class.Department,
                                  };
 
-            List<CourseWithGradeViewModel> coursesWithGrades = new List<CourseWithGradeViewModel>();
+            List<CourseWithGradeDTO> coursesWithGrades = new List<CourseWithGradeDTO>();
 
             foreach (var item in studentCourses.Distinct())
             {
