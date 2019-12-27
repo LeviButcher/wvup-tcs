@@ -3,7 +3,7 @@ using AutoMapper;
 using System.Linq;
 using tcs_service.Models;
 using tcs_service.Models.DTOs;
-using tcs_service.Models.ViewModels;
+using tcs_service.Models.DTO;
 
 namespace tcs_service.Helpers
 {
@@ -17,10 +17,10 @@ namespace tcs_service.Helpers
                 .ForMember(dest => dest.SelectedClasses, opts =>
                 opts.MapFrom(src => src.SessionClasses.Select(x => x.Class)));
             CreateMap<SessionPostOrPutDTO, Session>();
-            CreateMap<Session, SignInViewModel>()
+            CreateMap<Session, SignInDTO>()
                 .ForMember(dest => dest.Classes, opts =>
                     opts.MapFrom(src => src.SessionClasses.Select(x => x.Class)));
-            CreateMap<SignInViewModel, Session>()
+            CreateMap<SignInDTO, Session>()
                 .ForMember(dest => dest.SessionClasses, opts =>
                     opts.MapFrom(src => src.Classes.Select(x => new SessionClass() { Class = x })))
                 .ForMember(dest => dest.SessionReasons, opts =>

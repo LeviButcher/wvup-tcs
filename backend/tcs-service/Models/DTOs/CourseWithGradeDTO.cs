@@ -1,6 +1,6 @@
-﻿namespace tcs_service.Models.ViewModels
+﻿namespace tcs_service.Models.DTO
 {
-    public class CourseWithGradeViewModel
+    public class CourseWithGradeDTO
     {
         public string DepartmentName { get; set; }
 

@@ -1,13 +1,13 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using tcs_service.Models.ViewModels;
+using tcs_service.Models.DTO;
 
 namespace tcs_service.Services.Interfaces
 {
     public interface IBannerService
     {
         Task<BannerPersonInfo> GetBannerInfo(string identifier);
-        Task<CourseWithGradeViewModel> GetStudentGrade(int studentId, int crn, int termCode);
+        Task<CourseWithGradeDTO> GetStudentGrade(int studentId, int crn, int termCode);
     }
 }
 

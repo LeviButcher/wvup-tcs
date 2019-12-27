@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace tcs_service.Models.ViewModels
+namespace tcs_service.Models.DTO
 {
-    public class CourseWithSuccessCountViewModel
+    public class CourseWithSuccessCountDTO
     {
         public int CRN { get; set; }
 

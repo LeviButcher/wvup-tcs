@@ -4,11 +4,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace tcs_service.Models.ViewModels
+namespace tcs_service.Models.DTO
 {
-    public class WeeklyVisitsViewModel
+    public class WeeklyVisitsDTO
     {
-        public WeeklyVisitsViewModel(DateTime startDate, DateTime endDate) {
+        public WeeklyVisitsDTO(DateTime startDate, DateTime endDate) {
             this.startDate = startDate;
             this.endDate = endDate;
         }
@@ -33,7 +33,7 @@ namespace tcs_service.Models.ViewModels
             {
                 return false;
             }
-            WeeklyVisitsViewModel wv = (WeeklyVisitsViewModel) obj;
+            WeeklyVisitsDTO wv = (WeeklyVisitsDTO) obj;
             // TODO: write your implementation of Equals() here
             return startDate == wv.startDate && endDate == wv.endDate && Count == wv.Count;
         }

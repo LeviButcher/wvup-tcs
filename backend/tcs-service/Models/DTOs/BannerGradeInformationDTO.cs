@@ -1,6 +1,6 @@
-namespace tcs_service.Models.ViewModels
+namespace tcs_service.Models.DTO
 {
-    class BannerGradeInformation
+    public class BannerGradeInformationDTO
     {
         public int CRN { get; set; }
         public string SubjectCode { get; set; }

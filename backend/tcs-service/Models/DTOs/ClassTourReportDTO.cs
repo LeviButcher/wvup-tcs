@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace tcs_service.Models.ViewModels
+namespace tcs_service.Models.DTO
 {
-    public class ClassTourReportViewModel
+    public class ClassTourReportDTO
     {
         public string Name { get; set; }
 

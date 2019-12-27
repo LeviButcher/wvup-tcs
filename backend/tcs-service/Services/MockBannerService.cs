@@ -3,7 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using tcs_service.Helpers;
 using tcs_service.Models;
-using tcs_service.Models.ViewModels;
+using tcs_service.Models.DTO;
 using tcs_service.Repos.Interfaces;
 using tcs_service.Services.Interfaces;
 
@@ -71,13 +71,13 @@ namespace tcs_service.Services
         }
 
 
-        public async Task<CourseWithGradeViewModel> GetStudentGrade(int studentId, int crn, int termCode)
+        public async Task<CourseWithGradeDTO> GetStudentGrade(int studentId, int crn, int termCode)
         {
             var grades = Enum.GetValues(typeof(Grade));
 
             var course = await classRepo.Find(x => x.CRN == crn);
 
-            return new CourseWithGradeViewModel()
+            return new CourseWithGradeDTO()
             {
                 CRN = course.CRN,
                 CourseName = course.Name,

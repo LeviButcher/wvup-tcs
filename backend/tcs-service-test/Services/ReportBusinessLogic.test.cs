@@ -2,10 +2,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using tcs_service.EF;
-using tcs_service.Models;
-using tcs_service.Models.ViewModels;
+using tcs_service.Models.DTO;
 using tcs_service.Services;
 using tcs_service_test.Helpers;
 using Xunit;
@@ -34,13 +32,13 @@ namespace tcs_service_test.Services
         [Fact]
         public void SuccessReport_StudentsSummedCorrectly()
         {
-            var courseWithGradeList = new List<CourseWithGradeViewModel>();
+            var courseWithGradeList = new List<CourseWithGradeDTO>();
             
             for (int i = 0; i < 100; i++)
             {
                 Random rand = new Random();
                 var num = rand.Next(3);
-                var courseWithGrade = fixture.Create<CourseWithGradeViewModel>();
+                var courseWithGrade = fixture.Create<CourseWithGradeDTO>();
                 courseWithGrade.CRN = 555;
                 courseWithGrade.CourseName = "history";
                 courseWithGrade.DepartmentName = "History";
