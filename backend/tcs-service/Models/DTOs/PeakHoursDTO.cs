@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace tcs_service.Models.ViewModels
+namespace tcs_service.Models.DTO
 {
-    public class PeakHoursViewModel
+    public class PeakHoursDTO
     {
 
-        public PeakHoursViewModel(int hour, int count)
+        public PeakHoursDTO(int hour, int count)
         {
             this.hour = hour;
             this.Count = count;

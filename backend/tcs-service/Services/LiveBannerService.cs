@@ -1,9 +1,8 @@
 using System;
 using System.Net.Http;
-using tcs_service.Models.ViewModels;
+using tcs_service.Models.DTO;
 using tcs_service.Services.Interfaces;
 using System.Threading.Tasks;
-using AutoMapper;
 using tcs_service.Helpers;
 using System.Net;
 
@@ -37,13 +36,13 @@ namespace tcs_service.Services
             throw new TCSException("Banner is currently down");
         }
 
-        public async Task<CourseWithGradeViewModel> GetStudentGrade(int studentId, int crn, int termCode)
+        public async Task<CourseWithGradeDTO> GetStudentGrade(int studentId, int crn, int termCode)
         {
             var response = await bannerApi.GetAsync($"student/{studentId}/{termCode}/{crn}");
             response.EnsureSuccessStatusCode();
-            var bannerGradeInfo = await response.Content.ReadAsAsync<BannerGradeInformation>();
+            var bannerGradeInfo = await response.Content.ReadAsAsync<BannerGradeInformationDTO>();
 
-            return new CourseWithGradeViewModel()
+            return new CourseWithGradeDTO()
             {
                 CRN = bannerGradeInfo.CRN,
                 CourseName = bannerGradeInfo.SubjectCode += bannerGradeInfo.CourseNumber,

@@ -20,11 +20,11 @@ namespace tcs_service.Models
                 switch (partOfYear)
                 {
                     case "01":
-                        return $"Spring {year}";
-                    case "02":
-                        return $"Summer {year}";
-                    case "03":
                         return $"Fall {year}";
+                    case "02":
+                        return $"Spring {year}";
+                    case "03":
+                        return $"Summer {year}";
                 }
                 return Code.ToString();
             }

@@ -4,9 +4,9 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace tcs_service.Models.ViewModels
+namespace tcs_service.Models.DTO
 {
-    public class ClassTourViewModel
+    public class ClassTourDTO
     {
         [Required]
         public int Id { get; set; }

@@ -41,7 +41,7 @@ namespace tcs_service.EF
             }
             catch (Exception ex)
             {
-                // logger.Error("Exception running migrations. ", ex);
+                Console.WriteLine(ex);
             }
         }
 

@@ -5,9 +5,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using tcs_service.Models.Attributes;
 
-namespace tcs_service.Models.ViewModels
+namespace tcs_service.Models.DTO
 {
-    public class SignInViewModel
+    public class SignInDTO
     {
         public int Id { get; set; }
 
