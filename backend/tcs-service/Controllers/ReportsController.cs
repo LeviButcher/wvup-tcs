@@ -32,31 +32,31 @@ namespace tcs_service.Controllers
         [HttpGet("weekly-visits")]
         public async Task<IActionResult> Get([FromQuery] DateTime start, [FromQuery] DateTime end)
         {
-            return ReportsBusinessLogic.WeeklyVisits( _sessionRepo.GetAll(), start, end);
+            return Ok(ReportsBusinessLogic.WeeklyVisits(_sessionRepo.GetAll(), start, end));
         }
 
         [HttpGet("peakhours")]
         public async Task<IActionResult> PeakHours([FromQuery] DateTime start, [FromQuery] DateTime end)
         {
-            return ReportsBusinessLogic.PeakHours(_sessionRepo.GetAll(), start, end);
+            return Ok(ReportsBusinessLogic.PeakHours(_sessionRepo.GetAll(), start, end));
         }
 
         [HttpGet("classtours")]
         public async Task<IActionResult> ClassTours([FromQuery] DateTime start, [FromQuery] DateTime end)
         {
-            return ReportsBusinessLogic.ClassTours(_classTourRepo.GetAll(), start, end);
+            return Ok(ReportsBusinessLogic.ClassTours(_classTourRepo.GetAll(), start, end));
         }
 
         [HttpGet("volunteers")]
         public async Task<IActionResult> Volunteers([FromQuery] DateTime start, [FromQuery] DateTime end)
         {
-            return ReportsBusinessLogic.Volunteers(_sessionRepo.GetAll(), start, end);
+            return Ok(ReportsBusinessLogic.Volunteers(_sessionRepo.GetAll(), start, end));
         }
 
         [HttpGet("reasons")]
         public async Task<IActionResult> Reasons([FromQuery] DateTime start, [FromQuery] DateTime end)
         {
-            return ReportsBusinessLogic.Reasons(_sessionRepo.GetAll(), start, end);
+            return Ok(ReportsBusinessLogic.Reasons(_sessionRepo.GetAll(), start, end));
         }
 
         [HttpGet("success/{semesterId}")]
