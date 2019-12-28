@@ -24,31 +24,31 @@ namespace tcs_service.Controllers
         }
 
         [HttpGet("weekly-visits")]
-        public async Task<ActionResult<IEnumerable<WeeklyVisitsDTO>>> Get([FromQuery] DateTime start, [FromQuery] DateTime end)
+        public async Task<IActionResult> Get([FromQuery] DateTime start, [FromQuery] DateTime end)
         {
             return Ok(await _iRepo.WeeklyVisits(start, end));
         }
 
         [HttpGet("peakhours")]
-        public async Task<ActionResult<IEnumerable<PeakHoursDTO>>> PeakHours([FromQuery] DateTime start, [FromQuery] DateTime end)
+        public async Task<IActionResult> PeakHours([FromQuery] DateTime start, [FromQuery] DateTime end)
         {
             return Ok(await _iRepo.PeakHours(start, end));
         }
 
         [HttpGet("classtours")]
-        public async Task<ActionResult<IEnumerable<ClassTourReportDTO>>> ClassTours([FromQuery] DateTime start, [FromQuery] DateTime end)
+        public async Task<IActionResult> ClassTours([FromQuery] DateTime start, [FromQuery] DateTime end)
         {
             return Ok(await _iRepo.ClassTours(start, end));
         }
 
         [HttpGet("volunteers")]
-        public async Task<ActionResult<IEnumerable<TeacherSignInTimeDTO>>> Volunteers([FromQuery] DateTime start, [FromQuery] DateTime end)
+        public async Task<IActionResult> Volunteers([FromQuery] DateTime start, [FromQuery] DateTime end)
         {
             return Ok(await _iRepo.Volunteers(start, end));
         }
 
         [HttpGet("reasons")]
-        public async Task<ActionResult<IEnumerable<ReasonWithClassVisitsDTO>>> Reasons([FromQuery] DateTime start, [FromQuery] DateTime end)
+        public async Task<IActionResult> Reasons([FromQuery] DateTime start, [FromQuery] DateTime end)
         {
             return Ok(await _iRepo.Reasons(start, end));
         }

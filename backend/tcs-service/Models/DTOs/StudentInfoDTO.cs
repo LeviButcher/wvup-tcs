@@ -4,7 +4,7 @@ namespace tcs_service.Models.DTO
 {
     public class StudentInfoDTO
     {
-        public int StudentID { get; set; }
+        public int StudentId { get; set; }
 
         public string StudentEmail { get; set; }
 
