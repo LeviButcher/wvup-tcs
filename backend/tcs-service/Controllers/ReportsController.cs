@@ -30,31 +30,31 @@ namespace tcs_service.Controllers
         }
 
         [HttpGet("weekly-visits")]
-        public IEnumerable<WeeklyVisitsDTO> Get([FromQuery] DateTime start, [FromQuery] DateTime end)
+        public async Task<IActionResult> Get([FromQuery] DateTime start, [FromQuery] DateTime end)
         {
             return ReportsBusinessLogic.WeeklyVisits( _sessionRepo.GetAll(), start, end);
         }
 
         [HttpGet("peakhours")]
-        public IEnumerable<PeakHoursDTO> PeakHours([FromQuery] DateTime start, [FromQuery] DateTime end)
+        public async Task<IActionResult> PeakHours([FromQuery] DateTime start, [FromQuery] DateTime end)
         {
             return ReportsBusinessLogic.PeakHours(_sessionRepo.GetAll(), start, end);
         }
 
         [HttpGet("classtours")]
-        public IEnumerable<ClassTourReportDTO> ClassTours([FromQuery] DateTime start, [FromQuery] DateTime end)
+        public async Task<IActionResult> ClassTours([FromQuery] DateTime start, [FromQuery] DateTime end)
         {
             return ReportsBusinessLogic.ClassTours(_classTourRepo.GetAll(), start, end);
         }
 
         [HttpGet("volunteers")]
-        public IEnumerable<TeacherSignInTimeDTO> Volunteers([FromQuery] DateTime start, [FromQuery] DateTime end)
+        public async Task<IActionResult> Volunteers([FromQuery] DateTime start, [FromQuery] DateTime end)
         {
             return ReportsBusinessLogic.Volunteers(_sessionRepo.GetAll(), start, end);
         }
 
         [HttpGet("reasons")]
-        public IEnumerable<ReasonWithClassVisitsDTO> Reasons([FromQuery] DateTime start, [FromQuery] DateTime end)
+        public async Task<IActionResult> Reasons([FromQuery] DateTime start, [FromQuery] DateTime end)
         {
             return ReportsBusinessLogic.Reasons(_sessionRepo.GetAll(), start, end);
         }
