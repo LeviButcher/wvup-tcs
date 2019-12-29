@@ -69,6 +69,104 @@ namespace tcs_service_test.Services
         }
 
         [Fact]
+        public void ClassTours_OneSchoolWithTwoTours_OneSchoolWithOneTour_SummedCorrectly()
+        {
+            var tours = new List<ClassTour>();
+
+            tours.Add(new ClassTour() { DayVisited = new DateTime(2020, 12, 24), Name = "Lincoln High School", NumberOfStudents = 25 });
+            tours.Add(new ClassTour() { DayVisited = new DateTime(2020, 12, 28), Name = "Lincoln High School", NumberOfStudents = 20 });
+            tours.Add(new ClassTour() { DayVisited = new DateTime(2020, 12, 30), Name = "Larry David High School", NumberOfStudents = 35 });
+
+            var results = ReportsBusinessLogic.ClassTours(tours, new DateTime(2020, 12, 24), new DateTime(2020, 12, 30));
+            Assert.Equal(45, results.Where(x => x.Name == "Lincoln High School").FirstOrDefault().Students);
+            Assert.Equal(35, results.Where(x => x.Name == "Larry David High School").FirstOrDefault().Students);
+        }
+
+        [Fact]
+        public void Volunteers_OneTeacherWithTwoSessions_OtherTeacherWithOneSession()
+        {
+            var sessions = new List<Session>();
+            var people = new List<Person>();
+            people.Add(new Person() { PersonType = PersonType.Teacher, Email = "teacher1@wvup.edu", FirstName = "Teacher", LastName = "One", Id = 12345 });
+            people.Add(new Person() { PersonType = PersonType.Teacher, Email = "teacher2@wvup.edu", FirstName = "Teacher", LastName = "Two", Id = 45678 });
+            db.People.AddRange(people);
+            db.SaveChanges();
+
+            sessions.Add(new Session()
+            {
+                InTime = new DateTime(2020, 12, 24, 10, 0, 0),
+                OutTime = new DateTime(2020, 12, 24, 11, 00, 0),
+                PersonId = 12345
+            });
+
+            sessions.Add(new Session()
+            {
+                InTime = new DateTime(2020, 12, 24, 12, 0, 0),
+                OutTime = new DateTime(2020, 12, 24, 15, 00, 0),
+                PersonId = 12345
+            });
+
+            sessions.Add(new Session()
+            {
+                InTime = new DateTime(2020, 12, 24, 9, 0, 0),
+                OutTime = new DateTime(2020, 12, 24, 15, 0, 0),
+                PersonId = 45678
+            });
+            db.Sessions.AddRange(sessions);
+            db.SaveChanges();
+
+            var results = ReportsBusinessLogic.Volunteers(sessions, new DateTime(2020, 12, 24), new DateTime(2020, 12, 30));
+            Assert.Equal(4, results.Where(x => x.TeacherEmail == "teacher1@wvup.edu").FirstOrDefault().TotalHours);
+            Assert.Equal(6, results.Where(x => x.TeacherEmail == "teacher2@wvup.edu").FirstOrDefault().TotalHours);
+        }
+
+        [Fact]
+        public void Reasons_FiveSessionsAt10AM_TwoSessionsAt5PM()
+        {
+            var reasons = new List<Reason>();
+            reasons.Add(new Reason() { Name = "Study Time", Deleted = false });
+            reasons.Add(new Reason() { Name = "Computer Use", Deleted = false });
+            reasons.Add(new Reason() { Name = "Printer Use", Deleted = false });
+            db.Reasons.AddRange(reasons);
+            db.SaveChanges();
+
+            db.Departments.Add(new Department() { Code = 111, Name = "General " });
+            db.SaveChanges();
+
+            var classes = new List<Class>();
+            classes.Add(new Class() { Name = "Art 101", CRN = 123, ShortName = "Art", DepartmentCode = 111 });
+            db.Classes.AddRange(classes);
+            db.SaveChanges();
+
+            db.People.Add( new Person() { PersonType = PersonType.Student, Email = "student1@wvup.edu", FirstName = "Student", LastName = "One", Id = 12345 });
+            db.SaveChanges();
+
+            var sessions = new List<Session>();
+            sessions.Add(new Session()
+            {
+                InTime = new DateTime(2020, 12, 24, 10, 0, 0),
+                OutTime = new DateTime(2020, 12, 24, 11, 00, 0),
+                Tutoring = true,
+                PersonId = 12345
+            });
+            db.Sessions.AddRange(sessions);
+            db.SaveChanges();
+            var sessionId = db.Sessions.Where(x => x.PersonId == 12345).FirstOrDefault().Id;
+
+            db.SessionClasses.Add(new SessionClass() { ClassId = 123, SessionId = sessionId });
+            db.SaveChanges();
+
+            var studyTime = db.Reasons.Where(x => x.Name == "Study Time").FirstOrDefault();
+            var computerUse = db.Reasons.Where(x => x.Name == "Computer Use").FirstOrDefault();
+            var printerUse = db.Reasons.Where(x => x.Name == "Printer Use").FirstOrDefault();
+            db.SessionReasons.Add(new SessionReason() { SessionId = sessionId, ReasonId = studyTime.Id });
+            db.SaveChanges();
+
+            var results = ReportsBusinessLogic.Reasons(sessions, new DateTime(2020, 12, 24), new DateTime(2020, 12, 30));
+            Assert.Equal(1, results.Where(x => x.ReasonId== studyTime.Id).FirstOrDefault().Visits);
+        }
+
+        [Fact]
         public void SuccessReport_GradesGeneratedWithFixture_SuccessReportSummedCorrectly()
         {
             var courseWithGradeList = new List<ClassWithGradeDTO>();

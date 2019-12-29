@@ -59,7 +59,7 @@ namespace tcs_service.Services
                          {
                              FullName = grp.Key.fullName,
                              TeacherEmail = grp.Key.teacherEmail,
-                             TotalHours = Math.Round(grp.Sum(x => x.totalHours / 600000000) / 60, 2)
+                             TotalHours = Math.Round(grp.Sum(x => x.totalHours / 36000000000), 2)  //36000000000 = microseconds in an hour
                          };
 
             return result.ToList();
