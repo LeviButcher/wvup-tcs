@@ -23,7 +23,7 @@ namespace tcs_service.Services
         }
 
         public static List<PeakHoursDTO> PeakHours(IEnumerable<Session> sessions, DateTime start, DateTime end) => 
-                sessions.Where(x => x.InTime >= start && x.InTime <= end)
+                sessions.Where(x => x.InTime.Date >= start.Date && x.InTime.Date <= end.Date)
                 .GroupBy(x => x.InTime.Hour)
                 .Where(x => x.Count() >= 1)
                 .Select(x => new PeakHoursDTO(x.Key, x.Count())).ToList();
