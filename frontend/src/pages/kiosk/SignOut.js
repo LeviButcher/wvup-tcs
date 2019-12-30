@@ -1,12 +1,11 @@
 import React from 'react';
 import { navigate, Link } from '@reach/router';
-import { callApi } from '../../utils';
-import ensureResponseCode from '../../utils/ensureResponseCode';
+import { apiFetch } from '../../utils/fetchLight';
 import { KioskFullScreenContainer, Card, Stack } from '../../ui';
 import EmailOrCardSwipeForm from '../../components/EmailOrCardSwipeForm';
 
 const putSignOut = (personId: string) =>
-  callApi(`sessions/out`, 'PUT', { personId });
+  apiFetch(`sessions/out`, 'PUT', { personId });
 
 const SignOutPage = () => {
   return (
@@ -17,11 +16,9 @@ const SignOutPage = () => {
           <h1>Sign Out</h1>
           <EmailOrCardSwipeForm
             afterValidSubmit={({ id }) => {
-              return putSignOut(id)
-                .then(ensureResponseCode(200))
-                .then(() => {
-                  navigate('/', { state: { info: 'You have signed out!' } });
-                });
+              return putSignOut(id).then(() => {
+                navigate('/', { state: { info: 'You have signed out!' } });
+              });
             }}
           />
         </Stack>

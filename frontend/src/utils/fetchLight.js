@@ -1,7 +1,8 @@
 const BaseUrl: string = process.env.REACT_APP_BACKEND || '';
 
 type Response = {
-  status: number
+  status: number,
+  json: () => Promise<any>
 };
 
 type Method = 'POST' | 'GET' | 'PUT' | 'DELETE';
@@ -17,6 +18,11 @@ class FailedRequestError extends Error {
     this.name = 'FailedRequestError';
     this.response = response;
     this.message = `Failed Request | status code: ${response.status}`;
+  }
+
+  async unwrapFetchErrorMessage() {
+    const json = await this.response.json();
+    return json.message;
   }
 }
 
@@ -38,6 +44,7 @@ const fetchLight = (url: string, method: Method, json: Object) => {
 
   return fetch(url, options).then(res => {
     if (res.status < 200 || res.status >= 300) {
+      // $FlowFixMe
       return Promise.reject(new FailedRequestError(res));
     }
     return res;

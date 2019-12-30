@@ -2,7 +2,8 @@ import React from 'react';
 import styled from 'styled-components';
 import { Form, Field, Formik } from 'formik';
 import Topography from '../../images/topography.svg';
-import { callApi, ensureResponseCode, unwrapToJSON } from '../../utils';
+import { unwrapToJSON } from '../../utils';
+import { apiFetch } from '../../utils/fetchLight';
 import { Card, Header, Input, Button, Stack } from '../../ui';
 import type { User } from '../../types';
 
@@ -15,7 +16,7 @@ const CenterComponent = styled.div`
   background-image: url('${Topography}');
 `;
 
-const postToAuthApi = callApi(`users/authenticate`, 'POST');
+const postToAuthApi = values => apiFetch(`users/authenticate`, 'POST', values);
 
 const Login = () => {
   return (
@@ -25,8 +26,8 @@ const Login = () => {
           initialValues={{ username: '', password: '' }}
           isInitialValid={false}
           onSubmit={(values, { setStatus }) => {
+            // $FlowFixMe
             return postToAuthApi(values)
-              .then(ensureResponseCode(200))
               .then(unwrapToJSON)
               .then((user: User) => {
                 // put user in local storage
@@ -37,16 +38,15 @@ const Login = () => {
                 localStorage.setItem('username', user.username);
                 window.history.back();
               })
-              .catch(setStatus);
+              .catch(e => e.unwrapFetchErrorMessage())
+              .then(message => setStatus(message));
           }}
         >
           {({ status, isSubmitting, isValid }) => (
             <Form>
               <Stack>
                 <Header align="center">Tutoring Center Login</Header>
-                {status && status.message && (
-                  <div style={{ color: 'red' }}>{status.message}</div>
-                )}
+                {status && <div style={{ color: 'red' }}>{status}</div>}
                 <Field
                   id="username"
                   name="username"

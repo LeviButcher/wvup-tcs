@@ -3,7 +3,7 @@ import { Form, Field, Formik } from 'formik';
 import { navigate } from '@reach/router';
 import * as Yup from 'yup';
 import { Input, Button, Header, Card, Stack } from '../ui';
-import { callApi, ensureResponseCode } from '../utils';
+import { apiFetch } from '../utils/fetchLight';
 import type { ClassTour } from '../types';
 
 const ClassTourSchema = Yup.object().shape({
@@ -16,15 +16,10 @@ const ClassTourSchema = Yup.object().shape({
     .required()
 });
 
-const postClassTour = callApi(`classtours/`, 'POST');
-
-const createClassTour = values =>
-  postClassTour(values).then(ensureResponseCode(201));
+const createClassTour = values => apiFetch(`classtours/`, 'POST', values);
 
 const updateClassTour = values =>
-  callApi(`classtours/${values.id}`, 'PUT', values).then(
-    ensureResponseCode(200)
-  );
+  apiFetch(`classtours/${values.id}`, 'PUT', values);
 
 const classTourDefault = {
   name: '',
@@ -40,7 +35,7 @@ const ClassTourForm = ({ classTour }: Props) => {
   const action = classTour === classTourDefault ? 'Create' : 'Update';
 
   const callCorrectApi = values => {
-    if (classTour === classTourDefault) {
+    if (action === 'Create') {
       return createClassTour(values);
     }
     return updateClassTour(values);
@@ -51,14 +46,14 @@ const ClassTourForm = ({ classTour }: Props) => {
       <Formik
         initialValues={classTour}
         onSubmit={(submittedTour, { setStatus }) => {
+          // $FlowFixMe
           return callCorrectApi(submittedTour)
             .then(() => {
-              alert(`Updated tour for ${submittedTour.name}`);
+              alert(`${action}d tour for ${submittedTour.name}`);
               navigate('/dashboard/tours');
             })
-            .catch(e => {
-              setStatus(e.message);
-            });
+            .catch(e => e.unwrapFetchErrorMessage())
+            .then(m => setStatus(m));
         }}
         validationSchema={ClassTourSchema}
         isInitialValid={false}

@@ -97,7 +97,8 @@ test('Submit with valid wvup.edu email, calls fetch with correct backend endpoin
         headers: {
           'Content-Type': 'application/json'
         },
-        method: 'GET'
+        method: 'GET',
+        body: null
       }
     );
   });
@@ -127,7 +128,8 @@ test('Card swipe calls fetch with correct backend endpoint', async () => {
       headers: {
         'Content-Type': 'application/json'
       },
-      method: 'GET'
+      method: 'GET',
+      body: null
     });
   });
 });
