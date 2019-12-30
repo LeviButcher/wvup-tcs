@@ -18,7 +18,7 @@ type Props = {
 };
 
 const SemesterForm = ({ onSubmit, title, initialValues, ...props }: Props) => {
-  const [, semesters] = useApi('reports/semesters');
+  const [, semesters] = useApi('semesters');
   return (
     <Card {...props}>
       <Header>{title}</Header>

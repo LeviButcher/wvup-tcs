@@ -1,11 +1,11 @@
 import React from 'react';
 import { Link, navigate } from '@reach/router';
 import { Table, Header, Card } from '../../ui';
-import { callApi } from '../../utils';
+import { apiFetch } from '../../utils/fetchLight';
 import { Gear, Trashcan } from '../../ui/icons';
 import useApi from '../../hooks/useApi';
 
-const deleteUser = id => callApi(`users/${id}`, 'DELETE', null);
+const deleteUser = id => apiFetch(`users/${id}`, 'DELETE', null);
 
 const UserManagement = () => {
   const [loading, data] = useApi('users/');

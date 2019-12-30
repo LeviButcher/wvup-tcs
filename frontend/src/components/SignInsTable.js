@@ -1,7 +1,7 @@
 import React from 'react';
 import { Table, Link } from '../ui';
 import { Gear, Trashcan } from '../ui/icons';
-import { callApi } from '../utils';
+import { apiFetch } from '../utils/fetchLight';
 import type { SignInDisplay } from '../types';
 
 function hourDifferenceInTime(date, date2) {
@@ -17,7 +17,7 @@ type Props = {
   signIns: Array<SignInDisplay>
 };
 
-const removeSession = id => callApi(`sessions/${id}`, 'DELETE', null);
+const removeSession = id => apiFetch(`sessions/${id}`, 'DELETE', null);
 
 const SignInsTable = ({ signIns }: Props) => {
   return (

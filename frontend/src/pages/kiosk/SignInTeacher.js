@@ -1,11 +1,11 @@
 import React from 'react';
 import { Link, navigate } from '@reach/router';
-import { callApi, ensureResponseCode } from '../../utils';
+import { apiFetch } from '../../utils/fetchLight';
 import { Card, KioskFullScreenContainer } from '../../ui';
 import EmailOrCardSwipeForm from '../../components/EmailOrCardSwipeForm';
 import type { Teacher } from '../../types';
 
-const postSignInTeacher = callApi(`sessions/in`, 'POST');
+const postSignInTeacher = values => apiFetch(`sessions/in`, 'POST', values);
 
 // test email : teacher@wvup.edu
 const SignInTeacher = () => {
@@ -17,11 +17,9 @@ const SignInTeacher = () => {
             const signIn = {
               personId: teacher.id
             };
-            return postSignInTeacher(signIn)
-              .then(ensureResponseCode(201))
-              .then(() => {
-                navigate('/', { state: { info: 'You have signed in!' } });
-              });
+            return postSignInTeacher(signIn).then(() => {
+              navigate('/', { state: { info: 'You have signed in!' } });
+            });
           }}
         >
           <Link to="/">Go to Home Screen</Link>

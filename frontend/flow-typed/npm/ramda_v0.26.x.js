@@ -1,5 +1,5 @@
-// flow-typed signature: 4c9d0c331e2b054e81d322cfb6edc981
-// flow-typed version: b38de1436c/ramda_v0.26.x/flow_>=v0.104.x
+// flow-typed signature: 5d554eceaaa48f0426a86dee8f3f6b18
+// flow-typed version: 37b38f3680/ramda_v0.26.x/flow_>=v0.104.x
 
 /* eslint-disable no-unused-vars, no-redeclare */
 
@@ -1175,7 +1175,7 @@ declare module ramda {
 
   declare function transpose<T>(xs: Array<Array<T>>): Array<Array<T>>;
 
-  declare function uniq<T>(xs: Array<T>): Array<T>;
+  declare function uniq<T>(xs: $ReadOnlyArray<T>): Array<T>;
 
   declare function unnest<T>(xs: NestedArray<T>): NestedArray<T>;
 
@@ -1304,8 +1304,8 @@ declare module ramda {
     b: Array<B>
   ): Array<A>;
 
-  declare function intersection<T>(x: Array<T>, y: Array<T>): Array<T>;
-  declare function intersection<T>(x: Array<T>): (y: Array<T>) => Array<T>;
+  declare function intersection<T>(xs: $ReadOnlyArray<T>, ys: $ReadOnlyArray<T>): Array<T>;
+  declare function intersection<T>(xs: $ReadOnlyArray<T>): (ys: $ReadOnlyArray<T>) => Array<T>;
 
   declare function max<T>(x: T): (y: T) => T;
   declare function max<T>(x: T, y: T): T;

@@ -3,7 +3,8 @@ import type { Node } from 'react';
 import { Formik, Form, Field, useFormikContext } from 'formik';
 import * as Yup from 'yup';
 import { Input, Button, Stack } from '../ui';
-import { callApi, unwrapToJSON, ensureResponseCode, isWVUPId } from '../utils';
+import { unwrapToJSON, isWVUPId } from '../utils';
+import { apiFetch } from '../utils/fetchLight';
 import useCardReader from '../hooks/useCardReader';
 import type { Teacher, Student } from '../types';
 
@@ -28,7 +29,7 @@ const EmailSchema = Yup.object().shape({
 
 // Can be called with either email or wvupId
 const getPersonInfo = (identifier: string | number) =>
-  callApi(`person/${identifier}`, 'GET', null);
+  apiFetch(`person/${identifier}`, 'GET', null);
 
 type Props = {
   afterValidSubmit: (Teacher & Student) => Promise<any>,
@@ -62,15 +63,12 @@ const EmailOrCardSwipeForm = ({ afterValidSubmit, children }: Props) => {
       onSubmit={({ email, id }, { setStatus }) => {
         const identifier = id && id !== '' ? id : email;
 
+        // $FlowFixMe
         return getPersonInfo(identifier)
-          .then(ensureResponseCode(200))
           .then(unwrapToJSON)
           .then(afterValidSubmit)
-          .catch(e => {
-            if (e.message) {
-              setStatus(e.message);
-            }
-          });
+          .catch(e => e.unwrapFetchErrorMessage())
+          .then(m => setStatus(m));
       }}
       initialValues={{ email: '', id: '' }}
       validationSchema={EmailSchema}
