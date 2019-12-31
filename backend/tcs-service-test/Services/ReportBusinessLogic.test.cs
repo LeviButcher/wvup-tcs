@@ -31,6 +31,63 @@ namespace tcs_service_test.Services
         }
 
         [Fact]
+        public void WeelyVisits_SessionOnStartDay_ResultCountShouldBeOne()
+        {
+            var sessions = new List<Session>() {
+                new Session() {
+                    InTime = new DateTime(2020, 12, 24, 10, 0, 0),
+                    OutTime = new DateTime(2020, 12, 24, 11, 00, 0),
+                }
+            };
+
+            var results = ReportsBusinessLogic.WeeklyVisits(sessions, new DateTime(2020, 12, 24), new DateTime(2020, 12, 30));
+            Assert.Equal(1, results.FirstOrDefault().Count);
+        }
+
+        [Fact]
+        public void WeelyVisits_SessionOnEndDay_ResultCountShouldBeOne()
+        {
+            var sessions = new List<Session>() {
+                new Session() {
+                    InTime = new DateTime(2020, 12, 30, 10, 0, 0),
+                    OutTime = new DateTime(2020, 12, 30, 11, 00, 0),
+                }
+            };
+
+            var results = ReportsBusinessLogic.WeeklyVisits(sessions, new DateTime(2020, 12, 24), new DateTime(2020, 12, 30));
+            Assert.Equal(1, results.FirstOrDefault().Count);
+        }
+
+        [Fact]
+        public void WeelyVisits_SessionNotWithinStartAndEndDates_ResultCountShouldBeZero()
+        {
+            var sessions = new List<Session>() {
+                new Session() {
+                    InTime = new DateTime(2020, 11, 30, 10, 0, 0),
+                    OutTime = new DateTime(2020, 11, 30, 11, 00, 0),
+                }
+            };
+
+            var results = ReportsBusinessLogic.WeeklyVisits(sessions, new DateTime(2020, 12, 24), new DateTime(2020, 12, 30));
+            Assert.Equal(0, results.FirstOrDefault().Count);
+        }
+
+        [Fact]
+        public void WeelyVisits_SessionsFromTwoDifferentNotWithinStartAndEndDates_ResultCountShouldBeZero()
+        {
+            var sessions = new List<Session>() {
+                new Session() {
+                    InTime = new DateTime(2020, 11, 30, 10, 0, 0),
+                    OutTime = new DateTime(2020, 11, 30, 11, 00, 0),
+                }
+            };
+
+            var results = ReportsBusinessLogic.WeeklyVisits(sessions, new DateTime(2020, 12, 1), new DateTime(2020, 12, 30));
+            Assert.Equal(0, results.FirstOrDefault().Count);
+        }
+
+
+        [Fact]
         public void WeeklyVisits_SevenSessionsWithinDate_TwoSessionsOutsideOfDate_ResultCountShouldBeSeven()
         {
             var sessions = new List<Session>();
@@ -86,34 +143,26 @@ namespace tcs_service_test.Services
         public void Volunteers_OneTeacherWithTwoSessions_OtherTeacherWithOneSession()
         {
             var sessions = new List<Session>();
-            var people = new List<Person>();
-            people.Add(new Person() { PersonType = PersonType.Teacher, Email = "teacher1@wvup.edu", FirstName = "Teacher", LastName = "One", Id = 12345 });
-            people.Add(new Person() { PersonType = PersonType.Teacher, Email = "teacher2@wvup.edu", FirstName = "Teacher", LastName = "Two", Id = 45678 });
-            db.People.AddRange(people);
-            db.SaveChanges();
-
             sessions.Add(new Session()
             {
                 InTime = new DateTime(2020, 12, 24, 10, 0, 0),
                 OutTime = new DateTime(2020, 12, 24, 11, 00, 0),
-                PersonId = 12345
+                Person = new Person() { PersonType = PersonType.Teacher, Email = "teacher1@wvup.edu", FirstName = "Teacher", LastName = "One", Id = 12345 }
             });
 
             sessions.Add(new Session()
             {
                 InTime = new DateTime(2020, 12, 24, 12, 0, 0),
                 OutTime = new DateTime(2020, 12, 24, 15, 00, 0),
-                PersonId = 12345
+                Person = new Person() { PersonType = PersonType.Teacher, Email = "teacher1@wvup.edu", FirstName = "Teacher", LastName = "One", Id = 12345 }
             });
 
             sessions.Add(new Session()
             {
                 InTime = new DateTime(2020, 12, 24, 9, 0, 0),
                 OutTime = new DateTime(2020, 12, 24, 15, 0, 0),
-                PersonId = 45678
+                Person = new Person() { PersonType = PersonType.Teacher, Email = "teacher2@wvup.edu", FirstName = "Teacher", LastName = "Two", Id = 45678 }
             });
-            db.Sessions.AddRange(sessions);
-            db.SaveChanges();
 
             var results = ReportsBusinessLogic.Volunteers(sessions, new DateTime(2020, 12, 24), new DateTime(2020, 12, 30));
             Assert.Equal(4, results.Where(x => x.TeacherEmail == "teacher1@wvup.edu").FirstOrDefault().TotalHours);
@@ -121,49 +170,155 @@ namespace tcs_service_test.Services
         }
 
         [Fact]
-        public void Reasons_FiveSessionsAt10AM_TwoSessionsAt5PM()
+        public void Reasons_SessionWithTutoringTrue_TutoringVisitCountIsOne()
         {
-            var reasons = new List<Reason>();
-            reasons.Add(new Reason() { Name = "Study Time", Deleted = false });
-            reasons.Add(new Reason() { Name = "Computer Use", Deleted = false });
-            reasons.Add(new Reason() { Name = "Printer Use", Deleted = false });
-            db.Reasons.AddRange(reasons);
-            db.SaveChanges();
-
-            db.Departments.Add(new Department() { Code = 111, Name = "General " });
-            db.SaveChanges();
-
-            var classes = new List<Class>();
-            classes.Add(new Class() { Name = "Art 101", CRN = 123, ShortName = "Art", DepartmentCode = 111 });
-            db.Classes.AddRange(classes);
-            db.SaveChanges();
-
-            db.People.Add( new Person() { PersonType = PersonType.Student, Email = "student1@wvup.edu", FirstName = "Student", LastName = "One", Id = 12345 });
-            db.SaveChanges();
-
-            var sessions = new List<Session>();
-            sessions.Add(new Session()
-            {
-                InTime = new DateTime(2020, 12, 24, 10, 0, 0),
-                OutTime = new DateTime(2020, 12, 24, 11, 00, 0),
-                Tutoring = true,
-                PersonId = 12345
-            });
-            db.Sessions.AddRange(sessions);
-            db.SaveChanges();
-            var sessionId = db.Sessions.Where(x => x.PersonId == 12345).FirstOrDefault().Id;
-
-            db.SessionClasses.Add(new SessionClass() { ClassId = 123, SessionId = sessionId });
-            db.SaveChanges();
-
-            var studyTime = db.Reasons.Where(x => x.Name == "Study Time").FirstOrDefault();
-            var computerUse = db.Reasons.Where(x => x.Name == "Computer Use").FirstOrDefault();
-            var printerUse = db.Reasons.Where(x => x.Name == "Printer Use").FirstOrDefault();
-            db.SessionReasons.Add(new SessionReason() { SessionId = sessionId, ReasonId = studyTime.Id });
-            db.SaveChanges();
+            var sessions = new List<Session>() {
+                new Session() {
+                    InTime = new DateTime(2020, 12, 24, 10, 0, 0),
+                    OutTime = new DateTime(2020, 12, 24, 11, 00, 0),
+                    Tutoring = true,
+                    Person = new Person() { PersonType = PersonType.Student, Email = "student1@wvup.edu", FirstName = "Student", LastName = "One", Id = 12345 },
+                    SessionClasses = new List<SessionClass>()
+                    {
+                        new SessionClass() { Class = new Class(){ Name = "Art 101", CRN = 123, ShortName = "Art", DepartmentCode = 111 } }
+                    }
+                }
+            };
 
             var results = ReportsBusinessLogic.Reasons(sessions, new DateTime(2020, 12, 24), new DateTime(2020, 12, 30));
-            Assert.Equal(1, results.Where(x => x.ReasonId== studyTime.Id).FirstOrDefault().Visits);
+            Assert.Equal(1, results.Where(x => x.ReasonName == "Tutoring").FirstOrDefault().Visits);
+        }
+
+        [Fact]
+        public void Reasons_SessionWithTutoringFalse_TutoringReasonDoesNotExist()
+        {
+            var sessions = new List<Session>() {
+                new Session() {
+                    InTime = new DateTime(2020, 12, 24, 10, 0, 0),
+                    OutTime = new DateTime(2020, 12, 24, 11, 00, 0),
+                    Tutoring = false,
+                    Person = new Person() { PersonType = PersonType.Student, Email = "student1@wvup.edu", FirstName = "Student", LastName = "One", Id = 12345 },
+                    SessionClasses = new List<SessionClass>()
+                    {
+                        new SessionClass() { Class = new Class(){ Name = "Art 101", CRN = 123, ShortName = "Art", DepartmentCode = 111 } }
+                    },
+                    SessionReasons = new List<SessionReason>()
+                    {
+                        new SessionReason() { Reason = new Reason() { Name = "Study Time", Deleted = false } }
+                    }
+                }
+            };
+
+            var results = ReportsBusinessLogic.Reasons(sessions, new DateTime(2020, 12, 24), new DateTime(2020, 12, 30));
+            Assert.False(results.Exists(x => x.ReasonName == "Tutoring"));
+        }
+
+        [Fact]
+        public void Reasons_TwoSessionsForAClass_TwoDifferentReasonsForVisit_()
+        {
+            var sessions = new List<Session>() {
+                new Session() {
+                    InTime = new DateTime(2020, 12, 24, 10, 0, 0),
+                    OutTime = new DateTime(2020, 12, 24, 11, 00, 0),
+                    Tutoring = true,
+                    Person = new Person() { PersonType = PersonType.Student, Email = "student1@wvup.edu", FirstName = "Student", LastName = "One", Id = 12345 },
+                    SessionClasses = new List<SessionClass>()
+                    {
+                        new SessionClass() { Class = new Class(){ Name = "Art 101", CRN = 123, ShortName = "Art", DepartmentCode = 111 } }
+                    },
+                    SessionReasons = new List<SessionReason>()
+                    {
+                        new SessionReason() { Reason = new Reason() { Name = "Study Time", Deleted = false } }
+                    }
+                },
+                new Session() {
+                    InTime = new DateTime(2020, 12, 24, 10, 0, 0),
+                    OutTime = new DateTime(2020, 12, 24, 11, 00, 0),
+                    Tutoring = true,
+                    Person = new Person() { PersonType = PersonType.Student, Email = "student1@wvup.edu", FirstName = "Student", LastName = "One", Id = 12345 },
+                    SessionClasses = new List<SessionClass>()
+                    {
+                        new SessionClass() { Class = new Class(){ Name = "Art 101", CRN = 123, ShortName = "Art", DepartmentCode = 111 } }
+                    },
+                    SessionReasons = new List<SessionReason>()
+                    {
+                        new SessionReason() { Reason = new Reason() { Name = "Printer Use", Deleted = false } }
+                    }
+                },
+
+            };
+
+            var results = ReportsBusinessLogic.Reasons(sessions, new DateTime(2020, 12, 24), new DateTime(2020, 12, 30));
+            Assert.Equal(2, results.Where(x => x.ClassName == "Art 101").Count());
+        }
+        
+        [Fact]
+        public void Reasons_FourSessions_OneWithTutoringFalse__TwoSessionsAt5PM()
+        {
+            var sessions = new List<Session>() {
+                new Session() {
+                    InTime = new DateTime(2020, 12, 24, 10, 0, 0),
+                    OutTime = new DateTime(2020, 12, 24, 11, 00, 0),
+                    Tutoring = true,
+                    Person = new Person() { PersonType = PersonType.Student, Email = "student1@wvup.edu", FirstName = "Student", LastName = "One", Id = 12345 },
+                    SessionClasses = new List<SessionClass>()
+                    {
+                        new SessionClass() { Class = new Class(){ Name = "Art 101", CRN = 123, ShortName = "Art", DepartmentCode = 111 } }
+                    },
+                    SessionReasons = new List<SessionReason>()
+                    {
+                        new SessionReason() { Reason = new Reason() { Name = "Study Time", Deleted = false } }
+                    }
+                },
+                new Session() {
+                    InTime = new DateTime(2020, 12, 27, 10, 0, 0),
+                    OutTime = new DateTime(2020, 12, 27, 11, 00, 0),
+                    Tutoring = true,
+                    Person = new Person() { PersonType = PersonType.Student, Email = "student1@wvup.edu", FirstName = "Student", LastName = "One", Id = 12345 },
+                    SessionClasses = new List<SessionClass>()
+                    {
+                        new SessionClass() { Class = new Class(){ Name = "Art 101", CRN = 123, ShortName = "Art", DepartmentCode = 111 } }
+                    },
+                    SessionReasons = new List<SessionReason>()
+                    {
+                        new SessionReason() { Reason = new Reason() { Name = "Study Time", Deleted = false } }
+                    }
+                },
+                new Session() {
+                    InTime = new DateTime(2020, 12, 24, 10, 0, 0),
+                    OutTime = new DateTime(2020, 12, 24, 11, 00, 0),
+                    Tutoring = true,
+                    Person = new Person() { PersonType = PersonType.Student, Email = "student1@wvup.edu", FirstName = "Student", LastName = "One", Id = 12345 },
+                    SessionClasses = new List<SessionClass>()
+                    {
+                        new SessionClass() { Class = new Class(){ Name = "Art 101", CRN = 123, ShortName = "Art", DepartmentCode = 111 } }
+                    },
+                    SessionReasons = new List<SessionReason>()
+                    {
+                        new SessionReason() { Reason = new Reason() { Name = "Computer Use", Deleted = false } }
+                    }
+                },
+                new Session() {
+                    InTime = new DateTime(2020, 12, 30, 10, 0, 0),
+                    OutTime = new DateTime(2020, 12, 30, 11, 00, 0),
+                    Tutoring = false,
+                    Person = new Person() { PersonType = PersonType.Student, Email = "student1@wvup.edu", FirstName = "Student", LastName = "One", Id = 12345 },
+                    SessionClasses = new List<SessionClass>()
+                    {
+                        new SessionClass() { Class = new Class(){ Name = "Art 101", CRN = 123, ShortName = "Art", DepartmentCode = 111 } }
+                    },
+                    SessionReasons = new List<SessionReason>()
+                    {
+                        new SessionReason() { Reason = new Reason() { Name = "Printer Use", Deleted = false } }
+                    }
+                },
+            };
+            
+            var results = ReportsBusinessLogic.Reasons(sessions, new DateTime(2020, 12, 24), new DateTime(2020, 12, 30));
+            Assert.Equal(2, results.Where(x => x.ReasonName == "Study Time").FirstOrDefault().Visits);
+            Assert.Equal(1, results.Where(x => x.ReasonName == "Computer Use").FirstOrDefault().Visits);
+            Assert.Equal(1, results.Where(x => x.ReasonName == "Printer Use").FirstOrDefault().Visits);
+            Assert.Equal(3, results.Where(x => x.ReasonName == "Tutoring").FirstOrDefault().Visits);
         }
 
         [Fact]

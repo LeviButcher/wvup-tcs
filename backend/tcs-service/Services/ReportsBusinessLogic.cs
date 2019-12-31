@@ -71,8 +71,8 @@ namespace tcs_service.Services
                          from reason in session.SessionReasons
                          where reason.Reason.Name != "Tutoring"
                          from course in session.SessionClasses
-                         where session.InTime >= start
-                         && session.InTime <= end
+                         where session.InTime.Date >= start.Date
+                         && session.InTime.Date <= end.Date
                          select new
                          {
                              ReasonName = reason.Reason.Name,
@@ -85,8 +85,20 @@ namespace tcs_service.Services
                                  from reason in session.SessionReasons
                                  from course in session.SessionClasses
                                  where session.Tutoring == true
-                                 && session.InTime >= start
-                                 && session.InTime <= end
+                                 && session.InTime.Date >= start.Date
+                                 && session.InTime.Date <= end.Date
+                                 select new
+                                 {
+
+                                     className = course.Class.Name,
+                                     classId = course.ClassId
+                                 };
+
+            var tutoringWithoutReasonResult = from session in sessions
+                                 from course in session.SessionClasses
+                                 where session.Tutoring == true
+                                 && session.InTime.Date >= start.Date
+                                 && session.InTime.Date <= end.Date
                                  select new
                                  {
 
@@ -106,8 +118,8 @@ namespace tcs_service.Services
                               {
                                   ReasonId = grp.Key.ReasonId,
                                   ReasonName = grp.Key.ReasonName,
-                                  CourseCRN = grp.Key.classId,
-                                  CourseName = grp.Key.className,
+                                  ClassCRN = grp.Key.classId,
+                                  ClassName = grp.Key.className,
                                   Visits = grp.Count()
                               };
 
@@ -121,12 +133,28 @@ namespace tcs_service.Services
                               {
                                   ReasonId = 0,
                                   ReasonName = "Tutoring",
-                                  CourseCRN = grp.Key.classId,
-                                  CourseName = grp.Key.className,
+                                  ClassCRN = grp.Key.classId,
+                                  ClassName = grp.Key.className,
                                   Visits = grp.Count()
                               };
 
-            var finalResult = resultGroup.Concat(tutorResult);
+            var tutorWithoutResult = from item in tutoringWithoutReasonResult
+                              group item by new
+                              {
+                                  item.classId,
+                                  item.className
+                              } into grp
+                              select new ReasonWithClassVisitsDTO()
+                              {
+                                  ReasonId = 0,
+                                  ReasonName = "Tutoring",
+                                  ClassCRN = grp.Key.classId,
+                                  ClassName = grp.Key.className,
+                                  Visits = grp.Count()
+                              };
+
+            var finalResult = resultGroup.Concat(tutorResult).Concat(tutorWithoutResult);
+
 
             return finalResult.ToList();
         }
