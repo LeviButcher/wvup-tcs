@@ -15,7 +15,7 @@ namespace tcs_service.Services
             {
                 result.Add(new WeeklyVisitsDTO(start, start.Date.AddDays(6))
                 {
-                    Count = sessions.Where(x => x.InTime >= start && x.InTime <= start.AddDays(6)).Count()
+                    Count = sessions.Where(x => x.InTime.Date >= start.Date && x.InTime.Date <= start.AddDays(6)).Count()
                 });
                 start = start.AddDays(7);
             }
