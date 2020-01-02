@@ -221,36 +221,229 @@ namespace tcs_service_test.Services
             Assert.Equal(11, results.Where(x => x.Name == "Parkersburg High School").FirstOrDefault().Students);
         }
 
-        //Tests below need to be like tests above. 
+        [Fact]
+        public void Volunteers_SessionOnStartDay_ResultListShouldHaveOneElement()
+        {
+            var sessions = new List<Session>() {
+                new Session() {
+                    InTime = new DateTime(2020, 12, 01, 10, 0, 0),
+                    OutTime = new DateTime(2020, 12, 01, 11, 00, 0),
+                    Person = new Person()
+                    {
+                        FirstName = "Teacher",
+                        LastName = "Teach",
+                        Email = "teacher@wvup.edu",
+                        PersonType = PersonType.Teacher
+                    }
+                }
+            };
+
+            var results = ReportsBusinessLogic.Volunteers(sessions, new DateTime(2020, 12, 01), new DateTime(2020, 12, 07));
+            Assert.Single(results);
+        }
 
         [Fact]
-        public void Volunteers_OneTeacherWithTwoSessions_OtherTeacherWithOneSession()
+        public void Volunteers_SessionOnEndDay_ResultListShouldHaveOneElement()
         {
-            var sessions = new List<Session>();
-            sessions.Add(new Session()
-            {
-                InTime = new DateTime(2020, 12, 24, 10, 0, 0),
-                OutTime = new DateTime(2020, 12, 24, 11, 00, 0),
-                Person = new Person() { PersonType = PersonType.Teacher, Email = "teacher1@wvup.edu", FirstName = "Teacher", LastName = "One", Id = 12345 }
-            });
+            var sessions = new List<Session>() {
+                new Session() {
+                    InTime = new DateTime(2020, 12, 07, 10, 0, 0),
+                    OutTime = new DateTime(2020, 12, 07, 11, 00, 0),
+                    Person = new Person()
+                    {
+                        FirstName = "Teacher",
+                        LastName = "Teach",
+                        Email = "teacher@wvup.edu",
+                        PersonType = PersonType.Teacher
+                    }
+                }
+            };
 
-            sessions.Add(new Session()
-            {
-                InTime = new DateTime(2020, 12, 24, 12, 0, 0),
-                OutTime = new DateTime(2020, 12, 24, 15, 00, 0),
-                Person = new Person() { PersonType = PersonType.Teacher, Email = "teacher1@wvup.edu", FirstName = "Teacher", LastName = "One", Id = 12345 }
-            });
+            var results = ReportsBusinessLogic.Volunteers(sessions, new DateTime(2020, 12, 01), new DateTime(2020, 12, 07));
+            Assert.Single(results);
+        }
 
-            sessions.Add(new Session()
-            {
-                InTime = new DateTime(2020, 12, 24, 9, 0, 0),
-                OutTime = new DateTime(2020, 12, 24, 15, 0, 0),
-                Person = new Person() { PersonType = PersonType.Teacher, Email = "teacher2@wvup.edu", FirstName = "Teacher", LastName = "Two", Id = 45678 }
-            });
 
-            var results = ReportsBusinessLogic.Volunteers(sessions, new DateTime(2020, 12, 24), new DateTime(2020, 12, 30));
-            Assert.Equal(4, results.Where(x => x.TeacherEmail == "teacher1@wvup.edu").FirstOrDefault().TotalHours);
-            Assert.Equal(6, results.Where(x => x.TeacherEmail == "teacher2@wvup.edu").FirstOrDefault().TotalHours);
+        [Fact]
+        public void Volunteers_TeacherHasTwoOneHourSessions_VolunteerHoursShouldBeTwoHours()
+        {
+            var sessions = new List<Session>() {
+                new Session() {
+                    InTime = new DateTime(2020, 12, 05, 10, 0, 0),
+                    OutTime = new DateTime(2020, 12, 05, 11, 00, 0),
+                    Person = new Person()
+                    {
+                        FirstName = "Teacher",
+                        LastName = "Teach",
+                        Email = "teacher@wvup.edu",
+                        PersonType = PersonType.Teacher
+                    }
+                },
+                new Session() {
+                    InTime = new DateTime(2020, 12, 07, 10, 0, 0),
+                    OutTime = new DateTime(2020, 12, 07, 11, 00, 0),
+                    Person = new Person()
+                    {
+                        FirstName = "Teacher",
+                        LastName = "Teach",
+                        Email = "teacher@wvup.edu",
+                        PersonType = PersonType.Teacher
+                    }
+                },
+            };
+
+            var results = ReportsBusinessLogic.Volunteers(sessions, new DateTime(2020, 12, 01), new DateTime(2020, 12, 07));
+            Assert.Equal(2, results.Where(x => x.TeacherEmail == "teacher@wvup.edu").FirstOrDefault().TotalHours);
+        }
+
+        [Fact]
+        public void Volunteers_TwoTeachersHaveOneHourSessions_EachTeachersHoursSummedCorrectly()
+        {
+            var sessions = new List<Session>() {
+                new Session() {
+                    InTime = new DateTime(2020, 12, 05, 10, 0, 0),
+                    OutTime = new DateTime(2020, 12, 05, 11, 00, 0),
+                    Person = new Person()
+                    {
+                        FirstName = "Teacher",
+                        LastName = "Teach",
+                        Email = "teacher@wvup.edu",
+                        PersonType = PersonType.Teacher
+                    }
+                },
+                new Session() {
+                    InTime = new DateTime(2020, 12, 07, 10, 0, 0),
+                    OutTime = new DateTime(2020, 12, 07, 11, 00, 0),
+                    Person = new Person()
+                    {
+                        FirstName = "Teacher",
+                        LastName = "Teach",
+                        Email = "otherteacher@wvup.edu",
+                        PersonType = PersonType.Teacher
+                    }
+                },
+            };
+
+            var results = ReportsBusinessLogic.Volunteers(sessions, new DateTime(2020, 12, 01), new DateTime(2020, 12, 07));
+            Assert.Equal(1, results.Where(x => x.TeacherEmail == "teacher@wvup.edu").FirstOrDefault().TotalHours);
+            Assert.Equal(1, results.Where(x => x.TeacherEmail == "otherteacher@wvup.edu").FirstOrDefault().TotalHours);
+        }
+
+        [Fact]
+        public void Reasons_SessionOnStartDay_ResultCountShouldBeOne()
+        {
+            var sessions = new List<Session>() {
+                new Session() {
+                    InTime = new DateTime(2020, 12, 24, 10, 0, 0),
+                    OutTime = new DateTime(2020, 12, 24, 11, 00, 0),
+                    Tutoring = false,
+                    Person = new Person() { PersonType = PersonType.Student, Email = "student1@wvup.edu", FirstName = "Student", LastName = "One", Id = 12345 },
+                    SessionClasses = new List<SessionClass>()
+                    {
+                        new SessionClass() { Class = new Class(){ Name = "Art 101", CRN = 123, ShortName = "Art", DepartmentCode = 111 } }
+                    },
+                    SessionReasons = new List<SessionReason>()
+                    {
+                        new SessionReason() { Reason = new Reason() { Name = "Study Time", Deleted = false } }
+                    }
+                }
+            };
+
+            var results = ReportsBusinessLogic.Reasons(sessions, new DateTime(2020, 12, 24), new DateTime(2020, 12, 30));
+            Assert.Single(results);
+        }
+
+        [Fact]
+        public void Reasons_SessionOnEndDay_ResultCountShouldBeOne()
+        {
+            var sessions = new List<Session>() {
+                new Session() {
+                    InTime = new DateTime(2020, 12, 30, 10, 0, 0),
+                    OutTime = new DateTime(2020, 12, 30, 11, 00, 0),
+                    Tutoring = false,
+                    Person = new Person() { PersonType = PersonType.Student, Email = "student1@wvup.edu", FirstName = "Student", LastName = "One", Id = 12345 },
+                    SessionClasses = new List<SessionClass>()
+                    {
+                        new SessionClass() { Class = new Class(){ Name = "Art 101", CRN = 123, ShortName = "Art", DepartmentCode = 111 } }
+                    },
+                    SessionReasons = new List<SessionReason>()
+                    {
+                        new SessionReason() { Reason = new Reason() { Name = "Study Time", Deleted = false } }
+                    }
+                }
+            };
+
+            var results = ReportsBusinessLogic.Reasons(sessions, new DateTime(2020, 12, 24), new DateTime(2020, 12, 30));
+            Assert.Single(results);
+        }
+
+        [Fact]
+        public void Reasons_SessionWithClassSelectedAndNoReasonSelected_TutoringIsTrue_VisitsForTutoringShouldBeOne()
+        {
+            var sessions = new List<Session>() {
+                new Session() {
+                    InTime = new DateTime(2020, 12, 30, 10, 0, 0),
+                    OutTime = new DateTime(2020, 12, 30, 11, 00, 0),
+                    Tutoring = true,
+                    Person = new Person() { PersonType = PersonType.Student, Email = "student1@wvup.edu", FirstName = "Student", LastName = "One", Id = 12345 },
+                    SessionClasses = new List<SessionClass>()
+                    {
+                        new SessionClass() { Class = new Class(){ Name = "Art 101", CRN = 123, ShortName = "Art", DepartmentCode = 111 } }
+                    }                    
+                }
+            };
+
+            var results = ReportsBusinessLogic.Reasons(sessions, new DateTime(2020, 12, 24), new DateTime(2020, 12, 30));
+            Assert.Equal(1, results.Where(x => x.ReasonName == "Tutoring").FirstOrDefault().Visits);
+        }
+
+        [Fact]
+        public void Reasons_SessionWithClassSelectedAndStudyTimeSelected_TutoringIsTrue_VisitsForTutoringShouldBeOne_VisitsForStudyTimeShouldBeOne()
+        {
+            var sessions = new List<Session>() {
+                new Session() {
+                    InTime = new DateTime(2020, 12, 30, 10, 0, 0),
+                    OutTime = new DateTime(2020, 12, 30, 11, 00, 0),
+                    Tutoring = true,
+                    Person = new Person() { PersonType = PersonType.Student, Email = "student1@wvup.edu", FirstName = "Student", LastName = "One", Id = 12345 },
+                    SessionClasses = new List<SessionClass>()
+                    {
+                        new SessionClass() { Class = new Class(){ Name = "Art 101", CRN = 123, ShortName = "Art", DepartmentCode = 111 } }
+                    },
+                    SessionReasons = new List<SessionReason>()
+                    {
+                        new SessionReason() { Reason = new Reason() { Name = "Study Time", Deleted = false } }
+                    }
+                }
+            };
+
+            var results = ReportsBusinessLogic.Reasons(sessions, new DateTime(2020, 12, 24), new DateTime(2020, 12, 30));
+            Assert.Equal(1, results.Where(x => x.ReasonName == "Tutoring").FirstOrDefault().Visits);
+            Assert.Equal(1, results.Where(x => x.ReasonName == "Study Time").FirstOrDefault().Visits);
+        }
+
+        [Fact]
+        public void Reasons_SessionWithClassSelectedAndStudyTimeSelected_TutoringIsFalse_VisitsForStudyTimeShouldBeOne()
+        {
+            var sessions = new List<Session>() {
+                new Session() {
+                    InTime = new DateTime(2020, 12, 30, 10, 0, 0),
+                    OutTime = new DateTime(2020, 12, 30, 11, 00, 0),
+                    Tutoring = false,
+                    Person = new Person() { PersonType = PersonType.Student, Email = "student1@wvup.edu", FirstName = "Student", LastName = "One", Id = 12345 },
+                    SessionClasses = new List<SessionClass>()
+                    {
+                        new SessionClass() { Class = new Class(){ Name = "Art 101", CRN = 123, ShortName = "Art", DepartmentCode = 111 } }
+                    },
+                    SessionReasons = new List<SessionReason>()
+                    {
+                        new SessionReason() { Reason = new Reason() { Name = "Study Time", Deleted = false } }
+                    }
+                }
+            };
+
+            var results = ReportsBusinessLogic.Reasons(sessions, new DateTime(2020, 12, 24), new DateTime(2020, 12, 30));
+            Assert.Equal(1, results.Where(x => x.ReasonName == "Study Time").FirstOrDefault().Visits);
         }
 
         [Fact]
@@ -272,9 +465,9 @@ namespace tcs_service_test.Services
             var results = ReportsBusinessLogic.Reasons(sessions, new DateTime(2020, 12, 24), new DateTime(2020, 12, 30));
             Assert.Equal(1, results.Where(x => x.ReasonName == "Tutoring").FirstOrDefault().Visits);
         }
-
+        
         [Fact]
-        public void Reasons_SessionWithTutoringFalse_TutoringReasonDoesNotExist()
+        public void Reasons_TwoSessionsForAClass_TutoringIsFalse_TwoDifferentReasonsForVisit_ResultsIncludesClassTwice_OnceForEachReason()
         {
             var sessions = new List<Session>() {
                 new Session() {
@@ -290,35 +483,11 @@ namespace tcs_service_test.Services
                     {
                         new SessionReason() { Reason = new Reason() { Name = "Study Time", Deleted = false } }
                     }
-                }
-            };
-
-            var results = ReportsBusinessLogic.Reasons(sessions, new DateTime(2020, 12, 24), new DateTime(2020, 12, 30));
-            Assert.False(results.Exists(x => x.ReasonName == "Tutoring"));
-        }
-
-        [Fact]
-        public void Reasons_TwoSessionsForAClass_TwoDifferentReasonsForVisit_()
-        {
-            var sessions = new List<Session>() {
-                new Session() {
-                    InTime = new DateTime(2020, 12, 24, 10, 0, 0),
-                    OutTime = new DateTime(2020, 12, 24, 11, 00, 0),
-                    Tutoring = true,
-                    Person = new Person() { PersonType = PersonType.Student, Email = "student1@wvup.edu", FirstName = "Student", LastName = "One", Id = 12345 },
-                    SessionClasses = new List<SessionClass>()
-                    {
-                        new SessionClass() { Class = new Class(){ Name = "Art 101", CRN = 123, ShortName = "Art", DepartmentCode = 111 } }
-                    },
-                    SessionReasons = new List<SessionReason>()
-                    {
-                        new SessionReason() { Reason = new Reason() { Name = "Study Time", Deleted = false } }
-                    }
                 },
                 new Session() {
                     InTime = new DateTime(2020, 12, 24, 10, 0, 0),
                     OutTime = new DateTime(2020, 12, 24, 11, 00, 0),
-                    Tutoring = true,
+                    Tutoring = false,
                     Person = new Person() { PersonType = PersonType.Student, Email = "student1@wvup.edu", FirstName = "Student", LastName = "One", Id = 12345 },
                     SessionClasses = new List<SessionClass>()
                     {
@@ -335,9 +504,9 @@ namespace tcs_service_test.Services
             var results = ReportsBusinessLogic.Reasons(sessions, new DateTime(2020, 12, 24), new DateTime(2020, 12, 30));
             Assert.Equal(2, results.Where(x => x.ClassName == "Art 101").Count());
         }
-        
+
         [Fact]
-        public void Reasons_FourSessions_OneWithTutoringFalse__TwoSessionsAt5PM()
+        public void Reasons_TwoSessionsForAClass_TutoringIsTrue_TwoDifferentReasonsForVisit_ResultsIncludesClassFourTimes_OnceForEachReason()
         {
             var sessions = new List<Session>() {
                 new Session() {
@@ -355,20 +524,6 @@ namespace tcs_service_test.Services
                     }
                 },
                 new Session() {
-                    InTime = new DateTime(2020, 12, 27, 10, 0, 0),
-                    OutTime = new DateTime(2020, 12, 27, 11, 00, 0),
-                    Tutoring = true,
-                    Person = new Person() { PersonType = PersonType.Student, Email = "student1@wvup.edu", FirstName = "Student", LastName = "One", Id = 12345 },
-                    SessionClasses = new List<SessionClass>()
-                    {
-                        new SessionClass() { Class = new Class(){ Name = "Art 101", CRN = 123, ShortName = "Art", DepartmentCode = 111 } }
-                    },
-                    SessionReasons = new List<SessionReason>()
-                    {
-                        new SessionReason() { Reason = new Reason() { Name = "Study Time", Deleted = false } }
-                    }
-                },
-                new Session() {
                     InTime = new DateTime(2020, 12, 24, 10, 0, 0),
                     OutTime = new DateTime(2020, 12, 24, 11, 00, 0),
                     Tutoring = true,
@@ -379,83 +534,234 @@ namespace tcs_service_test.Services
                     },
                     SessionReasons = new List<SessionReason>()
                     {
-                        new SessionReason() { Reason = new Reason() { Name = "Computer Use", Deleted = false } }
-                    }
-                },
-                new Session() {
-                    InTime = new DateTime(2020, 12, 30, 10, 0, 0),
-                    OutTime = new DateTime(2020, 12, 30, 11, 00, 0),
-                    Tutoring = false,
-                    Person = new Person() { PersonType = PersonType.Student, Email = "student1@wvup.edu", FirstName = "Student", LastName = "One", Id = 12345 },
-                    SessionClasses = new List<SessionClass>()
-                    {
-                        new SessionClass() { Class = new Class(){ Name = "Art 101", CRN = 123, ShortName = "Art", DepartmentCode = 111 } }
-                    },
-                    SessionReasons = new List<SessionReason>()
-                    {
                         new SessionReason() { Reason = new Reason() { Name = "Printer Use", Deleted = false } }
                     }
                 },
+
             };
-            
+
             var results = ReportsBusinessLogic.Reasons(sessions, new DateTime(2020, 12, 24), new DateTime(2020, 12, 30));
-            Assert.Equal(2, results.Where(x => x.ReasonName == "Study Time").FirstOrDefault().Visits);
-            Assert.Equal(1, results.Where(x => x.ReasonName == "Computer Use").FirstOrDefault().Visits);
-            Assert.Equal(1, results.Where(x => x.ReasonName == "Printer Use").FirstOrDefault().Visits);
-            Assert.Equal(3, results.Where(x => x.ReasonName == "Tutoring").FirstOrDefault().Visits);
+            Assert.Equal(3, results.Where(x => x.ClassName == "Art 101").Count());
+            Assert.Equal(2, results.Where(x => x.ReasonName == "Tutoring").FirstOrDefault().Visits);
         }
 
-        //[Fact]
-        //public void SuccessReport_GradesGeneratedWithFixture_SuccessReportSummedCorrectly()
-        //{
-        //    var courseWithGradeList = new List<ClassWithGradeDTO>();
-            
-        //    for (int i = 0; i < 100; i++)
-        //    {
-        //        var courseWithGrade = fixture.Create<ClassWithGradeDTO>();
-        //        courseWithGrade.CRN = 555;
-        //        courseWithGrade.CourseName = "history";
-        //        courseWithGrade.DepartmentName = "History";
-        //        courseWithGradeList.Add(courseWithGrade);
-        //    }
+        [Fact]
+        public void SuccessReport_OneClass_StudentReceivedA_ClassPassedSuccessfullyIsOne_ClassCompletedSuccessfullyIsOne_DroppedStudentCountIsZero_UniqueCountIsOne()
+        {
+            var classWithGradeList = new List<ClassWithGradeDTO>() {
+                new ClassWithGradeDTO()
+                {
+                    CourseName = "History",
+                    CRN = 111,
+                    DepartmentName = "History Dept",
+                    Grade = Grade.A
+                }
+            };
 
-        //    var results = ReportsBusinessLogic.SuccessReport(courseWithGradeList);
+            var results = ReportsBusinessLogic.SuccessReport(classWithGradeList);
+            Assert.Equal(1, results.Where(x => x.CRN == 111).FirstOrDefault().CompletedCourseCount);
+            Assert.Equal(1, results.Where(x => x.CRN == 111).FirstOrDefault().PassedSuccessfullyCount);
+            Assert.Equal(0, results.Where(x => x.CRN == 111).FirstOrDefault().DroppedStudentCount);
+            Assert.Equal(1, results.Where(x => x.CRN == 111).FirstOrDefault().UniqueStudentCount);
+        }
 
-        //    var historyGrades = courseWithGradeList.Where(x => x.CRN == 555);
-        //    var passedSuccessfully = historyGrades.Where(x => x.Grade == Grade.A || x.Grade == Grade.B || x.Grade == Grade.C || x.Grade == Grade.I);
-        //    var completedClass = historyGrades.Where(x => x.Grade == Grade.A || x.Grade == Grade.B || x.Grade == Grade.C || x.Grade == Grade.I || x.Grade == Grade.D || x.Grade == Grade.F);
-        //    var droppedClass = historyGrades.Where(x => x.Grade == Grade.W || x.Grade == Grade.FIW);
+        [Fact]
+        public void SuccessReport_OneClass_StudentReceivedB_ClassPassedSuccessfullyIsOne_ClassCompletedSuccessfullyIsOne_DroppedStudentCountIsZero_UniqueCountIsOne()
+        {
+            var classWithGradeList = new List<ClassWithGradeDTO>() {
+                new ClassWithGradeDTO()
+                {
+                    CourseName = "History",
+                    CRN = 111,
+                    DepartmentName = "History Dept",
+                    Grade = Grade.B
+                }
+            };
 
-        //    Assert.Equal(passedSuccessfully.Count(), results.Where(x => x.CRN == 555).FirstOrDefault().PassedSuccessfullyCount);
-        //    Assert.Equal(completedClass.Count(), results.Where(x => x.CRN == 555).FirstOrDefault().CompletedCourseCount);
-        //    Assert.Equal(droppedClass.Count(), results.Where(x => x.CRN == 555).FirstOrDefault().DroppedStudentCount);
-        //    Assert.Equal(100, results.Where(x => x.CRN == 555).FirstOrDefault().UniqueStudentCount);
-        //}
+            var results = ReportsBusinessLogic.SuccessReport(classWithGradeList);
+            Assert.Equal(1, results.Where(x => x.CRN == 111).FirstOrDefault().CompletedCourseCount);
+            Assert.Equal(1, results.Where(x => x.CRN == 111).FirstOrDefault().PassedSuccessfullyCount);
+            Assert.Equal(0, results.Where(x => x.CRN == 111).FirstOrDefault().DroppedStudentCount);
+            Assert.Equal(1, results.Where(x => x.CRN == 111).FirstOrDefault().UniqueStudentCount);
+        }
 
-        //[Fact]
-        //public void SuccessReport_GradesEnteredManually_SuccessReportSummedCorrectly()
-        //{
-        //    var courseWithGradeList = new List<ClassWithGradeDTO>();
-        //    courseWithGradeList.Add(new ClassWithGradeDTO() { CourseName = "History", CRN = 555, DepartmentName = "History Dept.", Grade = Grade.A });
-        //    courseWithGradeList.Add(new ClassWithGradeDTO() { CourseName = "History", CRN = 555, DepartmentName = "History Dept.", Grade = Grade.B });
-        //    courseWithGradeList.Add(new ClassWithGradeDTO() { CourseName = "History", CRN = 555, DepartmentName = "History Dept.", Grade = Grade.B });
-        //    courseWithGradeList.Add(new ClassWithGradeDTO() { CourseName = "History", CRN = 555, DepartmentName = "History Dept.", Grade = Grade.C });
-        //    courseWithGradeList.Add(new ClassWithGradeDTO() { CourseName = "History", CRN = 555, DepartmentName = "History Dept.", Grade = Grade.I });
+        [Fact]
+        public void SuccessReport_OneClass_StudentReceivedC_ClassPassedSuccessfullyIsOne_ClassCompletedSuccessfullyIsOne_DroppedStudentCountIsZero_UniqueCountIsOne()
+        {
+            var classWithGradeList = new List<ClassWithGradeDTO>() {
+                new ClassWithGradeDTO()
+                {
+                    CourseName = "History",
+                    CRN = 111,
+                    DepartmentName = "History Dept",
+                    Grade = Grade.C
+                }
+            };
 
-        //    courseWithGradeList.Add(new ClassWithGradeDTO() { CourseName = "History", CRN = 555, DepartmentName = "History Dept.", Grade = Grade.D });
-        //    courseWithGradeList.Add(new ClassWithGradeDTO() { CourseName = "History", CRN = 555, DepartmentName = "History Dept.", Grade = Grade.D });
-        //    courseWithGradeList.Add(new ClassWithGradeDTO() { CourseName = "History", CRN = 555, DepartmentName = "History Dept.", Grade = Grade.F });
+            var results = ReportsBusinessLogic.SuccessReport(classWithGradeList);
+            Assert.Equal(1, results.Where(x => x.CRN == 111).FirstOrDefault().CompletedCourseCount);
+            Assert.Equal(1, results.Where(x => x.CRN == 111).FirstOrDefault().PassedSuccessfullyCount);
+            Assert.Equal(0, results.Where(x => x.CRN == 111).FirstOrDefault().DroppedStudentCount);
+            Assert.Equal(1, results.Where(x => x.CRN == 111).FirstOrDefault().UniqueStudentCount);
+        }
 
-        //    courseWithGradeList.Add(new ClassWithGradeDTO() { CourseName = "History", CRN = 555, DepartmentName = "History Dept.", Grade = Grade.W });
-        //    courseWithGradeList.Add(new ClassWithGradeDTO() { CourseName = "History", CRN = 555, DepartmentName = "History Dept.", Grade = Grade.FIW });
+        [Fact]
+        public void SuccessReport_OneClass_StudentReceivedD_ClassPassedSuccessfullyIsZero_ClassCompletedSuccessfullyIsOne_DroppedStudentCountIsZero_UniqueCountIsOne()
+        {
+            var classWithGradeList = new List<ClassWithGradeDTO>() {
+                new ClassWithGradeDTO()
+                {
+                    CourseName = "History",
+                    CRN = 111,
+                    DepartmentName = "History Dept",
+                    Grade = Grade.D
+                }
+            };
 
+            var results = ReportsBusinessLogic.SuccessReport(classWithGradeList);
+            Assert.Equal(1, results.Where(x => x.CRN == 111).FirstOrDefault().CompletedCourseCount);
+            Assert.Equal(0, results.Where(x => x.CRN == 111).FirstOrDefault().PassedSuccessfullyCount);
+            Assert.Equal(0, results.Where(x => x.CRN == 111).FirstOrDefault().DroppedStudentCount);
+            Assert.Equal(1, results.Where(x => x.CRN == 111).FirstOrDefault().UniqueStudentCount);
+        }
 
-        //    var results = ReportsBusinessLogic.SuccessReport(courseWithGradeList);
-            
-        //    Assert.Equal(5, results.Where(x => x.CRN == 555).FirstOrDefault().PassedSuccessfullyCount);
-        //    Assert.Equal(8, results.Where(x => x.CRN == 555).FirstOrDefault().CompletedCourseCount);
-        //    Assert.Equal(2, results.Where(x => x.CRN == 555).FirstOrDefault().DroppedStudentCount);
-        //    Assert.Equal(10, results.Where(x => x.CRN == 555).FirstOrDefault().UniqueStudentCount);
-        //}
+        [Fact]
+        public void SuccessReport_OneClass_StudentReceivedF_ClassPassedSuccessfullyIsZero_ClassCompletedSuccessfullyIsOne_DroppedStudentCountIsZero_UniqueCountIsOne()
+        {
+            var classWithGradeList = new List<ClassWithGradeDTO>() {
+                new ClassWithGradeDTO()
+                {
+                    CourseName = "History",
+                    CRN = 111,
+                    DepartmentName = "History Dept",
+                    Grade = Grade.F
+                }
+            };
+
+            var results = ReportsBusinessLogic.SuccessReport(classWithGradeList);
+            Assert.Equal(1, results.Where(x => x.CRN == 111).FirstOrDefault().CompletedCourseCount);
+            Assert.Equal(0, results.Where(x => x.CRN == 111).FirstOrDefault().PassedSuccessfullyCount);
+            Assert.Equal(0, results.Where(x => x.CRN == 111).FirstOrDefault().DroppedStudentCount);
+            Assert.Equal(1, results.Where(x => x.CRN == 111).FirstOrDefault().UniqueStudentCount);
+        }
+
+        [Fact]
+        public void SuccessReport_OneClass_StudentReceivedFIW_ClassPassedSuccessfullyIsZero_ClassCompletedSuccessfullyIsZero_DroppedStudentCountIsOne_UniqueCountIsOne()
+        {
+            var classWithGradeList = new List<ClassWithGradeDTO>() {
+                new ClassWithGradeDTO()
+                {
+                    CourseName = "History",
+                    CRN = 111,
+                    DepartmentName = "History Dept",
+                    Grade = Grade.FIW
+                }
+            };
+
+            var results = ReportsBusinessLogic.SuccessReport(classWithGradeList);
+            Assert.Equal(0, results.Where(x => x.CRN == 111).FirstOrDefault().CompletedCourseCount);
+            Assert.Equal(0, results.Where(x => x.CRN == 111).FirstOrDefault().PassedSuccessfullyCount);
+            Assert.Equal(1, results.Where(x => x.CRN == 111).FirstOrDefault().DroppedStudentCount);
+            Assert.Equal(1, results.Where(x => x.CRN == 111).FirstOrDefault().UniqueStudentCount);
+        }
+
+        [Fact]
+        public void SuccessReport_OneClass_StudentReceivedW_ClassPassedSuccessfullyIsZero_ClassCompletedSuccessfullyIsZero_DroppedStudentCountIsOne_UniqueCountIsOne()
+        {
+            var classWithGradeList = new List<ClassWithGradeDTO>() {
+                new ClassWithGradeDTO()
+                {
+                    CourseName = "History",
+                    CRN = 111,
+                    DepartmentName = "History Dept",
+                    Grade = Grade.W
+                }
+            };
+
+            var results = ReportsBusinessLogic.SuccessReport(classWithGradeList);
+            Assert.Equal(0, results.Where(x => x.CRN == 111).FirstOrDefault().CompletedCourseCount);
+            Assert.Equal(0, results.Where(x => x.CRN == 111).FirstOrDefault().PassedSuccessfullyCount);
+            Assert.Equal(1, results.Where(x => x.CRN == 111).FirstOrDefault().DroppedStudentCount);
+            Assert.Equal(1, results.Where(x => x.CRN == 111).FirstOrDefault().UniqueStudentCount);
+        }
+
+        [Fact]
+        public void SuccessReport_OneClass_StudentReceivedI_ClassPassedSuccessfullyIsOne_ClassCompletedSuccessfullyIsOne_DroppedStudentCountIsZero_UniqueCountIsOne()
+        {
+            var classWithGradeList = new List<ClassWithGradeDTO>() {
+                new ClassWithGradeDTO()
+                {
+                    CourseName = "History",
+                    CRN = 111,
+                    DepartmentName = "History Dept",
+                    Grade = Grade.I
+                }
+            };
+
+            var results = ReportsBusinessLogic.SuccessReport(classWithGradeList);
+            Assert.Equal(1, results.Where(x => x.CRN == 111).FirstOrDefault().CompletedCourseCount);
+            Assert.Equal(1, results.Where(x => x.CRN == 111).FirstOrDefault().PassedSuccessfullyCount);
+            Assert.Equal(0, results.Where(x => x.CRN == 111).FirstOrDefault().DroppedStudentCount);
+            Assert.Equal(1, results.Where(x => x.CRN == 111).FirstOrDefault().UniqueStudentCount);
+        }
+
+        [Fact]
+        public void SuccessReport_OneClass_TwoStudents_OneReceivesA_OneReceivesF_CompletedCourseCountIsTwo_PassedSuccessfullyCountIsOne_DroppedCountIsZero_UniqueStudentsIsTwo()
+        {
+            var classWithGradeList = new List<ClassWithGradeDTO>() {
+                new ClassWithGradeDTO()
+                {
+                    CourseName = "History",
+                    CRN = 111,
+                    DepartmentName = "History Dept",
+                    Grade = Grade.A
+                },
+                new ClassWithGradeDTO()
+                {
+                    CourseName = "History",
+                    CRN = 111,
+                    DepartmentName = "History Dept",
+                    Grade = Grade.F
+                },
+            };
+
+            var results = ReportsBusinessLogic.SuccessReport(classWithGradeList);
+            Assert.Equal(2, results.Where(x => x.CRN == 111).FirstOrDefault().CompletedCourseCount);
+            Assert.Equal(1, results.Where(x => x.CRN == 111).FirstOrDefault().PassedSuccessfullyCount);
+            Assert.Equal(0, results.Where(x => x.CRN == 111).FirstOrDefault().DroppedStudentCount);
+            Assert.Equal(2, results.Where(x => x.CRN == 111).FirstOrDefault().UniqueStudentCount);
+        }
+
+        [Fact]
+        public void SuccessReport_TwoClasses_TwoStudents_BothReceiveA_CompletedCourseCountIsTwo_EachClassCompletedAndPassedCountIsOne_DroppedIsZero_UniqueIsOne()
+        {
+            var classWithGradeList = new List<ClassWithGradeDTO>() {
+                new ClassWithGradeDTO()
+                {
+                    CourseName = "History",
+                    CRN = 111,
+                    DepartmentName = "History Dept",
+                    Grade = Grade.A
+                },
+                new ClassWithGradeDTO()
+                {
+                    CourseName = "English",
+                    CRN = 123,
+                    DepartmentName = "English Dept",
+                    Grade = Grade.A
+                },
+            };
+
+            var results = ReportsBusinessLogic.SuccessReport(classWithGradeList);
+            Assert.Equal(2, results.Count);
+            Assert.Equal(1, results.Where(x => x.CRN == 111).FirstOrDefault().CompletedCourseCount);
+            Assert.Equal(1, results.Where(x => x.CRN == 111).FirstOrDefault().PassedSuccessfullyCount);
+            Assert.Equal(0, results.Where(x => x.CRN == 111).FirstOrDefault().DroppedStudentCount);
+            Assert.Equal(1, results.Where(x => x.CRN == 111).FirstOrDefault().UniqueStudentCount);
+            Assert.Equal(1, results.Where(x => x.CRN == 123).FirstOrDefault().CompletedCourseCount);
+            Assert.Equal(1, results.Where(x => x.CRN == 123).FirstOrDefault().PassedSuccessfullyCount);
+            Assert.Equal(0, results.Where(x => x.CRN == 123).FirstOrDefault().DroppedStudentCount);
+            Assert.Equal(1, results.Where(x => x.CRN == 123).FirstOrDefault().UniqueStudentCount);
+        }
     }
 }

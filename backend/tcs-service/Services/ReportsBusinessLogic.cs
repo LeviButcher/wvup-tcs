@@ -37,8 +37,8 @@ namespace tcs_service.Services
         public static List<TeacherSignInTimeDTO> Volunteers(IEnumerable<Session> sessions, DateTime start, DateTime end)
         {
             var teachers = from session in sessions
-                           where session.InTime >= start
-                           && session.InTime <= end
+                           where session.InTime.Date >= start.Date
+                           && session.InTime.Date <= end.Date
                            && session.Person.PersonType == PersonType.Teacher
                            select new
                            {
@@ -101,10 +101,10 @@ namespace tcs_service.Services
                                  && session.InTime.Date <= end.Date
                                  select new
                                  {
-
                                      className = course.Class.Name,
                                      classId = course.ClassId
                                  };
+
 
             var resultGroup = from item in result
                               group item by new
@@ -138,7 +138,7 @@ namespace tcs_service.Services
                                   Visits = grp.Count()
                               };
 
-            var tutorWithoutResult = from item in tutoringWithoutReasonResult
+            var tutorWithoutReason = from item in tutoringWithoutReasonResult
                               group item by new
                               {
                                   item.classId,
@@ -152,11 +152,11 @@ namespace tcs_service.Services
                                   ClassName = grp.Key.className,
                                   Visits = grp.Count()
                               };
+            
+            var finalResult = resultGroup.Concat(tutorResult).Concat(tutorWithoutReason);
 
-            var finalResult = resultGroup.Concat(tutorResult).Concat(tutorWithoutResult);
 
-
-            return finalResult.ToList();
+            return finalResult.Distinct().ToList();
         }
 
         public static List<ClassWithSuccessCountDTO> SuccessReport(IEnumerable<ClassWithGradeDTO> classesWithGrades)
