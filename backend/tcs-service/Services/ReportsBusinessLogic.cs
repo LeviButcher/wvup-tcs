@@ -82,7 +82,6 @@ namespace tcs_service.Services
                          };
 
             var tutoringResult = from session in sessions
-                                 from reason in session.SessionReasons
                                  from course in session.SessionClasses
                                  where session.Tutoring == true
                                  && session.InTime.Date >= start.Date
@@ -93,18 +92,6 @@ namespace tcs_service.Services
                                      className = course.Class.Name,
                                      classId = course.ClassId
                                  };
-
-            var tutoringWithoutReasonResult = from session in sessions
-                                 from course in session.SessionClasses
-                                 where session.Tutoring == true
-                                 && session.InTime.Date >= start.Date
-                                 && session.InTime.Date <= end.Date
-                                 select new
-                                 {
-                                     className = course.Class.Name,
-                                     classId = course.ClassId
-                                 };
-
 
             var resultGroup = from item in result
                               group item by new
@@ -137,26 +124,10 @@ namespace tcs_service.Services
                                   ClassName = grp.Key.className,
                                   Visits = grp.Count()
                               };
-
-            var tutorWithoutReason = from item in tutoringWithoutReasonResult
-                              group item by new
-                              {
-                                  item.classId,
-                                  item.className
-                              } into grp
-                              select new ReasonWithClassVisitsDTO()
-                              {
-                                  ReasonId = 0,
-                                  ReasonName = "Tutoring",
-                                  ClassCRN = grp.Key.classId,
-                                  ClassName = grp.Key.className,
-                                  Visits = grp.Count()
-                              };
             
-            var finalResult = resultGroup.Concat(tutorResult).Concat(tutorWithoutReason);
+            var finalResult = resultGroup.Concat(tutorResult);
 
-
-            return finalResult.Distinct().ToList();
+            return finalResult.ToList();
         }
 
         public static List<ClassWithSuccessCountDTO> SuccessReport(IEnumerable<ClassWithGradeDTO> classesWithGrades)
