@@ -2,14 +2,14 @@ import React from 'react';
 import { Formik, Form } from 'formik';
 import { navigate } from '@reach/router';
 import { Button, Stack } from '../ui';
-import { callApi, ensureResponseCode } from '../utils';
+import { apiFetch } from '../utils/fetchLight';
 import CoursesCheckboxes from './CoursesCheckboxes';
 import ReasonCheckboxes from './ReasonCheckboxes';
 import useApi from '../hooks/useApi';
 import SignInSchema from '../schemas/SignInFormSchema';
 import type { Student } from '../types';
 
-const postSignIn = callApi(`sessions/in`, 'POST');
+const postSignIn = signIn => apiFetch(`sessions/in`, 'POST', signIn);
 
 type Props = {
   student: Student
@@ -27,12 +27,17 @@ const StudentSignInForm = ({ student }: Props) => {
           selectedReasons: studentSignIn.reasons,
           selectedClasses: studentSignIn.courses
         };
+
+        // $FlowFixMe
         return postSignIn(signIn)
-          .then(ensureResponseCode(201))
-          .then(() => navigate('/', { state: { info: 'You have signed in!' } }))
-          .catch(e => {
-            setStatus(e.message);
-          });
+          .then(() => {
+            // $FlowFixMe
+            navigate('/', {
+              state: { info: 'You have signed in!' }
+            });
+          })
+          .catch(e => e.unwrapFetchErrorMessage())
+          .then(m => setStatus(m));
       }}
       initialValues={{
         email: student.email,

@@ -7,7 +7,7 @@ import { Card } from '../../ui';
 const CreateSignIn = () => {
   const [person, setPerson]: [any, any] = useState();
   const [, reasons] = useApi('reasons/active');
-  const [, semesters] = useApi('reports/semesters');
+  const [, semesters] = useApi('semesters');
 
   return (
     <Card>

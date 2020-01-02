@@ -10,7 +10,7 @@ type Props = {
 const UpdateSignIn = ({ id }: Props) => {
   const [, signIn] = useApi(`sessions/${id}`);
   const [, reasons] = useApi('reasons');
-  const [, semesters] = useApi('reports/semesters');
+  const [, semesters] = useApi('semesters');
 
   return (
     <>

@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { Formik, Form, Field } from 'formik';
 import * as Yup from 'yup';
 import { Input, Header, Button, Stack } from '../ui';
-import { callApi, ensureResponseCode } from '../utils';
+import { apiFetch } from '../utils/fetchLight';
 import CoursesCheckboxes from './CoursesCheckboxes';
 import ReasonCheckboxes from './ReasonCheckboxes';
 import SignInSchema from '../schemas/SignInFormSchema';
@@ -68,13 +68,10 @@ const StyledReasonCheckboxes = styled(ReasonCheckboxes)`
   }
 `;
 
-const postSession = signIn =>
-  callApi(`sessions/`, 'POST', signIn).then(ensureResponseCode(201));
+const postSession = signIn => apiFetch(`sessions/`, 'POST', signIn);
 
 const putSession = signIn =>
-  callApi(`sessions/${signIn.id || ''}`, 'PUT', signIn).then(
-    ensureResponseCode(200)
-  );
+  apiFetch(`sessions/${signIn.id || ''}`, 'PUT', signIn);
 
 const getDateOrTime = option => dateTimeString => {
   if (!dateTimeString) return '';
@@ -144,7 +141,7 @@ const SignInForm = ({ signInRecord, reasons, semesters }: Props) => {
           inTime: `${values.inDate}T${values.inTime}`,
           outTime: `${values.outDate}T${values.outTime}`,
           selectedClasses: values.courses,
-          selectedReasons: values.reasons,
+          selectedReasons: values.reasons || [],
           tutoring: values.tutoring
         };
 
@@ -154,7 +151,8 @@ const SignInForm = ({ signInRecord, reasons, semesters }: Props) => {
             alert('Success!');
             window.history.back();
           })
-          .catch(e => setStatus(e.message));
+          .catch(e => e.unwrapFetchErrorMessage())
+          .then(m => setStatus(m));
       }}
     >
       {({ values, isSubmitting, status, isValid, errors, touched }) => (

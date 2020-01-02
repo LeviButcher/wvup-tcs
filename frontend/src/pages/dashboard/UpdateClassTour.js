@@ -9,10 +9,14 @@ type Props = {
 
 const UpdateClassTour = ({ id }: Props) => {
   const [loading, classTour] = useApi(`classtours/${id}`);
+
   return (
     <div style={{ margin: 'auto' }}>
-      {/* $FlowFixMe */}
-      {loading ? <ScaleLoader /> : <ClassTourForm classTour={classTour} />}
+      {!loading && classTour ? (
+        <ClassTourForm classTour={classTour} />
+      ) : (
+        <ScaleLoader loading={loading} />
+      )}
     </div>
   );
 };

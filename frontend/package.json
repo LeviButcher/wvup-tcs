@@ -5,7 +5,7 @@
   "dependencies": {
     "@reach/router": "^1.2.1",
     "flow-bin": "^0.107.0",
-    "formik": "2.0.6",
+    "formik": "2.0.9",
     "normalize.css": "^8.0.1",
     "ramda": "^0.26.1",
     "react": "^16.12.0",
