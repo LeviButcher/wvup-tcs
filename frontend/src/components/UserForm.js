@@ -4,7 +4,7 @@ import { Form, Field, Formik } from 'formik';
 import { navigate } from '@reach/router';
 import * as Yup from 'yup';
 import { Input, Button, Header, Card, Stack } from '../ui';
-import { callApi, ensureResponseCode } from '../utils';
+import { apiFetch } from '../utils/fetchLight';
 import type { User } from '../types';
 
 const isCreate = (val): boolean => val === 'Create';
@@ -25,24 +25,17 @@ const UserSchema = Yup.object().shape({
   lastName: Yup.string().trim()
 });
 
-const postUser = callApi(`users/register`, 'POST');
-const putUser = user => callApi(`users/${user.id}`, 'PUT', user);
-
 const createUser = user =>
-  postUser(user)
-    .then(ensureResponseCode(201))
-    .then(() => {
-      alert(`Created user for ${user.username}`);
-      navigate('/dashboard/admin/users');
-    });
+  apiFetch(`users/register`, 'POST', user).then(() => {
+    alert(`Created user for ${user.username}`);
+    navigate('/dashboard/admin/users');
+  });
 
 const updateUser = user =>
-  putUser(user)
-    .then(ensureResponseCode(200))
-    .then(() => {
-      alert(`Updated user for ${user.username}`);
-      navigate('/dashboard/admin/users');
-    });
+  apiFetch(`users/${user.id}`, 'PUT', user).then(() => {
+    alert(`Updated user for ${user.username}`);
+    navigate('/dashboard/admin/users');
+  });
 
 const userDefault = {
   username: '',
@@ -74,9 +67,11 @@ const UserForm = ({ user = userDefault }: Props) => {
           { setStatus }
         ) => {
           const submitUser = { username, firstName, lastName, password, id };
-          return callCorrectApiFunc(submitUser).catch(e => {
-            setStatus(e.message);
-          });
+
+          // $FlowFixMe
+          return callCorrectApiFunc(submitUser)
+            .catch(e => e.unwrapFetchErrorMessage())
+            .then(m => setStatus(m));
         }}
         isInitialValid={false}
       >

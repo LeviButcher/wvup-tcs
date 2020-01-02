@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import type { Node } from 'react';
 import { navigate } from '@reach/router';
-import callApi from '../utils/callApi';
+import { apiFetch } from '../utils/fetchLight';
 
-const checkAuth = () => callApi(`users/IsAuthenticate`, 'GET', null);
+const checkAuth = () => apiFetch(`users/IsAuthenticate`, 'GET', null);
 
 type Props = {
   redirectRoute: string,

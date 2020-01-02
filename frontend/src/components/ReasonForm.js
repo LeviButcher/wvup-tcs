@@ -3,7 +3,7 @@ import { Form, Field, Formik } from 'formik';
 import * as Yup from 'yup';
 import { navigate } from '@reach/router';
 import { Input, Button, Header, Card, Stack } from '../ui';
-import { callApi, ensureResponseCode } from '../utils';
+import { apiFetch } from '../utils/fetchLight';
 import type { Reason } from '../types';
 
 const ReasonSchema = Yup.object().shape({
@@ -13,22 +13,15 @@ const ReasonSchema = Yup.object().shape({
   deleted: Yup.boolean().required()
 });
 
-const postReason = callApi(`reasons/`, 'POST');
-const putReason = reason => callApi(`reasons/${reason.id}`, 'PUT', reason);
-
 const createReason = values =>
-  postReason(values)
-    .then(ensureResponseCode(201))
-    .then(() => {
-      alert(`Created reason - ${values.name}`);
-    });
+  apiFetch(`reasons/`, 'POST', values).then(() => {
+    alert(`Created reason - ${values.name}`);
+  });
 
 const updateReason = values =>
-  putReason(values)
-    .then(ensureResponseCode(200))
-    .then(() => {
-      alert(`Updated reason - ${values.name}`);
-    });
+  apiFetch(`reasons/${values.id}`, 'PUT', values).then(() => {
+    alert(`Updated reason - ${values.name}`);
+  });
 
 const reasonDefault = {
   name: '',
@@ -55,11 +48,13 @@ const ReasonForm = ({ reason = reasonDefault }: Props) => {
       <Formik
         initialValues={reason}
         validationSchema={ReasonSchema}
-        onSubmit={(submittedReason, { setStatus }) =>
-          callCorrectApi(submittedReason)
+        onSubmit={(submittedReason, { setStatus }) => {
+          // $FlowFixMe
+          return callCorrectApi(submittedReason)
             .then(() => navigate('/dashboard/admin/reason'))
-            .catch(e => setStatus(e.message))
-        }
+            .catch(e => e.unwrapFetchErrorMessage())
+            .then(m => setStatus(m));
+        }}
         isInitialValid={false}
       >
         {({ status, isSubmitting, isValid }) => (
