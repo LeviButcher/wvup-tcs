@@ -261,7 +261,7 @@ namespace tcs_integration.Controllers
         }
 
         [Fact]
-        public async void DELETE_Sessions_Id_ShouldReturn200WithDeletedSession()
+        public async void DELETE_Sessions_Id_ShouldReturn200WithSessionsDeletedValueSetToTrue()
         {
             var client = _factory.CreateClient();
             var user = await Login(client);
@@ -272,12 +272,7 @@ namespace tcs_integration.Controllers
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             var session = await response.Content.ReadAsAsync<Session>();
             Assert.Equal(27, session.Id);
-
-            request = new HttpRequestMessage(HttpMethod.Get, $"api/sessions/27");
-            request.Headers.Add("Authorization", $"Bearer {user.Token}");
-            response = await client.SendAsync(request);
-            Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
-
+            Assert.True(session.Deleted);
         }
 
 
