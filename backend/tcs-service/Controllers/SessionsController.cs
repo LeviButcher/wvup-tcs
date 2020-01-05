@@ -86,7 +86,6 @@ namespace tcs_service.Controllers
         public IActionResult GetSignedIn() => Ok(_sessionRepo.GetAll(x => x.OutTime == null));
 
         [HttpGet("deleted")]
-        [AllowAnonymous]
         public IActionResult GetDeleted() => Ok(_sessionRepo.GetAll(x => x.Deleted == true));
 
         [HttpPost]
