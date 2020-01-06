@@ -1,20 +1,18 @@
-﻿using System.Runtime.CompilerServices;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System;
+
 
 namespace tcs_service.Models.DTO
 {
     public class WeeklyVisitsDTO
     {
-        public WeeklyVisitsDTO(DateTime startDate, DateTime endDate) {
+        public WeeklyVisitsDTO(DateTime startDate, DateTime endDate)
+        {
             this.startDate = startDate;
             this.endDate = endDate;
         }
 
-        private DateTime startDate;
-        private DateTime endDate;
+        readonly private DateTime startDate;
+        readonly private DateTime endDate;
 
         public string Item => $"{startDate.Date.ToShortDateString()} - {endDate.ToShortDateString()}";
 
@@ -22,20 +20,24 @@ namespace tcs_service.Models.DTO
 
         public override bool Equals(object obj)
         {
-            //
-            // See the full list of guidelines at
-            //   http://go.microsoft.com/fwlink/?LinkID=85237
-            // and also the guidance for operator== at
-            //   http://go.microsoft.com/fwlink/?LinkId=85238
-            //
-            
-            if (obj == null || GetType() != obj.GetType())
-            {
-                return false;
-            }
-            WeeklyVisitsDTO wv = (WeeklyVisitsDTO) obj;
-            // TODO: write your implementation of Equals() here
-            return startDate == wv.startDate && endDate == wv.endDate && Count == wv.Count;
+            return obj is WeeklyVisitsDTO wk && this == wk;
         }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(startDate, endDate, Count);
+        }
+
+        public static bool operator ==(WeeklyVisitsDTO x, WeeklyVisitsDTO y)
+        {
+            return x.startDate == y.startDate && x.endDate == y.endDate && x.Count == y.Count;
+        }
+
+        public static bool operator !=(WeeklyVisitsDTO x, WeeklyVisitsDTO y)
+        {
+            return !(x == y);
+        }
+
+
     }
 }
