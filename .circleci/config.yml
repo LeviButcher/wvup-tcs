@@ -79,6 +79,9 @@ jobs:
           paths:
             - ~/.nuget/packages
           key: v1-back-dependencies-{{ checksum "sXb-service/sXb-service.csproj" }}-{{ checksum "sXb-service-test/sXb-service-test.csproj" }}
+      - run:
+          name: Build to check for warnings
+          command: dotnet build --no-incremental /warnaserror
 
   flow:
     executor: front-exec
