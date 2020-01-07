@@ -11,9 +11,9 @@ namespace tcs_service.Models.DTO
 
         public int ReasonId { get; set; }
 
-        public string CourseName { get; set; }
+        public string ClassName { get; set; }
 
-        public int CourseCRN { get; set; }
+        public int ClassCRN { get; set; }
 
         public int Visits { get; set; }
     }

@@ -7,7 +7,7 @@ namespace tcs_service.Services.Interfaces
     public interface IBannerService
     {
         Task<BannerPersonInfo> GetBannerInfo(string identifier);
-        Task<CourseWithGradeDTO> GetStudentGrade(int studentId, int crn, int termCode);
+        Task<ClassWithGradeDTO> GetStudentGrade(int studentId, int crn, int termCode);
     }
 }
 

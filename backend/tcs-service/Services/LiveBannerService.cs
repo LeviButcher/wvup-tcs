@@ -36,13 +36,13 @@ namespace tcs_service.Services
             throw new TCSException("Banner is currently down");
         }
 
-        public async Task<CourseWithGradeDTO> GetStudentGrade(int studentId, int crn, int termCode)
+        public async Task<ClassWithGradeDTO> GetStudentGrade(int studentId, int crn, int termCode)
         {
             var response = await bannerApi.GetAsync($"student/{studentId}/{termCode}/{crn}");
             response.EnsureSuccessStatusCode();
             var bannerGradeInfo = await response.Content.ReadAsAsync<BannerGradeInformationDTO>();
 
-            return new CourseWithGradeDTO()
+            return new ClassWithGradeDTO()
             {
                 CRN = bannerGradeInfo.CRN,
                 CourseName = bannerGradeInfo.SubjectCode += bannerGradeInfo.CourseNumber,
