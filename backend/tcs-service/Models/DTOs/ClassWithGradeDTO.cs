@@ -1,6 +1,6 @@
 ﻿namespace tcs_service.Models.DTO
 {
-    public class CourseWithGradeDTO
+    public class ClassWithGradeDTO
     {
         public string DepartmentName { get; set; }
 

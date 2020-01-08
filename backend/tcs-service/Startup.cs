@@ -124,7 +124,6 @@ namespace tcs_service
 
             services.AddScoped<IClassTourRepo, ClassTourRepo>();
             services.AddScoped<IUserRepo, UserRepo>();
-            services.AddScoped<IReportsRepo, ReportsRepo>();
             services.AddScoped<IReasonRepo, ReasonRepo>();
             services.AddScoped<ISessionRepo, SessionRepo>();
             services.AddScoped<IPersonRepo, PersonRepo>();
