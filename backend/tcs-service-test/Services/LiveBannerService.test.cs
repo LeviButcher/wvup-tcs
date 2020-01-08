@@ -19,7 +19,7 @@ namespace tcs_service_test.Services
 {
     public class LiveBannerServiceTest : IDisposable
     {
-        private readonly FluentMockServer server;
+        private readonly WireMockServer server;
         private readonly IBannerService bannerApi;
 
         public LiveBannerServiceTest()
@@ -139,6 +139,65 @@ namespace tcs_service_test.Services
             );
 
             var exception = await Assert.ThrowsAsync<TCSException>(async () => await bannerApi.GetBannerInfo(email));
+            Assert.Equal($"Banner is currently down", exception.Message);
+        }
+
+        [Fact]
+        public async Task GetStudentGrade_ShouldCallCorrectApiAndReturnStudentGrade()
+        {
+            var studentId = 6789613;
+            var semesterCode = 201901;
+            var classCRN = 1476;
+
+            server.Given(Request.Create()
+                .WithPath($"/student/{studentId}/{semesterCode}/{classCRN}")
+                .UsingGet())
+            .RespondWith(
+                Response.Create()
+                .WithStatusCode(200)
+                .WithHeader("Content-Type", "application/json")
+                .WithBodyAsJson(new { FinalGrade = "A", CRN = classCRN, SubjectCode = "STEM", CourseNumber = "101" })
+            );
+            var result = await bannerApi.GetStudentGrade(studentId, classCRN, semesterCode);
+            Assert.NotNull(result);
+            Assert.Equal(classCRN, result.CRN);
+        }
+
+        [Fact]
+        public async Task GetStudentGrade_BannerApiReturnsBack404_ShouldThrowTCSExceptionWithMessage()
+        {
+            var studentId = 6789613;
+            var semesterCode = 201901;
+            var classCRN = 1476;
+
+            server.Given(Request.Create()
+                .WithPath($"/student/{studentId}/{semesterCode}/{classCRN}")
+                .UsingGet())
+            .RespondWith(
+                Response.Create()
+                .WithStatusCode(404)
+            );
+
+            var exception = await Assert.ThrowsAsync<TCSException>(async () => await bannerApi.GetStudentGrade(studentId, classCRN, semesterCode));
+            Assert.Equal($"No information found for {studentId} during semester {semesterCode} for class {classCRN}", exception.Message);
+        }
+
+        [Fact]
+        public async Task GetStudentGrade_BannerApiReturnsBadStatusCode_ShouldThrowTCSException()
+        {
+            var studentId = 6789613;
+            var semesterCode = 201901;
+            var classCRN = 1476;
+
+            server.Given(Request.Create()
+                .WithPath($"/student/{studentId}/{semesterCode}/{classCRN}")
+                .UsingGet())
+            .RespondWith(
+                Response.Create()
+                .WithStatusCode(500)
+            );
+
+            var exception = await Assert.ThrowsAsync<TCSException>(async () => await bannerApi.GetStudentGrade(studentId, classCRN, semesterCode));
             Assert.Equal($"Banner is currently down", exception.Message);
         }
     }

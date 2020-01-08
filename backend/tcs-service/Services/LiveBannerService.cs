@@ -39,7 +39,10 @@ namespace tcs_service.Services
         public async Task<ClassWithGradeDTO> GetStudentGrade(int studentId, int crn, int termCode)
         {
             var response = await bannerApi.GetAsync($"student/{studentId}/{termCode}/{crn}");
-            response.EnsureSuccessStatusCode();
+            if (response.StatusCode == HttpStatusCode.NotFound)
+                throw new TCSException($"No information found for {studentId} during semester {termCode} for class {crn}");
+            if (response.StatusCode != HttpStatusCode.OK) throw new TCSException("Banner is currently down");
+
             var bannerGradeInfo = await response.Content.ReadAsAsync<BannerGradeInformationDTO>();
 
             return new ClassWithGradeDTO()
