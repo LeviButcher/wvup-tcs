@@ -73,7 +73,7 @@ namespace tcs_service.Repos.Base
 
         public IEnumerable<T> GetAll() => Include(table);
 
-        public async Task<T> Remove(Expression<Func<T, bool>> function)
+        public async virtual Task<T> Remove(Expression<Func<T, bool>> function)
         {
             var found = await Find(function);
             var deleted = table.Remove(found);

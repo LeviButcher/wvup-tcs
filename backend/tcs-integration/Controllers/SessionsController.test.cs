@@ -261,7 +261,7 @@ namespace tcs_integration.Controllers
         }
 
         [Fact]
-        public async void DELETE_Sessions_Id_ShouldReturn200WithSessionsDeletedValueSetToTrue()
+        public async void DELETE_Sessions_Id_ShouldReturn200WithDeletedSession()
         {
             var client = _factory.CreateClient();
             var user = await Login(client);
@@ -274,8 +274,6 @@ namespace tcs_integration.Controllers
             Assert.Equal(27, session.Id);
             Assert.True(session.Deleted);
         }
-
-
 
         [Fact]
         public async void POST_Sessions_In_StudentNotSignedIn_ShouldReturn201()

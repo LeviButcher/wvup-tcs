@@ -85,9 +85,6 @@ namespace tcs_service.Controllers
         [HttpGet("in")]
         public IActionResult GetSignedIn() => Ok(_sessionRepo.GetAll(x => x.OutTime == null));
 
-        [HttpGet("deleted")]
-        public IActionResult GetDeleted() => Ok(_sessionRepo.GetAll(x => x.Deleted == true));
-
         [HttpPost]
         public async Task<IActionResult> PostSession([FromBody] SessionPostOrPutDTO sessionDTO)
         {
@@ -239,9 +236,7 @@ namespace tcs_service.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteSession([FromRoute] int id)
         {
-            var session = await _sessionRepo.Find(x => x.Id == id);
-            session.Deleted = true;
-            await _sessionRepo.Update(session);
+            var session = await _sessionRepo.Remove(x => x.Id == id);
             return Ok(session);
         }
     }
