@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using Xunit;
 using tcs_service.Helpers;
 
-namespace tcs_service_test
+namespace tcs_service_test.Helpers
 {
     public class PagingTest
     {

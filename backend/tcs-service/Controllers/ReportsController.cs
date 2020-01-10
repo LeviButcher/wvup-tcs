@@ -4,10 +4,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using tcs_service.Models;
+using tcs_service.Helpers;
 using tcs_service.Models.DTO;
 using tcs_service.Repos.Interfaces;
 using tcs_service.Services;
+using tcs_service.Services.Interfaces;
 
 namespace tcs_service.Controllers
 {
@@ -16,49 +17,76 @@ namespace tcs_service.Controllers
     [Authorize]
     public class ReportsController : ControllerBase
     {
-        private IReportsRepo _iRepo;
+        private ISessionRepo _sessionRepo;
+        private IClassTourRepo _classTourRepo;
+        private IBannerService _bannerService;
 
-        public ReportsController(IReportsRepo iRepo)
+        public ReportsController(ISessionRepo sessionRepo, IClassTourRepo classTourRepo, IBannerService bannerService)
         {
-            _iRepo = iRepo;
+            _sessionRepo = sessionRepo;
+            _classTourRepo = classTourRepo;
+            _bannerService = bannerService;
         }
 
         [HttpGet("weekly-visits")]
-        public async Task<IActionResult> Get([FromQuery] DateTime start, [FromQuery] DateTime end)
+        public IActionResult Get([FromQuery] DateTime start, [FromQuery] DateTime end)
         {
-            return Ok(await _iRepo.WeeklyVisits(start, end));
+            return Ok(ReportsBusinessLogic.WeeklyVisits(_sessionRepo.GetAll(), start, end));
         }
 
         [HttpGet("peakhours")]
-        public async Task<IActionResult> PeakHours([FromQuery] DateTime start, [FromQuery] DateTime end)
+        public IActionResult PeakHours([FromQuery] DateTime start, [FromQuery] DateTime end)
         {
-            return Ok(await _iRepo.PeakHours(start, end));
+            return Ok(ReportsBusinessLogic.PeakHours(_sessionRepo.GetAll(), start, end));
         }
 
         [HttpGet("classtours")]
-        public async Task<IActionResult> ClassTours([FromQuery] DateTime start, [FromQuery] DateTime end)
+        public IActionResult ClassTours([FromQuery] DateTime start, [FromQuery] DateTime end)
         {
-            return Ok(await _iRepo.ClassTours(start, end));
+            return Ok(ReportsBusinessLogic.ClassTours(_classTourRepo.GetAll(), start, end));
         }
 
         [HttpGet("volunteers")]
-        public async Task<IActionResult> Volunteers([FromQuery] DateTime start, [FromQuery] DateTime end)
+        public IActionResult Volunteers([FromQuery] DateTime start, [FromQuery] DateTime end)
         {
-            return Ok(await _iRepo.Volunteers(start, end));
+            return Ok(ReportsBusinessLogic.Volunteers(_sessionRepo.GetAll(), start, end));
         }
 
         [HttpGet("reasons")]
-        public async Task<IActionResult> Reasons([FromQuery] DateTime start, [FromQuery] DateTime end)
+        public IActionResult Reasons([FromQuery] DateTime start, [FromQuery] DateTime end)
         {
-            return Ok(await _iRepo.Reasons(start, end));
+            return Ok(ReportsBusinessLogic.Reasons(_sessionRepo.GetAll(), start, end));
         }
 
         [HttpGet("success/{semesterId}")]
         public async Task<IActionResult> SuccessReport(int semesterId)
         {
-            var courses = await _iRepo.SuccessReport(semesterId);
-            
-            return Ok(ReportsBusinessLogic.SuccessReport(courses));
+            var studentCourses = from item in _sessionRepo.GetAll()
+                                 from course in item.SessionClasses
+                                 where item.SemesterCode == semesterId
+                                 select new
+                                 {
+                                     item.PersonId,
+                                     course.Class,
+                                     course.Class.Department,
+                                 };
+
+            List<ClassWithGradeDTO> classessWithGrades = new List<ClassWithGradeDTO>();
+
+            foreach (var item in studentCourses.Distinct())
+            {
+                try
+                {
+                    var grade = await _bannerService.GetStudentGrade(item.PersonId, item.Class.CRN, semesterId);
+                    classessWithGrades.Add(grade);
+                }
+                catch
+                {
+                    throw new TCSException("Something went wrong");
+                }
+            }
+
+            return Ok(ReportsBusinessLogic.SuccessReport(classessWithGrades));
         }
     }
 }
