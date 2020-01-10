@@ -10,6 +10,5 @@ namespace tcs_service.Repos.Interfaces
 {
     public interface ISessionRepo : IRepo<Session>
     {
-        IEnumerable<Session> GetAllNotDeleted(Expression<Func<Session, bool>> function);
     }
 }

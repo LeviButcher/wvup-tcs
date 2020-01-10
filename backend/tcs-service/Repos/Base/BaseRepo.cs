@@ -69,7 +69,7 @@ namespace tcs_service.Repos.Base
         public async Task<T> Find(Expression<Func<T, bool>> function)
             => await Include(table).FirstOrDefaultAsync(function);
 
-        public IEnumerable<T> GetAll(Expression<Func<T, bool>> function) => Include(table).Where(function);
+        public virtual IEnumerable<T> GetAll(Expression<Func<T, bool>> function) => Include(table).Where(function);
 
         public IEnumerable<T> GetAll() => Include(table);
 
