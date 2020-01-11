@@ -20,7 +20,17 @@ namespace tcs_service.Repos
             .Include(x => x.Person).ThenInclude(x => x.Schedules).ThenInclude(x => x.Class)
             .Include(x => x.Semester);
 
-        public override IEnumerable<Session> GetAll(Expression<Func<Session, bool>> function) => base.GetAll(function).Where(x => x.Deleted == false);
+        public override IEnumerable<Session> GetAll(Expression<Func<Session, bool>> function)
+        {
+            var sessions = base.GetAll(function);
+            return sessions.Where(x => x.Deleted == false);
+        }
+        
+        public override IEnumerable<Session> GetAll()
+        {
+            var sessions = base.GetAll();
+            return sessions.Where(x => x.Deleted == false);
+        }
 
         public async override Task<Session> Remove(Expression<Func<Session, bool>> function)
         {

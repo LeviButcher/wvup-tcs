@@ -71,7 +71,7 @@ namespace tcs_service.Repos.Base
 
         public virtual IEnumerable<T> GetAll(Expression<Func<T, bool>> function) => Include(table).Where(function);
 
-        public IEnumerable<T> GetAll() => Include(table);
+        public virtual IEnumerable<T> GetAll() => Include(table);
 
         public async virtual Task<T> Remove(Expression<Func<T, bool>> function)
         {
