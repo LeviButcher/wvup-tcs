@@ -194,7 +194,8 @@ namespace tcs_integration.Controllers
 
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             var tour = await response.Content.ReadAsAsync<ClassTour>();
-            Assert.Equal(tourId, tour.Id);           
+            Assert.Equal(tourId, tour.Id);
+            Assert.True(tour.Deleted);
         }
 
         [Fact]
