@@ -20,5 +20,7 @@ namespace tcs_service.Models
 
         [Required]
         public int NumberOfStudents { get; set; }
+
+        public bool Deleted { get; set; }
     }
 }
