@@ -41,5 +41,7 @@ namespace tcs_service.Models
         [ForeignKey(nameof(SemesterCode))]
         public Semester Semester { get; set; }
 
+        public bool Deleted { get; set; }
+
     }
 }
