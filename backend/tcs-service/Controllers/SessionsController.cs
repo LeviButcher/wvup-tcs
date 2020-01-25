@@ -56,7 +56,8 @@ namespace tcs_service.Controllers
             {
                 resultSet = resultSet.Where(x => x.Person.Email == email);
             }
-            var sessionsDisplay = resultSet.Select(x => _mapper.Map<SessionDisplayDTO>(x));
+            var sortedResultSet  = resultSet.OrderBy(x => x.InTime);
+            var sessionsDisplay = sortedResultSet.Select(x => _mapper.Map<SessionDisplayDTO>(x));
             var pageResult = new Paging<SessionDisplayDTO>(page, sessionsDisplay);
             return Ok(pageResult);
         }
