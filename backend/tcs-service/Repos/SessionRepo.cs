@@ -25,11 +25,12 @@ namespace tcs_service.Repos
             var sessions = base.GetAll(function);
             return sessions.Where(x => x.Deleted == false);
         }
-        
+
         public override IEnumerable<Session> GetAll()
         {
             var sessions = base.GetAll();
-            return sessions.Where(x => x.Deleted == false);
+            var sortedSessions = sessions.OrderBy(x => x.InTime);
+            return sortedSessions.Where(x => x.Deleted == false);
         }
 
         public async override Task<Session> Remove(Expression<Func<Session, bool>> function)
