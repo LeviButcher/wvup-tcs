@@ -83,19 +83,19 @@ namespace tcs_service_test.Controllers
             var semesterCode = 201902;
             var bannerPersonInfo = new BannerPersonInfo()
             {
-                Id = id,
-                Email = identifier,
-                Classes = courses,
+                WVUPID = id,
+                EmailAddress = identifier,
+                Courses = courses,
                 FirstName = "Bob",
                 LastName = "Dylan",
-                SemesterId = semesterCode
+                TermCode = semesterCode
             };
             mockBannerService.Setup(x => x.GetBannerInfo(It.IsAny<string>())).ReturnsAsync(() => bannerPersonInfo);
 
 
             var personInfo = await unitPerson.GetPersonInfo(email);
 
-            mockBannerService.Verify(x => x.GetBannerInfo(It.Is<string>(a => a == bannerPersonInfo.Email || a == bannerPersonInfo.Id.ToString())), Times.Once());
+            mockBannerService.Verify(x => x.GetBannerInfo(It.Is<string>(a => a == bannerPersonInfo.EmailAddress || a == bannerPersonInfo.WVUPID.ToString())), Times.Once());
             Assert.NotNull(personInfo);
             Assert.NotNull(personInfo.Schedule);
             var person = db.People.FirstOrDefault(x => x.Email == email || x.Id == id);
@@ -159,9 +159,9 @@ namespace tcs_service_test.Controllers
 
             var bannerPersonInfo = new BannerPersonInfo()
             {
-                Id = person.Id,
-                Email = person.Email,
-                Classes = new List<BannerClass>() {
+                WVUPID = person.Id,
+                EmailAddress = person.Email,
+                Courses = new List<BannerClass>() {
                     new BannerClass(){
                     CRN = 11112,
                     CourseName = "Intro to Excel",
@@ -174,7 +174,7 @@ namespace tcs_service_test.Controllers
                 },
                 FirstName = person.FirstName,
                 LastName = person.LastName,
-                SemesterId = newSemesterId
+                TermCode = newSemesterId
             };
 
             db.People.Add(person);
@@ -189,7 +189,7 @@ namespace tcs_service_test.Controllers
 
             mockBannerService.Verify(x => x.GetBannerInfo(It.Is<string>(a => a == person.Email || a == person.Id.ToString())), Times.Once());
 
-            Assert.Equal(personInfo.Schedule.Select(x => x.CRN), bannerPersonInfo.Classes.Select(x => x.CRN));
+            Assert.Equal(personInfo.Schedule.Select(x => x.CRN), bannerPersonInfo.Courses.Select(x => x.CRN));
             var addedSemester = db.Semesters.SingleOrDefault(x => x.Code == newSemesterId);
             Assert.NotNull(addedSemester);
             Assert.Equal(personInfo.Schedule.Select(x => x.CRN), db.Schedules.Where(x => x.Person.Email == person.Email).Select(x => x.ClassCRN));
@@ -261,9 +261,9 @@ namespace tcs_service_test.Controllers
 
             var bannerPersonInfo = new BannerPersonInfo()
             {
-                Id = person.Id,
-                Email = person.Email,
-                Classes = classes.Select(x => new BannerClass()
+                WVUPID = person.Id,
+                EmailAddress = person.Email,
+                Courses = classes.Select(x => new BannerClass()
                 {
                     CourseName = x.Name,
                     CRN = x.CRN,
@@ -276,7 +276,7 @@ namespace tcs_service_test.Controllers
                 }),
                 FirstName = person.FirstName,
                 LastName = person.LastName,
-                SemesterId = semester.Code
+                TermCode = semester.Code
             };
 
             mockBannerService.Setup(x => x.GetBannerInfo(It.IsAny<string>())).ReturnsAsync(() => bannerPersonInfo);
@@ -311,8 +311,8 @@ namespace tcs_service_test.Controllers
             var id = Utils.ParseOrDefault(identifier, 54321687);
             var bannerPersonInfo = new BannerPersonInfo()
             {
-                Email = email,
-                Id = id,
+                EmailAddress = email,
+                WVUPID = id,
                 FirstName = "Barry",
                 LastName = "Lomphson",
                 Teacher = true
@@ -322,7 +322,7 @@ namespace tcs_service_test.Controllers
 
             var personInfo = await unitPerson.GetPersonInfo(identifier);
 
-            var teacher = db.People.LastOrDefault(x => x.Email == bannerPersonInfo.Email || x.Id == bannerPersonInfo.Id);
+            var teacher = db.People.LastOrDefault(x => x.Email == bannerPersonInfo.EmailAddress || x.Id == bannerPersonInfo.WVUPID);
             Assert.NotNull(teacher);
             Assert.Equal(PersonType.Teacher, teacher.PersonType);
             var semester = db.Semesters.Last();
@@ -382,12 +382,12 @@ namespace tcs_service_test.Controllers
 
             var bannerPersonInfo = new BannerPersonInfo()
             {
-                Id = person.Id,
-                Email = person.Email,
-                Classes = null,
+                WVUPID = person.Id,
+                EmailAddress = person.Email,
+                Courses = null,
                 FirstName = "Bob",
                 LastName = "Dylan",
-                SemesterId = semester.Code
+                TermCode = semester.Code
             };
             mockBannerService.Setup(x => x.GetBannerInfo(It.IsAny<string>())).ReturnsAsync(() => bannerPersonInfo);
 

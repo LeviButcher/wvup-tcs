@@ -33,7 +33,7 @@ namespace tcs_service.UnitOfWorks
             var person = await personRepo.Find(x => x.Email == identifier || x.Id.ToString() == identifier);
 
             var bannerInfo = await bannerApi.GetBannerInfo(identifier);
-            var hasSchedule = await scheduleRepo.Exist(x => person is Person && x.SemesterCode == bannerInfo.SemesterId && x.PersonId == person.Id);
+            var hasSchedule = await scheduleRepo.Exist(x => person is Person && x.SemesterCode == bannerInfo.TermCode && x.PersonId == person.Id);
 
             // if person has a schedule, just return their schedule
             if (person is Person && hasSchedule)
@@ -53,16 +53,16 @@ namespace tcs_service.UnitOfWorks
 
             var newPerson = new Person()
             {
-                Email = bannerInfo.Email,
+                Email = bannerInfo.EmailAddress,
                 FirstName = bannerInfo.FirstName,
                 LastName = bannerInfo.LastName,
-                Id = bannerInfo.Id,
+                Id = bannerInfo.WVUPID,
                 PersonType = bannerInfo.Teacher ? PersonType.Teacher : PersonType.Student
             };
             var savedPerson = await personRepo.CreateOrUpdate(x => x.Id == newPerson.Id, newPerson);
             var semester = new Semester()
             {
-                Code = bannerInfo.SemesterId
+                Code = bannerInfo.TermCode
             };
             var savedSemester = await semesterRepo.CreateOrUpdate(x => x.Code == semester.Code, semester);
 
@@ -78,7 +78,7 @@ namespace tcs_service.UnitOfWorks
                     PersonType = savedPerson.PersonType
                 };
             }
-            var departments = bannerInfo.Classes.Select(x => x.Department).Select(x => new Department()
+            var departments = bannerInfo.Courses.Select(x => x.Department).Select(x => new Department()
             {
                 Code = x.Code,
                 Name = x.Name
@@ -88,7 +88,7 @@ namespace tcs_service.UnitOfWorks
                 await departmentRepo.CreateOrUpdate(x => x.Code == d.Code, d);
             }
 
-            var courses = bannerInfo.Classes.Select(x => new Class()
+            var courses = bannerInfo.Courses.Select(x => new Class()
             {
                 CRN = x.CRN,
                 Name = x.CourseName,
@@ -100,10 +100,10 @@ namespace tcs_service.UnitOfWorks
             {
                 await classRepo.CreateOrUpdate(x => x.CRN == c.CRN, c);
                 await scheduleRepo.CreateOrUpdate(x => x.PersonId == savedPerson.Id
-                && x.SemesterCode == bannerInfo.SemesterId
+                && x.SemesterCode == bannerInfo.TermCode
                 && x.ClassCRN == c.CRN, new Schedule()
                 {
-                    SemesterCode = bannerInfo.SemesterId,
+                    SemesterCode = bannerInfo.TermCode,
                     PersonId = savedPerson.Id,
                     ClassCRN = c.CRN
                 });
