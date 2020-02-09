@@ -22,12 +22,12 @@ namespace tcs_service.Services
             return result;
         }
 
-        public static List<PeakHoursDTO> PeakHours(IEnumerable<Session> sessions, DateTime start, DateTime end) => 
+        public static List<PeakHoursDTO> PeakHours(IEnumerable<Session> sessions, DateTime start, DateTime end) =>
                 sessions.Where(x => x.InTime.Date >= start.Date && x.InTime.Date <= end.Date)
                 .GroupBy(x => x.InTime.Hour)
                 .Where(x => x.Count() >= 1)
                 .Select(x => new PeakHoursDTO(x.Key, x.Count())).ToList();
-        
+
         public static List<ClassTourReportDTO> ClassTours(IEnumerable<ClassTour> tours, DateTime start, DateTime end) =>
                 tours.Where(x => x.DayVisited >= start && x.DayVisited <= end)
                 .GroupBy(x => x.Name)
@@ -124,7 +124,7 @@ namespace tcs_service.Services
                                   ClassName = grp.Key.className,
                                   Visits = grp.Count()
                               };
-            
+
             var finalResult = resultGroup.Concat(tutorResult);
 
             return finalResult.ToList();
@@ -145,7 +145,7 @@ namespace tcs_service.Services
                 }
                 if (successCount != null)
                 {
-                    DetermineSuccess(course.Grade, successCount);
+                    DetermineSuccess(course.FinalGrade, successCount);
                 }
                 else
                 {
@@ -156,7 +156,7 @@ namespace tcs_service.Services
                         DepartmentName = course.DepartmentName
                     };
 
-                    DetermineSuccess(course.Grade, successCourse);
+                    DetermineSuccess(course.FinalGrade, successCourse);
                     coursesWithSuccessCount.Add(successCourse);
                 }
             }
@@ -185,5 +185,5 @@ namespace tcs_service.Services
     }
 
 
-   
+
 }

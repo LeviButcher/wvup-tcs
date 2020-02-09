@@ -13,13 +13,13 @@ namespace tcs_service.Services.Interfaces
 
 public class BannerPersonInfo
 {
-    public int Id { get; set; }
-    public string Email { get; set; }
+    public int WVUPID { get; set; }
+    public string EmailAddress { get; set; }
     public string FirstName { get; set; }
     public string LastName { get; set; }
-    public int SemesterId { get; set; }
+    public int TermCode { get; set; }
     public bool Teacher { get; set; }
-    public IEnumerable<BannerClass> Classes { get; set; }
+    public IEnumerable<BannerClass> Courses { get; set; }
 }
 
 

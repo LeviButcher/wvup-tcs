@@ -50,7 +50,8 @@ namespace tcs_service.Services
                 CRN = bannerGradeInfo.CRN,
                 CourseName = bannerGradeInfo.SubjectCode += bannerGradeInfo.CourseNumber,
                 DepartmentName = bannerGradeInfo.SubjectCode,
-                Grade = (Grade)Enum.Parse(typeof(Grade), bannerGradeInfo.FinalGrade)
+                MidtermGrade = (Grade)Enum.Parse(typeof(Grade), bannerGradeInfo.MidtermGrade),
+                FinalGrade = (Grade)Enum.Parse(typeof(Grade), bannerGradeInfo.FinalGrade)
             };
         }
     }

@@ -52,8 +52,8 @@ namespace tcs_service_test.Services
         {
             var bannerInfo = new BannerPersonInfo()
             {
-                Email = identifier,
-                Id = Utils.ParseOrDefault(identifier, 11243213),
+                EmailAddress = identifier,
+                WVUPID = Utils.ParseOrDefault(identifier, 11243213),
                 FirstName = "Billy",
                 LastName = "Loel",
                 Teacher = false
@@ -83,8 +83,8 @@ namespace tcs_service_test.Services
         {
             var bannerInfo = new BannerPersonInfo()
             {
-                Email = identifier,
-                Id = Utils.ParseOrDefault(identifier, 11243213),
+                EmailAddress = identifier,
+                WVUPID = Utils.ParseOrDefault(identifier, 11243213),
                 FirstName = "Barry",
                 LastName = "LoppySomph",
                 Teacher = true
@@ -156,7 +156,7 @@ namespace tcs_service_test.Services
                 Response.Create()
                 .WithStatusCode(200)
                 .WithHeader("Content-Type", "application/json")
-                .WithBodyAsJson(new { FinalGrade = "A", CRN = classCRN, SubjectCode = "STEM", CourseNumber = "101" })
+                .WithBodyAsJson(new { FinalGrade = "A", MidtermGrade = "B", CRN = classCRN, SubjectCode = "STEM", CourseNumber = "101" })
             );
             var result = await bannerApi.GetStudentGrade(studentId, classCRN, semesterCode);
             Assert.NotNull(result);
