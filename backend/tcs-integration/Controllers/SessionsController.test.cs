@@ -47,6 +47,30 @@ namespace tcs_integration.Controllers
             Assert.NotNull(sessions);
         }
 
+        [Fact]
+        public async void GET_Sessions_ShouldReturn_ListInAscendingOrderByInTime()
+        {
+            var client = _factory.CreateClient();
+            var user = await Login(client);
+            var request = new HttpRequestMessage(HttpMethod.Get, "api/sessions");
+            request.Headers.Add("Authorization", $"Bearer {user.Token}");
+
+            var response = await client.SendAsync(request);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            var sessions = await response.Content.ReadAsAsync<IEnumerable<Session>>();
+            var previousSession = default(Session);
+            bool isPreviousSession = false;
+            foreach(Session session in sessions)
+            {
+                if(isPreviousSession)
+                {
+                    Assert.True(previousSession.InTime.CompareTo(session.InTime) < 0);
+                }
+                previousSession = session;
+                isPreviousSession = true;
+            }
+        }
+
 
         [Fact]
         public async void GET_Sessions_Id_ShouldReturnSessionWithMatchingId()

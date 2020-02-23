@@ -99,6 +99,83 @@ namespace tcs_service_test.Repos
             Assert.True(deletedSession.Deleted);
         }
 
+        [Fact]
+        public async void Session_GetAll_SortedByInTime()
+        {
+            var classes = new List<Class>()
+            {
+                new Class() {
+                    Name = "Into to Excel",
+                    ShortName = "CS 101",
+                    CRN = 24668,
+                    Department = new Department () {
+                        Code = 134,
+                        Name = "STEM"
+                    }
+                },
+                new Class() {
+                    Name = "Advanced Datastructures",
+                    ShortName = "CS 387",
+                    CRN = 546789,
+                    Department = new Department () {
+                        Code = 134,
+                        Name = "STEM"
+                    }
+                }
+            };
+            var reasons = new List<Reason>()
+            {
+                new Reason() {
+                    Id = 1,
+                    Name = "Bone Use"
+                },
+                new Reason() {
+                    Id = 2,
+                    Name = "Computer Use"
+                }
+            };
+
+            var person = new Person()
+            {
+                Email = "lbutche3@wvup.edu",
+                FirstName = "Tom",
+                LastName = "Betty",
+                Id = 4697,
+                PersonType = PersonType.Student
+            };
+            var semester = new Semester()
+            {
+                Code = 201903
+            };
+
+            var session = new Session()
+            {
+                InTime = DateTime.Now,
+                OutTime = DateTime.Now.Add(new TimeSpan(5)),
+                PersonId = person.Id,
+                SemesterCode = semester.Code,
+                SessionClasses = new List<SessionClass>() { new SessionClass() { ClassId = 24668 } },
+                SessionReasons = new List<SessionReason>() { new SessionReason() { ReasonId = 1 } },
+                Deleted = false
+            };
+
+            db.Classes.AddRange(classes);
+            db.People.Add(person);
+            db.Semesters.Add(semester);
+            db.Sessions.Add(session);
+            db.SaveChanges();
+            bool isPreviousSession = false;
+            var previousSession = default(Session);
+            foreach(Session loopedSession in sessionRepo.GetAll() )
+            {
+                if (isPreviousSession)
+                {
+                    Assert.True(previousSession.InTime.CompareTo(session.InTime) < 0);
+                }
+                previousSession = session;
+                isPreviousSession = true;
+            }
+        }
 
         [Fact]
         public void Session_DeletedIsFalse_SessionIsReturnedByGetAll()
@@ -165,7 +242,7 @@ namespace tcs_service_test.Repos
             db.Semesters.Add(semester);
             db.Sessions.Add(session);
             db.SaveChanges();
-            
+
             var results = sessionRepo.GetAll();
 
             Assert.Equal(session.OutTime, results.FirstOrDefault().OutTime);
