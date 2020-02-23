@@ -8,7 +8,9 @@
 
         public string CourseName { get; set; }
 
-        public Grade Grade { get; set; }
+        public Grade MidtermGrade { get; set; }
+
+        public Grade FinalGrade { get; set; }
     }
 }
 

@@ -1,32 +1,42 @@
 import React from 'react';
 import { CSVLink } from 'react-csv';
-import { clone } from 'ramda';
 import { Router } from '@reach/router';
 import { ReportLayout, Table, Header, Card, PieChart } from '../../ui';
 import StartToEndDateForm from '../../components/StartToEndDateForm';
 import useApi from '../../hooks/useApi';
 
-// take all reasons and split up into reason groups
-const filterReason = reason => element => element.reasonName === reason;
+type ReasonWithClassVisits = {
+  reasonName: string,
+  reasonId: string,
+  className: string,
+  classCRN: string,
+  visits: number
+};
 
-// reducer to give reason, filter by reason
-const reasonForVisitingToReasonsReducer = (acc, reasonForVisiting) => {
-  const found = acc.find(element => element === reasonForVisiting.reasonName);
+const uniqueElementsReducer = func => (acc, curr) => {
+  const found = acc.find(func(curr));
   if (found) return acc;
-  acc.push(reasonForVisiting.reasonName);
-  return acc;
+  return [...acc, curr];
 };
 
-const reasonTotalStudentReducer = (acc, reason) => {
-  // reason already in acc, add to totalStudents
-  const index = acc.findIndex(filterReason(reason.reasonName));
-  if (index !== -1) {
-    acc[index].visits += reason.visits;
-  } else {
-    acc.push(clone(reason));
-  }
-  return acc;
-};
+const filterReason = reasonName => element => element.reasonName === reasonName;
+
+// Takes a list of ReasonWithClassVisits and returns a list of only the unique reason names
+const uniqueReasonNamesReducer = uniqueElementsReducer(reasonName => element =>
+  element === reasonName
+);
+
+// Used to get a Reasons Total Visits, for Pie Chart
+const sumUniqueReasonsWithClassVisits = reasons =>
+  reasons
+    .map(x => x.reasonName)
+    .reduce(uniqueReasonNamesReducer, [])
+    .map(reason => ({
+      reasonName: reason,
+      visits: reasons
+        .filter(filterReason(reason))
+        .reduce((acc, r) => acc + r.visits, 0)
+    }));
 
 type Props = {
   navigate: any,
@@ -41,8 +51,8 @@ const ReasonsReport = ({ navigate, '*': unMatchedUri }: Props) => {
         title="Reason For Visiting Report"
         style={{ gridArea: 'form' }}
         initialValues={{
-          startDate: start,
-          endDate: end
+          startDate: start || '',
+          endDate: end || ''
         }}
         onSubmit={({ startDate, endDate }) => {
           return Promise.resolve(navigate(`${startDate}/${endDate}`));
@@ -73,7 +83,7 @@ const ReasonsResult = ({ startDate, endDate }: ReasonsResultProps) => {
           <Card width="600px" style={{ gridArea: 'chart' }}>
             <PieChart
               title="Reason For Visiting Percentages"
-              data={reasonData.reduce(reasonTotalStudentReducer, [])}
+              data={sumUniqueReasonsWithClassVisits(reasonData)}
               x={d => d.reasonName}
               y={d => d.visits}
             />
@@ -86,7 +96,8 @@ const ReasonsResult = ({ startDate, endDate }: ReasonsResultProps) => {
               </CSVLink>
             </Header>
             {reasonData
-              .reduce(reasonForVisitingToReasonsReducer, [])
+              .map(x => x.reasonName)
+              .reduce(uniqueReasonNamesReducer, [])
               .map(reason => (
                 <ReasonsTable
                   key={reason}
@@ -101,7 +112,12 @@ const ReasonsResult = ({ startDate, endDate }: ReasonsResultProps) => {
   );
 };
 
-const ReasonsTable = ({ reasons, name }) => {
+type ReasonsTableProps = {
+  reasons: Array<ReasonWithClassVisits>,
+  name: string
+};
+
+const ReasonsTable = ({ reasons, name }: ReasonsTableProps) => {
   return (
     <Table>
       <caption>
@@ -121,9 +137,9 @@ const ReasonsTable = ({ reasons, name }) => {
       </thead>
       <tbody>
         {reasons.map(reason => (
-          <tr key={reason.courseName + reason.reasonName}>
-            <td>{reason.courseName}</td>
-            <td>{reason.courseCRN}</td>
+          <tr key={reason.className + reason.reasonName}>
+            <td>{reason.className}</td>
+            <td>{reason.classCRN}</td>
             <td>{reason.visits}</td>
           </tr>
         ))}

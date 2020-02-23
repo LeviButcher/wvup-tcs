@@ -35,13 +35,13 @@ namespace tcs_service.Services
                 {
                     return new BannerPersonInfo()
                     {
-                        Email = person.Email,
+                        EmailAddress = person.Email,
                         FirstName = person.FirstName,
                         LastName = person.LastName,
-                        Id = person.Id,
+                        WVUPID = person.Id,
                         Teacher = false,
-                        SemesterId = currentSemester.Code,
-                        Classes = randomCourses.Select(x => new BannerClass()
+                        TermCode = currentSemester.Code,
+                        Courses = randomCourses.Select(x => new BannerClass()
                         {
                             CourseName = x.Name,
                             CRN = x.CRN,
@@ -58,12 +58,12 @@ namespace tcs_service.Services
                 {
                     return new BannerPersonInfo()
                     {
-                        Email = person.Email,
+                        EmailAddress = person.Email,
                         FirstName = person.FirstName,
                         LastName = person.LastName,
-                        Id = person.Id,
+                        WVUPID = person.Id,
                         Teacher = true,
-                        SemesterId = currentSemester.Code,
+                        TermCode = currentSemester.Code,
                     };
                 }
             }
@@ -82,7 +82,7 @@ namespace tcs_service.Services
                 CRN = course.CRN,
                 CourseName = course.Name,
                 DepartmentName = course.Department.Name,
-                Grade = (Grade)new Random().Next(grades.Length),
+                FinalGrade = (Grade)new Random().Next(grades.Length),
             };
         }
     }

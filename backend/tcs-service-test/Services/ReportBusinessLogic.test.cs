@@ -10,10 +10,10 @@ namespace tcs_service_test.Services
 {
     public class ReportBusinessLogicTest
     {
-        public ReportBusinessLogicTest() { } 
+        public ReportBusinessLogicTest() { }
 
         [Fact]
-        public void WeelyVisits_SessionOnStartDay_ResultCountShouldBeOne()
+        public void WeeklyVisits_SessionOnStartDay_ResultCountShouldBeOne()
         {
             var sessions = new List<Session>() {
                 new Session() {
@@ -27,7 +27,7 @@ namespace tcs_service_test.Services
         }
 
         [Fact]
-        public void WeelyVisits_SessionOnEndDay_ResultCountShouldBeOne()
+        public void WeeklyVisits_SessionOnEndDay_ResultCountShouldBeOne()
         {
             var sessions = new List<Session>() {
                 new Session() {
@@ -41,7 +41,7 @@ namespace tcs_service_test.Services
         }
 
         [Fact]
-        public void WeelyVisits_SessionOnTheDayBeforeStartDate_ResultCountShouldBeZero()
+        public void WeeklyVisits_SessionOnTheDayBeforeStartDate_ResultCountShouldBeZero()
         {
             var sessions = new List<Session>() {
                 new Session() {
@@ -55,7 +55,7 @@ namespace tcs_service_test.Services
         }
 
         [Fact]
-        public void WeelyVisits_SessionOnTheDayAfterEndDate_ResultCountShouldBeZero()
+        public void WeeklyVisits_SessionOnTheDayAfterEndDate_ResultCountShouldBeZero()
         {
             var sessions = new List<Session>() {
                 new Session() {
@@ -69,7 +69,7 @@ namespace tcs_service_test.Services
         }
 
         [Fact]
-        public void WeelyVisits_TwoWeekSpan_OneSessionEachWeek_ResultsShouldHaveCountOfTwo_EachWeekShouldHaveCountOfOne()
+        public void WeeklyVisits_TwoWeekSpan_OneSessionEachWeek_ResultsShouldHaveCountOfTwo_EachWeekShouldHaveCountOfOne()
         {
             var sessions = new List<Session>() {
                 new Session() {
@@ -129,7 +129,7 @@ namespace tcs_service_test.Services
                 },
                 new Session() {
                     InTime = new DateTime(2020, 12, 05, 10, 0, 0),
-                    OutTime = new DateTime(2020, 12, 05, 11, 00, 0),    
+                    OutTime = new DateTime(2020, 12, 05, 11, 00, 0),
                 },
                 new Session() {
                     InTime = new DateTime(2020, 12, 06, 17, 0, 0),
@@ -153,7 +153,7 @@ namespace tcs_service_test.Services
                     NumberOfStudents = 23
                 }
             };
-            
+
             var results = ReportsBusinessLogic.ClassTours(tours, new DateTime(2020, 12, 01), new DateTime(2020, 12, 07));
             Assert.Single(results);
         }
@@ -389,7 +389,7 @@ namespace tcs_service_test.Services
                     SessionClasses = new List<SessionClass>()
                     {
                         new SessionClass() { Class = new Class(){ Name = "Art 101", CRN = 123, ShortName = "Art", DepartmentCode = 111 } }
-                    }                    
+                    }
                 }
             };
 
@@ -465,7 +465,7 @@ namespace tcs_service_test.Services
             var results = ReportsBusinessLogic.Reasons(sessions, new DateTime(2020, 12, 24), new DateTime(2020, 12, 30));
             Assert.Equal(1, results.Where(x => x.ReasonName == "Tutoring").FirstOrDefault().Visits);
         }
-        
+
         [Fact]
         public void Reasons_TwoSessionsForAClass_TutoringIsFalse_TwoDifferentReasonsForVisit_ResultsIncludesClassTwice_OnceForEachReason()
         {
@@ -554,7 +554,7 @@ namespace tcs_service_test.Services
                     CourseName = "History",
                     CRN = 111,
                     DepartmentName = "History Dept",
-                    Grade = Grade.A
+                    FinalGrade = Grade.A
                 }
             };
 
@@ -574,7 +574,7 @@ namespace tcs_service_test.Services
                     CourseName = "History",
                     CRN = 111,
                     DepartmentName = "History Dept",
-                    Grade = Grade.B
+                    FinalGrade = Grade.B
                 }
             };
 
@@ -594,7 +594,7 @@ namespace tcs_service_test.Services
                     CourseName = "History",
                     CRN = 111,
                     DepartmentName = "History Dept",
-                    Grade = Grade.C
+                    FinalGrade = Grade.C
                 }
             };
 
@@ -614,7 +614,7 @@ namespace tcs_service_test.Services
                     CourseName = "History",
                     CRN = 111,
                     DepartmentName = "History Dept",
-                    Grade = Grade.D
+                    FinalGrade = Grade.D
                 }
             };
 
@@ -634,7 +634,7 @@ namespace tcs_service_test.Services
                     CourseName = "History",
                     CRN = 111,
                     DepartmentName = "History Dept",
-                    Grade = Grade.F
+                    FinalGrade = Grade.F
                 }
             };
 
@@ -654,7 +654,7 @@ namespace tcs_service_test.Services
                     CourseName = "History",
                     CRN = 111,
                     DepartmentName = "History Dept",
-                    Grade = Grade.FIW
+                    FinalGrade = Grade.FIW
                 }
             };
 
@@ -674,7 +674,7 @@ namespace tcs_service_test.Services
                     CourseName = "History",
                     CRN = 111,
                     DepartmentName = "History Dept",
-                    Grade = Grade.W
+                    FinalGrade = Grade.W
                 }
             };
 
@@ -694,7 +694,7 @@ namespace tcs_service_test.Services
                     CourseName = "History",
                     CRN = 111,
                     DepartmentName = "History Dept",
-                    Grade = Grade.I
+                    FinalGrade = Grade.I
                 }
             };
 
@@ -714,14 +714,14 @@ namespace tcs_service_test.Services
                     CourseName = "History",
                     CRN = 111,
                     DepartmentName = "History Dept",
-                    Grade = Grade.A
+                    FinalGrade = Grade.A
                 },
                 new ClassWithGradeDTO()
                 {
                     CourseName = "History",
                     CRN = 111,
                     DepartmentName = "History Dept",
-                    Grade = Grade.F
+                    FinalGrade = Grade.F
                 },
             };
 
@@ -741,14 +741,14 @@ namespace tcs_service_test.Services
                     CourseName = "History",
                     CRN = 111,
                     DepartmentName = "History Dept",
-                    Grade = Grade.A
+                    FinalGrade = Grade.A
                 },
                 new ClassWithGradeDTO()
                 {
                     CourseName = "English",
                     CRN = 123,
                     DepartmentName = "English Dept",
-                    Grade = Grade.A
+                    FinalGrade = Grade.A
                 },
             };
 
