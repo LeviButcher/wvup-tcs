@@ -135,3 +135,24 @@ test('Should display fetch error message when fetch returns a non 2XX status cod
   const errorMessage = await waitForElement(() => getByText(error.message));
   expect(errorMessage).toBeDefined();
 });
+
+test('Should be able to select a course, deselect that course, and select the course again: #196', async () => {
+  const fakeFetch = jest.fn(() =>
+    Promise.resolve({
+      status: 200,
+      json: () => Promise.resolve(reasons),
+      headers: []
+    })
+  );
+
+  global.fetch = fakeFetch;
+
+  const { getByLabelText } = render(<StudentSignInForm student={student} />);
+  const checkbox = getByLabelText(/Math121/i);
+  fireEvent.click(checkbox);
+  expect(checkbox).toBeChecked();
+  fireEvent.click(checkbox);
+  expect(checkbox).not.toBeChecked();
+  fireEvent.click(checkbox);
+  expect(checkbox).toBeChecked();
+});
