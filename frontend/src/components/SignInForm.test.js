@@ -441,7 +441,7 @@ test('Should display fetch response message when fetch returns non 2XX status co
   });
 });
 
-test('Should display inTime when inTime has milliseconds and should not fill in outTime when null', async () => {
+test('Should display inTime when inTime has milliseconds and should not fill in outTime when null', () => {
   const signInRecord = {
     inTime: '2019-05-12T01:00:30.6748946',
     outTime: null,
@@ -463,4 +463,18 @@ test('Should display inTime when inTime has milliseconds and should not fill in 
   expect(getByLabelText(/in time/i)).toHaveValue('01:00');
   expect(getByLabelText(/out date/i)).toHaveValue('');
   expect(getByLabelText(/out time/i)).toHaveValue('');
+});
+
+test('Should be able to select a course, deselect that course, and select the course again: #196', async () => {
+  const { getByLabelText } = render(
+    <SignInForm signInRecord={studentSignIn} semesters={semesters} />
+  );
+
+  const checkbox = getByLabelText(/CS101/i);
+  fireEvent.click(checkbox);
+  expect(checkbox).toBeChecked();
+  fireEvent.click(checkbox);
+  expect(checkbox).not.toBeChecked();
+  fireEvent.click(checkbox);
+  expect(checkbox).toBeChecked();
 });
