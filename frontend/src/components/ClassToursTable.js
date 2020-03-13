@@ -2,6 +2,7 @@ import React from 'react';
 import { Table, Link } from '../ui';
 import { Gear, Trashcan } from '../ui/icons';
 import type { ClassTour } from '../types';
+import { apiFetch } from '../utils/fetchLight';
 
 type Props = {
   classTours: Array<ClassTour>
@@ -55,10 +56,19 @@ const ClassTourRow = ({
           <Gear />
         </Link>
         <Trashcan
-          onClick={() => {
-            // eslint-disable-next-line no-alert
-            // eslint-disable-next-line no-undef
-            alert('Not implemented yet');
+          data-testid="delete-classtour"
+          onClick={async () => {
+            if (
+              window.confirm(
+                `Are you sure you want to delete ${name} with ${numberOfStudents} students visited?`
+              )
+            ) {
+              await apiFetch(
+                `classtours/${id || ''}`,
+                'DELETE',
+                null
+              ).then(() => window.location.reload());
+            }
           }}
         />
       </td>
