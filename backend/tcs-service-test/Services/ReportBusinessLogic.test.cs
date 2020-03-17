@@ -763,5 +763,21 @@ namespace tcs_service_test.Services
             Assert.Equal(0, results.Where(x => x.CRN == 123).FirstOrDefault().DroppedStudentCount);
             Assert.Equal(1, results.Where(x => x.CRN == 123).FirstOrDefault().UniqueStudentCount);
         }
+
+        [Fact]
+        public void SuccessReport_APassedInClassGradeIsNull_ShouldNotFailDueToNull()
+        {
+            var classWithGradeList = new List<ClassWithGradeDTO>() {
+                new ClassWithGradeDTO() {
+                    CourseName = "CS101",
+                    CRN = 1324,
+                    DepartmentName = "STEM",
+                    FinalGrade = Grade.A
+                },
+                null,
+            };
+            var results = ReportsBusinessLogic.SuccessReport(classWithGradeList);
+            Assert.NotEmpty(results);
+        }
     }
 }

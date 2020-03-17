@@ -1,4 +1,6 @@
-﻿using System;
+﻿using System.Collections.Specialized;
+using System.ComponentModel;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -9,6 +11,7 @@ using tcs_service.Models.DTO;
 using tcs_service.Repos.Interfaces;
 using tcs_service.Services;
 using tcs_service.Services.Interfaces;
+using tcs_service.Models;
 
 namespace tcs_service.Controllers
 {
@@ -17,9 +20,9 @@ namespace tcs_service.Controllers
     [Authorize]
     public class ReportsController : ControllerBase
     {
-        private ISessionRepo _sessionRepo;
-        private IClassTourRepo _classTourRepo;
-        private IBannerService _bannerService;
+        private readonly ISessionRepo _sessionRepo;
+        private readonly IClassTourRepo _classTourRepo;
+        private readonly IBannerService _bannerService;
 
         public ReportsController(ISessionRepo sessionRepo, IClassTourRepo classTourRepo, IBannerService bannerService)
         {
@@ -58,35 +61,24 @@ namespace tcs_service.Controllers
             return Ok(ReportsBusinessLogic.Reasons(_sessionRepo.GetAll(), start, end));
         }
 
-        [HttpGet("success/{semesterId}")]
-        public async Task<IActionResult> SuccessReport(int semesterId)
+        /*
+            *Success Report Rules*
+            Success Report must look up all the sessions for the semester Code passed in that were only sessions for students.
+            Then it will call banner to get the grade for each class visited for during a session within the semester.
+            The ClassGrade returned by banner will be passed off to SuccessReport for it to do the final calculations and that will be returned to the frontend.
+        */
+        [HttpGet("success/{semesterCode}")]
+        public async Task<IActionResult> SuccessReport([FromRoute]int semesterCode)
         {
-            var studentCourses = from item in _sessionRepo.GetAll()
-                                 from course in item.SessionClasses
-                                 where item.SemesterCode == semesterId
-                                 select new
-                                 {
-                                     item.PersonId,
-                                     course.Class,
-                                     course.Class.Department,
-                                 };
+            var tasks = _sessionRepo.GetAll(x => x.SemesterCode == semesterCode
+                && x.Person.PersonType == PersonType.Student)
+                .SelectMany(x => x.SessionClasses.Select(s => new { x.PersonId, s.Class.CRN }))
+                .Distinct()
+                .Select(x => _bannerService.GetStudentGrade(x.PersonId, x.CRN, semesterCode));
 
-            List<ClassWithGradeDTO> classessWithGrades = new List<ClassWithGradeDTO>();
+            var classGrades = await Task.WhenAll(tasks);
 
-            foreach (var item in studentCourses.Distinct())
-            {
-                try
-                {
-                    var grade = await _bannerService.GetStudentGrade(item.PersonId, item.Class.CRN, semesterId);
-                    classessWithGrades.Add(grade);
-                }
-                catch
-                {
-                    throw new TCSException("Something went wrong");
-                }
-            }
-
-            return Ok(ReportsBusinessLogic.SuccessReport(classessWithGrades));
+            return Ok(ReportsBusinessLogic.SuccessReport(classGrades));
         }
     }
 }

@@ -36,22 +36,41 @@ namespace tcs_service.Services
             throw new TCSException("Banner is currently down");
         }
 
+        /*
+            GetStudentGrade
+
+            Returns the grade a student made in a class during a semester.
+
+            If the student did not take the class associated with the crn passed in,
+                this will return null
+
+            If the student does not yet have a grade for the classed passed in,
+                this will return null
+        */
         public async Task<ClassWithGradeDTO> GetStudentGrade(int studentId, int crn, int termCode)
         {
             var response = await bannerApi.GetAsync($"student/{studentId}/{termCode}/{crn}");
             if (response.StatusCode == HttpStatusCode.NotFound)
-                throw new TCSException($"No information found for {studentId} during semester {termCode} for class {crn}");
-            if (response.StatusCode != HttpStatusCode.OK) throw new TCSException("Banner is currently down");
+                return null;
+            if (response.StatusCode != HttpStatusCode.OK) return null;
 
             var bannerGradeInfo = await response.Content.ReadAsAsync<BannerGradeInformationDTO>();
+
+            Grade midtermGrade;
+            Grade finalGrade;
+            var midtermConversionSuccess = Enum.TryParse(bannerGradeInfo.MidtermGrade, true, out midtermGrade);
+            var finalGradeConversionSuccess = Enum.TryParse(bannerGradeInfo.FinalGrade, true, out finalGrade);
+
+            if (!midtermConversionSuccess || !finalGradeConversionSuccess)
+                return null;
 
             return new ClassWithGradeDTO()
             {
                 CRN = bannerGradeInfo.CRN,
                 CourseName = bannerGradeInfo.SubjectCode += bannerGradeInfo.CourseNumber,
                 DepartmentName = bannerGradeInfo.Department,
-                MidtermGrade = (Grade)Enum.Parse(typeof(Grade), bannerGradeInfo.MidtermGrade),
-                FinalGrade = (Grade)Enum.Parse(typeof(Grade), bannerGradeInfo.FinalGrade)
+                MidtermGrade = midtermGrade,
+                FinalGrade = finalGrade
             };
         }
     }
