@@ -130,60 +130,18 @@ namespace tcs_service.Services
             return finalResult.ToList();
         }
 
-        public static List<ClassWithSuccessCountDTO> SuccessReport(IEnumerable<ClassWithGradeDTO> classesWithGrades)
+        public static List<ClassSuccessCountDTO> SuccessReport(IEnumerable<ClassWithGradeDTO> classesWithGrades)
         {
+            var cleanedClassGrades = classesWithGrades.Where(x => x != null);
 
-            List<ClassWithSuccessCountDTO> coursesWithSuccessCount = new List<ClassWithSuccessCountDTO>();
-
-            foreach (var course in classesWithGrades)
-            {
-                ClassWithSuccessCountDTO successCount = null;
-
-                if (coursesWithSuccessCount.Any(x => x.CRN == course.CRN))
-                {
-                    successCount = coursesWithSuccessCount.Where(x => x.CRN == course.CRN).First();
-                }
-                if (successCount != null)
-                {
-                    DetermineSuccess(course.FinalGrade, successCount);
-                }
-                else
-                {
-                    var successCourse = new ClassWithSuccessCountDTO()
-                    {
-                        ClassName = course.CourseName,
-                        CRN = course.CRN,
-                        DepartmentName = course.DepartmentName
-                    };
-
-                    DetermineSuccess(course.FinalGrade, successCourse);
-                    coursesWithSuccessCount.Add(successCourse);
-                }
-            }
-
-            return coursesWithSuccessCount;
-        }
-
-        private static void DetermineSuccess(Grade grade, ClassWithSuccessCountDTO vm)
-        {
-            if (grade <= Grade.I)
-            {
-                vm.PassedSuccessfullyCount++;
-                vm.CompletedCourseCount++;
-            }
-            else if (grade <= Grade.F)
-            {
-                vm.CompletedCourseCount++;
-            }
-            else
-            {
-                vm.DroppedStudentCount++;
-            }
-
-            vm.UniqueStudentCount++;
+            return cleanedClassGrades
+            .Select(x => new { x.CRN, x.CourseName, x.DepartmentName })
+            .Distinct()
+            .Select(x => new ClassSuccessCountDTO(x.CRN, x.CourseName, x.DepartmentName))
+            .Select(x =>
+                cleanedClassGrades.Where(c => c.CRN == x.CRN)
+                    .Aggregate(x, (acc, curr) => acc.DetermineSuccess(curr.FinalGrade))
+            ).ToList();
         }
     }
-
-
-
 }

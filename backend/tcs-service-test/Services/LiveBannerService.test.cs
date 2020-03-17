@@ -1,5 +1,4 @@
 using System;
-using System.Net;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
@@ -14,6 +13,7 @@ using WireMock.ResponseBuilders;
 using WireMock.Settings;
 using tcs_service_test.Helpers;
 using tcs_service.Helpers;
+using tcs_service.Models.DTO;
 
 namespace tcs_service_test.Services
 {
@@ -159,7 +159,6 @@ namespace tcs_service_test.Services
                 .WithBodyAsJson(new { FinalGrade = "A", MidtermGrade = "B", CRN = classCRN, SubjectCode = "STEM", CourseNumber = "101" })
             );
             var result = await bannerApi.GetStudentGrade(studentId, classCRN, semesterCode);
-            Assert.NotNull(result);
             Assert.Equal(classCRN, result.CRN);
         }
 
@@ -177,13 +176,12 @@ namespace tcs_service_test.Services
                 Response.Create()
                 .WithStatusCode(404)
             );
-
-            var exception = await Assert.ThrowsAsync<TCSException>(async () => await bannerApi.GetStudentGrade(studentId, classCRN, semesterCode));
-            Assert.Equal($"No information found for {studentId} during semester {semesterCode} for class {classCRN}", exception.Message);
+            var result = await bannerApi.GetStudentGrade(studentId, classCRN, semesterCode);
+            Assert.Null(result);
         }
 
         [Fact]
-        public async Task GetStudentGrade_BannerApiReturnsBadStatusCode_ShouldThrowTCSException()
+        public async Task GetStudentGrade_BannerApiReturnsBadStatusCode_ShouldReturnNull()
         {
             var studentId = 6789613;
             var semesterCode = 201901;
@@ -197,8 +195,29 @@ namespace tcs_service_test.Services
                 .WithStatusCode(500)
             );
 
-            var exception = await Assert.ThrowsAsync<TCSException>(async () => await bannerApi.GetStudentGrade(studentId, classCRN, semesterCode));
-            Assert.Equal($"Banner is currently down", exception.Message);
+            var result = await bannerApi.GetStudentGrade(studentId, classCRN, semesterCode);
+            Assert.Null(result);
+        }
+
+        [Fact]
+        public async Task GetStudentGrade_BannerApiReturnsNoGrade_ShouldReturnNone()
+        {
+            var studentId = 6789613;
+            var semesterCode = 201901;
+            var classCRN = 1476;
+
+            server.Given(Request.Create()
+            .WithPath($"/student/{studentId}/{semesterCode}/{classCRN}")
+            .UsingGet())
+            .RespondWith(
+                Response.Create()
+                .WithStatusCode(200)
+                .WithHeader("Content-Type", "application/json")
+                .WithBodyAsJson(new { FinalGrade = "", MidtermGrade = "", CRN = classCRN, SubjectCode = "STEM", CourseNumber = "101" })
+            );
+
+            var result = await bannerApi.GetStudentGrade(studentId, classCRN, semesterCode);
+            Assert.Null(result);
         }
     }
 }
