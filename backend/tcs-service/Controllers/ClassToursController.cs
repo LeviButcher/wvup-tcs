@@ -3,83 +3,70 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using tcs_service.Models;
 using tcs_service.Helpers;
+using tcs_service.Models;
 using tcs_service.Repos.Interfaces;
 
-namespace tcs_service.Controllers
-{
-    [Route("api/ClassTours")]
+namespace tcs_service.Controllers {
+    [Route ("api/ClassTours")]
     [ApiController]
     [Authorize]
-    public class ClassToursController : ControllerBase
-    {
+    public class ClassToursController : ControllerBase {
         private readonly IClassTourRepo _iRepo;
 
-        public ClassToursController(IClassTourRepo iRepo)
-        {
+        public ClassToursController (IClassTourRepo iRepo) {
             _iRepo = iRepo;
         }
 
-        [HttpGet("{id}")]
-        public async Task<IActionResult> GetClassTour([FromRoute] int id)
-        {
-            var classTour = await _iRepo.Find(x => x.Id == id);
+        [HttpGet ("{id}")]
+        public async Task<IActionResult> GetClassTour ([FromRoute] int id) {
+            var classTour = await _iRepo.Find (x => x.Id == id);
 
-            if (classTour == null)
-            {
-                return NotFound();
+            if (classTour == null) {
+                return NotFound ();
             }
 
-            return Ok(classTour);
+            return Ok (classTour);
         }
 
         [HttpGet]
-        public IActionResult Get([FromQuery] DateTime start, [FromQuery] DateTime end, [FromQuery] int page = 1)
-        {
-            var pageResult = new Paging<ClassTour>(page, _iRepo.GetBetweenDates(start, end));
-            
-            return Ok(pageResult);
+        public IActionResult Get ([FromQuery] DateTime start, [FromQuery] DateTime end, [FromQuery] int page = 1) {
+            var pageResult = new Paging<ClassTour> (page,
+                _iRepo.GetAll (a => a.DayVisited >= start && a.DayVisited <= end));
+
+            return Ok (pageResult);
         }
 
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutClassTour([FromRoute] int id, [FromBody] ClassTour classTour)
-        {
-            if (id != classTour.Id)
-            {
-                throw new TCSException("Class Tour does not exist");
+        [HttpPut ("{id}")]
+        public async Task<IActionResult> PutClassTour ([FromRoute] int id, [FromBody] ClassTour classTour) {
+            if (id != classTour.Id) {
+                throw new TCSException ("Class Tour does not exist");
             }
 
-            try
-            {
-                await _iRepo.Update(classTour);
-                return Ok(classTour);
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-               return NotFound(new { message = "Something went wrong" });
+            try {
+                await _iRepo.Update (classTour);
+                return Ok (classTour);
+            } catch (DbUpdateConcurrencyException) {
+                return NotFound (new { message = "Something went wrong" });
             }
 
         }
 
         [HttpPost]
-        public async Task<IActionResult> PostClassTour([FromBody] ClassTour classTour)
-        {
-            await _iRepo.Create(classTour);
+        public async Task<IActionResult> PostClassTour ([FromBody] ClassTour classTour) {
+            await _iRepo.Create (classTour);
 
-            return Created($"classtours/{classTour.Id}", classTour);
+            return Created ($"classtours/{classTour.Id}", classTour);
         }
 
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteClassTour([FromRoute] int id)
-        {
-            if (! await _iRepo.Exist(x => x.Id == id))
-            {
-                return NotFound(new { message = "Something went wrong" });
+        [HttpDelete ("{id}")]
+        public async Task<IActionResult> DeleteClassTour ([FromRoute] int id) {
+            if (!await _iRepo.Exist (x => x.Id == id)) {
+                return NotFound (new { message = "Something went wrong" });
             }
-            var tour = await _iRepo.Remove(x => x.Id == id);
-            
-            return Ok(tour);
+            var tour = await _iRepo.Remove (x => x.Id == id);
+
+            return Ok (tour);
         }
     }
 }
