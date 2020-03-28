@@ -1,21 +1,28 @@
-using Microsoft.VisualBasic.CompilerServices;
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.IO;
 using System.Linq;
+using System.Linq.Expressions;
+using System.Net;
+using System.Text;
 using AutoFixture;
 using AutoFixture.AutoMoq;
 using AutoMapper;
+using CsvHelper;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Internal;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.VisualBasic.CompilerServices;
 using Moq;
-using System;
-using System.Linq.Expressions;
 using tcs_service.Controllers;
+using tcs_service.EF;
 using tcs_service.Models;
+using tcs_service.Models.DTOs;
 using tcs_service.Repos;
 using tcs_service.Repos.Interfaces;
 using tcs_service_test.Helpers;
 using Xunit;
-using tcs_service.Models.DTOs;
-using tcs_service.EF;
-using System.Collections.Generic;
 
 namespace tcs_service_test
 {
@@ -24,8 +31,9 @@ namespace tcs_service_test
         const string dbName = "SessionsControllerTest";
         readonly SessionsController sessionController;
         readonly TCSContext db;
-
         readonly ISessionRepo sessionRepo;
+
+        ICSVParser<CSVSessionUpload> csvParser;
 
         public SessionsControllerTest()
         {
@@ -36,8 +44,12 @@ namespace tcs_service_test
             var semesterRepo = new SemesterRepo(dbOptions);
             var sessionClassRepo = new SessionClassRepo(dbOptions);
             var sessionReasonRepo = new SessionReasonRepo(dbOptions);
+            var reasonRepo = new ReasonRepo(dbOptions);
+            var classRepo = new ClassRepo(dbOptions);
+            csvParser = new CSVSessionUploadParser();
             var mapper = Helpers.Utils.GetProjectMapper();
-            sessionController = new SessionsController(sessionRepo, semesterRepo, personRepo, sessionReasonRepo, sessionClassRepo, mapper);
+            var unitSession = new UnitOfWorkSession(personRepo, reasonRepo, sessionRepo, classRepo);
+            sessionController = new SessionsController(sessionRepo, semesterRepo, personRepo, sessionReasonRepo, sessionClassRepo, mapper, csvParser, unitSession);
         }
 
         public void Dispose()
@@ -48,36 +60,34 @@ namespace tcs_service_test
         [Fact]
         public async void UpdateSession_StudentSession_CompletelyChangeClassesAndReasons_ShouldSaveSelectedIntoDatabase()
         {
-            var classes = new List<Class>()
-            {
-                new Class() {
-                    Name = "Into to Excel",
-                    ShortName = "CS 101",
-                    CRN = 24668,
-                    Department = new Department () {
-                        Code = 134,
-                        Name = "STEM"
-                    }
+            var classes = new List<Class>() {
+                new Class () {
+                Name = "Into to Excel",
+                ShortName = "CS 101",
+                CRN = 24668,
+                Department = new Department () {
+                Code = 134,
+                Name = "STEM"
+                }
                 },
-                new Class() {
-                    Name = "Advanced Datastructures",
-                    ShortName = "CS 387",
-                    CRN = 546789,
-                    Department = new Department () {
-                        Code = 134,
-                        Name = "STEM"
-                    }
+                new Class () {
+                Name = "Advanced Datastructures",
+                ShortName = "CS 387",
+                CRN = 546789,
+                Department = new Department () {
+                Code = 134,
+                Name = "STEM"
+                }
                 }
             };
-            var reasons = new List<Reason>()
-            {
-                new Reason() {
-                    Id = 1,
-                    Name = "Bone Use"
+            var reasons = new List<Reason>() {
+                new Reason () {
+                Id = 1,
+                Name = "Bone Use"
                 },
-                new Reason() {
-                    Id = 2,
-                    Name = "Computer Use"
+                new Reason () {
+                Id = 2,
+                Name = "Computer Use"
                 }
             };
 

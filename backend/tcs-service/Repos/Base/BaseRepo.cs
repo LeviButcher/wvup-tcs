@@ -54,6 +54,11 @@ namespace tcs_service.Repos.Base
                 return await Create(t);
             }
         }
+        public async Task<int> Create(IEnumerable<T> tList)
+        {
+            await table.AddRangeAsync(tList);
+            return await SaveChangesAsync();
+        }
 
         public async Task<T> Update(T t)
         {

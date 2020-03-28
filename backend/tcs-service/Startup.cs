@@ -134,6 +134,8 @@ namespace tcs_service
             services.AddScoped<ISessionClassRepo, SessionClassRepo>();
             services.AddScoped<ISessionReasonRepo, SessionReasonRepo>();
             services.AddScoped<IUnitOfWorkPerson, UnitOfWorkPerson>();
+            services.AddScoped<ICSVParser<CSVSessionUpload>, CSVSessionUploadParser>();
+            services.AddScoped<IUnitOfWorkSession, UnitOfWorkSession>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
