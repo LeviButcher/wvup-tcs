@@ -42,7 +42,7 @@ namespace tcs_service_test.Controllers {
                 ));
         }
 
-        List<Person> personList = new List<Person> () {
+        readonly List<Person> personList = new List<Person> () {
             new Person () {
             Email = "lbutche3@wvup.edu",
             FirstName = "Levi",
@@ -54,13 +54,21 @@ namespace tcs_service_test.Controllers {
             Email = "srickard3@wvup.edu",
             FirstName = "Sean",
             LastName = "Epic",
-            Id = 79468
+            Id = 79468,
+            PersonType = PersonType.Student
+            },
+            new Person () {
+            Email = "teacher@wvup.edu",
+            FirstName = "Teach",
+            LastName = "Cool",
+            Id = 45454,
+            PersonType = PersonType.Teacher
             }
         };
-        Semester semester = new Semester () {
+        readonly Semester semester = new Semester () {
             Code = 201901
         };
-        List<Class> courseList = new List<Class> () {
+        readonly List<Class> courseList = new List<Class> () {
             new Class () {
             CRN = 78945,
             Name = "Intro to Comp Science",
@@ -80,7 +88,7 @@ namespace tcs_service_test.Controllers {
             },
             }
         };
-        List<Reason> reasons = new List<Reason> () {
+        readonly List<Reason> reasons = new List<Reason> () {
             new Reason () {
             Name = "Computer Use"
             },
@@ -173,7 +181,7 @@ namespace tcs_service_test.Controllers {
 
             var err = await Assert.ThrowsAsync<TCSException> (async () =>
                 await unitSession.UploadSessions (sessionUploads));
-            Assert.Contains ("lbutche3@wvup.edu does not exist", err.Message);
+            Assert.Contains ("'lbutche3@wvup.edu' does not exist", err.Message);
             Assert.False (CheckSessionWhereCreate (sessionUploads));
         }
 
@@ -240,7 +248,7 @@ namespace tcs_service_test.Controllers {
 
             var err = await Assert.ThrowsAsync<TCSException> (async () =>
                 await unitSession.UploadSessions (sessionUploads));
-            Assert.Contains ("lbutche3@wvup.edu does not exist", err.Message);
+            Assert.Contains ("'lbutche3@wvup.edu' does not exist", err.Message);
             Assert.Contains ("Reason with Name: 'Computer Use' does not exist", err.Message);
             Assert.Contains ("Class with CRN: 78945 does not exist", err.Message);
             Assert.False (CheckSessionWhereCreate (sessionUploads));
@@ -268,6 +276,26 @@ namespace tcs_service_test.Controllers {
                 await unitSession.UploadSessions (sessionUploads));
             Assert.Contains ("Semester with Code: '201901' does not exist", err.Message);
             Assert.False (CheckSessionWhereCreate (sessionUploads));
+        }
+
+        [Fact]
+        public async void UploadSessions_TeacherRecord_ShouldWork () {
+            db.People.AddRange (personList);
+            db.Semesters.Add (semester);
+            await db.SaveChangesAsync ();
+
+            var sessionUploads = new List<CSVSessionUpload> () {
+                new CSVSessionUpload () {
+                Email = "teacher@wvup.edu",
+                InTime = DateTime.Now,
+                OutTime = DateTime.Now.Add (TimeSpan.FromHours (2)),
+                Tutoring = false,
+                SemesterCode = 201901
+                }
+            };
+            var res = await unitSession.UploadSessions (sessionUploads);
+            Assert.Equal (GetAmountOfRecordsThatShouldBeCreated (sessionUploads), res);
+            Assert.True (CheckSessionWhereCreate (sessionUploads));
         }
     }
 }

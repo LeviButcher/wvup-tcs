@@ -28,7 +28,7 @@ public class UnitOfWorkSession : IUnitOfWorkSession {
         var personExistsErrors = (await Task.WhenAll (sessionUploads.Select (async x => {
             var personExists = await personRepo.Exist (p => p.Email == x.Email);
             if (!personExists)
-                return $"{x.Email} does not exist";
+                return $"Person with Email: '{x.Email}' does not exist";
             return null;
         }))).Where (x => x != null);
 
