@@ -1,6 +1,9 @@
-﻿using Newtonsoft.Json;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Internal;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -432,6 +435,52 @@ namespace tcs_integration.Controllers
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             var result = await response.Content.ReadAsAsync<IEnumerable<SessionDisplayDTO>>();
             Assert.All(result, x => Assert.Equal(semesterCode, x.SemesterCode));
+        }
+
+        [Fact]
+        public async void POST_Sessions_Upload_ShouldReturn200()
+        {
+            var filePath = "./test-utils/FakeData.csv";
+            HttpContent fileStream = new StreamContent(File.OpenRead(filePath));
+
+            var client = _factory.CreateClient();
+            var user = await Login(client);
+            var data = new MultipartFormDataContent
+            {
+                { fileStream, "csvFile", "csvFile" }
+            };
+            var request = new HttpRequestMessage(HttpMethod.Post, "api/sessions/upload")
+            {
+                Content = data
+            };
+            request.Headers.Add("Authorization", $"Bearer {user.Token}");
+
+            var response = await client.SendAsync(request);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        }
+
+        [Fact]
+        public async void POST_Sessions_Upload_BadCSVFile_ShouldReturn400()
+        {
+            var filePath = "./test-utils/BadFakeData.csv";
+            HttpContent fileStream = new StreamContent(File.OpenRead(filePath));
+
+            var client = _factory.CreateClient();
+            var user = await Login(client);
+            var data = new MultipartFormDataContent
+            {
+                { fileStream, "csvFile", "csvFile" }
+            };
+            var request = new HttpRequestMessage(HttpMethod.Post, "api/sessions/upload")
+            {
+                Content = data
+            };
+            request.Headers.Add("Authorization", $"Bearer {user.Token}");
+
+            var response = await client.SendAsync(request);
+            Assert.Equal(HttpStatusCode.InternalServerError, response.StatusCode);
+            var error = await response.Content.ReadAsAsync<ErrorMessage>();
+            Assert.NotNull(error.Message);
         }
     }
 }

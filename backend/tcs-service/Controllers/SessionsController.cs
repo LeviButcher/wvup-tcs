@@ -1,15 +1,21 @@
-﻿using System.Net;
-using System;
+﻿using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.IO;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using AutoMapper;
+using CsvHelper;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using tcs_service.Helpers;
 using tcs_service.Models;
 using tcs_service.Models.DTOs;
 using tcs_service.Repos.Interfaces;
+using tcs_service.UnitOfWorks.Interfaces;
 
 namespace tcs_service.Controllers
 {
@@ -24,11 +30,15 @@ namespace tcs_service.Controllers
         private readonly ISessionReasonRepo _sessionReasonRepo;
         private readonly ISessionClassRepo _sessionClassRepo;
         readonly private IMapper _mapper;
+        readonly private ICSVParser<CSVSessionUpload> _csvParser;
+        private readonly IUnitOfWorkSession _unitSession;
 
         public SessionsController(ISessionRepo sessionRepo, ISemesterRepo semesterRepo, IPersonRepo personRepo,
-         ISessionReasonRepo sessionReasonRepo, ISessionClassRepo sessionClassRepo, IMapper mapper)
+            ISessionReasonRepo sessionReasonRepo, ISessionClassRepo sessionClassRepo, IMapper mapper, ICSVParser<CSVSessionUpload> csvParser, IUnitOfWorkSession unitSession)
         {
             _mapper = mapper;
+            _csvParser = csvParser;
+            _unitSession = unitSession;
             _sessionRepo = sessionRepo;
             _semesterRepo = semesterRepo;
             _personRepo = personRepo;
@@ -195,7 +205,6 @@ namespace tcs_service.Controllers
                 throw new TCSException("Something went wrong");
             }
 
-
             if (!signIn.Tutoring && signIn.SelectedReasons.Count() < 1) throw new TCSException("Must select 1 or more reasons for visiting.");
 
             var alreadySignedIn = await _sessionRepo.Exist(x => x.PersonId == signIn.PersonId && x.OutTime == null);
@@ -238,6 +247,13 @@ namespace tcs_service.Controllers
         {
             var session = await _sessionRepo.Remove(x => x.Id == id);
             return Ok(session);
+        }
+
+        [HttpPost("upload")]
+        public async Task<IActionResult> UploadCSV(IFormFile csvFile)
+        {
+            var csvData = _csvParser.Parse(csvFile);
+            return Ok(await _unitSession.UploadSessions(csvData));
         }
     }
 }

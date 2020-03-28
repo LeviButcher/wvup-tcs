@@ -16,6 +16,7 @@ namespace tcs_service.Repos.Base
         Task<T> Find(Expression<Func<T, bool>> function);
 
         Task<T> Create(T t);
+        Task<int> Create(IEnumerable<T> t);
 
         Task<T> Update(T t);
 
