@@ -64,6 +64,9 @@ const SignInLookup = ({ navigate }: Props) => {
             <Link to="/dashboard/signins/semester">
               <Button align="left">Download Semesters Signins</Button>
             </Link>
+            <Link to="/dashboard/signins/upload">
+              <Button align="left">Upload Signins</Button>
+            </Link>
           </div>
         </Card>
 

@@ -1,16 +1,18 @@
-﻿#pragma warning disable 1591
+﻿﻿#pragma warning disable 1591
 
 using System;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using tcs_service.Helpers;
 using tcs_service.Models;
 using tcs_service.Models.DTOs;
 using tcs_service.Repos.Interfaces;
+using tcs_service.UnitOfWorks.Interfaces;
 
 namespace tcs_service.Controllers {
     [Route ("api/[controller]")]
@@ -23,10 +25,14 @@ namespace tcs_service.Controllers {
         private readonly ISessionReasonRepo _sessionReasonRepo;
         private readonly ISessionClassRepo _sessionClassRepo;
         readonly private IMapper _mapper;
+        readonly private ICSVParser<CSVSessionUpload> _csvParser;
+        private readonly IUnitOfWorkSession _unitSession;
 
         public SessionsController (ISessionRepo sessionRepo, ISemesterRepo semesterRepo, IPersonRepo personRepo,
-            ISessionReasonRepo sessionReasonRepo, ISessionClassRepo sessionClassRepo, IMapper mapper) {
+            ISessionReasonRepo sessionReasonRepo, ISessionClassRepo sessionClassRepo, IMapper mapper, ICSVParser<CSVSessionUpload> csvParser, IUnitOfWorkSession unitSession) {
             _mapper = mapper;
+            _csvParser = csvParser;
+            _unitSession = unitSession;
             _sessionRepo = sessionRepo;
             _semesterRepo = semesterRepo;
             _personRepo = personRepo;
@@ -203,6 +209,12 @@ namespace tcs_service.Controllers {
         public async Task<IActionResult> DeleteSession ([FromRoute] int id) {
             var session = await _sessionRepo.Remove (x => x.Id == id);
             return Ok (session);
+        }
+
+        [HttpPost ("upload")]
+        public async Task<IActionResult> UploadCSV (IFormFile csvFile) {
+            var csvData = _csvParser.Parse (csvFile);
+            return Ok (await _unitSession.UploadSessions (csvData));
         }
     }
 }

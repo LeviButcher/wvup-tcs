@@ -20,4 +20,10 @@
     <ProjectReference Include="..\tcs-service\tcs-service.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Include="test-utils/**/*.csv">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
 </Project>

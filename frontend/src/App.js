@@ -30,7 +30,8 @@ import {
   CreateReason,
   UpdateReason,
   CreateSignIn,
-  UpdateSignIn
+  UpdateSignIn,
+  UploadSignIns
 } from './pages/dashboard';
 import Theme from './theme.json';
 import NotFound from './pages/NotFound';
@@ -90,6 +91,7 @@ function App() {
               <CreateReason path="/admin/reason/create" />
               {/* $FlowFixMe */}
               <UpdateReason path="/admin/reason/update/:id" />
+              <UploadSignIns path="/signins/upload" />
               <NotFound default />
             </DashboardLayout>
           </IsAuthenticated>

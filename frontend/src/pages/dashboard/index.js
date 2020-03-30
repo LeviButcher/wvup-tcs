@@ -20,6 +20,7 @@ import CreateReason from './CreateReason';
 import UpdateReason from './UpdateReason';
 import CreateSignIn from './CreateSignIn';
 import UpdateSignIn from './UpdateSignIn';
+import UploadSignIns from './UploadSignIns';
 
 export {
   DashboardLayout,
@@ -43,5 +44,6 @@ export {
   CreateReason,
   UpdateReason,
   CreateSignIn,
-  UpdateSignIn
+  UpdateSignIn,
+  UploadSignIns
 };

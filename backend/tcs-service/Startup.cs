@@ -122,6 +122,8 @@ namespace tcs_service {
             services.AddScoped<ISessionClassRepo, SessionClassRepo> ();
             services.AddScoped<ISessionReasonRepo, SessionReasonRepo> ();
             services.AddScoped<IUnitOfWorkPerson, UnitOfWorkPerson> ();
+            services.AddScoped<ICSVParser<CSVSessionUpload>, CSVSessionUploadParser> ();
+            services.AddScoped<IUnitOfWorkSession, UnitOfWorkSession> ();
 
             services.AddSwaggerGen (c => {
                 c.SwaggerDoc ("v1", new OpenApiInfo { Title = "TCS API", Version = "v1" });
