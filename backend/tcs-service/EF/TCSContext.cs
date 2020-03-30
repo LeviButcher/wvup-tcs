@@ -1,11 +1,11 @@
+#pragma warning disable 1591
+
 using System;
 using Microsoft.EntityFrameworkCore;
 using tcs_service.Models;
 
-namespace tcs_service.EF
-{
-    public class TCSContext : DbContext
-    {
+namespace tcs_service.EF {
+    public class TCSContext : DbContext {
         public DbSet<ClassTour> ClassTours { get; set; }
 
         public DbSet<User> Users { get; set; }
@@ -28,52 +28,45 @@ namespace tcs_service.EF
 
         public DbSet<SessionClass> SessionClasses { get; set; }
 
-        public TCSContext()
-        {
+        public TCSContext () {
 
         }
 
-        public TCSContext(DbContextOptions options) : base(options)
-        {
-            try
-            {
-                Database.Migrate();
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex);
+        public TCSContext (DbContextOptions options) : base (options) {
+            try {
+                Database.Migrate ();
+            } catch (Exception ex) {
+                Console.WriteLine (ex);
             }
         }
 
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            base.OnConfiguring(optionsBuilder);
+        protected override void OnConfiguring (DbContextOptionsBuilder optionsBuilder) {
+            base.OnConfiguring (optionsBuilder);
         }
 
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
-            modelBuilder.Entity<SessionReason>().HasKey(key => new { key.SessionId, key.ReasonId });
+        protected override void OnModelCreating (ModelBuilder modelBuilder) {
+            modelBuilder.Entity<SessionReason> ().HasKey (key => new { key.SessionId, key.ReasonId });
 
-            modelBuilder.Entity<SessionClass>().HasKey(key => new { key.SessionId, key.ClassId });
+            modelBuilder.Entity<SessionClass> ().HasKey (key => new { key.SessionId, key.ClassId });
 
-            modelBuilder.Entity<Class>()
-            .Property(p => p.CRN)
-            .ValueGeneratedNever();
+            modelBuilder.Entity<Class> ()
+                .Property (p => p.CRN)
+                .ValueGeneratedNever ();
 
-            modelBuilder.Entity<Semester>()
-            .Property(p => p.Code)
-            .ValueGeneratedNever();
+            modelBuilder.Entity<Semester> ()
+                .Property (p => p.Code)
+                .ValueGeneratedNever ();
 
-            modelBuilder.Entity<Person>()
-             .Property(p => p.Id)
-             .ValueGeneratedNever();
+            modelBuilder.Entity<Person> ()
+                .Property (p => p.Id)
+                .ValueGeneratedNever ();
 
-            modelBuilder.Entity<Department>()
-            .Property(p => p.Code)
-            .ValueGeneratedNever();
+            modelBuilder.Entity<Department> ()
+                .Property (p => p.Code)
+                .ValueGeneratedNever ();
 
-            modelBuilder.Entity<Schedule>()
-            .HasKey(key => new { key.ClassCRN, key.PersonId, key.SemesterCode });
+            modelBuilder.Entity<Schedule> ()
+                .HasKey (key => new { key.ClassCRN, key.PersonId, key.SemesterCode });
         }
     }
 }

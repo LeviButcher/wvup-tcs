@@ -4,6 +4,8 @@
     <TargetFramework>netcoreapp2.2</TargetFramework>
     <RootNamespace>tcs_service</RootNamespace>
     <UserSecretsId>Secret-Sauce</UserSecretsId>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <WarningNotAsErrors>1591</WarningNotAsErrors>
     <LangVersion>7.1</LangVersion>
   </PropertyGroup>
 
@@ -13,6 +15,8 @@
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="6.1.1" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="2.2.4" />
     <PackageReference Include="Quartz" Version="3.0.7" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="5.0.0" />
+    <PackageReference Include="Swashbuckle.AspNetCore.Newtonsoft" Version="5.1.0" />
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="5.4.0" />
     <PackageReference Include="Microsoft.Extensions.Http" Version="2.2.0" />
   </ItemGroup>
