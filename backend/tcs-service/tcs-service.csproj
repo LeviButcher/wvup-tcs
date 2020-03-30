@@ -5,7 +5,6 @@
     <RootNamespace>tcs_service</RootNamespace>
     <UserSecretsId>Secret-Sauce</UserSecretsId>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <WarningNotAsErrors>1591</WarningNotAsErrors>
     <LangVersion>7.1</LangVersion>
   </PropertyGroup>
 
