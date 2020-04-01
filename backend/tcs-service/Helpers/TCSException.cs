@@ -1,14 +1,19 @@
-#pragma warning disable 1591
-
 using System;
 
-namespace tcs_service.Helpers {
+namespace tcs_service.Helpers
+{
+    /// <summary>The Exception for the TCS Application</summary>
+    /// This exception class should be used for any exceptions thrown within the TCS app.
     [Serializable]
-    public class TCSException : Exception {
-        public TCSException () {
+    public class TCSException : Exception
+    {
+        /// <summary>TCSException Constructor</summary>
+        public TCSException()
+        {
 
         }
 
-        public TCSException (string name) : base (name) { }
+        /// <summary>TCSException Constructor</summary>
+        public TCSException(string name) : base(name) { }
     }
 }

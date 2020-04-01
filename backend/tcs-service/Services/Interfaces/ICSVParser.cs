@@ -1,7 +1,10 @@
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Http;
 
-public interface ICSVParser<T>
+namespace tcs_service.Services
 {
-    IEnumerable<T> Parse(IFormFile file);
+    public interface ICSVParser<T>
+    {
+        IEnumerable<T> Parse(IFormFile file);
+    }
 }

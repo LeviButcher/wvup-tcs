@@ -1,6 +1,4 @@
-﻿#pragma warning disable 1591
-
-using System.IO;
+﻿using System.IO;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -8,7 +6,13 @@ using tcs_service.Models;
 using tcs_service.Repos.Interfaces;
 
 namespace tcs_service.EF {
+    /// <summary>Encompasses Initializing a database with sampledata</summary>
     public class DbInitializer {
+        /// <summary>Initialize the database with Sample Data</summary>
+        /// <remarks>
+        /// In production environments, it will only create a user to be able to log in with
+        /// In non-production environments, it will wipe the database then seed an array of sample data in the db
+        /// </remarks>
         public static void InitializeData (TCSContext context, IUserRepo userRepo, IHostingEnvironment env) {
             context.Database.Migrate ();
             if (!env.IsProduction ()) {

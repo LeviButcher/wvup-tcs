@@ -1,27 +1,28 @@
-#pragma warning disable 1591
-
-using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using tcs_service.Helpers;
 
-public class ErrorWrappingMiddleware {
+///<summary>ErrorWrappingMiddleware</summary>
+public class ErrorWrappingMiddleware
+{
     private readonly RequestDelegate _next;
-    private readonly ILogger<ErrorWrappingMiddleware> _logger;
 
-    public ErrorWrappingMiddleware (RequestDelegate next, ILogger<ErrorWrappingMiddleware> logger) {
+    ///<summary>ErrorWrappingMiddleware</summary>
+    public ErrorWrappingMiddleware(RequestDelegate next)
+    {
         _next = next;
-        _logger = logger ??
-            throw new ArgumentNullException (nameof (logger));
     }
 
-    public async Task Invoke (HttpContext context) {
-        try {
-            await _next.Invoke (context);
-        } catch (TCSException ex) {
-            // _logger.LogError(EventIds.GlobalException, ex, ex.Message);
+    ///<summary>ErrorWrappingMiddleware</summary>
+    public async Task Invoke(HttpContext context)
+    {
+        try
+        {
+            await _next.Invoke(context);
+        }
+        catch (TCSException ex)
+        {
 
             context.Response.StatusCode = 500;
 
@@ -29,9 +30,9 @@ public class ErrorWrappingMiddleware {
 
             var response = new { message = ex.Message };
 
-            var json = JsonConvert.SerializeObject (response);
+            var json = JsonConvert.SerializeObject(response);
 
-            await context.Response.WriteAsync (json);
+            await context.Response.WriteAsync(json);
         }
     }
 }
