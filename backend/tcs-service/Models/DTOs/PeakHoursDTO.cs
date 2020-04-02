@@ -1,25 +1,25 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
 namespace tcs_service.Models.DTO
 {
+    ///<summary>Represents the data used in the Peak Hours Report, which give a time and a count of visitors during that time</summary>
     public class PeakHoursDTO
     {
 
+        /// <summary>PeakHours Constructor</summary>
         public PeakHoursDTO(int hour, int count)
         {
             this.hour = hour;
-            this.Count = count;
+            Count = count;
         }
 
-        private int hour;
-        public String Hour => hourToString(hour);
+        readonly private int hour;
 
+        /// <summary>The Hour that sign in's took place in</summary>
+        public string Hour => HourToString(hour);
 
+        /// <summary>The Count of the amount of visitors during this time</summary>
         public int Count { get; set; }
-        private string hourToString(int hour)
+
+        private string HourToString(int hour)
         {
             switch (hour)
             {

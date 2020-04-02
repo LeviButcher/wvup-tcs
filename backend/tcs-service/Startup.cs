@@ -5,7 +5,6 @@ using System.IO;
 using System.Net.Http.Headers;
 using System.Text;
 using AutoMapper;
-using Helpers;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;

@@ -1,14 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace tcs_service.Models.Attributes
 {
+    ///<summary>Ensures that a Sign In inTime and outTime is valid</summary>
     [AttributeUsage(AttributeTargets.Property)]
     public class SignOutValidation : ValidationAttribute
     {
+        ///<summary>SignOutValidation Constructor</summary>
         public SignOutValidation(string dateToCompareToFieldName)
         {
             DateToCompareToFieldName = dateToCompareToFieldName;
@@ -16,6 +15,7 @@ namespace tcs_service.Models.Attributes
 
         private string DateToCompareToFieldName { get; set; }
 
+        ///<summary>Ensures that outTime is after the inTime property</summary>
         protected override ValidationResult IsValid(object value, ValidationContext validationContext)
         {
             if (value == null)

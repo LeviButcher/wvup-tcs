@@ -42,7 +42,7 @@ namespace tcs_service.Controllers {
         /// <response code="400">Username or password incorrect</response>
         [AllowAnonymous]
         [HttpPost ("authenticate")]
-        [ProducesResponseType (typeof (AuthDTO), 200)]
+        [ProducesResponseType (typeof (UserDto), 200)]
         [ProducesResponseType (typeof (ErrorMessage), 400)]
         public async Task<IActionResult> Authenticate ([FromBody] UserDto userParam) {
             var user = await _userRepo.Authenticate (userParam.Username, userParam.Password);
@@ -63,7 +63,7 @@ namespace tcs_service.Controllers {
             var tokenString = tokenHandler.WriteToken (token);
 
             // return basic user info (without password) and token to store client side
-            return Ok (new AuthDTO {
+            return Ok (new UserDto {
                 Id = user.Id,
                     Username = user.Username,
                     FirstName = user.FirstName,
