@@ -1,15 +1,14 @@
-using Microsoft.EntityFrameworkCore;
 using System.Linq;
+using Microsoft.EntityFrameworkCore;
 using tcs_service.Models;
 using tcs_service.Repos.Base;
 using tcs_service.Repos.Interfaces;
 
-namespace tcs_service.Repos
-{
-    public class SemesterRepo : BaseRepo<Semester>, ISemesterRepo
-    {
-        public SemesterRepo(DbContextOptions options) : base(options) { }
+namespace tcs_service.Repos {
+    ///<summary>Repo for the Semester Table</summary>
+    public class SemesterRepo : BaseRepo<Semester>, ISemesterRepo {
 
-        protected override IQueryable<Semester> Include(DbSet<Semester> set) => set;
+        ///<summary>SemesterRepo Constructor</summary>
+        public SemesterRepo (DbContextOptions options) : base (options) { }
     }
 }
