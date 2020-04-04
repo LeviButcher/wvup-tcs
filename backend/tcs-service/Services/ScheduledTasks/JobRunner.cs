@@ -1,29 +1,25 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using Quartz;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
+using Quartz;
 
-namespace tcs_service.Services.ScheduledTasks
-{
+namespace tcs_service.Services.ScheduledTasks {
+    /// <summary>Job Runner</summary>
     [DisallowConcurrentExecution]
-    public class JobRunner : IJob
-    {
+    public class JobRunner : IJob {
         private readonly IServiceProvider _serviceProvider;
 
-        public JobRunner(IServiceProvider serviceProvider)
-        {
+        /// <summary>Job Runner Constructor</summary>
+        public JobRunner (IServiceProvider serviceProvider) {
             _serviceProvider = serviceProvider;
         }
 
-        public async Task Execute(IJobExecutionContext context)
-        {
-            using (var scope = _serviceProvider.CreateScope())
-            {
-                var job = scope.ServiceProvider.GetRequiredService(context.JobDetail.JobType) as IJob;
+        /// <summary>Execute a Job</summary>
+        public async Task Execute (IJobExecutionContext context) {
+            using (var scope = _serviceProvider.CreateScope ()) {
+                var job = scope.ServiceProvider.GetRequiredService (context.JobDetail.JobType) as IJob;
 
-                await job.Execute(context);
+                await job.Execute (context);
             }
         }
     }

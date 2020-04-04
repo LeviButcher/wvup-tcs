@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -8,13 +7,15 @@ using tcs_service.Models;
 using tcs_service.Repos.Interfaces;
 using tcs_service.UnitOfWorks.Interfaces;
 
+/// <summary>UnitOfWorkSession</summary>
 public class UnitOfWorkSession : IUnitOfWorkSession {
     private readonly IPersonRepo personRepo;
     private readonly IReasonRepo reasonRepo;
     private readonly ISessionRepo sessionRepo;
     private readonly IClassRepo classRepo;
-    public readonly ISemesterRepo semesterRepo;
+    private readonly ISemesterRepo semesterRepo;
 
+    /// <summary>UnitOfWorkSession Constructor</summary>
     public UnitOfWorkSession (IPersonRepo personRepo, IReasonRepo reasonRepo, ISessionRepo sessionRepo, IClassRepo classRepo, ISemesterRepo semesterRepo) {
         this.semesterRepo = semesterRepo;
         this.personRepo = personRepo;
@@ -23,6 +24,7 @@ public class UnitOfWorkSession : IUnitOfWorkSession {
         this.classRepo = classRepo;
     }
 
+    /// <summary>Uploads a List of CSVSessionUpload to the database</summary>
     public async Task<int> UploadSessions (IEnumerable<CSVSessionUpload> sessionUploads) {
         var errorList = new List<string> ();
         var personExistsErrors = (await Task.WhenAll (sessionUploads.Select (async x => {
