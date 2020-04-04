@@ -1,9 +1,11 @@
 using Microsoft.AspNetCore.Builder;
 
-namespace Helpers
+namespace tcs_service.Helpers
 {
+    ///<summary>MiddlerwareExtensions</summary>
     public static class MiddlewareExtensions
     {
+        ///<summary>UseErrorWrapping</summary>
         public static IApplicationBuilder UseErrorWrapping(
             this IApplicationBuilder builder)
         {

@@ -1,21 +1,20 @@
-using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using tcs_service.Helpers;
 
+///<summary>ErrorWrappingMiddleware</summary>
 public class ErrorWrappingMiddleware
 {
     private readonly RequestDelegate _next;
-    private readonly ILogger<ErrorWrappingMiddleware> _logger;
 
-    public ErrorWrappingMiddleware(RequestDelegate next, ILogger<ErrorWrappingMiddleware> logger)
+    ///<summary>ErrorWrappingMiddleware</summary>
+    public ErrorWrappingMiddleware(RequestDelegate next)
     {
         _next = next;
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
+    ///<summary>ErrorWrappingMiddleware</summary>
     public async Task Invoke(HttpContext context)
     {
         try
@@ -24,7 +23,6 @@ public class ErrorWrappingMiddleware
         }
         catch (TCSException ex)
         {
-            // _logger.LogError(EventIds.GlobalException, ex, ex.Message);
 
             context.Response.StatusCode = 500;
 

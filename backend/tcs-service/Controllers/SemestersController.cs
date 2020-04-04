@@ -1,28 +1,27 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
+﻿using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
+using tcs_service.Models;
 using tcs_service.Repos.Interfaces;
 
-namespace tcs_service.Controllers
-{
-    [Route("api/[controller]")]
-    [ApiController]
-    public class SemestersController : ControllerBase
-    {
-        private ISemesterRepo _iRepo;
+namespace tcs_service.Controllers {
 
-        public SemestersController(ISemesterRepo iRepo)
-        {
+    /// <summary>Semesters API</summary>
+    [Route ("api/[controller]")]
+    [ApiController]
+    public class SemestersController : ControllerBase {
+        readonly private ISemesterRepo _iRepo;
+
+        /// <summary>Semesters Controller Constructor</summary>
+        public SemestersController (ISemesterRepo iRepo) {
             _iRepo = iRepo;
         }
 
+        /// <summary>Retrieves all semesters</summary>
+        /// <response code="200">Returns list of Semesters</response>
         [HttpGet]
-        public IActionResult Semesters()
-        {
-            return Ok(_iRepo.GetAll());
+        [ProducesResponseType (typeof (IEnumerable<Semester>), 200)]
+        public IActionResult Semesters () {
+            return Ok (_iRepo.GetAll ());
         }
     }
 }

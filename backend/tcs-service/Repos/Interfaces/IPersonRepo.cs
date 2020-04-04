@@ -1,9 +1,7 @@
 using tcs_service.Models;
 using tcs_service.Repos.Base;
 
-namespace tcs_service.Repos.Interfaces
-{
-    public interface IPersonRepo : IRepo<Person>
-    {
-    }
+namespace tcs_service.Repos.Interfaces {
+    ///<summary>Repo for the Person Table</summary>
+    public interface IPersonRepo : IRepo<Person> { }
 }

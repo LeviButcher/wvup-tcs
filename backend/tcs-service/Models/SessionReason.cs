@@ -1,24 +1,28 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace tcs_service.Models
-{
-    public class SessionReason
-    {
+namespace tcs_service.Models {
+    ///<summary>Represents the Session Reason table</summary>
+    /// Mapping table of a M:M relationship
+    public class SessionReason {
+        ///<summary>The Id of the Reason chosen during signing in</summary>
         [Key]
-        [Column(Order = 1)]
+        [Column (Order = 1)]
         [Required]
         public int ReasonId { get; set; }
 
-        [ForeignKey(nameof(ReasonId))]
+        ///<summary>The actual Reason</summary>
+        [ForeignKey (nameof (ReasonId))]
         public Reason Reason { get; set; }
 
+        ///<summary>The Id of the session this reason was chosen for</summary>
         [Key]
-        [Column(Order = 2)]
+        [Column (Order = 2)]
         [Required]
         public int SessionId { get; set; }
 
-        [ForeignKey(nameof(SessionId))]
+        ///<summary>The actual session</summary>
+        [ForeignKey (nameof (SessionId))]
         public Session Session { get; set; }
     }
 }
