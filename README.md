@@ -2,9 +2,9 @@
 
 # Tutoring Center System
 
-WVUP Tutoring Center System
+This project was developed by both Sean Rickard and Levi Butcher. It allows Students at WVUP to Sign Into the tutoring center using their WVUP Id card or their email. Tutoring Center Faculty can then later search sign ins or generate reports such as how many sign ins happen during a given time period.
 
-# Working with tcs
+# Working with TCS
 
 It's recommended to use vscode while working with TCS for the best experience. At least with the frontend.
 
