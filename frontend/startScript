@@ -1,6 +1,6 @@
 #!/bin/sh
 
 set -e
-npm i -g serve
+npm i -g http-server
 npm run build
-serve -s build
+http-server build -p 5000
